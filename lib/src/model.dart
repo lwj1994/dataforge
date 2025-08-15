@@ -1,3 +1,5 @@
+import 'package:collection/collection.dart';
+
 class ParseResult {
   final String outputPath;
   final String partOf;
@@ -14,65 +16,35 @@ class ParseResult {
 class ClassInfo {
   final String name;
   final String mixinName;
-  final String fromMapName;
-  final String toMapName;
-  final bool fromMap;
   final List<FieldInfo> fields;
+  final bool includeFromJson;
+  final bool includeToJson;
+  final List<String> genericParameters;
 
-//<editor-fold desc="Data Methods">
   const ClassInfo({
     required this.name,
     required this.mixinName,
-    required this.fromMapName,
-    required this.toMapName,
-    required this.fromMap,
     required this.fields,
+    this.includeFromJson = true,
+    this.includeToJson = true,
+    this.genericParameters = const [],
   });
-
-  @override
-  bool operator ==(Object other) =>
-      identical(this, other) ||
-      (other is ClassInfo &&
-          runtimeType == other.runtimeType &&
-          name == other.name &&
-          mixinName == other.mixinName &&
-          fromMapName == other.fromMapName &&
-          toMapName == other.toMapName &&
-          fromMap == other.fromMap &&
-          fields == other.fields);
-
-  @override
-  int get hashCode =>
-      name.hashCode ^
-      mixinName.hashCode ^
-      fromMapName.hashCode ^
-      toMapName.hashCode ^
-      fromMap.hashCode ^
-      fields.hashCode;
-
-  @override
-  String toString() {
-    return 'ClassInfo{' ' name: $name,' ' mixinName: $mixinName,' ' fromMapName: $fromMapName,' ' toMapName: $toMapName,' +
-        ' fromMap: $fromMap,' +
-        ' fields: $fields,' +
-        '}';
-  }
 
   ClassInfo copyWith({
     String? name,
     String? mixinName,
-    String? fromMapName,
-    String? toMapName,
-    bool? fromMap,
     List<FieldInfo>? fields,
+    bool? includeFromJson,
+    bool? includeToJson,
+    List<String>? genericParameters,
   }) {
     return ClassInfo(
       name: name ?? this.name,
       mixinName: mixinName ?? this.mixinName,
-      fromMapName: fromMapName ?? this.fromMapName,
-      toMapName: toMapName ?? this.toMapName,
-      fromMap: fromMap ?? this.fromMap,
       fields: fields ?? this.fields,
+      includeFromJson: includeFromJson ?? this.includeFromJson,
+      includeToJson: includeToJson ?? this.includeToJson,
+      genericParameters: genericParameters ?? this.genericParameters,
     );
   }
 
@@ -80,115 +52,158 @@ class ClassInfo {
     return {
       'name': name,
       'mixinName': mixinName,
-      'fromMapName': fromMapName,
-      'toMapName': toMapName,
-      'fromMap': fromMap,
-      'fields': fields,
+      'fields': fields.map((x) => x.toMap()).toList(),
+      'includeFromJson': includeFromJson,
+      'includeToJson': includeToJson,
+      'genericParameters': genericParameters,
     };
   }
 
   factory ClassInfo.fromMap(Map<String, dynamic> map) {
+    // Support legacy fields for backward compatibility
+    final legacyFromMap = map['fromMap'] as bool? ?? true;
+    final legacyIncludeFromMap =
+        map['includeFromMap'] as bool? ?? legacyFromMap;
+    final legacyIncludeToMap = map['includeToMap'] as bool? ?? legacyFromMap;
+
     return ClassInfo(
-      name: map['name'] as String,
-      mixinName: map['mixinName'] as String,
-      fromMapName: map['fromMapName'] as String,
-      toMapName: map['toMapName'] as String,
-      fromMap: map['fromMap'] as bool,
-      fields: map['fields'] as List<FieldInfo>,
+      name: map['name'] as String? ?? '',
+      mixinName: map['mixinName'] as String? ?? '',
+      fields: (map['fields'] as List<dynamic>?)
+              ?.map((e) => FieldInfo.fromMap(e as Map<String, dynamic>))
+              .toList() ??
+          [],
+      includeFromJson: map['includeFromJson'] as bool? ?? legacyIncludeFromMap,
+      includeToJson: map['includeToJson'] as bool? ?? legacyIncludeToMap,
+      genericParameters: (map['genericParameters'] as List<dynamic>?)
+              ?.map((e) => e.toString())
+              .toList() ??
+          [],
     );
   }
 
-//</editor-fold>
+  @override
+  String toString() {
+    return 'ClassInfo(name: $name, mixinName: $mixinName, fields: $fields, includeFromJson: $includeFromJson, includeToJson: $includeToJson, genericParameters: $genericParameters)';
+  }
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+    return other is ClassInfo &&
+        other.name == name &&
+        other.mixinName == mixinName &&
+        const DeepCollectionEquality().equals(other.fields, fields) &&
+        other.includeFromJson == includeFromJson &&
+        other.includeToJson == includeToJson &&
+        const DeepCollectionEquality()
+            .equals(other.genericParameters, genericParameters);
+  }
+
+  @override
+  int get hashCode => Object.hashAll([
+        name,
+        mixinName,
+        const DeepCollectionEquality().hash(fields),
+        includeFromJson,
+        includeToJson,
+        const DeepCollectionEquality().hash(genericParameters),
+      ]);
 }
 
 class FieldInfo {
-  final String defaultValue;
   final String name;
   final String type;
-  final bool isFunction;
-  final bool isRecord;
   final bool isFinal;
+  final bool isFunction;
   final JsonKeyInfo? jsonKey;
-
-  //<editor-fold desc="Data Methods">
+  final bool isRecord;
+  final String defaultValue;
 
   const FieldInfo({
-    this.defaultValue = "",
     required this.name,
-    this.type = "dynamic",
-    this.isFinal = true,
-    this.isFunction = false,
-    this.isRecord = false,
+    required this.type,
+    required this.isFinal,
+    required this.isFunction,
     this.jsonKey,
+    required this.isRecord,
+    required this.defaultValue,
   });
 
-  @override
-  bool operator ==(Object other) =>
-      identical(this, other) ||
-      (other is FieldInfo &&
-          runtimeType == other.runtimeType &&
-          defaultValue == other.defaultValue &&
-          name == other.name &&
-          type == other.type &&
-          isFinal == other.isFinal &&
-          jsonKey == other.jsonKey);
-
-  @override
-  int get hashCode =>
-      defaultValue.hashCode ^
-      name.hashCode ^
-      type.hashCode ^
-      isFinal.hashCode ^
-      jsonKey.hashCode;
-
-  @override
-  String toString() {
-    return 'FieldInfo{'
-        ' defaultValue: $defaultValue,'
-        ' name: $name,'
-        ' type: $type,'
-        ' isFinal: $isFinal,'
-        ' jsonKey: $jsonKey,'
-        '}';
-  }
-
   FieldInfo copyWith({
-    String? defaultValue,
     String? name,
     String? type,
     bool? isFinal,
+    bool? isFunction,
     JsonKeyInfo? jsonKey,
+    bool? isRecord,
+    String? defaultValue,
   }) {
     return FieldInfo(
-      defaultValue: defaultValue ?? this.defaultValue,
       name: name ?? this.name,
       type: type ?? this.type,
       isFinal: isFinal ?? this.isFinal,
+      isFunction: isFunction ?? this.isFunction,
       jsonKey: jsonKey ?? this.jsonKey,
+      isRecord: isRecord ?? this.isRecord,
+      defaultValue: defaultValue ?? this.defaultValue,
     );
   }
 
   Map<String, dynamic> toMap() {
     return {
-      'defaultValue': defaultValue,
       'name': name,
       'type': type,
       'isFinal': isFinal,
-      'jsonKey': jsonKey,
+      'isFunction': isFunction,
+      'jsonKey': jsonKey?.toMap(),
+      'isRecord': isRecord,
+      'defaultValue': defaultValue,
     };
   }
 
-  factory FieldInfo.fromMap(Map<String, dynamic> map) {
+  static FieldInfo fromMap(Map<String, dynamic> map) {
     return FieldInfo(
-      defaultValue: map['defaultValue'] as String,
-      name: map['name'] as String,
-      type: map['type'] as String,
-      isFinal: map['isFinal'] as bool,
-      jsonKey: map['jsonKey'] as JsonKeyInfo,
+      name: map['name'] as String? ?? '',
+      type: map['type'] as String? ?? 'dynamic',
+      isFinal: map['isFinal'] as bool? ?? false,
+      isFunction: map['isFunction'] as bool? ?? false,
+      jsonKey: map['jsonKey'] != null
+          ? JsonKeyInfo.fromMap(map['jsonKey'] as Map<String, dynamic>)
+          : null,
+      isRecord: map['isRecord'] as bool? ?? false,
+      defaultValue: map['defaultValue'] as String? ?? '',
     );
   }
 
-//</editor-fold>
+  @override
+  String toString() {
+    return 'FieldInfo(name: $name, type: $type, isFinal: $isFinal, isFunction: $isFunction, jsonKey: $jsonKey, isRecord: $isRecord, defaultValue: $defaultValue)';
+  }
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+    return other is FieldInfo &&
+        other.name == name &&
+        other.type == type &&
+        other.isFinal == isFinal &&
+        other.isFunction == isFunction &&
+        other.jsonKey == jsonKey &&
+        other.isRecord == isRecord &&
+        other.defaultValue == defaultValue;
+  }
+
+  @override
+  int get hashCode => Object.hashAll([
+        name,
+        type,
+        isFinal,
+        isFunction,
+        jsonKey,
+        isRecord,
+        defaultValue,
+      ]);
 }
 
 class JsonKeyInfo {
@@ -196,53 +211,33 @@ class JsonKeyInfo {
   final List<String> alternateNames;
   final String readValue;
   final bool ignore;
+  final String converter;
+  final bool? includeIfNull;
 
-//<editor-fold desc="Data Methods">
   const JsonKeyInfo({
     required this.name,
     required this.alternateNames,
     required this.readValue,
     required this.ignore,
+    this.converter = '',
+    this.includeIfNull,
   });
-
-  @override
-  bool operator ==(Object other) =>
-      identical(this, other) ||
-      (other is JsonKeyInfo &&
-          runtimeType == other.runtimeType &&
-          name == other.name &&
-          alternateNames == other.alternateNames &&
-          readValue == other.readValue &&
-          ignore == other.ignore);
-
-  @override
-  int get hashCode =>
-      name.hashCode ^
-      alternateNames.hashCode ^
-      readValue.hashCode ^
-      ignore.hashCode;
-
-  @override
-  String toString() {
-    return 'JsonKeyInfo{'
-        ' name: $name,'
-        ' alternateNames: $alternateNames,'
-        ' readValue: $readValue,'
-        ' ignore: $ignore,'
-        '}';
-  }
 
   JsonKeyInfo copyWith({
     String? name,
     List<String>? alternateNames,
     String? readValue,
     bool? ignore,
+    String? converter,
+    bool? includeIfNull,
   }) {
     return JsonKeyInfo(
       name: name ?? this.name,
       alternateNames: alternateNames ?? this.alternateNames,
       readValue: readValue ?? this.readValue,
       ignore: ignore ?? this.ignore,
+      converter: converter ?? this.converter,
+      includeIfNull: includeIfNull ?? this.includeIfNull,
     );
   }
 
@@ -252,17 +247,50 @@ class JsonKeyInfo {
       'alternateNames': alternateNames,
       'readValue': readValue,
       'ignore': ignore,
+      'converter': converter,
+      'includeIfNull': includeIfNull,
     };
   }
 
-  factory JsonKeyInfo.fromMap(Map<String, dynamic> map) {
+  static JsonKeyInfo fromMap(Map<String, dynamic> map) {
     return JsonKeyInfo(
-      name: map['name'] as String,
-      alternateNames: map['alternateNames'] as List<String>,
-      readValue: map['readValue'] as String,
-      ignore: map['ignore'] as bool,
+      name: map['name'] as String? ?? '',
+      alternateNames: (map['alternateNames'] as List<dynamic>?)
+              ?.map((e) => e.toString())
+              .toList() ??
+          [],
+      readValue: map['readValue'] as String? ?? '',
+      ignore: map['ignore'] as bool? ?? false,
+      converter: map['converter'] as String? ?? '',
+      includeIfNull: map['includeIfNull'] as bool?,
     );
   }
 
-//</editor-fold>
+  @override
+  String toString() {
+    return 'JsonKeyInfo(name: $name, alternateNames: $alternateNames, readValue: $readValue, ignore: $ignore, converter: $converter, includeIfNull: $includeIfNull)';
+  }
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+    return other is JsonKeyInfo &&
+        other.name == name &&
+        const DeepCollectionEquality()
+            .equals(other.alternateNames, alternateNames) &&
+        other.readValue == readValue &&
+        other.ignore == ignore &&
+        other.converter == converter &&
+        other.includeIfNull == includeIfNull;
+  }
+
+  @override
+  int get hashCode => Object.hashAll([
+        name,
+        const DeepCollectionEquality().hash(alternateNames),
+        readValue,
+        ignore,
+        converter,
+        includeIfNull,
+      ]);
 }

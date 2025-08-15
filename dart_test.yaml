@@ -1,0 +1,5 @@
+# Dart test configuration
+# Exclude model files from being treated as test files
+test_on: vm
+exclude:
+  - "test/models/**"
