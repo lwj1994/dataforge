@@ -1,14 +1,10 @@
 class GlobalConfig {
-  final String fromMapName;
-  final String toMapName;
-  final bool includeFromMap;
-  final bool includeToMap;
+  final bool includeFromJson;
+  final bool includeToJson;
 
   const GlobalConfig({
-    this.fromMapName = "fromMap",
-    this.toMapName = "toMap",
-    this.includeFromMap = false,
-    this.includeToMap = false,
+    this.includeFromJson = true,
+    this.includeToJson = true,
   });
 }
 

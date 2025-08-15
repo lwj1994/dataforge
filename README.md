@@ -1,55 +1,110 @@
-# dart_data_class_gen
+# Dart Data Class Generator
 
-The speed of `dart_build_runner` is extremely slow, especially in large-scale projects. Therefore,
-this script was developed to enable rapid generation.
+[![Pub Version](https://img.shields.io/pub/v/data_class_gen)](https://pub.dev/packages/data_class_gen)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-## Usage
+A high-performance Dart data class code generator that's multiple times faster than `build_runner`.
 
-1. **Dependency Setup**
+## Features
 
-   First, add `data_class_annotation` to your `pubspec.yaml`:
+- ⚡ **Lightning Fast**: Multiple times faster than `build_runner`
+- 🎯 **Zero Configuration**: Works out of the box
+- 📦 **Complete**: Auto-generates `copyWith`, `==`, `hashCode`, `toJson`, `toString`
+- 🔄 **Automatic `fromJson`**: Automatically adds `fromJson` factory method to original file when `includeFromJson` is true
+- 🔧 **Flexible**: Supports nested objects, collections, custom field mapping
+
+## Installation
+
+Add dependency to `pubspec.yaml`:
 
 ```yaml
-  data_class_annotation:
+dependencies:
+  dataclass_annotation:
     git:
       url: https://github.com/lwj1994/dart_data_class_gen
       ref: main
       path: annotation
 ```
 
-    Then, install the CLI tool:
+Install CLI tool:
 
-```shell
+```bash
 dart pub global activate --source git https://github.com/lwj1994/dart_data_class_gen
 ```
 
-2. **Add Annotations to the Model**
+## Quick Start
 
-   Incorporate the necessary annotations into your model class as shown below:
+Create a data class:
 
 ```dart
-part 'model.data.dart';
+import 'package:data_class_annotation/data_class_annotation.dart';
 
-@DataClass(fromMap: true)
-class Bean with _BeanMixin {
+part 'user.data.dart';
+
+@DataClass(includeFromJson: true, includeToJson: true)
+class User with _User {
   @override
-  @JsonKey(name: "name", readValue: Bean.redValue)
   final String name;
+  
+  @override
+  @JsonKey(name: "user_age")
+  final int age;
+  
+  @override
+  final List<String> hobbies;
 
-  static Object? redValue(Map map, String key) {
-    return map[key];
-  }
-
-  Bean({
-    this.name = "a",
+  const User({
+    required this.name,
+    this.age = 0,
+    this.hobbies = const [],
   });
+
+  factory User.fromJson(Map<String, dynamic> json) => _User.fromJson(json);
 }
 ```
 
-3. **Execute the CLI**
+Generate code:
 
-   Run the following command in the terminal to generate the required code:
-
-```shell
+```bash
 data_class_gen .
-``` 
+```
+
+Use generated methods:
+
+```dart
+final user = User(name: "John", age: 25);
+final updated = user.copyWith(age: 26);
+final json = user.toJson();
+final fromJson = User.fromJson(json);
+print(user.toString()); // User(name: John, age: 25, hobbies: [])
+```
+
+## Annotations
+
+**@DataClass**: Configure code generation
+```dart
+@DataClass(includeFromJson: true, includeToJson: true)
+```
+
+**@JsonKey**: Customize field serialization
+```dart
+@JsonKey(name: "custom_name")           // Rename field
+@JsonKey(ignore: true)                  // Skip field
+@JsonKey(alternateNames: ["alt1"])      // Multiple names
+@JsonKey(includeIfNull: false)          // Exclude null values from JSON
+```
+
+## Supported Types
+
+- Basic: `String`, `int`, `double`, `bool`, optional types
+- Collections: `List<T>`, `Set<T>`, `Map<K, V>`
+- Complex: Nested objects, custom classes
+
+## Development
+
+```bash
+git clone https://github.com/lwj1994/dart_data_class_gen.git
+cd dart_data_class_gen
+dart pub get
+dart test
+```

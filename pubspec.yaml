@@ -1,24 +1,26 @@
 name: data_class_gen
-description: A sample command-line application.
-version: 0.0.1
+description: A Dart code generator that creates data classes with JSON serialization support from annotated classes.
+version: 0.1.0-dev.0
+homepage: https://github.com/your_username/dart_data_class_gen
+repository: https://github.com/your_username/dart_data_class_gen
+issue_tracker: https://github.com/your_username/dart_data_class_gen/issues
+documentation: https://github.com/your_username/dart_data_class_gen#readme
+publish_to: none
 executables:
   data_class_gen:
-# repository: https://github.com/my_org/my_repo
 
 environment:
   sdk: ^3.0.0
 
 # Add regular dependencies here.
 dependencies:
-  # path: ^1.8.0
-  analyzer: ">=7.0.0"
-  collection: ">=1.17.0"
-  path: ">=1.7.0"
-  args:
+  analyzer: ^8.0.0
+  collection: ^1.17.0
+  path: ^1.7.0
+  args: ^2.7.0
   data_class_annotation:
-    path: "annotation"
+    path: ./annotation
 
 dev_dependencies:
   lints: ^5.0.0
   test: ^1.25.15
-

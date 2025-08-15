@@ -1,0 +1,172 @@
+import 'package:data_class_annotation/data_class_annotation.dart';
+import 'package:collection/collection.dart';
+
+part 'nested_objects.data.dart';
+
+@DataClass()
+class Address with _Address {
+  @override
+  final String street;
+  @override
+  final String city;
+  @override
+  final String? state;
+  @override
+  final String zipCode;
+  @override
+  final String country;
+  @override
+  @JsonKey(name: 'is_primary')
+  final bool isPrimary;
+
+  const Address({
+    required this.street,
+    required this.city,
+    this.state,
+    required this.zipCode,
+    required this.country,
+    required this.isPrimary,
+  });
+
+  factory Address.fromJson(Map<String, dynamic> json) {
+    return _Address.fromJson(json);
+  }
+}
+
+@DataClass()
+class Contact with _Contact {
+  @override
+  final String email;
+  @override
+  final String? phone;
+  @override
+  @JsonKey(name: 'contact_type')
+  final String contactType;
+
+  const Contact({
+    required this.email,
+    this.phone,
+    required this.contactType,
+  });
+
+  factory Contact.fromJson(Map<String, dynamic> json) {
+    return _Contact.fromJson(json);
+  }
+}
+
+@DataClass()
+class Company with _Company {
+  @override
+  final String name;
+  @override
+  final Address headquarters;
+  @override
+  final List<Address>? branches;
+  @override
+  final Contact primaryContact;
+  @override
+  final List<Contact>? additionalContacts;
+
+  const Company({
+    required this.name,
+    required this.headquarters,
+    this.branches,
+    required this.primaryContact,
+    this.additionalContacts,
+  });
+
+  factory Company.fromJson(Map<String, dynamic> json) {
+    return _Company.fromJson(json);
+  }
+}
+
+@DataClass()
+class NestedObjects with _NestedObjects {
+  @override
+  final String name;
+  @override
+  final Address homeAddress;
+  @override
+  final Address? workAddress;
+  @override
+  final List<Address> previousAddresses;
+  @override
+  final Map<String, Address>? namedAddresses;
+  @override
+  final Contact primaryContact;
+  @override
+  final List<Contact>? contacts;
+  @override
+  final Company? employer;
+  @override
+  @JsonKey(readValue: NestedObjects._readValue)
+  final Address? customAddress;
+  @override
+  @JsonKey(readValue: NestedObjects._readValue)
+  final List<Contact>? parsedContacts;
+
+  const NestedObjects({
+    required this.name,
+    required this.homeAddress,
+    this.workAddress,
+    required this.previousAddresses,
+    this.namedAddresses,
+    required this.primaryContact,
+    this.contacts,
+    this.employer,
+    this.customAddress,
+    this.parsedContacts,
+  });
+
+  factory NestedObjects.fromJson(Map<String, dynamic> json) {
+    return _NestedObjects.fromJson(json);
+  }
+
+  static Object? _readValue(Map<dynamic, dynamic> map, String key) {
+    final value = map[key];
+
+    switch (key) {
+      case 'customAddress':
+        if (value == null) return null;
+        if (value is Map<String, dynamic>) {
+          return value; // Return Map, let generated code handle conversion
+        }
+        if (value is String) {
+          // Parse address from string format: "street,city,zipCode,country"
+          final parts = value.split(',');
+          if (parts.length >= 4) {
+            return {
+              'street': parts[0].trim(),
+              'city': parts[1].trim(),
+              'zipCode': parts[2].trim(),
+              'country': parts[3].trim(),
+              'is_primary': false,
+            };
+          }
+        }
+        return null;
+
+      case 'parsedContacts':
+        if (value == null) return null;
+        if (value is List) {
+          return value.whereType<Map<String, dynamic>>().toList();
+        }
+        if (value is String) {
+          // Parse contacts from string format: "email1:phone1;email2:phone2"
+          final contactStrings = value.split(';');
+          return contactStrings.map((contactStr) {
+            final parts = contactStr.split(':');
+            return {
+              'email': parts[0].trim(),
+              'phone': parts.length > 1 ? parts[1].trim() : null,
+              'contact_type': 'parsed',
+            };
+          }).toList();
+        }
+        return null;
+
+      default:
+        return null;
+    }
+  }
+}

@@ -1,6 +1,17 @@
 // @author luwenjie on 20/04/2025 12:34:21
 
+// Extension for type detection
 extension StringExtension on String {
+  bool isDateTime() => this == 'DateTime' || startsWith('DateTime');
+  bool isUri() => this == 'Uri';
+  bool isDuration() => this == 'Duration';
+  bool isBigInt() => this == 'BigInt';
+
+  bool isPrimitiveType() {
+    const primitives = {'String', 'int', 'double', 'bool', 'num'};
+    return primitives.contains(replaceAll('?', ''));
+  }
+
   bool isMap() {
     final index = indexOf("<");
     if (index == -1) return false;
