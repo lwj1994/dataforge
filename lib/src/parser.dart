@@ -4,11 +4,9 @@ import 'package:analyzer/dart/analysis/results.dart';
 import 'package:analyzer/dart/analysis/utilities.dart';
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:collection/collection.dart';
-import 'package:data_class_annotation/data_class_annotation.dart';
 import 'package:path/path.dart' as p;
 
 import 'model.dart';
-import 'config_loader.dart';
 
 /// Parse Dart files and extract DataClass annotation information
 ///
@@ -29,29 +27,14 @@ class Parser {
   /// Optional output directory
   final String? outputDirectory;
 
-  /// Global configuration
-  late final GlobalConfig _config;
-
   /// Cache for frequently used calculation results
   final Map<String, bool> _annotationCache = {};
 
   /// Create parser instance
   ///
   /// [path] must be a valid Dart file path
-  /// [configPath] optional configuration file path
   /// [outputDirectory] optional output directory
-  Parser(this.path, {String? configPath, this.outputDirectory}) {
-    try {
-      _config =
-          ConfigLoader.loadFromFile(configPath ?? 'data_class_config.json');
-    } catch (e) {
-      print('Warning: Failed to load config, using defaults: $e');
-      _config = GlobalConfig(
-        includeFromJson: true,
-        includeToJson: true,
-      );
-    }
-  }
+  Parser(this.path, {this.outputDirectory});
 
   /// Check if it's a DataClass annotation
   bool _isDataClassAnnotation(String name) {
@@ -144,22 +127,26 @@ class Parser {
 
             switch (name) {
               case "fromMap":
+                // Legacy support: fromMap controls both includeFromJson/toJson
+                // Global config no longer overrides these; default to true
                 if (expressionSource == "null") {
-                  fromMap = _config.includeFromJson;
+                  fromMap = true;
                 } else {
                   fromMap = expressionSource == "true";
                 }
                 break;
               case "includeFromJson":
+                // If null, default to true regardless of global config
                 if (expressionSource == "null") {
-                  includeFromJson = _config.includeFromJson;
+                  includeFromJson = true;
                 } else {
                   includeFromJson = expressionSource == "true";
                 }
                 break;
               case "includeToJson":
+                // If null, default to true regardless of global config
                 if (expressionSource == "null") {
-                  includeToJson = _config.includeToJson;
+                  includeToJson = true;
                 } else {
                   includeToJson = expressionSource == "true";
                 }
@@ -324,22 +311,19 @@ class Parser {
           if (field.jsonKey?.ignore == true) {
             final isNullable = field.type.endsWith('?');
             final hasDefaultValue = field.defaultValue.isNotEmpty;
-            
+
             if (!isNullable && !hasDefaultValue) {
               throw ArgumentError(
-                'Field "${field.name}" in class "$className" is marked as @JsonKey(ignore: true) '
-                'but is not nullable and has no default value. '
-                'Ignored fields must be either nullable (${field.type}?) or have a default value in the constructor.'
-              );
+                  'Field "${field.name}" in class "$className" is marked as @JsonKey(ignore: true) '
+                  'but is not nullable and has no default value. '
+                  'Ignored fields must be either nullable (${field.type}?) or have a default value in the constructor.');
             }
           }
         }
 
         // Handle backward compatibility: if new parameters are not specified, use fromMap parameter or configuration defaults
-        final finalIncludeFromJson =
-            includeFromJson ?? fromMap ?? _config.includeFromJson;
-        final finalIncludeToJson =
-            includeToJson ?? fromMap ?? _config.includeToJson;
+        final finalIncludeFromJson = includeFromJson ?? fromMap ?? true;
+        final finalIncludeToJson = includeToJson ?? fromMap ?? true;
 
         classes.add(
           ClassInfo(
@@ -359,7 +343,7 @@ class Parser {
     final baseName = p.basename(path);
     final partOf = "part of '$baseName';";
 
-    // If output directory is specified, use that directory; otherwise use the original file's directory
+    // If output directory is specified, use that directory; otherwise use original file's directory
     final String outputPath;
     if (outputDirectory != null) {
       final fileName = p.basenameWithoutExtension(path);

@@ -183,9 +183,7 @@ class Writer {
 
     final validFields = clazz.fields
         .where((f) =>
-            f.name.isNotEmpty &&
-            f.type.isNotEmpty &&
-            f.type != 'dynamic')
+            f.name.isNotEmpty && f.type.isNotEmpty && f.type != 'dynamic')
         .toList();
     if (validFields.isNotEmpty) {
       buffer.writeln();
@@ -221,9 +219,7 @@ class Writer {
 
     final validFields = clazz.fields
         .where((f) =>
-            f.name.isNotEmpty &&
-            f.type.isNotEmpty &&
-            f.type != 'dynamic')
+            f.name.isNotEmpty && f.type.isNotEmpty && f.type != 'dynamic')
         .toList();
     if (validFields.isEmpty) {
       buffer.writeln('    return runtimeType.hashCode;');
@@ -255,9 +251,7 @@ class Writer {
 
     final validFields = clazz.fields
         .where((f) =>
-            f.name.isNotEmpty &&
-            f.type.isNotEmpty &&
-            f.type != 'dynamic')
+            f.name.isNotEmpty && f.type.isNotEmpty && f.type != 'dynamic')
         .toList();
     for (final field in validFields) {
       final paramType = _generateCopyWithParameterType(field);

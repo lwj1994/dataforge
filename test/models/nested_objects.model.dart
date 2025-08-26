@@ -1,7 +1,7 @@
 import 'package:data_class_annotation/data_class_annotation.dart';
 import 'package:collection/collection.dart';
 
-part 'nested_objects.data.dart';
+part 'nested_objects.model.data.dart';
 
 @DataClass()
 class Address with _Address {

@@ -1,6 +1,6 @@
 import 'package:test/test.dart';
-import 'models/ignore_test.dart';
-import 'models/valid_ignore_test.dart';
+import 'models/ignore_test.model.dart';
+import 'models/valid_ignore_test.model.dart';
 
 void main() {
   group('Ignore Field Validation Tests', () {
@@ -16,14 +16,14 @@ void main() {
       // Test that ignored fields are accessible but not in JSON
       expect(instance.password, equals('secret123'));
       expect(instance.secretToken, equals('token456'));
-      
+
       final json = instance.toJson();
       expect(json.containsKey('password'), isFalse);
       expect(json.containsKey('secretToken'), isFalse);
       expect(json.containsKey('name'), isTrue);
       expect(json.containsKey('age'), isTrue);
       expect(json.containsKey('isActive'), isTrue);
-      
+
       print('✓ Nullable ignored fields test passed!');
     });
 
@@ -38,13 +38,13 @@ void main() {
       // Test that ignored fields are accessible but not in JSON
       expect(instance.nullablePassword, equals('nullable123'));
       expect(instance.passwordWithDefault, equals('custom456'));
-      
+
       final json = instance.toJson();
       expect(json.containsKey('nullablePassword'), isFalse);
       expect(json.containsKey('passwordWithDefault'), isFalse);
       expect(json.containsKey('name'), isTrue);
       expect(json.containsKey('age'), isTrue);
-      
+
       print('✓ Ignored fields with default values test passed!');
     });
 
@@ -56,8 +56,9 @@ void main() {
       );
 
       expect(instance.nullablePassword, isNull); // nullable default
-      expect(instance.passwordWithDefault, equals('defaultPassword')); // explicit default
-      
+      expect(instance.passwordWithDefault,
+          equals('defaultPassword')); // explicit default
+
       print('✓ Default values for ignored fields test passed!');
     });
 
@@ -75,7 +76,7 @@ void main() {
       expect(instance.isActive, equals(true));
       expect(instance.password, isNull); // ignored field gets null default
       expect(instance.secretToken, isNull); // ignored field gets null default
-      
+
       print('✓ fromJson without ignored fields test passed!');
     });
   });

@@ -1,7 +1,7 @@
 import 'package:data_class_annotation/data_class_annotation.dart';
 import 'package:collection/collection.dart';
 
-part 'enum_types.data.dart';
+part 'enum_types.model.data.dart';
 
 enum Status { active, inactive, pending }
 

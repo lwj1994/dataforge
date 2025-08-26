@@ -1,7 +1,7 @@
 import 'package:data_class_annotation/data_class_annotation.dart';
 import 'package:collection/collection.dart';
 
-part 'datetime_types.data.dart';
+part 'datetime_types.model.data.dart';
 
 @DataClass()
 class DateTimeTypes with _DateTimeTypes {

@@ -1,7 +1,7 @@
 import 'package:data_class_annotation/data_class_annotation.dart';
 import 'package:collection/collection.dart';
 
-part 'default_values.data.dart';
+part 'default_values.model.data.dart';
 
 /// Test data class with default value constructor parameters
 @DataClass()

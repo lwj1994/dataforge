@@ -23,9 +23,8 @@ void generate(String path) {
           return;
         }
 
-        // Get the directory containing the file as output directory
-        final outputDir = p.dirname(filePath);
-        final parser = Parser(filePath, outputDirectory: outputDir);
+        // Use default output directory from config, fallback to file directory
+        final parser = Parser(filePath);
         final parseRes = parser.parseDartFile();
         if (parseRes != null) {
           final writer = Writer(parseRes);
@@ -44,9 +43,8 @@ void generate(String path) {
       return;
     }
 
-    // Get the directory containing the file as output directory
-    final outputDir = p.dirname(path);
-    final parser = Parser(path, outputDirectory: outputDir);
+    // Use default output directory from config, fallback to file directory
+    final parser = Parser(path);
     final parseRes = parser.parseDartFile();
     if (parseRes != null) {
       final writer = Writer(parseRes);
