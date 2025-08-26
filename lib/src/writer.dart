@@ -379,7 +379,7 @@ class Writer {
         } else {
           valueExpression = "$readValue(map, '${jsonKeys[0]}')";
         }
-        // For fields with readValue, directly use readValue result without additional conversion
+        // For fields with readValue, apply safe type conversion for basic types
         // But for generic classes, need special handling for type parameters
         if (clazz.genericParameters.isNotEmpty &&
             RegExp(r'^[A-Z]\??$').hasMatch(field.type)) {
@@ -391,13 +391,9 @@ class Writer {
                 "($valueExpression ?? ${_getDefaultValueForType('dynamic')}) as dynamic$defaultValue";
           }
         } else {
-          if (field.type.endsWith('?')) {
-            getValueExpression =
-                "$valueExpression as ${field.type}$defaultValue";
-          } else {
-            getValueExpression =
-                "($valueExpression ?? ${_getDefaultValueForType(field.type)}) as ${field.type}$defaultValue";
-          }
+          // Apply safe type conversion for basic types when using readValue
+          getValueExpression = _generateSafeReadValueExpression(
+              field, valueExpression, defaultValue);
         }
       } else {
         getValueExpression =
@@ -760,6 +756,90 @@ class Writer {
     }
 
     return "$valueExpression$defaultValue";
+  }
+
+  String _generateSafeReadValueExpression(
+      FieldInfo field, String valueExpression, String defaultValue) {
+    final type = field.type.replaceAll('?', '');
+    final isNullable = field.type.endsWith('?');
+
+    switch (type) {
+      case 'String':
+        if (isNullable) {
+          return "($valueExpression)?.toString()$defaultValue";
+        } else {
+          if (defaultValue.isNotEmpty) {
+            return "($valueExpression)?.toString()$defaultValue";
+          } else {
+            return "($valueExpression)?.toString() ?? ''";
+          }
+        }
+      case 'int':
+        if (isNullable) {
+          return "$valueExpression != null ? int.tryParse($valueExpression.toString()) : null$defaultValue";
+        } else {
+          if (defaultValue.isNotEmpty) {
+            return "int.tryParse(($valueExpression ?? '').toString())$defaultValue";
+          } else {
+            return "int.tryParse(($valueExpression ?? '').toString()) ?? 0";
+          }
+        }
+      case 'double':
+        if (isNullable) {
+          return "$valueExpression != null ? double.tryParse($valueExpression.toString()) : null$defaultValue";
+        } else {
+          if (defaultValue.isNotEmpty) {
+            return "double.tryParse(($valueExpression ?? '').toString())$defaultValue";
+          } else {
+            return "double.tryParse(($valueExpression ?? '').toString()) ?? 0.0";
+          }
+        }
+      case 'num':
+        if (isNullable) {
+          return "$valueExpression != null ? num.tryParse($valueExpression.toString()) : null$defaultValue";
+        } else {
+          if (defaultValue.isNotEmpty) {
+            return "num.tryParse(($valueExpression ?? '').toString())$defaultValue";
+          } else {
+            return "num.tryParse(($valueExpression ?? '').toString()) ?? 0";
+          }
+        }
+      case 'bool':
+        if (isNullable) {
+          return "$valueExpression != null ? ($valueExpression.toString().toLowerCase() == 'true') : null$defaultValue";
+        } else {
+          if (defaultValue.isNotEmpty) {
+            return "$valueExpression != null ? ($valueExpression.toString().toLowerCase() == 'true') : false$defaultValue";
+          } else {
+            return "$valueExpression != null ? ($valueExpression.toString().toLowerCase() == 'true') : false";
+          }
+        }
+      case 'DateTime':
+        if (isNullable) {
+          return "$valueExpression != null ? DateTime.tryParse($valueExpression.toString()) : null$defaultValue";
+        } else {
+          return "DateTime.parse(($valueExpression ?? '').toString())$defaultValue";
+        }
+      case 'Uri':
+        if (isNullable) {
+          return "$valueExpression != null ? Uri.tryParse($valueExpression.toString()) : null$defaultValue";
+        } else {
+          return "Uri.parse(($valueExpression ?? '').toString())$defaultValue";
+        }
+      case 'Duration':
+        if (isNullable) {
+          return "$valueExpression != null ? Duration(milliseconds: $valueExpression as int? ?? 0) : null$defaultValue";
+        } else {
+          return "Duration(milliseconds: ($valueExpression as int? ?? 0))$defaultValue";
+        }
+      default:
+        // For complex types, use direct casting as before
+        if (isNullable) {
+          return "$valueExpression as ${field.type}$defaultValue";
+        } else {
+          return "($valueExpression ?? ${_getDefaultValueForType(field.type)}) as ${field.type}$defaultValue";
+        }
+    }
   }
 
   String _generateCopyWithParameterType(FieldInfo field) {

@@ -144,17 +144,26 @@ mixin _DateTimeTypes {
       optionalEventDates:
           (map['optionalEventDates'] as List<dynamic>?)?.cast<DateTime>(),
       namedDates: (map['namedDates'] as Map<String, DateTime>?) ?? {},
-      isoDateTime: DateTimeTypes._readValue(map, 'isoDateTime') as DateTime?,
-      timestampDate: (DateTimeTypes._readValue(map, 'timestampDate') ??
-          DateTime.now()) as DateTime,
-      parsedDate: DateTimeTypes._readValue(map, 'parsedDate') as DateTime?,
+      isoDateTime: DateTimeTypes._readValue(map, 'isoDateTime') != null
+          ? DateTime.tryParse(
+              DateTimeTypes._readValue(map, 'isoDateTime').toString())
+          : null,
+      timestampDate: DateTime.parse(
+          (DateTimeTypes._readValue(map, 'timestampDate') ?? '').toString()),
+      parsedDate: DateTimeTypes._readValue(map, 'parsedDate') != null
+          ? DateTime.tryParse(
+              DateTimeTypes._readValue(map, 'parsedDate').toString())
+          : null,
       dateTimeList:
           DateTimeTypes._readValue(map, 'dateTimeList') as List<DateTime>?,
       duration: map['duration'] != null
           ? Duration(milliseconds: map['duration'] as int? ?? 0)
           : null,
-      customDuration:
-          DateTimeTypes._readValue(map, 'customDuration') as Duration?,
+      customDuration: DateTimeTypes._readValue(map, 'customDuration') != null
+          ? Duration(
+              milliseconds:
+                  DateTimeTypes._readValue(map, 'customDuration') as int? ?? 0)
+          : null,
     );
   }
 }
@@ -227,7 +236,10 @@ mixin _TimeZoneTest {
     return TimeZoneTest(
       utcTime: DateTime.parse((map['utcTime'] ?? '').toString()),
       localTime: DateTime.parse((map['localTime'] ?? '').toString()),
-      timeZoneAware: TimeZoneTest._readValue(map, 'timeZoneAware') as DateTime?,
+      timeZoneAware: TimeZoneTest._readValue(map, 'timeZoneAware') != null
+          ? DateTime.tryParse(
+              TimeZoneTest._readValue(map, 'timeZoneAware').toString())
+          : null,
       timeList: (map['timeList'] as List<dynamic>?)?.cast<DateTime>() ?? [],
     );
   }
