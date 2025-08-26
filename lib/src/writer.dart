@@ -167,12 +167,13 @@ class Writer {
 
       // Check and add fromJson method to original files
       _processOriginalFiles();
+
+      // Return the generated file path instead of content
+      return result.outputPath;
     } catch (e) {
       print('Error writing file ${result.outputPath}: $e');
       rethrow;
     }
-
-    return buffer.toString();
   }
 
   void _buildEquality(StringBuffer buffer, ClassInfo clazz) {
@@ -546,7 +547,22 @@ class Writer {
               }
             }
           } else if (itemType == "String") {
-            return "($valueExpression as List<dynamic>?)?.map((e) => e.toString()).toList()$defaultValue";
+            // Handle alternateNames properly for List<String>
+            if (field.jsonKey?.alternateNames.isNotEmpty == true) {
+              final jsonKeys = <String>[];
+              if (field.jsonKey!.name.isNotEmpty) {
+                jsonKeys.add(field.jsonKey!.name);
+              } else {
+                jsonKeys.add(field.name);
+              }
+              jsonKeys.addAll(field.jsonKey!.alternateNames);
+              final expressions = jsonKeys
+                  .map((key) => "(map['$key'] as List<dynamic>?)")
+                  .join(' ?? ');
+              return "($expressions)?.map((e) => e.toString()).toList()$defaultValue";
+            } else {
+              return "($valueExpression as List<dynamic>?)?.map((e) => e.toString()).toList()$defaultValue";
+            }
           } else if (itemType == 'int') {
             return "($valueExpression as List<dynamic>?)?.map((e) => int.tryParse(e.toString()) ?? 0).toList()$defaultValue";
           } else if (itemType == 'double') {
@@ -648,6 +664,13 @@ class Writer {
           'UserRole',
           'Priority'
         ].contains(itemType)) {
+          if (itemType == 'String') {
+            if (isNullable) {
+              return "($valueExpression as List<dynamic>?)?.map((e) => e.toString()).toList()$defaultValue";
+            } else {
+              return "(($valueExpression as List<dynamic>?) ?? []).map((e) => e.toString()).toList()$defaultValue";
+            }
+          }
           if (isNullable) {
             return "($valueExpression as List<dynamic>?)?.cast<$itemType>()$defaultValue";
           } else {
