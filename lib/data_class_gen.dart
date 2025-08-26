@@ -4,23 +4,25 @@ import 'package:path/path.dart' as p;
 import 'package:data_class_gen/src/parser.dart';
 import 'package:data_class_gen/src/writer.dart';
 
-void generate(String path) {
+List<String> generate(String path) {
+  final generatedFiles = <String>[];
   final entity = FileSystemEntity.typeSync(path);
   final isDirectory = entity == FileSystemEntityType.directory;
 
   if (isDirectory) {
-    Directory(path).listSync(recursive: true).forEach((element) {
+    final files = Directory(path).listSync(recursive: true);
+    for (final element in files) {
       if (element is File && element.path.endsWith('.dart')) {
         final filePath = element.absolute.path;
 
         // Skip generated .data.dart files
         if (filePath.endsWith('.data.dart')) {
-          return;
+          continue;
         }
 
         // Skip certain special directories and files
         if (_shouldSkipFile(filePath)) {
-          return;
+          continue;
         }
 
         // Use default output directory from config, fallback to file directory
@@ -28,19 +30,22 @@ void generate(String path) {
         final parseRes = parser.parseDartFile();
         if (parseRes != null) {
           final writer = Writer(parseRes);
-          writer.writeCode();
+          final generatedFile = writer.writeCode();
+          if (generatedFile.isNotEmpty) {
+            generatedFiles.add(generatedFile);
+          }
         }
       }
-    });
+    }
   } else {
     // Skip generated .data.dart files
     if (path.endsWith('.data.dart')) {
-      return;
+      return generatedFiles;
     }
 
     // Skip certain special directories and files
     if (_shouldSkipFile(path)) {
-      return;
+      return generatedFiles;
     }
 
     // Use default output directory from config, fallback to file directory
@@ -48,9 +53,13 @@ void generate(String path) {
     final parseRes = parser.parseDartFile();
     if (parseRes != null) {
       final writer = Writer(parseRes);
-      writer.writeCode();
+      final generatedFile = writer.writeCode();
+      if (generatedFile.isNotEmpty) {
+        generatedFiles.add(generatedFile);
+      }
     }
   }
+  return generatedFiles;
 }
 
 /// Determine whether a file should be skipped
