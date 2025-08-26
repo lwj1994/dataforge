@@ -1,6 +1,6 @@
 import 'package:data_class_annotation/data_class_annotation.dart';
 
-part 'ignore_test.data.dart';
+part 'ignore_test.model.data.dart';
 
 @DataClass()
 class IgnoreTest with _IgnoreTest {

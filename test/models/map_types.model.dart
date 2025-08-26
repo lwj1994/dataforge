@@ -1,7 +1,7 @@
 import 'package:data_class_annotation/data_class_annotation.dart';
 import 'package:collection/collection.dart';
 
-part 'map_types.data.dart';
+part 'map_types.model.data.dart';
 
 @DataClass()
 class MapTypes with _MapTypes {

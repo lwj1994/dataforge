@@ -3,7 +3,7 @@
 
 import 'package:data_class_annotation/data_class_annotation.dart';
 
-part 'example_ignore_validation.data.dart';
+part 'example_ignore_validation.example.data.dart';
 
 /// ✅ Valid: ignored field is nullable
 @DataClass()

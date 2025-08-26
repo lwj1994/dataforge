@@ -1,6 +1,6 @@
 import 'package:data_class_annotation/data_class_annotation.dart';
 
-part 'valid_ignore_test.data.dart';
+part 'valid_ignore_test.model.data.dart';
 
 // This class should work fine - ignored fields are either nullable or have default values
 @DataClass()

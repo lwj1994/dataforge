@@ -1,7 +1,7 @@
 import 'package:data_class_annotation/data_class_annotation.dart';
 import 'package:collection/collection.dart';
 
-part 'custom_read_value.data.dart';
+part 'custom_read_value.model.data.dart';
 
 @DataClass()
 class CustomReadValue with _CustomReadValue {

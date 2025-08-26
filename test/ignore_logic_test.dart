@@ -1,5 +1,5 @@
 import 'package:test/test.dart';
-import 'models/ignore_test.dart';
+import 'models/ignore_test.model.dart';
 
 void main() {
   group('Ignore Logic Tests', () {
@@ -53,7 +53,8 @@ void main() {
         secretToken: 'token456',
         isActive: true,
       );
-      expect(instance == different, isFalse); // should be false because password is different
+      expect(instance == different,
+          isFalse); // should be false because password is different
 
       // Test that toString includes all fields (including ignored ones)
       final toStringResult = instance.toString();
@@ -77,7 +78,7 @@ void main() {
       expect(instance.isActive, equals(false));
       // ignored fields should have default values from constructor
       // but since fromJson doesn't provide them, they need to be handled
-      
+
       print('✓ fromJson test passed!');
     });
   });

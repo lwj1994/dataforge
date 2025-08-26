@@ -2,7 +2,7 @@ import 'dart:io';
 import 'package:test/test.dart';
 import 'package:data_class_gen/data_class_gen.dart';
 import 'package:path/path.dart' as p;
-import 'models/default_values.dart';
+import 'models/default_values.model.dart';
 
 /// Data class generator tests
 ///
@@ -224,7 +224,7 @@ void main() {
       generate('test/models');
 
       // Verify the generated file exists
-      final generatedFile = File('test/models/default_values.data.dart');
+      final generatedFile = File('test/models/default_values.model.data.dart');
       expect(generatedFile.existsSync(), isTrue,
           reason: 'Generated file should exist');
 
@@ -270,7 +270,8 @@ void main() {
         print('✓ Default values classes have factory fromJson methods');
 
         // Verify generated code file exists
-        final generatedFile = File('test/models/default_values.data.dart');
+        final generatedFile =
+            File('test/models/default_values.model.data.dart');
         if (generatedFile.existsSync()) {
           print('✓ Generated default_values.data.dart file exists');
 
