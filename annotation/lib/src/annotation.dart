@@ -1,13 +1,13 @@
 // @author luwenjie on 2025/4/19 17:37:49
 
-class DataClass {
+class Dataforge {
   final String name;
   @Deprecated('Use includeFromJson and includeToJson instead')
   final bool? fromMap;
   final bool? includeFromJson;
   final bool? includeToJson;
 
-  const DataClass({
+  const Dataforge({
     this.name = "",
     @Deprecated('Use includeFromJson and includeToJson instead') this.fromMap,
     this.includeFromJson,
@@ -15,7 +15,14 @@ class DataClass {
   });
 }
 
-const dataClass = DataClass();
+const dataforge = Dataforge();
+
+// Keep DataClass as deprecated alias for backward compatibility
+@Deprecated('Use Dataforge instead')
+typedef DataClass = Dataforge;
+
+@Deprecated('Use dataforge instead')
+const dataClass = Dataforge();
 
 /// Abstract base class for type converters that can convert between JSON values and Dart objects.
 ///

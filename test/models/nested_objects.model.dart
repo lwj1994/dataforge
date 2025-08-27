@@ -1,9 +1,9 @@
-import 'package:data_class_annotation/data_class_annotation.dart';
+import 'package:dataforge_annotation/dataforge_annotation.dart';
 import 'package:collection/collection.dart';
 
 part 'nested_objects.model.data.dart';
 
-@DataClass()
+@Dataforge()
 class Address with _Address {
   @override
   final String street;
@@ -33,7 +33,7 @@ class Address with _Address {
   }
 }
 
-@DataClass()
+@Dataforge()
 class Contact with _Contact {
   @override
   final String email;
@@ -54,7 +54,7 @@ class Contact with _Contact {
   }
 }
 
-@DataClass()
+@Dataforge()
 class Company with _Company {
   @override
   final String name;
@@ -80,7 +80,7 @@ class Company with _Company {
   }
 }
 
-@DataClass()
+@Dataforge()
 class NestedObjects with _NestedObjects {
   @override
   final String name;

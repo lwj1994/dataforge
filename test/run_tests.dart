@@ -1,7 +1,7 @@
 #!/usr/bin/env dart
 
 import 'dart:io';
-import 'package:data_class_gen/data_class_gen.dart';
+import 'package:dataforge/dataforge.dart';
 
 /// Test runner script
 ///

@@ -1,9 +1,9 @@
-import 'package:data_class_annotation/data_class_annotation.dart';
+import 'package:dataforge_annotation/dataforge_annotation.dart';
 import 'package:collection/collection.dart';
 
 part 'alternate_names_test.model.data.dart';
 
-@DataClass()
+@Dataforge()
 class AlternateNamesTest with _AlternateNamesTest {
   @override
   final String name;

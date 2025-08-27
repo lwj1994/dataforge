@@ -12,7 +12,7 @@ packages:
     pubspec: "pubspec.yaml"
     
   # Annotation package configuration
-  data_class_annotation:
+  dataforge_annotation:
     path: "annotation"
     pubspec: "pubspec.yaml"
 

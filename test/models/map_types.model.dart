@@ -1,9 +1,9 @@
-import 'package:data_class_annotation/data_class_annotation.dart';
+import 'package:dataforge_annotation/dataforge_annotation.dart';
 import 'package:collection/collection.dart';
 
 part 'map_types.model.data.dart';
 
-@DataClass()
+@Dataforge()
 class MapTypes with _MapTypes {
   @override
   final Map<String, String> stringMap;
@@ -129,7 +129,7 @@ class MapTypes with _MapTypes {
   }
 }
 
-@DataClass()
+@Dataforge()
 class MapWithObjects with _MapWithObjects {
   @override
   final Map<String, Address> addressMap;
@@ -175,7 +175,7 @@ class MapWithObjects with _MapWithObjects {
   }
 }
 
-@DataClass()
+@Dataforge()
 class Address with _Address {
   @override
   final String street;
@@ -195,7 +195,7 @@ class Address with _Address {
   }
 }
 
-@DataClass()
+@Dataforge()
 class Contact with _Contact {
   @override
   final String email;

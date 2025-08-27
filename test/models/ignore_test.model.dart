@@ -1,8 +1,8 @@
-import 'package:data_class_annotation/data_class_annotation.dart';
+import 'package:dataforge_annotation/dataforge_annotation.dart';
 
 part 'ignore_test.model.data.dart';
 
-@DataClass()
+@Dataforge()
 class IgnoreTest with _IgnoreTest {
   @override
   final String name;

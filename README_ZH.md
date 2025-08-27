@@ -1,9 +1,9 @@
-# Dart 数据类生成器
+# Dart Dataforge 数据锻造厂
 
-[![Pub Version](https://img.shields.io/pub/v/data_class_gen)](https://pub.dev/packages/data_class_gen)
+[![Pub Version](https://img.shields.io/pub/v/dataforge)](https://pub.dev/packages/dataforge)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-一个高性能的 Dart 数据类代码生成器，专为替代缓慢的 `build_runner` 而设计。`dart_build_runner` 的速度极其缓慢，特别是在大型项目中。因此，开发了这个脚本来实现快速生成。
+一个高性能的 Dart 数据类锻造工具，专为替代缓慢的 `build_runner` 而设计。将原始数据结构锻造成完美的代码结构，速度比 `build_runner` 快数倍。
 
 ## ✨ 功能特性
 
@@ -20,13 +20,13 @@
 
 ### 1. 添加依赖
 
-首先，在你的 `pubspec.yaml` 中添加 `dataclass_annotation`：
+首先，在你的 `pubspec.yaml` 中添加 `dataforge_annotation`：
 
 ```yaml
 dependencies:
-  dataclass_annotation:
+  dataforge_annotation:
     git:
-      url: https://github.com/lwj1994/dart_data_class_gen
+      url: https://github.com/lwj1994/dataforge
       ref: main
       path: annotation
 ```
@@ -36,7 +36,7 @@ dependencies:
 然后，安装 CLI 工具：
 
 ```bash
-dart pub global activate --source git https://github.com/lwj1994/dart_data_class_gen
+dart pub global activate --source git https://github.com/lwj1994/dataforge
 ```
 
 ## 🚀 快速开始
@@ -44,11 +44,11 @@ dart pub global activate --source git https://github.com/lwj1994/dart_data_class
 ### 1. 创建数据类
 
 ```dart
-import 'package:data_class_annotation/data_class_annotation.dart';
+import 'package:dataforge_annotation/dataforge_annotation.dart';
 
 part 'user.data.dart';
 
-@DataClass(includeFromJson: true, includeToJson: true)
+@Dataforge(includeFromJson: true, includeToJson: true)
 class User with _User {
   @override
   final String name;
@@ -77,10 +77,10 @@ class User with _User {
 
 ```bash
 # 为当前目录生成
-data_class_gen
+dataforge
 
 # 为指定目录生成
-data_class_gen --path ./lib/models
+dataforge --path ./lib/models
 ```
 
 ### 3. 使用生成的代码
@@ -112,10 +112,10 @@ void main() {
 
 ## 📚 详细使用
 
-### DataClass 注解
+### Dataforge 注解
 
 ```dart
-@DataClass(
+@Dataforge(
   name: "CustomMixin",        // 自定义 mixin 名称，默认为 _ClassName
   includeFromJson: true,      // 是否生成 fromJson 方法
   includeToJson: true,        // 是否生成 toJson 方法
@@ -156,6 +156,39 @@ class User with _User {
 }
 ```
 
+## 🔄 向后兼容性
+
+**⚠️ 从 data_class_gen 迁移**
+
+如果您正在从旧的 `data_class_gen` 包迁移，`@DataClass` 注解仍然受支持但已**弃用**。我们建议新项目迁移到 `@Dataforge`。
+
+**旧版支持（已弃用）：**
+```dart
+// ❌ 已弃用 - 仍然可用但不推荐
+@DataClass(includeFromJson: true, includeToJson: true)
+class User with _User {
+  // ...
+}
+
+// ✅ 推荐 - 使用新注解
+@Dataforge(includeFromJson: true, includeToJson: true)
+class User with _User {
+  // ...
+}
+```
+
+**迁移步骤：**
+1. 将 `@DataClass` 替换为 `@Dataforge`
+2. 将 `@dataClass` 替换为 `@dataforge`
+3. 将导入从 `data_class_annotation` 更新为 `dataforge_annotation`
+4. 将CLI命令从 `data_class_gen` 更新为 `dataforge`
+
+**为什么要迁移？**
+- 更好的命名，体现工具作为"数据锻造厂"的用途
+- 未来功能将仅在 `@Dataforge` 中提供
+- 更清洁、更直观的API
+```
+
 ## 🔧 支持的类型
 
 ### 基本类型
@@ -176,7 +209,7 @@ class User with _User {
 ### 示例
 
 ```dart
-@DataClass(includeFromJson: true, includeToJson: true)
+@Dataforge(includeFromJson: true, includeToJson: true)
 class ComplexModel with _ComplexModel {
   @override
   final String name;
@@ -320,7 +353,7 @@ dart run bin/data_class_gen.dart --path ./test
 dart_data_class_gen/
 ├── annotation/           # 注解包
 │   ├── lib/
-│   │   ├── data_class_annotation.dart
+│   │   ├── dataforge_annotation.dart
 │   │   └── src/
 │   │       └── annotation.dart
 │   └── pubspec.yaml

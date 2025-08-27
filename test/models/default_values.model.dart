@@ -1,10 +1,10 @@
-import 'package:data_class_annotation/data_class_annotation.dart';
+import 'package:dataforge_annotation/dataforge_annotation.dart';
 import 'package:collection/collection.dart';
 
 part 'default_values.model.data.dart';
 
 /// Test data class with default value constructor parameters
-@DataClass()
+@Dataforge()
 class DefaultValues with _DefaultValues {
   @override
   final int intValue;
@@ -31,7 +31,7 @@ class DefaultValues with _DefaultValues {
 }
 
 /// Test default values for nested objects
-@DataClass()
+@Dataforge()
 class NestedDefaultValues with _NestedDefaultValues {
   @override
   final String name;

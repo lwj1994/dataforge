@@ -1,9 +1,9 @@
-import 'package:data_class_annotation/data_class_annotation.dart';
+import 'package:dataforge_annotation/dataforge_annotation.dart';
 import 'package:collection/collection.dart';
 
 part 'custom_read_value.model.data.dart';
 
-@DataClass()
+@Dataforge()
 class CustomReadValue with _CustomReadValue {
   @override
   final String id;

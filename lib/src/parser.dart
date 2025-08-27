@@ -36,11 +36,14 @@ class Parser {
   /// [outputDirectory] optional output directory
   Parser(this.path, {this.outputDirectory});
 
-  /// Check if it's a DataClass annotation
+  /// Check if it's a DataClass or Dataforge annotation
   bool _isDataClassAnnotation(String name) {
     return _annotationCache.putIfAbsent(name, () {
       final cleanName = name.contains('.') ? name.split('.').last : name;
-      return cleanName == 'DataClass' || cleanName == 'dataClass';
+      return cleanName == 'DataClass' ||
+          cleanName == 'dataClass' ||
+          cleanName == 'Dataforge' ||
+          cleanName == 'dataforge';
     });
   }
 
@@ -75,7 +78,7 @@ class Parser {
       return null;
     }
 
-    print("parsing $path");
+    // Parsing file silently
     final classes = <ClassInfo>[];
     final unit = parseRes.unit;
 
@@ -112,7 +115,7 @@ class Parser {
 
         final fields = <FieldInfo>[];
         final defaultValueMap = <String, String>{};
-        print("find class $className");
+        // Found class silently
 
         bool? fromMap;
         bool? includeFromJson;

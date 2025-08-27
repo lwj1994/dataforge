@@ -1,8 +1,8 @@
-import 'package:data_class_annotation/data_class_annotation.dart';
+import 'package:dataforge_annotation/dataforge_annotation.dart';
 
 part 'auto_fromjson_test.model.data.dart';
 
-@DataClass()
+@Dataforge()
 class AutoFromJsonTest with _AutoFromJsonTest {
   @override
   final String name;
