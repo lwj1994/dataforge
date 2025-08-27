@@ -1,5 +1,5 @@
 import 'dart:io';
-import 'package:data_class_gen/src/util.dart';
+import 'package:dataforge/src/util.dart';
 import 'model.dart';
 
 class Writer {
@@ -72,7 +72,7 @@ class Writer {
 
         // Write back to file
         file.writeAsStringSync(lines.join('\n'));
-        print('Added fromJson method to $filePath');
+        // Added fromJson method silently
       }
     } catch (e) {
       print('Error adding fromJson method to $filePath: $e');
@@ -163,7 +163,7 @@ class Writer {
       File(result.outputPath)
         ..createSync(recursive: true)
         ..writeAsStringSync(buffer.toString());
-      print("generated ${result.outputPath}");
+      // Generated file silently
 
       // Check and add fromJson method to original files
       _processOriginalFiles();

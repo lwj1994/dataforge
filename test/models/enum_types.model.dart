@@ -1,4 +1,4 @@
-import 'package:data_class_annotation/data_class_annotation.dart';
+import 'package:dataforge_annotation/dataforge_annotation.dart';
 import 'package:collection/collection.dart';
 
 part 'enum_types.model.data.dart';
@@ -9,7 +9,7 @@ enum UserRole { admin, user, guest }
 
 enum Priority { low, medium, high, urgent }
 
-@DataClass()
+@Dataforge()
 class EnumTypes with _EnumTypes {
   @override
   final Status status;

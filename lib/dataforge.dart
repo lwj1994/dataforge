@@ -1,8 +1,8 @@
 import 'dart:io';
 import 'package:path/path.dart' as p;
 
-import 'package:data_class_gen/src/parser.dart';
-import 'package:data_class_gen/src/writer.dart';
+import 'package:dataforge/src/parser.dart';
+import 'package:dataforge/src/writer.dart';
 
 List<String> generate(String path) {
   final generatedFiles = <String>[];
@@ -78,7 +78,6 @@ bool _shouldSkipFile(String filePath) {
 
   // If file is in project root directory (no subdirectories), skip it
   if (pathSegments.length == 1) {
-    print('Skipping root directory file: $filePath');
     return true;
   }
 

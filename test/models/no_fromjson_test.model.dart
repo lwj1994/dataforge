@@ -1,8 +1,8 @@
-import 'package:data_class_annotation/data_class_annotation.dart';
+import 'package:dataforge_annotation/dataforge_annotation.dart';
 
 part 'no_fromjson_test.model.data.dart';
 
-@DataClass(includeFromJson: false)
+@Dataforge(includeFromJson: false)
 class NoFromJsonTest with _NoFromJsonTest {
   @override
   final String name;

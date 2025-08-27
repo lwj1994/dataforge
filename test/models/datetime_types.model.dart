@@ -1,9 +1,9 @@
-import 'package:data_class_annotation/data_class_annotation.dart';
+import 'package:dataforge_annotation/dataforge_annotation.dart';
 import 'package:collection/collection.dart';
 
 part 'datetime_types.model.data.dart';
 
-@DataClass()
+@Dataforge()
 class DateTimeTypes with _DateTimeTypes {
   @override
   final DateTime createdAt;
@@ -248,7 +248,7 @@ class DateTimeTypes with _DateTimeTypes {
   }
 }
 
-@DataClass()
+@Dataforge()
 class TimeZoneTest with _TimeZoneTest {
   @override
   final DateTime utcTime;

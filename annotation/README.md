@@ -1,6 +1,6 @@
 # dataclass_annotation
 
-Annotations for the `data_class_gen` package to generate data classes with JSON serialization support.
+Annotations for the `dataforge` package to forge data classes with JSON serialization support.
 
 ## Features
 
@@ -11,7 +11,7 @@ Annotations for the `data_class_gen` package to generate data classes with JSON 
 ## Usage
 
 ```dart
-import 'package:data_class_annotation/data_class_annotation.dart';
+import 'package:dataforge_annotation/dataforge_annotation.dart';
 
 @DataClass()
 class User {
@@ -23,7 +23,7 @@ class User {
 }
 ```
 
-This package provides the annotations used by `data_class_gen` to generate data classes with JSON serialization methods.
+This package provides the annotations used by `dataforge` to forge data classes with JSON serialization methods.
 
 ## Installation
 

@@ -1,12 +1,12 @@
 // Example demonstrating ignore field validation
 // Run: dart run bin/data_class_gen.dart
 
-import 'package:data_class_annotation/data_class_annotation.dart';
+import 'package:dataforge_annotation/dataforge_annotation.dart';
 
 part 'example_ignore_validation.example.data.dart';
 
 /// ✅ Valid: ignored field is nullable
-@DataClass()
+@Dataforge()
 class ValidExample1 with _ValidExample1 {
   @override
   final String name;
@@ -26,7 +26,7 @@ class ValidExample1 with _ValidExample1 {
 }
 
 /// ✅ Valid: ignored field has default value
-@DataClass()
+@Dataforge()
 class ValidExample2 with _ValidExample2 {
   @override
   final String name;
@@ -48,7 +48,7 @@ class ValidExample2 with _ValidExample2 {
 /// ❌ Invalid: This would cause an error if uncommented
 /// because 'token' is ignored but not nullable and has no default value
 /*
-@DataClass()
+@Dataforge()
 class InvalidExample with _InvalidExample {
   @override
   final String name;

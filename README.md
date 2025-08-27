@@ -1,9 +1,9 @@
-# Dart Data Class Generator
+# Dart Dataforge
 
-[![Pub Version](https://img.shields.io/pub/v/data_class_gen)](https://pub.dev/packages/data_class_gen)
+[![Pub Version](https://img.shields.io/pub/v/dataforge)](https://pub.dev/packages/dataforge)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-A high-performance Dart data class code generator that's multiple times faster than `build_runner`.
+A high-performance Dart data class forge that crafts perfect code structures multiple times faster than `build_runner`.
 
 ## Features
 
@@ -19,9 +19,9 @@ Add dependency to `pubspec.yaml`:
 
 ```yaml
 dependencies:
-  dataclass_annotation:
+  dataforge_annotation:
     git:
-      url: https://github.com/lwj1994/dart_data_class_gen
+      url: https://github.com/lwj1994/dataforge
       ref: main
       path: annotation
 ```
@@ -29,7 +29,7 @@ dependencies:
 Install CLI tool:
 
 ```bash
-dart pub global activate --source git https://github.com/lwj1994/dart_data_class_gen
+dart pub global activate --source git https://github.com/lwj1994/dataforge
 ```
 
 ## Quick Start
@@ -37,11 +37,11 @@ dart pub global activate --source git https://github.com/lwj1994/dart_data_class
 Create a data class:
 
 ```dart
-import 'package:data_class_annotation/data_class_annotation.dart';
+import 'package:dataforge_annotation/dataforge_annotation.dart';
 
 part 'user.data.dart';
 
-@DataClass(includeFromJson: true, includeToJson: true)
+@Dataforge(includeFromJson: true, includeToJson: true)
 class User with _User {
   @override
   final String name;
@@ -66,7 +66,7 @@ class User with _User {
 Generate code:
 
 ```bash
-data_class_gen .
+dataforge .
 ```
 
 Use generated methods:
@@ -81,9 +81,9 @@ print(user.toString()); // User(name: John, age: 25, hobbies: [])
 
 ## Annotations
 
-**@DataClass**: Configure code generation
+**@Dataforge**: Configure code generation
 ```dart
-@DataClass(includeFromJson: true, includeToJson: true)
+@Dataforge(includeFromJson: true, includeToJson: true)
 ```
 
 **@JsonKey**: Customize field serialization
@@ -94,6 +94,38 @@ print(user.toString()); // User(name: John, age: 25, hobbies: [])
 @JsonKey(includeIfNull: false)          // Exclude null values from JSON
 ```
 
+## Backward Compatibility
+
+**⚠️ Migration from data_class_gen**
+
+If you're migrating from the old `data_class_gen` package, the `@DataClass` annotation is still supported but **deprecated**. We recommend migrating to `@Dataforge` for new projects.
+
+**Legacy Support (Deprecated):**
+```dart
+// ❌ Deprecated - still works but not recommended
+@DataClass(includeFromJson: true, includeToJson: true)
+class User with _User {
+  // ...
+}
+
+// ✅ Recommended - use the new annotation
+@Dataforge(includeFromJson: true, includeToJson: true)
+class User with _User {
+  // ...
+}
+```
+
+**Migration Steps:**
+1. Replace `@DataClass` with `@Dataforge`
+2. Replace `@dataClass` with `@dataforge`
+3. Update import from `data_class_annotation` to `dataforge_annotation`
+4. Update CLI command from `data_class_gen` to `dataforge`
+
+**Why migrate?**
+- Better naming that reflects the tool's purpose as a "data forge"
+- Future features will only be available in `@Dataforge`
+- Cleaner, more intuitive API
+
 ## Supported Types
 
 - Basic: `String`, `int`, `double`, `bool`, optional types
@@ -103,8 +135,8 @@ print(user.toString()); // User(name: John, age: 25, hobbies: [])
 ## Development
 
 ```bash
-git clone https://github.com/lwj1994/dart_data_class_gen.git
-cd dart_data_class_gen
+git clone https://github.com/lwj1994/dataforge.git
+cd dataforge
 dart pub get
 dart test
 ```

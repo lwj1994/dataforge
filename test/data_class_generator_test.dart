@@ -1,6 +1,6 @@
 import 'dart:io';
 import 'package:test/test.dart';
-import 'package:data_class_gen/data_class_gen.dart';
+import 'package:dataforge/dataforge.dart';
 import 'package:path/path.dart' as p;
 import 'models/default_values.model.dart';
 
