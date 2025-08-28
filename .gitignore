@@ -2,6 +2,9 @@
 # Created by `dart pub`
 .dart_tool/
 
+# Conventional directory for build output.
+build/
+
 # Generated test files
 test/gen/
 
