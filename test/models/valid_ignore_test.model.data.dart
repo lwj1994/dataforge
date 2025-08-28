@@ -52,11 +52,11 @@ mixin _ValidIgnoreTest {
       age,
     ]);
   }
-
   @override
   String toString() {
     return 'ValidIgnoreTest(name: $name, nullablePassword: $nullablePassword, passwordWithDefault: $passwordWithDefault, age: $age)';
   }
+
 
   Map<String, dynamic> toJson() {
     final map = <String, dynamic>{};
@@ -72,3 +72,4 @@ mixin _ValidIgnoreTest {
     );
   }
 }
+

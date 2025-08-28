@@ -59,11 +59,11 @@ mixin _AlternateNamesTest {
       const DeepCollectionEquality().hash(tags),
     ]);
   }
-
   @override
   String toString() {
     return 'AlternateNamesTest(name: $name, age: $age, email: $email, isActive: $isActive, tags: $tags)';
   }
+
 
   Map<String, dynamic> toJson() {
     final map = <String, dynamic>{};
@@ -78,22 +78,11 @@ mixin _AlternateNamesTest {
   static AlternateNamesTest fromJson(Map<String, dynamic> map) {
     return AlternateNamesTest(
       name: (map['name'])?.toString() ?? "",
-      age: int.tryParse((map['user_age'] ?? map['age'] ?? map['years'] ?? '')
-              .toString()) ??
-          0,
-      email:
-          (map['email'] ?? map['email_address'] ?? map['mail'] ?? map['e_mail'])
-                  ?.toString() ??
-              "",
-      isActive:
-          (map['is_active'] ?? map['active'] ?? map['enabled'] as bool?) ??
-              false,
-      tags: ((map['tags'] as List<dynamic>?) ??
-                  (map['tags_list'] as List<dynamic>?) ??
-                  (map['labels'] as List<dynamic>?))
-              ?.map((e) => e.toString())
-              .toList() ??
-          const [],
+      age: int.tryParse((map['user_age'] ?? map['age'] ?? map['years'] ?? '').toString()) ?? 0,
+      email: (map['email'] ?? map['email_address'] ?? map['mail'] ?? map['e_mail'])?.toString() ?? "",
+      isActive: (map['is_active'] ?? map['active'] ?? map['enabled'] as bool?) ?? false,
+      tags: ((map['tags'] as List<dynamic>?) ?? (map['tags_list'] as List<dynamic>?) ?? (map['labels'] as List<dynamic>?))?.map((e) => e.toString()).toList() ?? const [],
     );
   }
 }
+

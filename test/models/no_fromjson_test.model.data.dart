@@ -38,11 +38,11 @@ mixin _NoFromJsonTest {
       age,
     ]);
   }
-
   @override
   String toString() {
     return 'NoFromJsonTest(name: $name, age: $age)';
   }
+
 
   Map<String, dynamic> toJson() {
     final map = <String, dynamic>{};
@@ -51,3 +51,4 @@ mixin _NoFromJsonTest {
     return map;
   }
 }
+

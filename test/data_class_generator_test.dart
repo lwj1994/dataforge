@@ -151,14 +151,6 @@ void main() {
       // Test factory fromJson methods for all model classes
       print('Testing factory fromJson methods...');
 
-      // Test EnumTypes
-      final enumTypesJson = {
-        'status': 'active',
-        'user_type': 'admin',
-        'priority': 'high',
-        'parsedStatus': 'pending',
-      };
-
       // Dynamically import and test EnumTypes
       final enumTypesFile = File('test/models/enum_types.dart');
       if (enumTypesFile.existsSync()) {

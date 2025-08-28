@@ -6,8 +6,10 @@ void main(List<String> args) async {
   final parser = ArgParser();
 
   parser.addOption("path", defaultsTo: "");
+  parser.addFlag("format", defaultsTo: false, help: "Format generated code");
   final res = parser.parse(args);
   String path = res.option("path") ?? "";
+  bool shouldFormat = res.flag("format");
   List<String> generatedFiles = [];
 
   // Show loading indicator
@@ -22,7 +24,11 @@ void main(List<String> args) async {
 
   // Format only the files that were generated in this run
   if (generatedFiles.isNotEmpty) {
-    await _formatGeneratedCode(generatedFiles);
+    if (shouldFormat) {
+      await _formatGeneratedCode(generatedFiles);
+    } else {
+      print('\n✅ Generated ${generatedFiles.length} files successfully!');
+    }
   } else {
     print('\n✅ No files to generate.');
   }
@@ -39,11 +45,10 @@ Future<void> _formatGeneratedCode(List<String> generatedFiles) async {
     }
 
     // Run dart fix --apply on each generated file individually
-    bool fixSuccess = true;
     for (final file in generatedFiles) {
       final fixResult = await Process.run('dart', ['fix', '--apply', file]);
       if (fixResult.exitCode != 0) {
-        fixSuccess = false;
+        print('Warning: Failed to apply fixes to $file');
       }
     }
 
@@ -51,7 +56,7 @@ Future<void> _formatGeneratedCode(List<String> generatedFiles) async {
 
     // Run dart format on generated files only
     final formatArgs = ['format', ...generatedFiles];
-    final formatResult = await Process.run('dart', formatArgs);
+    await Process.run('dart', formatArgs);
 
     stdout.write('.');
     print('\n✅ Generated ${generatedFiles.length} files successfully!');
