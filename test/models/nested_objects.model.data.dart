@@ -66,11 +66,11 @@ mixin _Address {
       isPrimary,
     ]);
   }
-
   @override
   String toString() {
     return 'Address(street: $street, city: $city, state: $state, zipCode: $zipCode, country: $country, isPrimary: $isPrimary)';
   }
+
 
   Map<String, dynamic> toJson() {
     final map = <String, dynamic>{};
@@ -137,11 +137,11 @@ mixin _Contact {
       contactType,
     ]);
   }
-
   @override
   String toString() {
     return 'Contact(email: $email, phone: $phone, contactType: $contactType)';
   }
+
 
   Map<String, dynamic> toJson() {
     final map = <String, dynamic>{};
@@ -200,8 +200,7 @@ mixin _Company {
     if (primaryContact != other.primaryContact) {
       return false;
     }
-    if (!const DeepCollectionEquality()
-        .equals(additionalContacts, other.additionalContacts)) {
+    if (!const DeepCollectionEquality().equals(additionalContacts, other.additionalContacts)) {
       return false;
     }
     return true;
@@ -217,11 +216,11 @@ mixin _Company {
       const DeepCollectionEquality().hash(additionalContacts),
     ]);
   }
-
   @override
   String toString() {
     return 'Company(name: $name, headquarters: $headquarters, branches: $branches, primaryContact: $primaryContact, additionalContacts: $additionalContacts)';
   }
+
 
   Map<String, dynamic> toJson() {
     final map = <String, dynamic>{};
@@ -236,18 +235,10 @@ mixin _Company {
   static Company fromJson(Map<String, dynamic> map) {
     return Company(
       name: (map['name'])?.toString() ?? "",
-      headquarters:
-          Address.fromJson((map['headquarters'] ?? {}) as Map<String, dynamic>),
-      branches: (map['branches'] as List<dynamic>?)
-          ?.map((e) => Address.fromJson(e as Map<String, dynamic>))
-          .toList()
-          .cast<Address>(),
-      primaryContact: Contact.fromJson(
-          (map['primaryContact'] ?? {}) as Map<String, dynamic>),
-      additionalContacts: (map['additionalContacts'] as List<dynamic>?)
-          ?.map((e) => Contact.fromJson(e as Map<String, dynamic>))
-          .toList()
-          .cast<Contact>(),
+      headquarters: Address.fromJson((map['headquarters'] ?? {}) as Map<String, dynamic>),
+      branches: (map['branches'] as List<dynamic>?)?.map((e) => Address.fromJson(e as Map<String, dynamic>)).toList()?.cast<Address>(),
+      primaryContact: Contact.fromJson((map['primaryContact'] ?? {}) as Map<String, dynamic>),
+      additionalContacts: (map['additionalContacts'] as List<dynamic>?)?.map((e) => Contact.fromJson(e as Map<String, dynamic>)).toList()?.cast<Contact>(),
     );
   }
 }
@@ -304,12 +295,10 @@ mixin _NestedObjects {
     if (workAddress != other.workAddress) {
       return false;
     }
-    if (!const DeepCollectionEquality()
-        .equals(previousAddresses, other.previousAddresses)) {
+    if (!const DeepCollectionEquality().equals(previousAddresses, other.previousAddresses)) {
       return false;
     }
-    if (!const DeepCollectionEquality()
-        .equals(namedAddresses, other.namedAddresses)) {
+    if (!const DeepCollectionEquality().equals(namedAddresses, other.namedAddresses)) {
       return false;
     }
     if (primaryContact != other.primaryContact) {
@@ -324,8 +313,7 @@ mixin _NestedObjects {
     if (customAddress != other.customAddress) {
       return false;
     }
-    if (!const DeepCollectionEquality()
-        .equals(parsedContacts, other.parsedContacts)) {
+    if (!const DeepCollectionEquality().equals(parsedContacts, other.parsedContacts)) {
       return false;
     }
     return true;
@@ -346,11 +334,11 @@ mixin _NestedObjects {
       const DeepCollectionEquality().hash(parsedContacts),
     ]);
   }
-
   @override
   String toString() {
     return 'NestedObjects(name: $name, homeAddress: $homeAddress, workAddress: $workAddress, previousAddresses: $previousAddresses, namedAddresses: $namedAddresses, primaryContact: $primaryContact, contacts: $contacts, employer: $employer, customAddress: $customAddress, parsedContacts: $parsedContacts)';
   }
+
 
   Map<String, dynamic> toJson() {
     final map = <String, dynamic>{};
@@ -370,29 +358,16 @@ mixin _NestedObjects {
   static NestedObjects fromJson(Map<String, dynamic> map) {
     return NestedObjects(
       name: (map['name'])?.toString() ?? "",
-      homeAddress:
-          Address.fromJson((map['homeAddress'] ?? {}) as Map<String, dynamic>),
-      workAddress: map['workAddress'] != null
-          ? Address.fromJson(map['workAddress'] as Map<String, dynamic>)
-          : null,
-      previousAddresses: (map['previousAddresses'] as List<dynamic>?)
-              ?.map((e) => Address.fromJson(e as Map<String, dynamic>))
-              .toList()
-              .cast<Address>() ??
-          [],
+      homeAddress: Address.fromJson((map['homeAddress'] ?? {}) as Map<String, dynamic>),
+      workAddress: map['workAddress'] != null ? Address.fromJson(map['workAddress'] as Map<String, dynamic>) : null,
+      previousAddresses: (map['previousAddresses'] as List<dynamic>?)?.map((e) => Address.fromJson(e as Map<String, dynamic>)).toList()?.cast<Address>() ?? [],
       namedAddresses: (map['namedAddresses'] as Map<String, Address>?),
-      primaryContact: Contact.fromJson(
-          (map['primaryContact'] ?? {}) as Map<String, dynamic>),
-      contacts: (map['contacts'] as List<dynamic>?)
-          ?.map((e) => Contact.fromJson(e as Map<String, dynamic>))
-          .toList()
-          .cast<Contact>(),
-      employer: map['employer'] != null
-          ? Company.fromJson(map['employer'] as Map<String, dynamic>)
-          : null,
+      primaryContact: Contact.fromJson((map['primaryContact'] ?? {}) as Map<String, dynamic>),
+      contacts: (map['contacts'] as List<dynamic>?)?.map((e) => Contact.fromJson(e as Map<String, dynamic>)).toList()?.cast<Contact>(),
+      employer: map['employer'] != null ? Company.fromJson(map['employer'] as Map<String, dynamic>) : null,
       customAddress: NestedObjects._readValue(map, 'customAddress') as Address?,
-      parsedContacts:
-          NestedObjects._readValue(map, 'parsedContacts') as List<Contact>?,
+      parsedContacts: NestedObjects._readValue(map, 'parsedContacts') as List<Contact>?,
     );
   }
 }
+

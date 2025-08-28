@@ -80,11 +80,11 @@ mixin _EnumTypes {
       const DeepCollectionEquality().hash(roleMap),
     ]);
   }
-
   @override
   String toString() {
     return 'EnumTypes(status: $status, optionalRole: $optionalRole, userType: $userType, priority: $priority, parsedStatus: $parsedStatus, roleFromInt: $roleFromInt, statusList: $statusList, roleMap: $roleMap)';
   }
+
 
   Map<String, dynamic> toJson() {
     final map = <String, dynamic>{};
@@ -105,10 +105,11 @@ mixin _EnumTypes {
       optionalRole: (map['optionalRole'] as UserRole?),
       userType: (map['user_type'] as UserRole),
       priority: (map['priority'] as Priority),
-      parsedStatus: (EnumTypes._readValue(map, 'parsedStatus')) as Status,
+      parsedStatus: (EnumTypes._readValue(map, 'parsedStatus') ?? null) as Status,
       roleFromInt: EnumTypes._readValue(map, 'roleFromInt') as UserRole?,
       statusList: (map['statusList'] as List<dynamic>?)?.cast<Status>(),
       roleMap: (map['roleMap'] as Map<String, UserRole>?),
     );
   }
 }
+

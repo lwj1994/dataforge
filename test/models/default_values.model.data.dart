@@ -59,11 +59,11 @@ mixin _DefaultValues {
       const DeepCollectionEquality().hash(listValue),
     ]);
   }
-
   @override
   String toString() {
     return 'DefaultValues(intValue: $intValue, stringValue: $stringValue, boolValue: $boolValue, doubleValue: $doubleValue, listValue: $listValue)';
   }
+
 
   Map<String, dynamic> toJson() {
     final map = <String, dynamic>{};
@@ -80,12 +80,8 @@ mixin _DefaultValues {
       intValue: int.tryParse((map['intValue'] ?? '').toString()) ?? 42,
       stringValue: (map['stringValue'])?.toString() ?? 'default',
       boolValue: (map['boolValue'] as bool?) ?? true,
-      doubleValue:
-          double.tryParse((map['doubleValue'] ?? '').toString()) ?? 3.14,
-      listValue: (map['listValue'] as List<dynamic>?)
-              ?.map((e) => e.toString())
-              .toList() ??
-          const ['default'],
+      doubleValue: double.tryParse((map['doubleValue'] ?? '').toString()) ?? 3.14,
+      listValue: (map['listValue'] as List<dynamic>?)?.map((e) => e.toString()).toList() ?? const ['default'],
     );
   }
 }
@@ -132,11 +128,11 @@ mixin _NestedDefaultValues {
       nullableValue,
     ]);
   }
-
   @override
   String toString() {
     return 'NestedDefaultValues(name: $name, nested: $nested, nullableValue: $nullableValue)';
   }
+
 
   Map<String, dynamic> toJson() {
     final map = <String, dynamic>{};
@@ -149,12 +145,9 @@ mixin _NestedDefaultValues {
   static NestedDefaultValues fromJson(Map<String, dynamic> map) {
     return NestedDefaultValues(
       name: (map['name'])?.toString() ?? 'nested_default',
-      nested: map['nested'] != null
-          ? DefaultValues.fromJson(map['nested'] as Map<String, dynamic>)
-          : const DefaultValues(),
-      nullableValue: map['nullableValue'] != null
-          ? int.tryParse(map['nullableValue'].toString())
-          : null,
+      nested: map['nested'] != null ? DefaultValues.fromJson(map['nested'] as Map<String, dynamic>) : const DefaultValues(),
+      nullableValue: map['nullableValue'] != null ? int.tryParse(map['nullableValue'].toString()) : null,
     );
   }
 }
+

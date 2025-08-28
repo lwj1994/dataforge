@@ -287,7 +287,7 @@ class Parser {
                 }
 
                 // Skip invalid types
-                if (type == 'void' || type.startsWith('_')) {
+                if (type == 'void') {
                   print(
                       'Warning: Skipping field "$name" with invalid type "$type"');
                   continue;
