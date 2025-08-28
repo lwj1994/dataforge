@@ -38,11 +38,11 @@ mixin _ValidExample1 {
       password,
     ]);
   }
+
   @override
   String toString() {
     return 'ValidExample1(name: $name, password: $password)';
   }
-
 
   Map<String, dynamic> toJson() {
     final map = <String, dynamic>{};
@@ -92,11 +92,11 @@ mixin _ValidExample2 {
       secret,
     ]);
   }
+
   @override
   String toString() {
     return 'ValidExample2(name: $name, secret: $secret)';
   }
-
 
   Map<String, dynamic> toJson() {
     final map = <String, dynamic>{};
@@ -110,4 +110,3 @@ mixin _ValidExample2 {
     );
   }
 }
-

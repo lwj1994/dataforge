@@ -23,9 +23,9 @@ class TestModel with _TestModel {
 class Params with _Params {
   @override
   final String value;
-  
+
   const Params({required this.value});
-  
+
   factory Params.fromJson(Map<String, dynamic> json) {
     return _Params.fromJson(json);
   }

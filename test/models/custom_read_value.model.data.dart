@@ -80,11 +80,11 @@ mixin _CustomReadValue {
       const DeepCollectionEquality().hash(tags),
     ]);
   }
+
   @override
   String toString() {
     return 'CustomReadValue(id: $id, name: $name, title: $title, count: $count, enabled: $enabled, createdDate: $createdDate, config: $config, tags: $tags)';
   }
-
 
   Map<String, dynamic> toJson() {
     final map = <String, dynamic>{};
@@ -104,12 +104,22 @@ mixin _CustomReadValue {
       id: (map['id'])?.toString() ?? "",
       name: (map['name'])?.toString() ?? "",
       title: (CustomReadValue._readValue(map, 'title'))?.toString() ?? '',
-      count: int.tryParse((CustomReadValue._readValue(map, 'count') ?? '').toString()) ?? 0,
-      enabled: CustomReadValue._readValue(map, 'enabled') != null ? (CustomReadValue._readValue(map, 'enabled').toString().toLowerCase() == 'true') : false,
-      createdDate: CustomReadValue._readValue(map, 'createdDate') != null ? DateTime.tryParse(CustomReadValue._readValue(map, 'createdDate').toString()) : null,
-      config: CustomReadValue._readValue(map, 'config') as Map<String, dynamic>?,
+      count: int.tryParse(
+              (CustomReadValue._readValue(map, 'count') ?? '').toString()) ??
+          0,
+      enabled: CustomReadValue._readValue(map, 'enabled') != null
+          ? (CustomReadValue._readValue(map, 'enabled')
+                  .toString()
+                  .toLowerCase() ==
+              'true')
+          : false,
+      createdDate: CustomReadValue._readValue(map, 'createdDate') != null
+          ? DateTime.tryParse(
+              CustomReadValue._readValue(map, 'createdDate').toString())
+          : null,
+      config:
+          CustomReadValue._readValue(map, 'config') as Map<String, dynamic>?,
       tags: CustomReadValue._readValue(map, 'tags') as List<String>?,
     );
   }
 }
-

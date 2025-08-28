@@ -45,11 +45,11 @@ mixin _UserDataforge {
       email,
     ]);
   }
+
   @override
   String toString() {
     return 'UserDataforge(name: $name, age: $age, email: $email)';
   }
-
 
   Map<String, dynamic> toJson() {
     final map = <String, dynamic>{};
@@ -110,11 +110,11 @@ mixin _UserDataClass {
       email,
     ]);
   }
+
   @override
   String toString() {
     return 'UserDataClass(name: $name, age: $age, email: $email)';
   }
-
 
   Map<String, dynamic> toJson() {
     final map = <String, dynamic>{};
@@ -168,11 +168,11 @@ mixin _UserDataClassConstant {
       age,
     ]);
   }
+
   @override
   String toString() {
     return 'UserDataClassConstant(name: $name, age: $age)';
   }
-
 
   Map<String, dynamic> toJson() {
     final map = <String, dynamic>{};
@@ -224,11 +224,11 @@ mixin _UserDataforgeConstant {
       age,
     ]);
   }
+
   @override
   String toString() {
     return 'UserDataforgeConstant(name: $name, age: $age)';
   }
-
 
   Map<String, dynamic> toJson() {
     final map = <String, dynamic>{};
@@ -244,4 +244,3 @@ mixin _UserDataforgeConstant {
     );
   }
 }
-

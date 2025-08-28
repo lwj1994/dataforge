@@ -73,7 +73,8 @@ mixin _MapTypes {
     if (!const DeepCollectionEquality().equals(dynamicMap, other.dynamicMap)) {
       return false;
     }
-    if (!const DeepCollectionEquality().equals(optionalStringMap, other.optionalStringMap)) {
+    if (!const DeepCollectionEquality()
+        .equals(optionalStringMap, other.optionalStringMap)) {
       return false;
     }
     if (!const DeepCollectionEquality().equals(listMap, other.listMap)) {
@@ -88,7 +89,8 @@ mixin _MapTypes {
     if (!const DeepCollectionEquality().equals(parsedMap, other.parsedMap)) {
       return false;
     }
-    if (!const DeepCollectionEquality().equals(customIntMap, other.customIntMap)) {
+    if (!const DeepCollectionEquality()
+        .equals(customIntMap, other.customIntMap)) {
       return false;
     }
     if (!const DeepCollectionEquality().equals(complexMap, other.complexMap)) {
@@ -122,11 +124,11 @@ mixin _MapTypes {
       const DeepCollectionEquality().hash(intKeyMap),
     ]);
   }
+
   @override
   String toString() {
     return 'MapTypes(stringMap: $stringMap, intMap: $intMap, doubleMap: $doubleMap, boolMap: $boolMap, dynamicMap: $dynamicMap, optionalStringMap: $optionalStringMap, listMap: $listMap, nestedMap: $nestedMap, namedMap: $namedMap, parsedMap: $parsedMap, customIntMap: $customIntMap, complexMap: $complexMap, mapList: $mapList, intKeyMap: $intKeyMap)';
   }
-
 
   Map<String, dynamic> toJson() {
     final map = <String, dynamic>{};
@@ -159,9 +161,12 @@ mixin _MapTypes {
       nestedMap: (map['nestedMap'] as Map<String, Map<String, String>>?) ?? {},
       namedMap: (map['str_map'] as Map<String, String>?) ?? {},
       parsedMap: MapTypes._readValue(map, 'parsedMap') as Map<String, String>?,
-      customIntMap: (MapTypes._readValue(map, 'customIntMap') ?? {}) as Map<String, int>,
-      complexMap: MapTypes._readValue(map, 'complexMap') as Map<String, Map<String, dynamic>>?,
-      mapList: (map['mapList'] as List<dynamic>?)?.cast<Map<String, String>>() ?? [],
+      customIntMap:
+          (MapTypes._readValue(map, 'customIntMap') ?? {}) as Map<String, int>,
+      complexMap: MapTypes._readValue(map, 'complexMap')
+          as Map<String, Map<String, dynamic>>?,
+      mapList:
+          (map['mapList'] as List<dynamic>?)?.cast<Map<String, String>>() ?? [],
       intKeyMap: (map['intKeyMap'] as Map<int, String>?),
     );
   }
@@ -195,13 +200,16 @@ mixin _MapWithObjects {
     if (!const DeepCollectionEquality().equals(addressMap, other.addressMap)) {
       return false;
     }
-    if (!const DeepCollectionEquality().equals(contactListMap, other.contactListMap)) {
+    if (!const DeepCollectionEquality()
+        .equals(contactListMap, other.contactListMap)) {
       return false;
     }
-    if (!const DeepCollectionEquality().equals(optionalAddressMap, other.optionalAddressMap)) {
+    if (!const DeepCollectionEquality()
+        .equals(optionalAddressMap, other.optionalAddressMap)) {
       return false;
     }
-    if (!const DeepCollectionEquality().equals(parsedAddressMap, other.parsedAddressMap)) {
+    if (!const DeepCollectionEquality()
+        .equals(parsedAddressMap, other.parsedAddressMap)) {
       return false;
     }
     return true;
@@ -216,11 +224,11 @@ mixin _MapWithObjects {
       const DeepCollectionEquality().hash(parsedAddressMap),
     ]);
   }
+
   @override
   String toString() {
     return 'MapWithObjects(addressMap: $addressMap, contactListMap: $contactListMap, optionalAddressMap: $optionalAddressMap, parsedAddressMap: $parsedAddressMap)';
   }
-
 
   Map<String, dynamic> toJson() {
     final map = <String, dynamic>{};
@@ -234,9 +242,11 @@ mixin _MapWithObjects {
   static MapWithObjects fromJson(Map<String, dynamic> map) {
     return MapWithObjects(
       addressMap: (map['addressMap'] as Map<String, Address>?) ?? {},
-      contactListMap: (map['contactListMap'] as Map<String, List<Contact>>?) ?? {},
+      contactListMap:
+          (map['contactListMap'] as Map<String, List<Contact>>?) ?? {},
       optionalAddressMap: (map['optionalAddressMap'] as Map<String, Address>?),
-      parsedAddressMap: MapWithObjects._readValue(map, 'parsedAddressMap') as Map<String, Address>?,
+      parsedAddressMap: MapWithObjects._readValue(map, 'parsedAddressMap')
+          as Map<String, Address>?,
     );
   }
 }
@@ -283,11 +293,11 @@ mixin _Address {
       zipCode,
     ]);
   }
+
   @override
   String toString() {
     return 'Address(street: $street, city: $city, zipCode: $zipCode)';
   }
-
 
   Map<String, dynamic> toJson() {
     final map = <String, dynamic>{};
@@ -341,11 +351,11 @@ mixin _Contact {
       phone,
     ]);
   }
+
   @override
   String toString() {
     return 'Contact(email: $email, phone: $phone)';
   }
-
 
   Map<String, dynamic> toJson() {
     final map = <String, dynamic>{};
@@ -361,4 +371,3 @@ mixin _Contact {
     );
   }
 }
-
