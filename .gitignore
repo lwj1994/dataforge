@@ -4,3 +4,7 @@
 
 # Generated test files
 test/gen/
+
+# IDE files
+.idea/
+*.iml
