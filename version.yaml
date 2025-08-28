@@ -2,7 +2,7 @@
 # Used to manage version numbers for main package and annotation package
 
 # Current version number
-version: "0.1.0-dev.0"
+version: "0.1.0"
 
 # Package configuration
 packages:
