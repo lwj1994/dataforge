@@ -84,10 +84,9 @@ packages:
   dataforge_annotation:
     dependency: "direct main"
     description:
-      name: dataforge_annotation
-      sha256: "2d5427372c5e6f68bbfc40aee8de5545b4a1a0a890ed1c7b2efc0d91d959b48c"
-      url: "https://pub.dev"
-    source: hosted
+      path: annotation
+      relative: true
+    source: path
     version: "0.1.0"
   file:
     dependency: transitive

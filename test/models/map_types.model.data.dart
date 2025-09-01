@@ -137,15 +137,23 @@ mixin _MapTypes {
     map['doubleMap'] = doubleMap;
     map['boolMap'] = boolMap;
     map['dynamicMap'] = dynamicMap;
-    map['optionalStringMap'] = optionalStringMap;
+    if (optionalStringMap != null) {
+      map['optionalStringMap'] = optionalStringMap;
+    }
     map['listMap'] = listMap;
     map['nestedMap'] = nestedMap;
     map['str_map'] = namedMap;
-    map['parsedMap'] = parsedMap;
+    if (parsedMap != null) {
+      map['parsedMap'] = parsedMap;
+    }
     map['customIntMap'] = customIntMap;
-    map['complexMap'] = complexMap;
+    if (complexMap != null) {
+      map['complexMap'] = complexMap;
+    }
     map['mapList'] = mapList;
-    map['intKeyMap'] = intKeyMap;
+    if (intKeyMap != null) {
+      map['intKeyMap'] = intKeyMap;
+    }
     return map;
   }
 
@@ -162,7 +170,7 @@ mixin _MapTypes {
       namedMap: (map['str_map'] as Map<String, String>?) ?? {},
       parsedMap: MapTypes._readValue(map, 'parsedMap') as Map<String, String>?,
       customIntMap:
-          (MapTypes._readValue(map, 'customIntMap') ?? {}) as Map<String, int>,
+          MapTypes._readValue(map, 'customIntMap') as Map<String, int>,
       complexMap: MapTypes._readValue(map, 'complexMap')
           as Map<String, Map<String, dynamic>>?,
       mapList:
@@ -234,8 +242,12 @@ mixin _MapWithObjects {
     final map = <String, dynamic>{};
     map['addressMap'] = addressMap;
     map['contactListMap'] = contactListMap;
-    map['optionalAddressMap'] = optionalAddressMap;
-    map['parsedAddressMap'] = parsedAddressMap;
+    if (optionalAddressMap != null) {
+      map['optionalAddressMap'] = optionalAddressMap;
+    }
+    if (parsedAddressMap != null) {
+      map['parsedAddressMap'] = parsedAddressMap;
+    }
     return map;
   }
 
@@ -360,7 +372,9 @@ mixin _Contact {
   Map<String, dynamic> toJson() {
     final map = <String, dynamic>{};
     map['email'] = email;
-    map['phone'] = phone;
+    if (phone != null) {
+      map['phone'] = phone;
+    }
     return map;
   }
 

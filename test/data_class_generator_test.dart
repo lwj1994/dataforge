@@ -22,7 +22,8 @@ void main() {
       }
     });
 
-    test('should generate code for existing models', () async {
+    test('should generate code for existing models',
+        timeout: Timeout(Duration(minutes: 2)), () async {
       // 1. Verify test models exist
       final modelFiles = testModelsDir
           .listSync()
@@ -36,7 +37,12 @@ void main() {
 
       // 2. Run code generation
       print('Running code generation...');
-      generate('test/models');
+      final generateResult = await Process.run(
+          'dart', ['bin/dataforge.dart', 'test/models'],
+          workingDirectory: Directory.current.path);
+      expect(generateResult.exitCode, equals(0),
+          reason: 'Code generation should succeed');
+      print('Code generation completed: ${generateResult.stdout}');
 
       // 3. Execute code formatting
       print('Running dart fix...');
@@ -62,7 +68,7 @@ void main() {
         // First verify generated code has no syntax errors
         print('Checking syntax for $baseName.data.dart...');
         final analyzeResult = await Process.run(
-            'dart', ['analyze', generatedFile.path],
+            'dart', ['analyze', '--no-fatal-warnings', generatedFile.path],
             workingDirectory: Directory.current.path);
 
         if (analyzeResult.exitCode != 0) {

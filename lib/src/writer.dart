@@ -7,6 +7,55 @@ class Writer {
 
   Writer(this.result);
 
+  /// Check if a type is an enum by analyzing the source files
+  bool _isEnumType(String type) {
+    // Remove nullable marker and generic parameters
+    final cleanType =
+        type.replaceAll('?', '').replaceAll(RegExp(r'<[^>]*>'), '');
+
+    // Check all Dart files in the current directory for enum definitions
+    final currentDir = Directory.current;
+    final dartFiles = currentDir
+        .listSync(recursive: true)
+        .whereType<File>()
+        .where((file) => file.path.endsWith('.dart'))
+        .toList();
+
+    for (final file in dartFiles) {
+      try {
+        final content = file.readAsStringSync();
+        // Look for enum definition
+        final enumPattern =
+            RegExp(r'enum\s+' + RegExp.escape(cleanType) + r'\s*\{');
+        if (enumPattern.hasMatch(content)) {
+          return true;
+        }
+      } catch (e) {
+        // Ignore file read errors
+        continue;
+      }
+    }
+
+    return false;
+  }
+
+  /// Auto-match converter based on field type
+  /// Returns the appropriate converter name for common types
+  String? _getAutoMatchedConverter(String type) {
+    switch (type) {
+      case 'DateTime':
+        return 'DateTimeConverter';
+      case 'Duration':
+        return 'DurationConverter';
+      default:
+        // Check if it's an enum type
+        if (_isEnumType(type)) {
+          return 'EnumConverter';
+        }
+        return null;
+    }
+  }
+
   /// Check if the original file already has a fromJson factory method
   bool _hasFromJsonMethod(String filePath, String className) {
     try {
@@ -23,6 +72,65 @@ class Writer {
     } catch (e) {
       print('Error checking fromJson method in $filePath: $e');
       return false;
+    }
+  }
+
+  /// Add or update with clause in class declaration
+  void _addWithClauseToClass(String filePath, String className) {
+    try {
+      final file = File(filePath);
+      if (!file.existsSync()) return;
+
+      final content = file.readAsStringSync();
+      final lines = content.split('\n');
+      bool modified = false;
+
+      for (int i = 0; i < lines.length; i++) {
+        final line = lines[i];
+
+        // Find class declaration line
+        if (line.contains('class $className') && !line.contains('mixin')) {
+          final trimmedLine = line.trim();
+          final mixinName = '_$className';
+
+          // Check if already has the correct with clause
+          if (trimmedLine.contains('with $mixinName')) {
+            break; // Already has the correct with clause
+          }
+
+          // Check if has any with clause
+          if (trimmedLine.contains(' with ')) {
+            // Has existing with clause, add our mixin
+            final withIndex = line.indexOf(' with ');
+            final openBraceIndex = line.indexOf('{');
+
+            if (openBraceIndex > withIndex) {
+              // Insert before the opening brace
+              final beforeBrace = line.substring(0, openBraceIndex).trim();
+              final afterBrace = line.substring(openBraceIndex);
+              lines[i] = '$beforeBrace, $mixinName $afterBrace';
+              modified = true;
+            }
+          } else {
+            // No existing with clause, add one
+            final openBraceIndex = line.indexOf('{');
+
+            if (openBraceIndex != -1) {
+              final beforeBrace = line.substring(0, openBraceIndex).trim();
+              final afterBrace = line.substring(openBraceIndex);
+              lines[i] = '$beforeBrace with $mixinName $afterBrace';
+              modified = true;
+            }
+          }
+          break;
+        }
+      }
+
+      if (modified) {
+        file.writeAsStringSync(lines.join('\n'));
+      }
+    } catch (e) {
+      print('Error adding with clause to $filePath: $e');
     }
   }
 
@@ -79,15 +187,108 @@ class Writer {
     }
   }
 
-  /// Process original files, add fromJson method
-  void _processOriginalFiles() {
-    for (final clazz in result.classes) {
-      // Only process when includeFromJson is true
-      if (clazz.includeFromJson) {
-        // Infer original file path from output path
-        final originalFilePath =
-            result.outputPath.replaceAll('.data.dart', '.dart');
+  /// Check if the original file already has a part declaration
+  bool _hasPartDeclaration(String filePath) {
+    try {
+      final file = File(filePath);
+      if (!file.existsSync()) return false;
 
+      final content = file.readAsStringSync();
+      final dataFileName = result.outputPath.split('/').last;
+      final partPattern = RegExp(
+        'part\\s+[\'"]${RegExp.escape(dataFileName)}[\'"]\\s*;',
+        multiLine: true,
+      );
+      return partPattern.hasMatch(content);
+    } catch (e) {
+      print('Error checking part declaration in $filePath: $e');
+      return false;
+    }
+  }
+
+  /// Add part declaration to the original file
+  void _addPartToOriginalFile(String filePath) {
+    try {
+      final file = File(filePath);
+      if (!file.existsSync()) return;
+
+      final content = file.readAsStringSync();
+      final lines = content.split('\n');
+      final dataFileName = result.outputPath.split('/').last;
+
+      // Find the position to insert part declaration (after imports)
+      int insertIndex = 0;
+      bool foundImports = false;
+
+      for (int i = 0; i < lines.length; i++) {
+        final line = lines[i].trim();
+
+        // Skip empty lines and comments at the beginning
+        if (line.isEmpty || line.startsWith('//') || line.startsWith('/*')) {
+          continue;
+        }
+
+        // If it's an import or export, mark that we found imports
+        if (line.startsWith('import ') || line.startsWith('export ')) {
+          foundImports = true;
+          insertIndex = i + 1;
+        } else if (foundImports &&
+            !line.startsWith('import ') &&
+            !line.startsWith('export ')) {
+          // We've passed all imports, this is where we insert
+          break;
+        } else if (!foundImports) {
+          // No imports found, insert at the beginning (after initial comments)
+          insertIndex = i;
+          break;
+        }
+      }
+
+      // Insert part declaration
+      final partDeclaration = "part '$dataFileName';";
+
+      // Add empty line before part if there are imports
+      if (foundImports &&
+          insertIndex > 0 &&
+          lines[insertIndex - 1].trim().isNotEmpty) {
+        lines.insert(insertIndex, '');
+        insertIndex++;
+      }
+
+      lines.insert(insertIndex, partDeclaration);
+
+      // Add empty line after part if the next line is not empty
+      if (insertIndex + 1 < lines.length &&
+          lines[insertIndex + 1].trim().isNotEmpty) {
+        lines.insert(insertIndex + 1, '');
+      }
+
+      // Write back to file
+      file.writeAsStringSync(lines.join('\n'));
+      // Added part declaration silently
+    } catch (e) {
+      print('Error adding part declaration to $filePath: $e');
+    }
+  }
+
+  /// Process original files, add fromJson method and part declaration
+  void _processOriginalFiles() {
+    // Infer original file path from output path
+    final originalFilePath =
+        result.outputPath.replaceAll('.data.dart', '.dart');
+
+    // Check and add part declaration if missing (only once per file)
+    if (!_hasPartDeclaration(originalFilePath)) {
+      _addPartToOriginalFile(originalFilePath);
+    }
+
+    // Process each class for with clause and fromJson methods
+    for (final clazz in result.classes) {
+      // Add with clause to class declaration
+      _addWithClauseToClass(originalFilePath, clazz.name);
+
+      // Only process fromJson when includeFromJson is true
+      if (clazz.includeFromJson) {
         // Check if original file already has fromJson method
         if (!_hasFromJsonMethod(originalFilePath, clazz.name)) {
           _addFromJsonToOriginalFile(originalFilePath, clazz.name);
@@ -288,14 +489,33 @@ class Writer {
         key = field.jsonKey!.name;
       }
 
-      // If there is a TypeConverter, use converter's toJson method
+      // Check for explicit TypeConverter first, then auto-match
       String valueExpression = field.name;
-      if (field.jsonKey?.converter.isNotEmpty == true) {
-        final converterName = field.jsonKey!.converter;
+      String? converterName = field.jsonKey?.converter.isNotEmpty == true
+          ? field.jsonKey!.converter
+          : null;
+
+      // If no explicit converter, try to auto-match based on type
+      if (converterName == null || converterName.isEmpty) {
+        final cleanType = field.type.replaceAll('?', '');
+        converterName = _getAutoMatchedConverter(cleanType);
+      }
+
+      // If there is a TypeConverter (explicit or auto-matched), use converter's toJson method
+      if (converterName != null && converterName.isNotEmpty) {
         // Check if converterName already contains parentheses, if so use directly, otherwise add parentheses
-        final converterInstance = converterName.contains('(')
-            ? 'const $converterName'
-            : 'const $converterName()';
+        String converterInstance;
+        if (converterName.contains('(')) {
+          converterInstance = 'const $converterName';
+        } else {
+          // For EnumConverter, add values parameter
+          if (converterName == 'EnumConverter') {
+            final cleanType = field.type.replaceAll('?', '');
+            converterInstance = 'const $converterName($cleanType.values)';
+          } else {
+            converterInstance = 'const $converterName()';
+          }
+        }
         final isNullable = field.type.endsWith('?');
         if (isNullable) {
           valueExpression =
@@ -306,7 +526,7 @@ class Writer {
       }
 
       // Handle includeIfNull parameter
-      final includeIfNull = field.jsonKey?.includeIfNull ?? true;
+      final includeIfNull = field.jsonKey?.includeIfNull ?? false;
       final isNullable = field.type.endsWith('?');
 
       if (isNullable && !includeIfNull) {
@@ -391,9 +611,15 @@ class Writer {
                 "($valueExpression ?? ${_getDefaultValueForType('dynamic')}) as dynamic$defaultValue";
           }
         } else {
-          // Apply safe type conversion for basic types when using readValue
-          getValueExpression = _generateSafeReadValueExpression(
-              field, valueExpression, defaultValue);
+          // For fields with readValue, cast the result to the expected type
+          // The readValue method returns Object?, so we need to cast it
+          if (field.type.endsWith('?')) {
+            getValueExpression =
+                "$valueExpression as ${field.type}$defaultValue";
+          } else {
+            getValueExpression =
+                "$valueExpression as ${field.type}$defaultValue";
+          }
         }
       } else {
         getValueExpression =
@@ -412,13 +638,30 @@ class Writer {
     final type = field.type.replaceAll('?', '');
     final isNullable = field.type.endsWith('?');
 
-    // If there is a TypeConverter, use converter's fromJson method
-    if (field.jsonKey?.converter.isNotEmpty == true) {
-      final converterName = field.jsonKey!.converter;
+    // Check for explicit TypeConverter first
+    String? converterName = field.jsonKey?.converter.isNotEmpty == true
+        ? field.jsonKey!.converter
+        : null;
+
+    // If no explicit converter, try to auto-match based on type
+    if (converterName == null || converterName.isEmpty) {
+      converterName = _getAutoMatchedConverter(type);
+    }
+
+    // If there is a TypeConverter (explicit or auto-matched), use converter's fromJson method
+    if (converterName != null && converterName.isNotEmpty) {
       // Check if converterName already contains parentheses, if so use directly, otherwise add parentheses
-      final converterInstance = converterName.contains('(')
-          ? 'const $converterName'
-          : 'const $converterName()';
+      String converterInstance;
+      if (converterName.contains('(')) {
+        converterInstance = 'const $converterName';
+      } else {
+        // For EnumConverter, add generic type parameter and values
+        if (converterName == 'EnumConverter') {
+          converterInstance = 'const $converterName($type.values)';
+        } else {
+          converterInstance = 'const $converterName()';
+        }
+      }
 
       // If readValue is used, need to perform type conversion on return value
       final hasReadValue = field.jsonKey?.readValue.isNotEmpty == true;
@@ -565,15 +808,8 @@ class Writer {
             return "($valueExpression as List<dynamic>?)?.map((e) => double.tryParse(e.toString()) ?? 0.0).toList()$defaultValue";
           } else if (itemType == 'bool') {
             return "($valueExpression as List<dynamic>?)?.map((e) => e as bool? ?? false).toList()$defaultValue";
-          } else if ([
-            'DateTime',
-            'Uri',
-            'Duration',
-            'Status',
-            'UserRole',
-            'Priority'
-          ].contains(itemType)) {
-            // Built-in types and enum types, convert directly
+          } else if (['DateTime', 'Uri', 'Duration'].contains(itemType)) {
+            // Built-in types, convert directly
             if (isNullable) {
               return "($valueExpression as List<dynamic>?)?.cast<$itemType>()$defaultValue";
             } else {
@@ -606,14 +842,29 @@ class Writer {
               }
             }
 
-            if (isNullable) {
-              return "($valueExpression as List<dynamic>?)?.map((e) => $cleanItemType.fromJson(e as Map<String, dynamic>)).toList()?.cast<$castType>()$defaultValue";
+            // Check if it's an enum type
+            if (_isEnumType(cleanItemType)) {
+              // Enum type, use EnumConverter
+              if (isNullable) {
+                return "($valueExpression as List<dynamic>?)?.map((e) => const EnumConverter($cleanItemType.values).fromJson(e)).toList()?.cast<$castType>()$defaultValue";
+              } else {
+                if (defaultValue.isNotEmpty) {
+                  return "($valueExpression as List<dynamic>?)?.map((e) => const EnumConverter($cleanItemType.values).fromJson(e)).toList()?.cast<$castType>()$defaultValue";
+                } else {
+                  return "($valueExpression as List<dynamic>?)?.map((e) => const EnumConverter($cleanItemType.values).fromJson(e)).toList()?.cast<$castType>() ?? []";
+                }
+              }
             } else {
-              // Non-null List type
-              if (defaultValue.isNotEmpty) {
+              // Custom type, use fromJson
+              if (isNullable) {
                 return "($valueExpression as List<dynamic>?)?.map((e) => $cleanItemType.fromJson(e as Map<String, dynamic>)).toList()?.cast<$castType>()$defaultValue";
               } else {
-                return "($valueExpression as List<dynamic>?)?.map((e) => $cleanItemType.fromJson(e as Map<String, dynamic>)).toList()?.cast<$castType>() ?? []";
+                // Non-null List type
+                if (defaultValue.isNotEmpty) {
+                  return "($valueExpression as List<dynamic>?)?.map((e) => $cleanItemType.fromJson(e as Map<String, dynamic>)).toList()?.cast<$castType>()$defaultValue";
+                } else {
+                  return "($valueExpression as List<dynamic>?)?.map((e) => $cleanItemType.fromJson(e as Map<String, dynamic>)).toList()?.cast<$castType>() ?? []";
+                }
               }
             }
           }
@@ -647,19 +898,9 @@ class Writer {
         // List<T> type handling
         final itemType = type.substring(5, type.length - 1).replaceAll('?', '');
 
-        // Check if it's a built-in type or enum type
-        if ([
-          'DateTime',
-          'Uri',
-          'Duration',
-          'String',
-          'int',
-          'double',
-          'bool',
-          'Status',
-          'UserRole',
-          'Priority'
-        ].contains(itemType)) {
+        // Check if it's a built-in type
+        if (['DateTime', 'Uri', 'Duration', 'String', 'int', 'double', 'bool']
+            .contains(itemType)) {
           if (itemType == 'String') {
             if (isNullable) {
               return "($valueExpression as List<dynamic>?)?.map((e) => e.toString()).toList()$defaultValue";
@@ -691,10 +932,21 @@ class Writer {
             }
           }
 
-          if (isNullable) {
-            return "($valueExpression as List<dynamic>?)?.map((e) => $cleanItemType.fromJson(e as Map<String, dynamic>)).toList()?.cast<$castType>()$defaultValue";
+          // Check if it's an enum type
+          if (_isEnumType(cleanItemType)) {
+            // Enum type, use EnumConverter
+            if (isNullable) {
+              return "($valueExpression as List<dynamic>?)?.map((e) => const EnumConverter($cleanItemType.values).fromJson(e)).toList()?.cast<$castType>()$defaultValue";
+            } else {
+              return "(($valueExpression as List<dynamic>?) ?? []).map((e) => const EnumConverter($cleanItemType.values).fromJson(e)).toList().cast<$castType>()$defaultValue";
+            }
           } else {
-            return "(($valueExpression as List<dynamic>?) ?? []).map((e) => $cleanItemType.fromJson(e as Map<String, dynamic>)).toList().cast<$castType>()$defaultValue";
+            // Custom type, use fromJson
+            if (isNullable) {
+              return "($valueExpression as List<dynamic>?)?.map((e) => $cleanItemType.fromJson(e as Map<String, dynamic>)).toList()?.cast<$castType>()$defaultValue";
+            } else {
+              return "(($valueExpression as List<dynamic>?) ?? []).map((e) => $cleanItemType.fromJson(e as Map<String, dynamic>)).toList().cast<$castType>()$defaultValue";
+            }
           }
         }
       } else {
@@ -703,9 +955,8 @@ class Writer {
             .replaceAll('?', '')
             .replaceAll(RegExp(r'<[^>]*>'), ''); // Remove generic parameters
 
-        // Skip built-in types and enum types
-        if (['DateTime', 'Uri', 'Duration', 'Status', 'UserRole', 'Priority']
-            .contains(cleanType)) {
+        // Skip built-in types
+        if (['DateTime', 'Uri', 'Duration'].contains(cleanType)) {
           return "($valueExpression as $type)$defaultValue";
         }
 
@@ -739,13 +990,28 @@ class Writer {
           }
         }
 
-        if (isNullable) {
-          return "$valueExpression != null ? $cleanType.fromJson($valueExpression as Map<String, dynamic>) : null$defaultValue";
-        } else {
-          if (defaultValue.isNotEmpty) {
-            return "$valueExpression != null ? $cleanType.fromJson($valueExpression as Map<String, dynamic>) : ${defaultValue.substring(4)}";
+        // Check if it's an enum type
+        if (_isEnumType(cleanType)) {
+          // Enum type, use EnumConverter
+          if (isNullable) {
+            return "$valueExpression != null ? const EnumConverter($cleanType.values).fromJson($valueExpression) : null$defaultValue";
           } else {
-            return "$cleanType.fromJson(($valueExpression ?? {}) as Map<String, dynamic>)";
+            if (defaultValue.isNotEmpty) {
+              return "$valueExpression != null ? const EnumConverter($cleanType.values).fromJson($valueExpression) : ${defaultValue.substring(4)}";
+            } else {
+              return "const EnumConverter($cleanType.values).fromJson($valueExpression ?? '')";
+            }
+          }
+        } else {
+          // Custom type, use fromJson
+          if (isNullable) {
+            return "$valueExpression != null ? $cleanType.fromJson($valueExpression as Map<String, dynamic>) : null$defaultValue";
+          } else {
+            if (defaultValue.isNotEmpty) {
+              return "$valueExpression != null ? $cleanType.fromJson($valueExpression as Map<String, dynamic>) : ${defaultValue.substring(4)}";
+            } else {
+              return "$cleanType.fromJson(($valueExpression ?? {}) as Map<String, dynamic>)";
+            }
           }
         }
       }

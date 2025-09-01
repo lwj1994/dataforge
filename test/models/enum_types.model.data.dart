@@ -88,26 +88,50 @@ mixin _EnumTypes {
 
   Map<String, dynamic> toJson() {
     final map = <String, dynamic>{};
-    map['status'] = status;
-    map['optionalRole'] = optionalRole;
-    map['user_type'] = userType;
-    map['priority'] = priority;
-    map['parsedStatus'] = parsedStatus;
-    map['roleFromInt'] = roleFromInt;
-    map['statusList'] = statusList;
-    map['roleMap'] = roleMap;
+    map['status'] = const EnumConverter(Status.values).toJson(status);
+    if (optionalRole != null) {
+      map['optionalRole'] = optionalRole != null
+          ? const EnumConverter(UserRole.values).toJson(optionalRole!)
+          : null;
+    }
+    map['user_type'] = const EnumConverter(UserRole.values).toJson(userType);
+    map['priority'] = const EnumConverter(Priority.values).toJson(priority);
+    map['parsedStatus'] =
+        const EnumConverter(Status.values).toJson(parsedStatus);
+    if (roleFromInt != null) {
+      map['roleFromInt'] = roleFromInt != null
+          ? const EnumConverter(UserRole.values).toJson(roleFromInt!)
+          : null;
+    }
+    if (statusList != null) {
+      map['statusList'] = statusList;
+    }
+    if (roleMap != null) {
+      map['roleMap'] = roleMap;
+    }
     return map;
   }
 
   static EnumTypes fromJson(Map<String, dynamic> map) {
     return EnumTypes(
-      status: (map['status'] as Status),
-      optionalRole: (map['optionalRole'] as UserRole?),
-      userType: (map['user_type'] as UserRole),
-      priority: (map['priority'] as Priority),
-      parsedStatus: (EnumTypes._readValue(map, 'parsedStatus')) as Status,
+      status: map['status'] != null
+          ? const EnumConverter(Status.values).fromJson(map['status'])
+          : throw ArgumentError('Required field status is missing'),
+      optionalRole: map['optionalRole'] != null
+          ? const EnumConverter(UserRole.values).fromJson(map['optionalRole'])
+          : null,
+      userType: map['user_type'] != null
+          ? const EnumConverter(UserRole.values).fromJson(map['user_type'])
+          : throw ArgumentError('Required field userType is missing'),
+      priority: map['priority'] != null
+          ? const EnumConverter(Priority.values).fromJson(map['priority'])
+          : throw ArgumentError('Required field priority is missing'),
+      parsedStatus: EnumTypes._readValue(map, 'parsedStatus') as Status,
       roleFromInt: EnumTypes._readValue(map, 'roleFromInt') as UserRole?,
-      statusList: (map['statusList'] as List<dynamic>?)?.cast<Status>(),
+      statusList: (map['statusList'] as List<dynamic>?)
+          ?.map((e) => const EnumConverter(Status.values).fromJson(e))
+          .toList()
+          .cast<Status>(),
       roleMap: (map['roleMap'] as Map<String, UserRole>?),
     );
   }

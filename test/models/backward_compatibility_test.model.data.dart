@@ -55,7 +55,9 @@ mixin _UserDataforge {
     final map = <String, dynamic>{};
     map['name'] = name;
     map['age'] = age;
-    map['email'] = email;
+    if (email != null) {
+      map['email'] = email;
+    }
     return map;
   }
 
@@ -120,7 +122,9 @@ mixin _UserDataClass {
     final map = <String, dynamic>{};
     map['name'] = name;
     map['age'] = age;
-    map['email'] = email;
+    if (email != null) {
+      map['email'] = email;
+    }
     return map;
   }
 

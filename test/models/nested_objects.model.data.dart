@@ -76,7 +76,9 @@ mixin _Address {
     final map = <String, dynamic>{};
     map['street'] = street;
     map['city'] = city;
-    map['state'] = state;
+    if (state != null) {
+      map['state'] = state;
+    }
     map['zipCode'] = zipCode;
     map['country'] = country;
     map['is_primary'] = isPrimary;
@@ -146,7 +148,9 @@ mixin _Contact {
   Map<String, dynamic> toJson() {
     final map = <String, dynamic>{};
     map['email'] = email;
-    map['phone'] = phone;
+    if (phone != null) {
+      map['phone'] = phone;
+    }
     map['contact_type'] = contactType;
     return map;
   }
@@ -227,9 +231,13 @@ mixin _Company {
     final map = <String, dynamic>{};
     map['name'] = name;
     map['headquarters'] = headquarters;
-    map['branches'] = branches;
+    if (branches != null) {
+      map['branches'] = branches;
+    }
     map['primaryContact'] = primaryContact;
-    map['additionalContacts'] = additionalContacts;
+    if (additionalContacts != null) {
+      map['additionalContacts'] = additionalContacts;
+    }
     return map;
   }
 
@@ -356,14 +364,26 @@ mixin _NestedObjects {
     final map = <String, dynamic>{};
     map['name'] = name;
     map['homeAddress'] = homeAddress;
-    map['workAddress'] = workAddress;
+    if (workAddress != null) {
+      map['workAddress'] = workAddress;
+    }
     map['previousAddresses'] = previousAddresses;
-    map['namedAddresses'] = namedAddresses;
+    if (namedAddresses != null) {
+      map['namedAddresses'] = namedAddresses;
+    }
     map['primaryContact'] = primaryContact;
-    map['contacts'] = contacts;
-    map['employer'] = employer;
-    map['customAddress'] = customAddress;
-    map['parsedContacts'] = parsedContacts;
+    if (contacts != null) {
+      map['contacts'] = contacts;
+    }
+    if (employer != null) {
+      map['employer'] = employer;
+    }
+    if (customAddress != null) {
+      map['customAddress'] = customAddress;
+    }
+    if (parsedContacts != null) {
+      map['parsedContacts'] = parsedContacts;
+    }
     return map;
   }
 

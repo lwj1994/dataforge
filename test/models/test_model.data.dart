@@ -47,7 +47,9 @@ mixin _TestModel {
   Map<String, dynamic> toJson() {
     final map = <String, dynamic>{};
     map['name'] = name;
-    map['param'] = param;
+    if (param != null) {
+      map['param'] = param;
+    }
     return map;
   }
 

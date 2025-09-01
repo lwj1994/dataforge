@@ -118,52 +118,69 @@ mixin _DateTimeTypes {
 
   Map<String, dynamic> toJson() {
     final map = <String, dynamic>{};
-    map['createdAt'] = createdAt;
-    map['updatedAt'] = updatedAt;
-    map['birth_date'] = birthDate;
+    map['createdAt'] = const DateTimeConverter().toJson(createdAt);
+    if (updatedAt != null) {
+      map['updatedAt'] = updatedAt != null
+          ? const DateTimeConverter().toJson(updatedAt!)
+          : null;
+    }
+    map['birth_date'] = const DateTimeConverter().toJson(birthDate);
     map['eventDates'] = eventDates;
-    map['optionalEventDates'] = optionalEventDates;
+    if (optionalEventDates != null) {
+      map['optionalEventDates'] = optionalEventDates;
+    }
     map['namedDates'] = namedDates;
-    map['isoDateTime'] = isoDateTime;
-    map['timestampDate'] = timestampDate;
-    map['parsedDate'] = parsedDate;
-    map['dateTimeList'] = dateTimeList;
-    map['duration'] = duration;
-    map['customDuration'] = customDuration;
+    if (isoDateTime != null) {
+      map['isoDateTime'] = isoDateTime != null
+          ? const DateTimeConverter().toJson(isoDateTime!)
+          : null;
+    }
+    map['timestampDate'] = const DateTimeConverter().toJson(timestampDate);
+    if (parsedDate != null) {
+      map['parsedDate'] = parsedDate != null
+          ? const DateTimeConverter().toJson(parsedDate!)
+          : null;
+    }
+    if (dateTimeList != null) {
+      map['dateTimeList'] = dateTimeList;
+    }
+    if (duration != null) {
+      map['duration'] =
+          duration != null ? const DurationConverter().toJson(duration!) : null;
+    }
+    if (customDuration != null) {
+      map['customDuration'] = customDuration != null
+          ? const DurationConverter().toJson(customDuration!)
+          : null;
+    }
     return map;
   }
 
   static DateTimeTypes fromJson(Map<String, dynamic> map) {
     return DateTimeTypes(
-      createdAt: DateTime.parse((map['createdAt'] ?? '').toString()),
+      createdAt: map['createdAt'] != null
+          ? const DateTimeConverter().fromJson(map['createdAt'])
+          : throw ArgumentError('Required field createdAt is missing'),
       updatedAt: map['updatedAt'] != null
-          ? DateTime.tryParse(map['updatedAt'].toString())
+          ? const DateTimeConverter().fromJson(map['updatedAt'])
           : null,
-      birthDate: DateTime.parse((map['birth_date'] ?? '').toString()),
+      birthDate: map['birth_date'] != null
+          ? const DateTimeConverter().fromJson(map['birth_date'])
+          : throw ArgumentError('Required field birthDate is missing'),
       eventDates: (map['eventDates'] as List<dynamic>?)?.cast<DateTime>() ?? [],
       optionalEventDates:
           (map['optionalEventDates'] as List<dynamic>?)?.cast<DateTime>(),
       namedDates: (map['namedDates'] as Map<String, DateTime>?) ?? {},
-      isoDateTime: DateTimeTypes._readValue(map, 'isoDateTime') != null
-          ? DateTime.tryParse(
-              DateTimeTypes._readValue(map, 'isoDateTime').toString())
-          : null,
-      timestampDate: DateTime.parse(
-          (DateTimeTypes._readValue(map, 'timestampDate') ?? '').toString()),
-      parsedDate: DateTimeTypes._readValue(map, 'parsedDate') != null
-          ? DateTime.tryParse(
-              DateTimeTypes._readValue(map, 'parsedDate').toString())
-          : null,
+      isoDateTime: DateTimeTypes._readValue(map, 'isoDateTime') as DateTime?,
+      timestampDate: DateTimeTypes._readValue(map, 'timestampDate') as DateTime,
+      parsedDate: DateTimeTypes._readValue(map, 'parsedDate') as DateTime?,
       dateTimeList:
           DateTimeTypes._readValue(map, 'dateTimeList') as List<DateTime>?,
       duration: map['duration'] != null
-          ? Duration(milliseconds: map['duration'] as int? ?? 0)
+          ? const DurationConverter().fromJson(map['duration'])
           : null,
-      customDuration: DateTimeTypes._readValue(map, 'customDuration') != null
-          ? Duration(
-              milliseconds:
-                  DateTimeTypes._readValue(map, 'customDuration') as int? ?? 0)
-          : null,
+      customDuration:
+          DateTimeTypes._readValue(map, 'customDuration') as Duration?,
     );
   }
 }
@@ -225,21 +242,26 @@ mixin _TimeZoneTest {
 
   Map<String, dynamic> toJson() {
     final map = <String, dynamic>{};
-    map['utcTime'] = utcTime;
-    map['localTime'] = localTime;
-    map['timeZoneAware'] = timeZoneAware;
+    map['utcTime'] = const DateTimeConverter().toJson(utcTime);
+    map['localTime'] = const DateTimeConverter().toJson(localTime);
+    if (timeZoneAware != null) {
+      map['timeZoneAware'] = timeZoneAware != null
+          ? const DateTimeConverter().toJson(timeZoneAware!)
+          : null;
+    }
     map['timeList'] = timeList;
     return map;
   }
 
   static TimeZoneTest fromJson(Map<String, dynamic> map) {
     return TimeZoneTest(
-      utcTime: DateTime.parse((map['utcTime'] ?? '').toString()),
-      localTime: DateTime.parse((map['localTime'] ?? '').toString()),
-      timeZoneAware: TimeZoneTest._readValue(map, 'timeZoneAware') != null
-          ? DateTime.tryParse(
-              TimeZoneTest._readValue(map, 'timeZoneAware').toString())
-          : null,
+      utcTime: map['utcTime'] != null
+          ? const DateTimeConverter().fromJson(map['utcTime'])
+          : throw ArgumentError('Required field utcTime is missing'),
+      localTime: map['localTime'] != null
+          ? const DateTimeConverter().fromJson(map['localTime'])
+          : throw ArgumentError('Required field localTime is missing'),
+      timeZoneAware: TimeZoneTest._readValue(map, 'timeZoneAware') as DateTime?,
       timeList: (map['timeList'] as List<dynamic>?)?.cast<DateTime>() ?? [],
     );
   }

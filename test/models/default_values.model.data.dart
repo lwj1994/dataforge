@@ -142,7 +142,9 @@ mixin _NestedDefaultValues {
     final map = <String, dynamic>{};
     map['name'] = name;
     map['nested'] = nested;
-    map['nullableValue'] = nullableValue;
+    if (nullableValue != null) {
+      map['nullableValue'] = nullableValue;
+    }
     return map;
   }
 

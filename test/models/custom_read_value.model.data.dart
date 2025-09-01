@@ -93,9 +93,17 @@ mixin _CustomReadValue {
     map['title'] = title;
     map['count'] = count;
     map['enabled'] = enabled;
-    map['createdDate'] = createdDate;
-    map['config'] = config;
-    map['tags'] = tags;
+    if (createdDate != null) {
+      map['createdDate'] = createdDate != null
+          ? const DateTimeConverter().toJson(createdDate!)
+          : null;
+    }
+    if (config != null) {
+      map['config'] = config;
+    }
+    if (tags != null) {
+      map['tags'] = tags;
+    }
     return map;
   }
 
@@ -103,20 +111,10 @@ mixin _CustomReadValue {
     return CustomReadValue(
       id: (map['id'])?.toString() ?? "",
       name: (map['name'])?.toString() ?? "",
-      title: (CustomReadValue._readValue(map, 'title'))?.toString() ?? '',
-      count: int.tryParse(
-              (CustomReadValue._readValue(map, 'count') ?? '').toString()) ??
-          0,
-      enabled: CustomReadValue._readValue(map, 'enabled') != null
-          ? (CustomReadValue._readValue(map, 'enabled')
-                  .toString()
-                  .toLowerCase() ==
-              'true')
-          : false,
-      createdDate: CustomReadValue._readValue(map, 'createdDate') != null
-          ? DateTime.tryParse(
-              CustomReadValue._readValue(map, 'createdDate').toString())
-          : null,
+      title: CustomReadValue._readValue(map, 'title') as String,
+      count: CustomReadValue._readValue(map, 'count') as int,
+      enabled: CustomReadValue._readValue(map, 'enabled') as bool,
+      createdDate: CustomReadValue._readValue(map, 'createdDate') as DateTime?,
       config:
           CustomReadValue._readValue(map, 'config') as Map<String, dynamic>?,
       tags: CustomReadValue._readValue(map, 'tags') as List<String>?,
