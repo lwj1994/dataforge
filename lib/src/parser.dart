@@ -120,6 +120,7 @@ class Parser {
         bool? fromMap;
         bool? includeFromJson;
         bool? includeToJson;
+        bool? chainedCopyWith;
         String mixinName = "";
         final arguments = meta.arguments?.arguments ?? [];
 
@@ -152,6 +153,14 @@ class Parser {
                   includeToJson = true;
                 } else {
                   includeToJson = expressionSource == "true";
+                }
+                break;
+              case "chainedCopyWith":
+                // If null, default to false
+                if (expressionSource == "null") {
+                  chainedCopyWith = false;
+                } else {
+                  chainedCopyWith = expressionSource == "true";
                 }
                 break;
               case "name":
@@ -327,6 +336,7 @@ class Parser {
         // Handle backward compatibility: if new parameters are not specified, use fromMap parameter or configuration defaults
         final finalIncludeFromJson = includeFromJson ?? fromMap ?? true;
         final finalIncludeToJson = includeToJson ?? fromMap ?? true;
+        final finalChainedCopyWith = chainedCopyWith ?? false;
 
         classes.add(
           ClassInfo(
@@ -336,6 +346,7 @@ class Parser {
             includeFromJson: finalIncludeFromJson,
             includeToJson: finalIncludeToJson,
             genericParameters: genericParameters,
+            chainedCopyWith: finalChainedCopyWith,
           ),
         );
       }

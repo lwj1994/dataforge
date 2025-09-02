@@ -198,13 +198,13 @@ mixin _Company {
     if (headquarters != other.headquarters) {
       return false;
     }
-    if (!const DeepCollectionEquality().equals(branches, other.branches)) {
+    if (!DeepCollectionEquality().equals(branches, other.branches)) {
       return false;
     }
     if (primaryContact != other.primaryContact) {
       return false;
     }
-    if (!const DeepCollectionEquality()
+    if (!DeepCollectionEquality()
         .equals(additionalContacts, other.additionalContacts)) {
       return false;
     }
@@ -216,9 +216,9 @@ mixin _Company {
     return Object.hashAll([
       name,
       headquarters,
-      const DeepCollectionEquality().hash(branches),
+      DeepCollectionEquality().hash(branches),
       primaryContact,
-      const DeepCollectionEquality().hash(additionalContacts),
+      DeepCollectionEquality().hash(additionalContacts),
     ]);
   }
 
@@ -312,18 +312,18 @@ mixin _NestedObjects {
     if (workAddress != other.workAddress) {
       return false;
     }
-    if (!const DeepCollectionEquality()
+    if (!DeepCollectionEquality()
         .equals(previousAddresses, other.previousAddresses)) {
       return false;
     }
-    if (!const DeepCollectionEquality()
+    if (!DeepCollectionEquality()
         .equals(namedAddresses, other.namedAddresses)) {
       return false;
     }
     if (primaryContact != other.primaryContact) {
       return false;
     }
-    if (!const DeepCollectionEquality().equals(contacts, other.contacts)) {
+    if (!DeepCollectionEquality().equals(contacts, other.contacts)) {
       return false;
     }
     if (employer != other.employer) {
@@ -332,7 +332,7 @@ mixin _NestedObjects {
     if (customAddress != other.customAddress) {
       return false;
     }
-    if (!const DeepCollectionEquality()
+    if (!DeepCollectionEquality()
         .equals(parsedContacts, other.parsedContacts)) {
       return false;
     }
@@ -345,13 +345,13 @@ mixin _NestedObjects {
       name,
       homeAddress,
       workAddress,
-      const DeepCollectionEquality().hash(previousAddresses),
-      const DeepCollectionEquality().hash(namedAddresses),
+      DeepCollectionEquality().hash(previousAddresses),
+      DeepCollectionEquality().hash(namedAddresses),
       primaryContact,
-      const DeepCollectionEquality().hash(contacts),
+      DeepCollectionEquality().hash(contacts),
       employer,
       customAddress,
-      const DeepCollectionEquality().hash(parsedContacts),
+      DeepCollectionEquality().hash(parsedContacts),
     ]);
   }
 

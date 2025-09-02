@@ -43,7 +43,7 @@ mixin _AlternateNamesTest {
     if (isActive != other.isActive) {
       return false;
     }
-    if (!const DeepCollectionEquality().equals(tags, other.tags)) {
+    if (!DeepCollectionEquality().equals(tags, other.tags)) {
       return false;
     }
     return true;
@@ -56,7 +56,7 @@ mixin _AlternateNamesTest {
       age,
       email,
       isActive,
-      const DeepCollectionEquality().hash(tags),
+      DeepCollectionEquality().hash(tags),
     ]);
   }
 

@@ -61,14 +61,14 @@ mixin _DateTimeTypes {
     if (birthDate != other.birthDate) {
       return false;
     }
-    if (!const DeepCollectionEquality().equals(eventDates, other.eventDates)) {
+    if (!DeepCollectionEquality().equals(eventDates, other.eventDates)) {
       return false;
     }
-    if (!const DeepCollectionEquality()
+    if (!DeepCollectionEquality()
         .equals(optionalEventDates, other.optionalEventDates)) {
       return false;
     }
-    if (!const DeepCollectionEquality().equals(namedDates, other.namedDates)) {
+    if (!DeepCollectionEquality().equals(namedDates, other.namedDates)) {
       return false;
     }
     if (isoDateTime != other.isoDateTime) {
@@ -80,8 +80,7 @@ mixin _DateTimeTypes {
     if (parsedDate != other.parsedDate) {
       return false;
     }
-    if (!const DeepCollectionEquality()
-        .equals(dateTimeList, other.dateTimeList)) {
+    if (!DeepCollectionEquality().equals(dateTimeList, other.dateTimeList)) {
       return false;
     }
     if (duration != other.duration) {
@@ -99,13 +98,13 @@ mixin _DateTimeTypes {
       createdAt,
       updatedAt,
       birthDate,
-      const DeepCollectionEquality().hash(eventDates),
-      const DeepCollectionEquality().hash(optionalEventDates),
-      const DeepCollectionEquality().hash(namedDates),
+      DeepCollectionEquality().hash(eventDates),
+      DeepCollectionEquality().hash(optionalEventDates),
+      DeepCollectionEquality().hash(namedDates),
       isoDateTime,
       timestampDate,
       parsedDate,
-      const DeepCollectionEquality().hash(dateTimeList),
+      DeepCollectionEquality().hash(dateTimeList),
       duration,
       customDuration,
     ]);
@@ -219,7 +218,7 @@ mixin _TimeZoneTest {
     if (timeZoneAware != other.timeZoneAware) {
       return false;
     }
-    if (!const DeepCollectionEquality().equals(timeList, other.timeList)) {
+    if (!DeepCollectionEquality().equals(timeList, other.timeList)) {
       return false;
     }
     return true;
@@ -231,7 +230,7 @@ mixin _TimeZoneTest {
       utcTime,
       localTime,
       timeZoneAware,
-      const DeepCollectionEquality().hash(timeList),
+      DeepCollectionEquality().hash(timeList),
     ]);
   }
 
