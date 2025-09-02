@@ -58,10 +58,10 @@ mixin _EnumTypes {
     if (roleFromInt != other.roleFromInt) {
       return false;
     }
-    if (!const DeepCollectionEquality().equals(statusList, other.statusList)) {
+    if (!DeepCollectionEquality().equals(statusList, other.statusList)) {
       return false;
     }
-    if (!const DeepCollectionEquality().equals(roleMap, other.roleMap)) {
+    if (!DeepCollectionEquality().equals(roleMap, other.roleMap)) {
       return false;
     }
     return true;
@@ -76,8 +76,8 @@ mixin _EnumTypes {
       priority,
       parsedStatus,
       roleFromInt,
-      const DeepCollectionEquality().hash(statusList),
-      const DeepCollectionEquality().hash(roleMap),
+      DeepCollectionEquality().hash(statusList),
+      DeepCollectionEquality().hash(roleMap),
     ]);
   }
 

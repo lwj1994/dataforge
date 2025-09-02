@@ -58,10 +58,10 @@ mixin _CustomReadValue {
     if (createdDate != other.createdDate) {
       return false;
     }
-    if (!const DeepCollectionEquality().equals(config, other.config)) {
+    if (!DeepCollectionEquality().equals(config, other.config)) {
       return false;
     }
-    if (!const DeepCollectionEquality().equals(tags, other.tags)) {
+    if (!DeepCollectionEquality().equals(tags, other.tags)) {
       return false;
     }
     return true;
@@ -76,8 +76,8 @@ mixin _CustomReadValue {
       count,
       enabled,
       createdDate,
-      const DeepCollectionEquality().hash(config),
-      const DeepCollectionEquality().hash(tags),
+      DeepCollectionEquality().hash(config),
+      DeepCollectionEquality().hash(tags),
     ]);
   }
 

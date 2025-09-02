@@ -43,7 +43,7 @@ mixin _DefaultValues {
     if (doubleValue != other.doubleValue) {
       return false;
     }
-    if (!const DeepCollectionEquality().equals(listValue, other.listValue)) {
+    if (!DeepCollectionEquality().equals(listValue, other.listValue)) {
       return false;
     }
     return true;
@@ -56,7 +56,7 @@ mixin _DefaultValues {
       stringValue,
       boolValue,
       doubleValue,
-      const DeepCollectionEquality().hash(listValue),
+      DeepCollectionEquality().hash(listValue),
     ]);
   }
 

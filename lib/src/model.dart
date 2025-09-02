@@ -20,6 +20,7 @@ class ClassInfo {
   final bool includeFromJson;
   final bool includeToJson;
   final List<String> genericParameters;
+  final bool chainedCopyWith;
 
   const ClassInfo({
     required this.name,
@@ -28,6 +29,7 @@ class ClassInfo {
     this.includeFromJson = true,
     this.includeToJson = true,
     this.genericParameters = const [],
+    this.chainedCopyWith = false,
   });
 
   ClassInfo copyWith({
@@ -37,6 +39,7 @@ class ClassInfo {
     bool? includeFromJson,
     bool? includeToJson,
     List<String>? genericParameters,
+    bool? chainedCopyWith,
   }) {
     return ClassInfo(
       name: name ?? this.name,
@@ -45,6 +48,7 @@ class ClassInfo {
       includeFromJson: includeFromJson ?? this.includeFromJson,
       includeToJson: includeToJson ?? this.includeToJson,
       genericParameters: genericParameters ?? this.genericParameters,
+      chainedCopyWith: chainedCopyWith ?? this.chainedCopyWith,
     );
   }
 
@@ -56,6 +60,7 @@ class ClassInfo {
       'includeFromJson': includeFromJson,
       'includeToJson': includeToJson,
       'genericParameters': genericParameters,
+      'chainedCopyWith': chainedCopyWith,
     };
   }
 
@@ -79,12 +84,13 @@ class ClassInfo {
               ?.map((e) => e.toString())
               .toList() ??
           [],
+      chainedCopyWith: map['chainedCopyWith'] as bool? ?? false,
     );
   }
 
   @override
   String toString() {
-    return 'ClassInfo(name: $name, mixinName: $mixinName, fields: $fields, includeFromJson: $includeFromJson, includeToJson: $includeToJson, genericParameters: $genericParameters)';
+    return 'ClassInfo(name: $name, mixinName: $mixinName, fields: $fields, includeFromJson: $includeFromJson, includeToJson: $includeToJson, genericParameters: $genericParameters, chainedCopyWith: $chainedCopyWith)';
   }
 
   @override
@@ -97,7 +103,8 @@ class ClassInfo {
         other.includeFromJson == includeFromJson &&
         other.includeToJson == includeToJson &&
         const DeepCollectionEquality()
-            .equals(other.genericParameters, genericParameters);
+            .equals(other.genericParameters, genericParameters) &&
+        other.chainedCopyWith == chainedCopyWith;
   }
 
   @override
@@ -108,6 +115,7 @@ class ClassInfo {
         includeFromJson,
         includeToJson,
         const DeepCollectionEquality().hash(genericParameters),
+        chainedCopyWith,
       ]);
 }
 

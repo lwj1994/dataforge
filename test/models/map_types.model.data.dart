@@ -58,48 +58,47 @@ mixin _MapTypes {
     if (identical(this, other)) return true;
     if (other is! MapTypes) return false;
 
-    if (!const DeepCollectionEquality().equals(stringMap, other.stringMap)) {
+    if (!DeepCollectionEquality().equals(stringMap, other.stringMap)) {
       return false;
     }
-    if (!const DeepCollectionEquality().equals(intMap, other.intMap)) {
+    if (!DeepCollectionEquality().equals(intMap, other.intMap)) {
       return false;
     }
-    if (!const DeepCollectionEquality().equals(doubleMap, other.doubleMap)) {
+    if (!DeepCollectionEquality().equals(doubleMap, other.doubleMap)) {
       return false;
     }
-    if (!const DeepCollectionEquality().equals(boolMap, other.boolMap)) {
+    if (!DeepCollectionEquality().equals(boolMap, other.boolMap)) {
       return false;
     }
-    if (!const DeepCollectionEquality().equals(dynamicMap, other.dynamicMap)) {
+    if (!DeepCollectionEquality().equals(dynamicMap, other.dynamicMap)) {
       return false;
     }
-    if (!const DeepCollectionEquality()
+    if (!DeepCollectionEquality()
         .equals(optionalStringMap, other.optionalStringMap)) {
       return false;
     }
-    if (!const DeepCollectionEquality().equals(listMap, other.listMap)) {
+    if (!DeepCollectionEquality().equals(listMap, other.listMap)) {
       return false;
     }
-    if (!const DeepCollectionEquality().equals(nestedMap, other.nestedMap)) {
+    if (!DeepCollectionEquality().equals(nestedMap, other.nestedMap)) {
       return false;
     }
-    if (!const DeepCollectionEquality().equals(namedMap, other.namedMap)) {
+    if (!DeepCollectionEquality().equals(namedMap, other.namedMap)) {
       return false;
     }
-    if (!const DeepCollectionEquality().equals(parsedMap, other.parsedMap)) {
+    if (!DeepCollectionEquality().equals(parsedMap, other.parsedMap)) {
       return false;
     }
-    if (!const DeepCollectionEquality()
-        .equals(customIntMap, other.customIntMap)) {
+    if (!DeepCollectionEquality().equals(customIntMap, other.customIntMap)) {
       return false;
     }
-    if (!const DeepCollectionEquality().equals(complexMap, other.complexMap)) {
+    if (!DeepCollectionEquality().equals(complexMap, other.complexMap)) {
       return false;
     }
-    if (!const DeepCollectionEquality().equals(mapList, other.mapList)) {
+    if (!DeepCollectionEquality().equals(mapList, other.mapList)) {
       return false;
     }
-    if (!const DeepCollectionEquality().equals(intKeyMap, other.intKeyMap)) {
+    if (!DeepCollectionEquality().equals(intKeyMap, other.intKeyMap)) {
       return false;
     }
     return true;
@@ -108,20 +107,20 @@ mixin _MapTypes {
   @override
   int get hashCode {
     return Object.hashAll([
-      const DeepCollectionEquality().hash(stringMap),
-      const DeepCollectionEquality().hash(intMap),
-      const DeepCollectionEquality().hash(doubleMap),
-      const DeepCollectionEquality().hash(boolMap),
-      const DeepCollectionEquality().hash(dynamicMap),
-      const DeepCollectionEquality().hash(optionalStringMap),
-      const DeepCollectionEquality().hash(listMap),
-      const DeepCollectionEquality().hash(nestedMap),
-      const DeepCollectionEquality().hash(namedMap),
-      const DeepCollectionEquality().hash(parsedMap),
-      const DeepCollectionEquality().hash(customIntMap),
-      const DeepCollectionEquality().hash(complexMap),
-      const DeepCollectionEquality().hash(mapList),
-      const DeepCollectionEquality().hash(intKeyMap),
+      DeepCollectionEquality().hash(stringMap),
+      DeepCollectionEquality().hash(intMap),
+      DeepCollectionEquality().hash(doubleMap),
+      DeepCollectionEquality().hash(boolMap),
+      DeepCollectionEquality().hash(dynamicMap),
+      DeepCollectionEquality().hash(optionalStringMap),
+      DeepCollectionEquality().hash(listMap),
+      DeepCollectionEquality().hash(nestedMap),
+      DeepCollectionEquality().hash(namedMap),
+      DeepCollectionEquality().hash(parsedMap),
+      DeepCollectionEquality().hash(customIntMap),
+      DeepCollectionEquality().hash(complexMap),
+      DeepCollectionEquality().hash(mapList),
+      DeepCollectionEquality().hash(intKeyMap),
     ]);
   }
 
@@ -205,18 +204,18 @@ mixin _MapWithObjects {
     if (identical(this, other)) return true;
     if (other is! MapWithObjects) return false;
 
-    if (!const DeepCollectionEquality().equals(addressMap, other.addressMap)) {
+    if (!DeepCollectionEquality().equals(addressMap, other.addressMap)) {
       return false;
     }
-    if (!const DeepCollectionEquality()
+    if (!DeepCollectionEquality()
         .equals(contactListMap, other.contactListMap)) {
       return false;
     }
-    if (!const DeepCollectionEquality()
+    if (!DeepCollectionEquality()
         .equals(optionalAddressMap, other.optionalAddressMap)) {
       return false;
     }
-    if (!const DeepCollectionEquality()
+    if (!DeepCollectionEquality()
         .equals(parsedAddressMap, other.parsedAddressMap)) {
       return false;
     }
@@ -226,10 +225,10 @@ mixin _MapWithObjects {
   @override
   int get hashCode {
     return Object.hashAll([
-      const DeepCollectionEquality().hash(addressMap),
-      const DeepCollectionEquality().hash(contactListMap),
-      const DeepCollectionEquality().hash(optionalAddressMap),
-      const DeepCollectionEquality().hash(parsedAddressMap),
+      DeepCollectionEquality().hash(addressMap),
+      DeepCollectionEquality().hash(contactListMap),
+      DeepCollectionEquality().hash(optionalAddressMap),
+      DeepCollectionEquality().hash(parsedAddressMap),
     ]);
   }
 

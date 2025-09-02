@@ -9,11 +9,15 @@ class Dataforge {
   final bool? includeFromJson;
   final bool? includeToJson;
 
+  /// Enable chained copyWith syntax like object.copyWith.field(value)
+  final bool chainedCopyWith;
+
   const Dataforge({
     this.name = "",
     @Deprecated('Use includeFromJson and includeToJson instead') this.fromMap,
     this.includeFromJson,
     this.includeToJson,
+    this.chainedCopyWith = false,
   });
 }
 

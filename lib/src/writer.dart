@@ -244,6 +244,29 @@ class Writer {
         }
       }
 
+      // Check if collection import exists
+      bool hasCollectionImport = lines.any((line) =>
+          line
+              .trim()
+              .startsWith("import 'package:collection/collection.dart'") ||
+          line
+              .trim()
+              .startsWith('import "package:collection/collection.dart"'));
+
+      // Add collection import if not exists
+      if (!hasCollectionImport) {
+        final collectionImport = "import 'package:collection/collection.dart';";
+        lines.insert(insertIndex, collectionImport);
+        insertIndex++;
+
+        // Add empty line after import if needed
+        if (insertIndex < lines.length &&
+            lines[insertIndex].trim().isNotEmpty) {
+          lines.insert(insertIndex, '');
+          insertIndex++;
+        }
+      }
+
       // Insert part declaration
       final partDeclaration = "part '$dataFileName';";
 
@@ -271,11 +294,79 @@ class Writer {
     }
   }
 
+  /// Add collection import to original file if needed
+  void _addCollectionImportToOriginalFile(String filePath) {
+    try {
+      final file = File(filePath);
+      if (!file.existsSync()) return;
+
+      final content = file.readAsStringSync();
+      final lines = content.split('\n');
+
+      // Check if collection import already exists
+      bool hasCollectionImport = lines.any((line) =>
+          line
+              .trim()
+              .startsWith("import 'package:collection/collection.dart'") ||
+          line
+              .trim()
+              .startsWith('import "package:collection/collection.dart"'));
+
+      if (hasCollectionImport) return;
+
+      // Find the position to insert import (after existing imports)
+      int insertIndex = 0;
+      bool foundImports = false;
+
+      for (int i = 0; i < lines.length; i++) {
+        final line = lines[i].trim();
+
+        // Skip empty lines and comments at the beginning
+        if (line.isEmpty || line.startsWith('//') || line.startsWith('/*')) {
+          continue;
+        }
+
+        // If it's an import or export, mark that we found imports
+        if (line.startsWith('import ') || line.startsWith('export ')) {
+          foundImports = true;
+          insertIndex = i + 1;
+        } else if (foundImports &&
+            !line.startsWith('import ') &&
+            !line.startsWith('export ')) {
+          // We've passed all imports, this is where we insert
+          break;
+        } else if (!foundImports) {
+          // No imports found, insert at the beginning (after initial comments)
+          insertIndex = i;
+          break;
+        }
+      }
+
+      // Add collection import
+      final collectionImport = "import 'package:collection/collection.dart';";
+      lines.insert(insertIndex, collectionImport);
+
+      // Add empty line after import if needed
+      if (insertIndex + 1 < lines.length &&
+          lines[insertIndex + 1].trim().isNotEmpty) {
+        lines.insert(insertIndex + 1, '');
+      }
+
+      // Write back to file
+      file.writeAsStringSync(lines.join('\n'));
+    } catch (e) {
+      print('Error adding collection import to $filePath: $e');
+    }
+  }
+
   /// Process original files, add fromJson method and part declaration
   void _processOriginalFiles() {
     // Infer original file path from output path
     final originalFilePath =
         result.outputPath.replaceAll('.data.dart', '.dart');
+
+    // Add collection import if needed
+    _addCollectionImportToOriginalFile(originalFilePath);
 
     // Check and add part declaration if missing (only once per file)
     if (!_hasPartDeclaration(originalFilePath)) {
@@ -360,6 +451,26 @@ class Writer {
       buffer.writeln();
     }
 
+    // Generate chained copyWith helper classes after all mixins
+    for (final clazz in result.classes) {
+      if (clazz.chainedCopyWith &&
+          clazz.name.isNotEmpty &&
+          clazz.mixinName.isNotEmpty) {
+        final genericParams = clazz.genericParameters.isNotEmpty
+            ? '<${clazz.genericParameters.join(', ')}>'
+            : '';
+
+        final validFields = clazz.fields
+            .where((f) =>
+                f.name.isNotEmpty && f.type.isNotEmpty && f.type != 'dynamic')
+            .toList();
+
+        _buildChainedCopyWithHelperClass(
+            buffer, clazz, genericParams, validFields);
+        buffer.writeln();
+      }
+    }
+
     try {
       File(result.outputPath)
         ..createSync(recursive: true)
@@ -399,7 +510,7 @@ class Writer {
           buffer.writeln('    }');
         } else if (type.isCollection()) {
           buffer.writeln(
-            '    if (!const DeepCollectionEquality().equals($name, other.$name)) {',
+            '    if (!DeepCollectionEquality().equals($name, other.$name)) {',
           );
           buffer.writeln('      return false;');
           buffer.writeln('    }');
@@ -432,7 +543,7 @@ class Writer {
         final type = field.type;
 
         if (type.isCollection()) {
-          buffer.writeln('      const DeepCollectionEquality().hash($name),');
+          buffer.writeln('      DeepCollectionEquality().hash($name),');
         } else {
           buffer.writeln('      $name,');
         }
@@ -449,12 +560,25 @@ class Writer {
         ? '<${clazz.genericParameters.join(', ')}>'
         : '';
 
-    buffer.writeln('\n  ${clazz.name}$genericParams copyWith({');
-
     final validFields = clazz.fields
         .where((f) =>
             f.name.isNotEmpty && f.type.isNotEmpty && f.type != 'dynamic')
         .toList();
+
+    if (clazz.chainedCopyWith) {
+      // Generate chained copyWith getter and helper class
+      _buildChainedCopyWith(buffer, clazz, genericParams, validFields);
+    } else {
+      // Generate traditional copyWith method
+      _buildTraditionalCopyWith(buffer, clazz, genericParams, validFields);
+    }
+  }
+
+  /// Build traditional copyWith method
+  void _buildTraditionalCopyWith(StringBuffer buffer, ClassInfo clazz,
+      String genericParams, List<FieldInfo> validFields) {
+    buffer.writeln('\n  ${clazz.name}$genericParams copyWith({');
+
     for (final field in validFields) {
       final paramType = _generateCopyWithParameterType(field);
       buffer.writeln('    $paramType ${field.name},');
@@ -470,6 +594,74 @@ class Writer {
 
     buffer.writeln('    );');
     buffer.writeln('  }');
+  }
+
+  /// Build chained copyWith getter and helper class
+  void _buildChainedCopyWith(StringBuffer buffer, ClassInfo clazz,
+      String genericParams, List<FieldInfo> validFields) {
+    final copyWithClassName = '_${clazz.name}CopyWith$genericParams';
+
+    // Generate copyWith getter
+    buffer.writeln(
+        '\n  $copyWithClassName get copyWith => $copyWithClassName._(this);');
+  }
+
+  /// Build chained copyWith helper class (outside mixin)
+  void _buildChainedCopyWithHelperClass(StringBuffer buffer, ClassInfo clazz,
+      String genericParams, List<FieldInfo> validFields) {
+    final copyWithClassName = '_${clazz.name}CopyWith$genericParams';
+
+    // Generate copyWith helper class
+    buffer.writeln('\n/// Helper class for chained copyWith operations');
+    buffer.writeln('class $copyWithClassName {');
+    buffer.writeln('  final _${clazz.name}$genericParams _instance;');
+    buffer.writeln('  const $copyWithClassName._(this._instance);');
+
+    // Generate method for each field
+    for (final field in validFields) {
+      final paramType = _generateCopyWithParameterType(field);
+      buffer.writeln('\n  /// Update ${field.name} field');
+      buffer.writeln(
+          '  ${clazz.name}$genericParams ${field.name}($paramType value) {');
+      buffer.writeln('    return ${clazz.name}$genericParams(');
+
+      for (final f in validFields) {
+        if (f.name == field.name) {
+          // For nullable fields, use value directly to allow setting null
+          if (field.type.endsWith('?')) {
+            buffer.writeln('      ${f.name}: value,');
+          } else {
+            buffer.writeln('      ${f.name}: value ?? _instance.${f.name},');
+          }
+        } else {
+          buffer.writeln('      ${f.name}: _instance.${f.name},');
+        }
+      }
+
+      buffer.writeln('    );');
+      buffer.writeln('  }');
+    }
+
+    // Generate call method for traditional copyWith syntax
+    buffer.writeln('\n  /// Traditional copyWith method');
+    buffer.writeln('  ${clazz.name}$genericParams call({');
+
+    for (final field in validFields) {
+      final paramType = _generateCopyWithParameterType(field);
+      buffer.writeln('    $paramType ${field.name},');
+    }
+
+    buffer.writeln('  }) {');
+    buffer.writeln('    return ${clazz.name}$genericParams(');
+
+    for (final field in validFields) {
+      buffer.writeln(
+          '      ${field.name}: ${field.name} ?? _instance.${field.name},');
+    }
+
+    buffer.writeln('    );');
+    buffer.writeln('  }');
+    buffer.writeln('}');
   }
 
   void _buildToJson(StringBuffer buffer, ClassInfo clazz) {
@@ -800,7 +992,11 @@ class Writer {
                   .join(' ?? ');
               return "($expressions)?.map((e) => e.toString()).toList()$defaultValue";
             } else {
-              return "($valueExpression as List<dynamic>?)?.map((e) => e.toString()).toList()$defaultValue";
+              if (defaultValue.isNotEmpty) {
+                return "($valueExpression as List<dynamic>?)?.map((e) => e.toString()).toList()$defaultValue";
+              } else {
+                return "($valueExpression as List<dynamic>?)?.map((e) => e.toString()).toList() ?? []";
+              }
             }
           } else if (itemType == 'int') {
             return "($valueExpression as List<dynamic>?)?.map((e) => int.tryParse(e.toString()) ?? 0).toList()$defaultValue";
@@ -905,7 +1101,7 @@ class Writer {
             if (isNullable) {
               return "($valueExpression as List<dynamic>?)?.map((e) => e.toString()).toList()$defaultValue";
             } else {
-              return "(($valueExpression as List<dynamic>?) ?? []).map((e) => e.toString()).toList()$defaultValue";
+              return "(($valueExpression as List<dynamic>?) ?? []).map((e) => e.toString()).toList()";
             }
           }
           if (isNullable) {
