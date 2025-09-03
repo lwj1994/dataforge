@@ -6,8 +6,29 @@ class Writer {
   final ParseResult result;
   final String? projectRoot;
   final bool debugMode;
+  late final String _dataforgeAnnotationPrefix;
 
-  Writer(this.result, {this.projectRoot, this.debugMode = false});
+  Writer(this.result, {this.projectRoot, this.debugMode = false}) {
+    _dataforgeAnnotationPrefix = _getDataforgeAnnotationPrefix();
+  }
+
+  /// Get the prefix for dataforge_annotation based on import statements
+  String _getDataforgeAnnotationPrefix() {
+    for (final import in result.imports) {
+      if (import.uri ==
+              'package:dataforge_annotation/dataforge_annotation.dart' &&
+          import.alias != null) {
+        return '${import.alias!}.';
+      }
+    }
+    return ''; // No prefix needed if no alias is used
+  }
+
+  /// Get SafeCasteUtil with proper prefix based on import alias
+  String _getSafeCasteUtil() {
+    final prefix = _getDataforgeAnnotationPrefix();
+    return '${prefix}SafeCasteUtil';
+  }
 
   /// Check if a type is an enum by analyzing the source files
   bool _isEnumType(String type) {
@@ -1535,42 +1556,42 @@ class Writer {
           }
         case 'String':
           if (isNullable) {
-            return "SafeCasteUtil.safeCast<String>($valueExpression)$defaultValue";
+            return "${_getSafeCasteUtil()}.safeCast<String>($valueExpression)$defaultValue";
           } else {
             if (defaultValue.isNotEmpty) {
-              return "SafeCasteUtil.safeCast<String>($valueExpression)$defaultValue";
+              return "${_getSafeCasteUtil()}.safeCast<String>($valueExpression)$defaultValue";
             } else {
-              return "SafeCasteUtil.safeCast<String>($valueExpression) ?? \"\"";
+              return "${_getSafeCasteUtil()}.safeCast<String>($valueExpression) ?? \"\"";
             }
           }
         case 'bool':
           if (isNullable) {
-            return "SafeCasteUtil.safeCast<bool>($valueExpression)$defaultValue";
+            return "${_getSafeCasteUtil()}.safeCast<bool>($valueExpression)$defaultValue";
           } else {
             if (defaultValue.isNotEmpty) {
-              return "SafeCasteUtil.safeCast<bool>($valueExpression)$defaultValue";
+              return "${_getSafeCasteUtil()}.safeCast<bool>($valueExpression)$defaultValue";
             } else {
-              return "SafeCasteUtil.safeCast<bool>($valueExpression) ?? false";
+              return "${_getSafeCasteUtil()}.safeCast<bool>($valueExpression) ?? false";
             }
           }
         case 'int':
           if (isNullable) {
-            return "SafeCasteUtil.safeCast<int>($valueExpression)$defaultValue";
+            return "${_getSafeCasteUtil()}.safeCast<int>($valueExpression)$defaultValue";
           } else {
             if (defaultValue.isNotEmpty) {
-              return "SafeCasteUtil.safeCast<int>($valueExpression)$defaultValue";
+              return "${_getSafeCasteUtil()}.safeCast<int>($valueExpression)$defaultValue";
             } else {
-              return "SafeCasteUtil.safeCast<int>($valueExpression) ?? 0";
+              return "${_getSafeCasteUtil()}.safeCast<int>($valueExpression) ?? 0";
             }
           }
         case 'double':
           if (isNullable) {
-            return "SafeCasteUtil.safeCast<double>($valueExpression)$defaultValue";
+            return "${_getSafeCasteUtil()}.safeCast<double>($valueExpression)$defaultValue";
           } else {
             if (defaultValue.isNotEmpty) {
-              return "SafeCasteUtil.safeCast<double>($valueExpression)$defaultValue";
+              return "${_getSafeCasteUtil()}.safeCast<double>($valueExpression)$defaultValue";
             } else {
-              return "SafeCasteUtil.safeCast<double>($valueExpression) ?? 0.0";
+              return "${_getSafeCasteUtil()}.safeCast<double>($valueExpression) ?? 0.0";
             }
           }
         case 'num':
@@ -1868,14 +1889,14 @@ class Writer {
     // Use safeCasteUtil for basic types only: int, double, String, bool
     if (['String', 'int', 'double', 'bool'].contains(type)) {
       if (isNullable) {
-        return "SafeCasteUtil.safeCast<$type>($valueExpression)$defaultValue";
+        return "${_getSafeCasteUtil()}.safeCast<$type>($valueExpression)$defaultValue";
       } else {
         if (defaultValue.isNotEmpty) {
-          return "SafeCasteUtil.safeCast<$type>($valueExpression)$defaultValue";
+          return "${_getSafeCasteUtil()}.safeCast<$type>($valueExpression)$defaultValue";
         } else {
           // For non-nullable types without default value, provide fallback
           final fallbackValue = _getDefaultValueForType(type);
-          return "SafeCasteUtil.safeCast<$type>($valueExpression) ?? $fallbackValue";
+          return "${_getSafeCasteUtil()}.safeCast<$type>($valueExpression) ?? $fallbackValue";
         }
       }
     }
