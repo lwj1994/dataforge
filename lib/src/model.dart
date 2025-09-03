@@ -1,15 +1,61 @@
 import 'package:collection/collection.dart';
 
+/// Information about an import statement
+class ImportInfo {
+  final String uri;
+  final String? alias;
+  final bool isDeferred;
+  final List<String> showCombinators;
+  final List<String> hideCombinators;
+
+  const ImportInfo({
+    required this.uri,
+    this.alias,
+    this.isDeferred = false,
+    this.showCombinators = const [],
+    this.hideCombinators = const [],
+  });
+
+  @override
+  String toString() {
+    return 'ImportInfo{uri: $uri, alias: $alias, isDeferred: $isDeferred, showCombinators: $showCombinators, hideCombinators: $hideCombinators}';
+  }
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+    return other is ImportInfo &&
+        other.uri == uri &&
+        other.alias == alias &&
+        other.isDeferred == isDeferred &&
+        const DeepCollectionEquality()
+            .equals(other.showCombinators, showCombinators) &&
+        const DeepCollectionEquality()
+            .equals(other.hideCombinators, hideCombinators);
+  }
+
+  @override
+  int get hashCode => Object.hashAll([
+        uri,
+        alias,
+        isDeferred,
+        const DeepCollectionEquality().hash(showCombinators),
+        const DeepCollectionEquality().hash(hideCombinators),
+      ]);
+}
+
 class ParseResult {
   final String outputPath;
   final String partOf;
   final List<ClassInfo> classes;
+  final List<ImportInfo> imports;
 
-  ParseResult(this.outputPath, this.partOf, this.classes);
+  ParseResult(this.outputPath, this.partOf, this.classes,
+      [this.imports = const []]);
 
   @override
   String toString() {
-    return 'ParseResult{outputPath: $outputPath, partOf: $partOf, classes: $classes, }';
+    return 'ParseResult{outputPath: $outputPath, partOf: $partOf, classes: $classes, imports: $imports}';
   }
 }
 

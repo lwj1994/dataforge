@@ -80,7 +80,40 @@ class Parser {
 
     // Parsing file silently
     final classes = <ClassInfo>[];
+    final imports = <ImportInfo>[];
     final unit = parseRes.unit;
+
+    // Parse import statements
+    for (var directive in unit.directives) {
+      if (directive is ImportDirective) {
+        final uri = directive.uri.stringValue;
+        if (uri != null) {
+          String? alias;
+          if (directive.asKeyword != null && directive.prefix != null) {
+            alias = directive.prefix!.name;
+          }
+
+          final showCombinators = <String>[];
+          final hideCombinators = <String>[];
+
+          for (var combinator in directive.combinators) {
+            if (combinator is ShowCombinator) {
+              showCombinators.addAll(combinator.shownNames.map((e) => e.name));
+            } else if (combinator is HideCombinator) {
+              hideCombinators.addAll(combinator.hiddenNames.map((e) => e.name));
+            }
+          }
+
+          imports.add(ImportInfo(
+            uri: uri,
+            alias: alias,
+            isDeferred: directive.deferredKeyword != null,
+            showCombinators: showCombinators,
+            hideCombinators: hideCombinators,
+          ));
+        }
+      }
+    }
 
     for (var declaration in unit.declarations) {
       if (declaration is ClassDeclaration) {
@@ -378,6 +411,6 @@ class Parser {
       outputPath = path.replaceAll('.dart', '.data.dart');
     }
 
-    return ParseResult(outputPath, partOf, classes);
+    return ParseResult(outputPath, partOf, classes, imports);
   }
 }
