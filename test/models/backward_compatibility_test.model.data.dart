@@ -63,9 +63,9 @@ mixin _UserDataforge {
 
   static UserDataforge fromJson(Map<String, dynamic> map) {
     return UserDataforge(
-      name: (map['name'])?.toString() ?? "",
-      age: int.tryParse((map['age'] ?? '').toString()) ?? 0,
-      email: (map['email'])?.toString(),
+      name: SafeCasteUtil.safeCast<String>(map['name']) ?? "",
+      age: SafeCasteUtil.safeCast<int>(map['age']) ?? 0,
+      email: SafeCasteUtil.safeCast<String>(map['email']),
     );
   }
 }
@@ -130,9 +130,9 @@ mixin _UserDataClass {
 
   static UserDataClass fromJson(Map<String, dynamic> map) {
     return UserDataClass(
-      name: (map['name'])?.toString() ?? "",
-      age: int.tryParse((map['age'] ?? '').toString()) ?? 0,
-      email: (map['email'])?.toString(),
+      name: SafeCasteUtil.safeCast<String>(map['name']) ?? "",
+      age: SafeCasteUtil.safeCast<int>(map['age']) ?? 0,
+      email: SafeCasteUtil.safeCast<String>(map['email']),
     );
   }
 }
@@ -187,8 +187,8 @@ mixin _UserDataClassConstant {
 
   static UserDataClassConstant fromJson(Map<String, dynamic> map) {
     return UserDataClassConstant(
-      name: (map['name'])?.toString() ?? "",
-      age: int.tryParse((map['age'] ?? '').toString()) ?? 0,
+      name: SafeCasteUtil.safeCast<String>(map['name']) ?? "",
+      age: SafeCasteUtil.safeCast<int>(map['age']) ?? 0,
     );
   }
 }
@@ -243,8 +243,8 @@ mixin _UserDataforgeConstant {
 
   static UserDataforgeConstant fromJson(Map<String, dynamic> map) {
     return UserDataforgeConstant(
-      name: (map['name'])?.toString() ?? "",
-      age: int.tryParse((map['age'] ?? '').toString()) ?? 0,
+      name: SafeCasteUtil.safeCast<String>(map['name']) ?? "",
+      age: SafeCasteUtil.safeCast<int>(map['age']) ?? 0,
     );
   }
 }

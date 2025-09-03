@@ -53,8 +53,8 @@ mixin _TestUser {
 
   static TestUser fromJson(Map<String, dynamic> map) {
     return TestUser(
-      name: (map['name'])?.toString() ?? "",
-      age: int.tryParse((map['age'] ?? '').toString()) ?? 0,
+      name: SafeCasteUtil.safeCast<String>(map['name']) ?? "",
+      age: SafeCasteUtil.safeCast<int>(map['age']) ?? 0,
     );
   }
 }
@@ -109,8 +109,8 @@ mixin _TestAdmin {
 
   static TestAdmin fromJson(Map<String, dynamic> map) {
     return TestAdmin(
-      username: (map['username'])?.toString() ?? "",
-      role: (map['role'])?.toString() ?? "",
+      username: SafeCasteUtil.safeCast<String>(map['username']) ?? "",
+      role: SafeCasteUtil.safeCast<String>(map['role']) ?? "",
     );
   }
 }

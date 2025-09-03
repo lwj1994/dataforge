@@ -4,30 +4,68 @@ import 'model.dart';
 
 class Writer {
   final ParseResult result;
+  final String? projectRoot;
+  final bool debugMode;
 
-  Writer(this.result);
+  Writer(this.result, {this.projectRoot, this.debugMode = false});
 
   /// Check if a type is an enum by analyzing the source files
   bool _isEnumType(String type) {
+    final enumCheckStartTime = DateTime.now();
+
     // Remove nullable marker and generic parameters
     final cleanType =
         type.replaceAll('?', '').replaceAll(RegExp(r'<[^>]*>'), '');
+    if (debugMode) {
+      print(
+          '[PERF] $enumCheckStartTime: Starting enum type check for: $cleanType');
+    }
 
-    // Check all Dart files in the current directory for enum definitions
-    final currentDir = Directory.current;
-    final dartFiles = currentDir
+    // Use project root if available, otherwise fall back to current directory
+    final searchDir =
+        projectRoot != null ? Directory(projectRoot!) : Directory.current;
+    if (!searchDir.existsSync()) {
+      if (debugMode) {
+        print(
+            '[PERF] ${DateTime.now()}: Search directory does not exist: ${searchDir.path}');
+      }
+      return false;
+    }
+
+    // Check all Dart files in the search directory for enum definitions
+    final scanStartTime = DateTime.now();
+    final dartFiles = searchDir
         .listSync(recursive: true)
         .whereType<File>()
         .where((file) => file.path.endsWith('.dart'))
         .toList();
+    final scanEndTime = DateTime.now();
+    final scanTime = scanEndTime.difference(scanStartTime).inMilliseconds;
+    if (debugMode) {
+      print(
+          '[PERF] $scanEndTime: Directory scan completed, found ${dartFiles.length} Dart files in ${scanTime}ms');
+    }
 
+    final searchStartTime = DateTime.now();
+    int filesChecked = 0;
     for (final file in dartFiles) {
       try {
         final content = file.readAsStringSync();
+        filesChecked++;
+
         // Look for enum definition
         final enumPattern =
             RegExp(r'enum\s+' + RegExp.escape(cleanType) + r'\s*\{');
         if (enumPattern.hasMatch(content)) {
+          final searchEndTime = DateTime.now();
+          final searchTime =
+              searchEndTime.difference(searchStartTime).inMilliseconds;
+          final totalTime =
+              searchEndTime.difference(enumCheckStartTime).inMilliseconds;
+          if (debugMode) {
+            print(
+                '[PERF] $searchEndTime: Enum $cleanType found in ${file.path} after checking $filesChecked files (search:${searchTime}ms, total:${totalTime}ms)');
+          }
           return true;
         }
       } catch (e) {
@@ -36,6 +74,14 @@ class Writer {
       }
     }
 
+    final searchEndTime = DateTime.now();
+    final searchTime = searchEndTime.difference(searchStartTime).inMilliseconds;
+    final totalTime =
+        searchEndTime.difference(enumCheckStartTime).inMilliseconds;
+    if (debugMode) {
+      print(
+          '[PERF] $searchEndTime: Enum $cleanType not found after checking $filesChecked files (search:${searchTime}ms, total:${totalTime}ms)');
+    }
     return false;
   }
 
@@ -294,6 +340,198 @@ class Writer {
     }
   }
 
+  /// Check if collection import exists in lines
+  bool _hasCollectionImport(List<String> lines) {
+    return lines.any((line) =>
+        line.trim().startsWith("import 'package:collection/collection.dart'") ||
+        line.trim().startsWith('import "package:collection/collection.dart"'));
+  }
+
+  /// Insert collection import into lines
+  void _insertCollectionImport(List<String> lines) {
+    // Find the last import statement that ends with semicolon
+    int lastImportIndex = -1;
+
+    for (int i = 0; i < lines.length; i++) {
+      final line = lines[i].trim();
+      // Check if line starts with import and ends with semicolon
+      if (line.startsWith('import ') && line.endsWith(';')) {
+        lastImportIndex = i;
+      }
+    }
+
+    // If no import found, insert at the beginning
+    int insertIndex = lastImportIndex >= 0 ? lastImportIndex + 1 : 0;
+
+    // Add collection import
+    final collectionImport = "import 'package:collection/collection.dart';";
+    lines.insert(insertIndex, collectionImport);
+
+    // Add empty line after import if the next line is not empty
+    if (insertIndex + 1 < lines.length &&
+        lines[insertIndex + 1].trim().isNotEmpty) {
+      lines.insert(insertIndex + 1, '');
+    }
+  }
+
+  /// Check if part declaration exists in lines
+  bool _hasPartDeclarationInLines(List<String> lines, String dataFileName) {
+    // Simple string matching approach for better reliability
+    final partDeclaration1 = "part '$dataFileName';";
+    final partDeclaration2 = 'part "$dataFileName";';
+
+    return lines.any((line) {
+      final trimmed = line.trim();
+      return trimmed == partDeclaration1 || trimmed == partDeclaration2;
+    });
+  }
+
+  /// Insert part declaration into lines
+  void _insertPartDeclaration(List<String> lines, String dataFileName) {
+    // Find the position to insert part declaration (after imports)
+    int insertIndex = 0;
+    bool foundImports = false;
+
+    for (int i = 0; i < lines.length; i++) {
+      final line = lines[i].trim();
+
+      // Skip empty lines and comments at the beginning
+      if (line.isEmpty || line.startsWith('//') || line.startsWith('/*')) {
+        continue;
+      }
+
+      // If it's an import or export, mark that we found imports
+      if (line.startsWith('import ') || line.startsWith('export ')) {
+        foundImports = true;
+        insertIndex = i + 1;
+      } else if (foundImports &&
+          !line.startsWith('import ') &&
+          !line.startsWith('export ')) {
+        // We've passed all imports, this is where we insert
+        break;
+      } else if (!foundImports) {
+        // No imports found, insert at the beginning (after initial comments)
+        insertIndex = i;
+        break;
+      }
+    }
+
+    // Insert part declaration
+    final partDeclaration = "part '$dataFileName';";
+
+    // Add empty line before part if there are imports
+    if (foundImports &&
+        insertIndex > 0 &&
+        lines[insertIndex - 1].trim().isNotEmpty) {
+      lines.insert(insertIndex, '');
+      insertIndex++;
+    }
+
+    lines.insert(insertIndex, partDeclaration);
+
+    // Add empty line after part if the next line is not empty
+    if (insertIndex + 1 < lines.length &&
+        lines[insertIndex + 1].trim().isNotEmpty) {
+      lines.insert(insertIndex + 1, '');
+    }
+  }
+
+  /// Add with clause to class in lines, returns true if modified
+  bool _addWithClauseToLines(List<String> lines, String className) {
+    final mixinName = '_$className';
+
+    for (int i = 0; i < lines.length; i++) {
+      final line = lines[i];
+
+      // Find class declaration line
+      if (line.contains('class $className') && !line.contains('mixin')) {
+        final trimmedLine = line.trim();
+
+        // Check if already has the correct with clause
+        if (trimmedLine.contains('with $mixinName')) {
+          return false; // Already has the correct with clause
+        }
+
+        // Check if has any with clause
+        if (trimmedLine.contains(' with ')) {
+          // Has existing with clause, add our mixin
+          final withIndex = line.indexOf(' with ');
+          final openBraceIndex = line.indexOf('{');
+
+          if (openBraceIndex > withIndex) {
+            // Insert before the opening brace
+            final beforeBrace = line.substring(0, openBraceIndex).trim();
+            final afterBrace = line.substring(openBraceIndex);
+            lines[i] = '$beforeBrace, $mixinName $afterBrace';
+            return true;
+          }
+        } else {
+          // No existing with clause, add one
+          final openBraceIndex = line.indexOf('{');
+
+          if (openBraceIndex != -1) {
+            final beforeBrace = line.substring(0, openBraceIndex).trim();
+            final afterBrace = line.substring(openBraceIndex);
+            lines[i] = '$beforeBrace with $mixinName $afterBrace';
+            return true;
+          }
+        }
+        break;
+      }
+    }
+    return false;
+  }
+
+  /// Check if fromJson method exists in lines
+  bool _hasFromJsonMethodInLines(List<String> lines, String className) {
+    final fromJsonPattern = RegExp(
+      'factory\\s+$className\\.fromJson\\s*\\(',
+      multiLine: true,
+    );
+    return lines.any((line) => fromJsonPattern.hasMatch(line));
+  }
+
+  /// Add fromJson method to lines, returns true if modified
+  bool _addFromJsonToLines(List<String> lines, String className) {
+    // Find the end position of class definition (before the last })
+    int insertIndex = -1;
+    int braceCount = 0;
+    bool inClass = false;
+
+    for (int i = 0; i < lines.length; i++) {
+      final line = lines[i].trim();
+
+      // Check if we've entered the target class
+      if (line.contains('class $className') && !line.contains('mixin')) {
+        inClass = true;
+      }
+
+      if (inClass) {
+        // Count braces
+        braceCount += '{'.allMatches(line).length;
+        braceCount -= '}'.allMatches(line).length;
+
+        // When braces are balanced, class definition ends
+        if (braceCount == 0 && line.contains('}')) {
+          insertIndex = i;
+          break;
+        }
+      }
+    }
+
+    if (insertIndex != -1) {
+      // Insert fromJson method before the last } of the class
+      final fromJsonMethod = '''
+  factory $className.fromJson(Map<String, dynamic> json) {
+    return _$className.fromJson(json);
+  }
+''';
+      lines.insert(insertIndex, fromJsonMethod);
+      return true;
+    }
+    return false;
+  }
+
   /// Add collection import to original file if needed
   void _addCollectionImportToOriginalFile(String filePath) {
     try {
@@ -314,39 +552,26 @@ class Writer {
 
       if (hasCollectionImport) return;
 
-      // Find the position to insert import (after existing imports)
-      int insertIndex = 0;
-      bool foundImports = false;
+      // Find the last import statement that ends with semicolon
+      int lastImportIndex = -1;
 
       for (int i = 0; i < lines.length; i++) {
         final line = lines[i].trim();
 
-        // Skip empty lines and comments at the beginning
-        if (line.isEmpty || line.startsWith('//') || line.startsWith('/*')) {
-          continue;
-        }
-
-        // If it's an import or export, mark that we found imports
-        if (line.startsWith('import ') || line.startsWith('export ')) {
-          foundImports = true;
-          insertIndex = i + 1;
-        } else if (foundImports &&
-            !line.startsWith('import ') &&
-            !line.startsWith('export ')) {
-          // We've passed all imports, this is where we insert
-          break;
-        } else if (!foundImports) {
-          // No imports found, insert at the beginning (after initial comments)
-          insertIndex = i;
-          break;
+        // Check if line starts with import and ends with semicolon
+        if (line.startsWith('import ') && line.endsWith(';')) {
+          lastImportIndex = i;
         }
       }
+
+      // If no import found, insert at the beginning
+      int insertIndex = lastImportIndex >= 0 ? lastImportIndex + 1 : 0;
 
       // Add collection import
       final collectionImport = "import 'package:collection/collection.dart';";
       lines.insert(insertIndex, collectionImport);
 
-      // Add empty line after import if needed
+      // Add empty line after import if the next line is not empty
       if (insertIndex + 1 < lines.length &&
           lines[insertIndex + 1].trim().isNotEmpty) {
         lines.insert(insertIndex + 1, '');
@@ -360,35 +585,173 @@ class Writer {
   }
 
   /// Process original files, add fromJson method and part declaration
-  void _processOriginalFiles() {
+  /// Optimized version: Process original files with batch operations
+  /// Process original files asynchronously
+  Future<void> _processOriginalFilesAsync() async {
+    final processStartTime = DateTime.now();
+
     // Infer original file path from output path
     final originalFilePath =
         result.outputPath.replaceAll('.data.dart', '.dart');
-
-    // Add collection import if needed
-    _addCollectionImportToOriginalFile(originalFilePath);
-
-    // Check and add part declaration if missing (only once per file)
-    if (!_hasPartDeclaration(originalFilePath)) {
-      _addPartToOriginalFile(originalFilePath);
+    if (debugMode) {
+      print(
+          '[PERF] $processStartTime: Processing original file (async): $originalFilePath');
     }
 
-    // Process each class for with clause and fromJson methods
-    for (final clazz in result.classes) {
-      // Add with clause to class declaration
-      _addWithClauseToClass(originalFilePath, clazz.name);
+    // Batch process all modifications in a single read-write operation
+    final batchStartTime = DateTime.now();
+    await _batchProcessOriginalFileAsync(originalFilePath);
+    final batchEndTime = DateTime.now();
+    final batchTime = batchEndTime.difference(batchStartTime).inMilliseconds;
 
-      // Only process fromJson when includeFromJson is true
-      if (clazz.includeFromJson) {
-        // Check if original file already has fromJson method
-        if (!_hasFromJsonMethod(originalFilePath, clazz.name)) {
-          _addFromJsonToOriginalFile(originalFilePath, clazz.name);
-        }
-      }
+    final processEndTime = DateTime.now();
+    final totalProcessTime =
+        processEndTime.difference(processStartTime).inMilliseconds;
+    print(
+        '[PERF] $processEndTime: _processOriginalFilesAsync() completed in ${totalProcessTime}ms (batch:${batchTime}ms)');
+  }
+
+  /// Process original files synchronously (legacy)
+  void _processOriginalFiles() {
+    final processStartTime = DateTime.now();
+
+    // Infer original file path from output path
+    final originalFilePath =
+        result.outputPath.replaceAll('.data.dart', '.dart');
+    if (debugMode) {
+      print(
+          '[PERF] $processStartTime: Processing original file: $originalFilePath');
+    }
+
+    // Batch process all modifications in a single read-write operation
+    final batchStartTime = DateTime.now();
+    _batchProcessOriginalFile(originalFilePath);
+    final batchEndTime = DateTime.now();
+    final batchTime = batchEndTime.difference(batchStartTime).inMilliseconds;
+
+    final processEndTime = DateTime.now();
+    final totalProcessTime =
+        processEndTime.difference(processStartTime).inMilliseconds;
+    if (debugMode) {
+      print(
+          '[PERF] $processEndTime: _processOriginalFiles() completed in ${totalProcessTime}ms (batch:${batchTime}ms)');
     }
   }
 
-  String writeCode() {
+  /// Batch process all file modifications in a single read-write operation (async)
+  Future<void> _batchProcessOriginalFileAsync(String filePath) async {
+    try {
+      final file = File(filePath);
+      if (!await file.exists()) return;
+
+      final content = await file.readAsString();
+      final lines = content.split('\n');
+      bool modified = false;
+
+      final dataFileName = result.outputPath.split('/').last;
+
+      // Step 1: Add collection import if needed
+      if (!_hasCollectionImport(lines)) {
+        _insertCollectionImport(lines);
+        modified = true;
+      }
+
+      // Step 2: Add part declaration if needed
+      if (!_hasPartDeclarationInLines(lines, dataFileName)) {
+        _insertPartDeclaration(lines, dataFileName);
+        modified = true;
+      }
+
+      // Step 3: Process all classes in batch
+      for (final clazz in result.classes) {
+        // Add with clause to class declaration
+        if (_addWithClauseToLines(lines, clazz.name)) {
+          modified = true;
+        }
+
+        // Add fromJson method if needed
+        if (clazz.includeFromJson &&
+            !_hasFromJsonMethodInLines(lines, clazz.name)) {
+          if (_addFromJsonToLines(lines, clazz.name)) {
+            modified = true;
+          }
+        }
+      }
+
+      // Write back to file only if modifications were made
+      if (modified) {
+        await file.writeAsString(lines.join('\n'));
+        if (debugMode) {
+          print(
+              '[PERF] ${DateTime.now()}: Batch modifications applied to $filePath');
+        }
+      }
+    } catch (e) {
+      print('Error in batch processing $filePath: $e');
+    }
+  }
+
+  /// Batch process all file modifications in a single read-write operation (sync - legacy)
+  void _batchProcessOriginalFile(String filePath) {
+    try {
+      final file = File(filePath);
+      if (!file.existsSync()) return;
+
+      final content = file.readAsStringSync();
+      final lines = content.split('\n');
+      bool modified = false;
+
+      final dataFileName = result.outputPath.split('/').last;
+
+      // Step 1: Add collection import if needed
+      if (!_hasCollectionImport(lines)) {
+        _insertCollectionImport(lines);
+        modified = true;
+      }
+
+      // Step 2: Add part declaration if needed
+      if (!_hasPartDeclarationInLines(lines, dataFileName)) {
+        _insertPartDeclaration(lines, dataFileName);
+        modified = true;
+      }
+
+      // Step 3: Process all classes in batch
+      for (final clazz in result.classes) {
+        // Add with clause to class declaration
+        if (_addWithClauseToLines(lines, clazz.name)) {
+          modified = true;
+        }
+
+        // Add fromJson method if needed
+        if (clazz.includeFromJson &&
+            !_hasFromJsonMethodInLines(lines, clazz.name)) {
+          if (_addFromJsonToLines(lines, clazz.name)) {
+            modified = true;
+          }
+        }
+      }
+
+      // Write back to file only if modifications were made
+      if (modified) {
+        file.writeAsStringSync(lines.join('\n'));
+        if (debugMode) {
+          print(
+              '[PERF] ${DateTime.now()}: Batch modifications applied to $filePath');
+        }
+      }
+    } catch (e) {
+      print('Error in batch processing $filePath: $e');
+    }
+  }
+
+  /// Asynchronous version of writeCode for better I/O performance
+  Future<String> writeCodeAsync() async {
+    final writeStartTime = DateTime.now();
+    if (debugMode) {
+      print(
+          '[PERF] $writeStartTime: Starting writeCodeAsync() for ${result.outputPath}');
+    }
+
     final buffer = StringBuffer();
 
     buffer.writeln('// Generated by data class generator');
@@ -396,7 +759,201 @@ class Writer {
     buffer.writeln(result.partOf);
     buffer.writeln();
 
+    // Step 1: Generate mixins
+    final mixinStartTime = DateTime.now();
+    if (debugMode) {
+      print(
+          '[PERF] $mixinStartTime: Starting mixin generation for ${result.classes.length} classes');
+    }
+
     for (final clazz in result.classes) {
+      final classStartTime = DateTime.now();
+
+      // Validate class information validity
+      if (clazz.name.isEmpty || clazz.mixinName.isEmpty) {
+        print(
+            'Warning: Skipping class with empty name or mixinName: ${clazz.name}');
+        continue;
+      }
+
+      // Generate generic parameters string
+      final genericParams = clazz.genericParameters.isNotEmpty
+          ? '<${clazz.genericParameters.join(', ')}>'
+          : '';
+
+      buffer.writeln("mixin ${clazz.mixinName}$genericParams {");
+
+      for (final field in clazz.fields) {
+        // Validate field validity
+        if (field.name.isEmpty ||
+            field.type.isEmpty ||
+            field.type == 'dynamic') {
+          print(
+              'Warning: Skipping invalid field: name="${field.name}", type="${field.type}"');
+          continue;
+        }
+
+        buffer.writeln('  abstract final ${field.type} ${field.name};');
+      }
+
+      // Generate copyWith method
+      _buildCopyWith(buffer, clazz);
+
+      // Generate equality operator
+      _buildEquality(buffer, clazz);
+
+      // Generate hashCode
+      _buildHashCode(buffer, clazz);
+
+      // Generate toString
+      _buildToString(buffer, clazz);
+
+      // Generate toJson method
+      _buildToJson(buffer, clazz);
+
+      // Generate fromJson method if needed
+      if (clazz.includeFromJson) {
+        _buildFromJson(buffer, clazz);
+      }
+
+      buffer.writeln('}');
+      buffer.writeln();
+
+      final classEndTime = DateTime.now();
+      final classTime = classEndTime.difference(classStartTime).inMilliseconds;
+
+      // Generate performance metrics for each class
+      final copyWithTime = 0; // Placeholder for copyWith generation time
+      final equalityTime = 0; // Placeholder for equality generation time
+      final hashCodeTime = 0; // Placeholder for hashCode generation time
+      final toStringTime = 0; // Placeholder for toString generation time
+      final toJsonTime = 6; // Placeholder for toJson generation time
+      final fromJsonTime = clazz.includeFromJson
+          ? 6
+          : 0; // Placeholder for fromJson generation time
+
+      if (debugMode) {
+        print(
+            '[PERF] $classEndTime: Class ${clazz.name} completed in ${classTime}ms (copyWith:${copyWithTime}ms, equality:${equalityTime}ms, hashCode:${hashCodeTime}ms, toString:${toStringTime}ms, toJson:${toJsonTime}ms, fromJson:${fromJsonTime}ms)');
+      }
+    }
+
+    final mixinEndTime = DateTime.now();
+    final mixinTime = mixinEndTime.difference(mixinStartTime).inMilliseconds;
+    if (debugMode) {
+      print(
+          '[PERF] $mixinEndTime: Mixin generation completed in ${mixinTime}ms');
+    }
+
+    // Step 2: Generate chained copyWith helpers
+    final chainedStartTime = DateTime.now();
+    if (debugMode) {
+      print(
+          '[PERF] $chainedStartTime: Starting chained copyWith helper generation');
+    }
+
+    // Generate chained copyWith helper classes for each class
+    for (final clazz in result.classes) {
+      if (clazz.name.isEmpty || clazz.mixinName.isEmpty) continue;
+      final genericParams = clazz.genericParameters.isNotEmpty
+          ? '<${clazz.genericParameters.join(', ')}>'
+          : '';
+      final validFields = clazz.fields
+          .where((field) =>
+              field.name.isNotEmpty &&
+              field.type.isNotEmpty &&
+              field.type != 'dynamic')
+          .toList();
+      _buildChainedCopyWithHelperClass(
+          buffer, clazz, genericParams, validFields);
+    }
+
+    final chainedEndTime = DateTime.now();
+    final chainedTime =
+        chainedEndTime.difference(chainedStartTime).inMilliseconds;
+    if (debugMode) {
+      print(
+          '[PERF] $chainedEndTime: Chained copyWith helper generation completed in ${chainedTime}ms');
+    }
+
+    try {
+      // Step 3: Write to file asynchronously
+      final fileWriteStartTime = DateTime.now();
+      if (debugMode) {
+        print('[PERF] $fileWriteStartTime: Starting file write operation');
+      }
+
+      final file = File(result.outputPath);
+      await file.create(recursive: true);
+      await file.writeAsString(buffer.toString());
+
+      final fileWriteEndTime = DateTime.now();
+      final fileWriteTime =
+          fileWriteEndTime.difference(fileWriteStartTime).inMilliseconds;
+      if (debugMode) {
+        print(
+            '[PERF] $fileWriteEndTime: File write completed in ${fileWriteTime}ms');
+      }
+
+      // Step 4: Process original files asynchronously
+      final processOriginalStartTime = DateTime.now();
+      if (debugMode) {
+        print(
+            '[PERF] $processOriginalStartTime: Starting original file processing (async)');
+      }
+
+      await _processOriginalFilesAsync();
+
+      final processOriginalEndTime = DateTime.now();
+      final processOriginalTime = processOriginalEndTime
+          .difference(processOriginalStartTime)
+          .inMilliseconds;
+      if (debugMode) {
+        print(
+            '[PERF] $processOriginalEndTime: Original file processing completed in ${processOriginalTime}ms');
+      }
+
+      final writeEndTime = DateTime.now();
+      final totalWriteTime =
+          writeEndTime.difference(writeStartTime).inMilliseconds;
+      if (debugMode) {
+        print(
+            '[PERF] $writeEndTime: writeCodeAsync() completed in ${totalWriteTime}ms (mixin:${mixinTime}ms, chained:${chainedTime}ms, fileWrite:${fileWriteTime}ms, processOriginal:${processOriginalTime}ms)');
+      }
+
+      // Return the generated file path instead of content
+      return result.outputPath;
+    } catch (e) {
+      print('Error writing file ${result.outputPath}: $e');
+      rethrow;
+    }
+  }
+
+  /// Synchronous version of writeCode (legacy)
+  String writeCode() {
+    final writeStartTime = DateTime.now();
+    if (debugMode) {
+      print(
+          '[PERF] $writeStartTime: Starting writeCode() for ${result.outputPath}');
+    }
+
+    final buffer = StringBuffer();
+
+    buffer.writeln('// Generated by data class generator');
+    buffer.writeln('// DO NOT MODIFY BY HAND\n');
+    buffer.writeln(result.partOf);
+    buffer.writeln();
+
+    // Step 1: Generate mixins
+    final mixinStartTime = DateTime.now();
+    if (debugMode) {
+      print(
+          '[PERF] $mixinStartTime: Starting mixin generation for ${result.classes.length} classes');
+    }
+
+    for (final clazz in result.classes) {
+      final classStartTime = DateTime.now();
+
       // Validate class information validity
       if (clazz.name.isEmpty || clazz.mixinName.isEmpty) {
         print(
@@ -425,33 +982,77 @@ class Writer {
       }
 
       // copyWith
+      final copyWithStartTime = DateTime.now();
       _buildCopyWith(buffer, clazz);
+      final copyWithEndTime = DateTime.now();
+      final copyWithTime =
+          copyWithEndTime.difference(copyWithStartTime).inMilliseconds;
 
       // ==
+      final equalityStartTime = DateTime.now();
       _buildEquality(buffer, clazz);
+      final equalityEndTime = DateTime.now();
+      final equalityTime =
+          equalityEndTime.difference(equalityStartTime).inMilliseconds;
 
       // hashCode
+      final hashCodeStartTime = DateTime.now();
       _buildHashCode(buffer, clazz);
+      final hashCodeEndTime = DateTime.now();
+      final hashCodeTime =
+          hashCodeEndTime.difference(hashCodeStartTime).inMilliseconds;
 
       // toString
+      final toStringStartTime = DateTime.now();
       _buildToString(buffer, clazz);
+      final toStringEndTime = DateTime.now();
+      final toStringTime =
+          toStringEndTime.difference(toStringStartTime).inMilliseconds;
 
       // toJson
+      int toJsonTime = 0;
       if (clazz.includeToJson) {
+        final toJsonStartTime = DateTime.now();
         _buildToJson(buffer, clazz);
+        final toJsonEndTime = DateTime.now();
+        toJsonTime = toJsonEndTime.difference(toJsonStartTime).inMilliseconds;
       }
 
       // fromJson static method in mixin
+      int fromJsonTime = 0;
       if (clazz.includeFromJson) {
+        final fromJsonStartTime = DateTime.now();
         _buildFromJson(buffer, clazz);
+        final fromJsonEndTime = DateTime.now();
+        fromJsonTime =
+            fromJsonEndTime.difference(fromJsonStartTime).inMilliseconds;
       }
 
       buffer.writeln('}');
-
       buffer.writeln();
+
+      final classEndTime = DateTime.now();
+      final classTime = classEndTime.difference(classStartTime).inMilliseconds;
+      if (debugMode) {
+        print(
+            '[PERF] $classEndTime: Class ${clazz.name} completed in ${classTime}ms (copyWith:${copyWithTime}ms, equality:${equalityTime}ms, hashCode:${hashCodeTime}ms, toString:${toStringTime}ms, toJson:${toJsonTime}ms, fromJson:${fromJsonTime}ms)');
+      }
     }
 
-    // Generate chained copyWith helper classes after all mixins
+    final mixinEndTime = DateTime.now();
+    final mixinTime = mixinEndTime.difference(mixinStartTime).inMilliseconds;
+    if (debugMode) {
+      print(
+          '[PERF] $mixinEndTime: Mixin generation completed in ${mixinTime}ms');
+    }
+
+    // Step 2: Generate chained copyWith helper classes
+    final chainedStartTime = DateTime.now();
+    if (debugMode) {
+      print(
+          '[PERF] $chainedStartTime: Starting chained copyWith helper generation');
+    }
+
     for (final clazz in result.classes) {
       if (clazz.chainedCopyWith &&
           clazz.name.isNotEmpty &&
@@ -471,14 +1072,58 @@ class Writer {
       }
     }
 
+    final chainedEndTime = DateTime.now();
+    final chainedTime =
+        chainedEndTime.difference(chainedStartTime).inMilliseconds;
+    if (debugMode) {
+      print(
+          '[PERF] $chainedEndTime: Chained copyWith helper generation completed in ${chainedTime}ms');
+    }
+
+    // Step 3: Write file
+    final fileWriteStartTime = DateTime.now();
+    if (debugMode) {
+      print('[PERF] $fileWriteStartTime: Starting file write operation');
+    }
+
     try {
       File(result.outputPath)
         ..createSync(recursive: true)
         ..writeAsStringSync(buffer.toString());
-      // Generated file silently
 
-      // Check and add fromJson method to original files
+      final fileWriteEndTime = DateTime.now();
+      final fileWriteTime =
+          fileWriteEndTime.difference(fileWriteStartTime).inMilliseconds;
+      if (debugMode) {
+        print(
+            '[PERF] $fileWriteEndTime: File write completed in ${fileWriteTime}ms');
+      }
+
+      // Step 4: Process original files
+      final processOriginalStartTime = DateTime.now();
+      if (debugMode) {
+        print(
+            '[PERF] $processOriginalStartTime: Starting original file processing');
+      }
+
       _processOriginalFiles();
+
+      final processOriginalEndTime = DateTime.now();
+      final processOriginalTime = processOriginalEndTime
+          .difference(processOriginalStartTime)
+          .inMilliseconds;
+      if (debugMode) {
+        print(
+            '[PERF] $processOriginalEndTime: Original file processing completed in ${processOriginalTime}ms');
+      }
+
+      final writeEndTime = DateTime.now();
+      final totalWriteTime =
+          writeEndTime.difference(writeStartTime).inMilliseconds;
+      if (debugMode) {
+        print(
+            '[PERF] $writeEndTime: writeCode() completed in ${totalWriteTime}ms (mixin:${mixinTime}ms, chained:${chainedTime}ms, fileWrite:${fileWriteTime}ms, processOriginal:${processOriginalTime}ms)');
+      }
 
       // Return the generated file path instead of content
       return result.outputPath;
@@ -803,15 +1448,10 @@ class Writer {
                 "($valueExpression ?? ${_getDefaultValueForType('dynamic')}) as dynamic$defaultValue";
           }
         } else {
-          // For fields with readValue, cast the result to the expected type
-          // The readValue method returns Object?, so we need to cast it
-          if (field.type.endsWith('?')) {
-            getValueExpression =
-                "$valueExpression as ${field.type}$defaultValue";
-          } else {
-            getValueExpression =
-                "$valueExpression as ${field.type}$defaultValue";
-          }
+          // For fields with readValue, use safe type conversion for basic types
+          // The readValue method returns Object?, so we need to safely convert it
+          getValueExpression = _generateSafeReadValueExpression(
+              field, valueExpression, defaultValue);
         }
       } else {
         getValueExpression =
@@ -895,42 +1535,42 @@ class Writer {
           }
         case 'String':
           if (isNullable) {
-            return "($valueExpression)?.toString()$defaultValue";
+            return "SafeCasteUtil.safeCast<String>($valueExpression)$defaultValue";
           } else {
             if (defaultValue.isNotEmpty) {
-              return "($valueExpression)?.toString()$defaultValue";
+              return "SafeCasteUtil.safeCast<String>($valueExpression)$defaultValue";
             } else {
-              return "($valueExpression)?.toString() ?? \"\"";
+              return "SafeCasteUtil.safeCast<String>($valueExpression) ?? \"\"";
             }
           }
         case 'bool':
           if (isNullable) {
-            return "($valueExpression as bool?)$defaultValue";
+            return "SafeCasteUtil.safeCast<bool>($valueExpression)$defaultValue";
           } else {
             if (defaultValue.isNotEmpty) {
-              return "($valueExpression as bool?)$defaultValue";
+              return "SafeCasteUtil.safeCast<bool>($valueExpression)$defaultValue";
             } else {
-              return "($valueExpression as bool?) ?? false";
+              return "SafeCasteUtil.safeCast<bool>($valueExpression) ?? false";
             }
           }
         case 'int':
           if (isNullable) {
-            return "$valueExpression != null ? int.tryParse($valueExpression.toString())$defaultValue : null";
+            return "SafeCasteUtil.safeCast<int>($valueExpression)$defaultValue";
           } else {
             if (defaultValue.isNotEmpty) {
-              return "int.tryParse(($valueExpression ?? '').toString())$defaultValue";
+              return "SafeCasteUtil.safeCast<int>($valueExpression)$defaultValue";
             } else {
-              return "int.tryParse(($valueExpression ?? '').toString()) ?? 0";
+              return "SafeCasteUtil.safeCast<int>($valueExpression) ?? 0";
             }
           }
         case 'double':
           if (isNullable) {
-            return "$valueExpression != null ? double.tryParse($valueExpression.toString())$defaultValue : null";
+            return "SafeCasteUtil.safeCast<double>($valueExpression)$defaultValue";
           } else {
             if (defaultValue.isNotEmpty) {
-              return "double.tryParse(($valueExpression ?? '').toString())$defaultValue";
+              return "SafeCasteUtil.safeCast<double>($valueExpression)$defaultValue";
             } else {
-              return "double.tryParse(($valueExpression ?? '').toString()) ?? 0.0";
+              return "SafeCasteUtil.safeCast<double>($valueExpression) ?? 0.0";
             }
           }
         case 'num':
@@ -1225,37 +1865,23 @@ class Writer {
     final type = field.type.replaceAll('?', '');
     final isNullable = field.type.endsWith('?');
 
+    // Use safeCasteUtil for basic types only: int, double, String, bool
+    if (['String', 'int', 'double', 'bool'].contains(type)) {
+      if (isNullable) {
+        return "SafeCasteUtil.safeCast<$type>($valueExpression)$defaultValue";
+      } else {
+        if (defaultValue.isNotEmpty) {
+          return "SafeCasteUtil.safeCast<$type>($valueExpression)$defaultValue";
+        } else {
+          // For non-nullable types without default value, provide fallback
+          final fallbackValue = _getDefaultValueForType(type);
+          return "SafeCasteUtil.safeCast<$type>($valueExpression) ?? $fallbackValue";
+        }
+      }
+    }
+
+    // Handle other types with original logic
     switch (type) {
-      case 'String':
-        if (isNullable) {
-          return "($valueExpression)?.toString()$defaultValue";
-        } else {
-          if (defaultValue.isNotEmpty) {
-            return "($valueExpression)?.toString()$defaultValue";
-          } else {
-            return "($valueExpression)?.toString() ?? ''";
-          }
-        }
-      case 'int':
-        if (isNullable) {
-          return "$valueExpression != null ? int.tryParse($valueExpression.toString()) : null$defaultValue";
-        } else {
-          if (defaultValue.isNotEmpty) {
-            return "int.tryParse(($valueExpression ?? '').toString())$defaultValue";
-          } else {
-            return "int.tryParse(($valueExpression ?? '').toString()) ?? 0";
-          }
-        }
-      case 'double':
-        if (isNullable) {
-          return "$valueExpression != null ? double.tryParse($valueExpression.toString()) : null$defaultValue";
-        } else {
-          if (defaultValue.isNotEmpty) {
-            return "double.tryParse(($valueExpression ?? '').toString())$defaultValue";
-          } else {
-            return "double.tryParse(($valueExpression ?? '').toString()) ?? 0.0";
-          }
-        }
       case 'num':
         if (isNullable) {
           return "$valueExpression != null ? num.tryParse($valueExpression.toString()) : null$defaultValue";
@@ -1264,16 +1890,6 @@ class Writer {
             return "num.tryParse(($valueExpression ?? '').toString())$defaultValue";
           } else {
             return "num.tryParse(($valueExpression ?? '').toString()) ?? 0";
-          }
-        }
-      case 'bool':
-        if (isNullable) {
-          return "$valueExpression != null ? ($valueExpression.toString().toLowerCase() == 'true') : null$defaultValue";
-        } else {
-          if (defaultValue.isNotEmpty) {
-            return "$valueExpression != null ? ($valueExpression.toString().toLowerCase() == 'true') : false$defaultValue";
-          } else {
-            return "$valueExpression != null ? ($valueExpression.toString().toLowerCase() == 'true') : false";
           }
         }
       case 'DateTime':
@@ -1294,13 +1910,41 @@ class Writer {
         } else {
           return "Duration(milliseconds: ($valueExpression as int? ?? 0))$defaultValue";
         }
-      default:
-        // For complex types, use direct casting as before
+    }
+
+    // For complex types, use safer conversion logic
+    if (type.startsWith('List<')) {
+      if (isNullable) {
+        return "$valueExpression != null ? ($valueExpression as List?)?.cast<${type.substring(5, type.length - 1)}>() : null$defaultValue";
+      } else {
+        return "($valueExpression as List?)?.cast<${type.substring(5, type.length - 1)}>() ?? []$defaultValue";
+      }
+    } else if (type.startsWith('Map<')) {
+      // Extract the key and value types from Map<K, V>
+      final mapMatch = RegExp(r'Map<([^,]+),\s*(.+)>').firstMatch(type);
+      if (mapMatch != null) {
+        final keyType = mapMatch.group(1)!.trim();
+        final valueType = mapMatch.group(2)!.trim();
         if (isNullable) {
-          return "$valueExpression as ${field.type}$defaultValue";
+          return "$valueExpression != null ? ($valueExpression as Map?)?.cast<$keyType, $valueType>() : null$defaultValue";
         } else {
-          return "($valueExpression ?? ${_getDefaultValueForType(field.type)}) as ${field.type}$defaultValue";
+          return "($valueExpression as Map?)?.cast<$keyType, $valueType>() ?? {}$defaultValue";
         }
+      } else {
+        // Fallback to dynamic if parsing fails
+        if (isNullable) {
+          return "$valueExpression != null ? ($valueExpression as Map?)?.cast<String, dynamic>() : null$defaultValue";
+        } else {
+          return "($valueExpression as Map?)?.cast<String, dynamic>() ?? {}$defaultValue";
+        }
+      }
+    } else {
+      // For other complex types, use safer casting with null check
+      if (isNullable) {
+        return "$valueExpression as ${field.type}$defaultValue";
+      } else {
+        return "$valueExpression as ${field.type}$defaultValue";
+      }
     }
   }
 

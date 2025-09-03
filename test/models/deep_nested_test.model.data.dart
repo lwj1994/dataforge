@@ -51,9 +51,9 @@ mixin _Employee {
 
   static Employee fromJson(Map<String, dynamic> map) {
     return Employee(
-      name: (map['name'])?.toString() ?? "",
-      id: int.tryParse((map['id'] ?? '').toString()) ?? 0,
-      position: (map['position'])?.toString() ?? "",
+      name: SafeCasteUtil.safeCast<String>(map['name']) ?? "",
+      id: SafeCasteUtil.safeCast<int>(map['id']) ?? 0,
+      position: SafeCasteUtil.safeCast<String>(map['position']) ?? "",
     );
   }
 }
@@ -106,7 +106,7 @@ mixin _Team {
 
   static Team fromJson(Map<String, dynamic> map) {
     return Team(
-      name: (map['name'])?.toString() ?? "",
+      name: SafeCasteUtil.safeCast<String>(map['name']) ?? "",
       leader: Employee.fromJson((map['leader'] ?? {}) as Map<String, dynamic>),
       members: (map['members'] as List<dynamic>?)
               ?.map((e) => Employee.fromJson(e as Map<String, dynamic>))
@@ -165,8 +165,8 @@ mixin _Department {
 
   static Department fromJson(Map<String, dynamic> map) {
     return Department(
-      name: (map['name'])?.toString() ?? "",
-      code: (map['code'])?.toString() ?? "",
+      name: SafeCasteUtil.safeCast<String>(map['name']) ?? "",
+      code: SafeCasteUtil.safeCast<String>(map['code']) ?? "",
       teams: (map['teams'] as List<dynamic>?)
               ?.map((e) => Team.fromJson(e as Map<String, dynamic>))
               .toList()
@@ -224,8 +224,8 @@ mixin _Company {
 
   static Company fromJson(Map<String, dynamic> map) {
     return Company(
-      name: (map['name'])?.toString() ?? "",
-      address: (map['address'])?.toString() ?? "",
+      name: SafeCasteUtil.safeCast<String>(map['name']) ?? "",
+      address: SafeCasteUtil.safeCast<String>(map['address']) ?? "",
       departments: (map['departments'] as List<dynamic>?)
               ?.map((e) => Department.fromJson(e as Map<String, dynamic>))
               .toList()

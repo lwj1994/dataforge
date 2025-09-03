@@ -75,9 +75,9 @@ mixin _IgnoreTest {
 
   static IgnoreTest fromJson(Map<String, dynamic> map) {
     return IgnoreTest(
-      name: (map['name'])?.toString() ?? "",
-      age: int.tryParse((map['age'] ?? '').toString()) ?? 0,
-      isActive: (map['isActive'] as bool?) ?? false,
+      name: SafeCasteUtil.safeCast<String>(map['name']) ?? "",
+      age: SafeCasteUtil.safeCast<int>(map['age']) ?? 0,
+      isActive: SafeCasteUtil.safeCast<bool>(map['isActive']) ?? false,
     );
   }
 }

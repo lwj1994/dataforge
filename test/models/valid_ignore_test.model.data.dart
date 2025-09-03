@@ -67,8 +67,8 @@ mixin _ValidIgnoreTest {
 
   static ValidIgnoreTest fromJson(Map<String, dynamic> map) {
     return ValidIgnoreTest(
-      name: (map['name'])?.toString() ?? "",
-      age: int.tryParse((map['age'] ?? '').toString()) ?? 0,
+      name: SafeCasteUtil.safeCast<String>(map['name']) ?? "",
+      age: SafeCasteUtil.safeCast<int>(map['age']) ?? 0,
     );
   }
 }

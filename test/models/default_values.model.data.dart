@@ -77,11 +77,11 @@ mixin _DefaultValues {
 
   static DefaultValues fromJson(Map<String, dynamic> map) {
     return DefaultValues(
-      intValue: int.tryParse((map['intValue'] ?? '').toString()) ?? 42,
-      stringValue: (map['stringValue'])?.toString() ?? 'default',
-      boolValue: (map['boolValue'] as bool?) ?? true,
-      doubleValue:
-          double.tryParse((map['doubleValue'] ?? '').toString()) ?? 3.14,
+      intValue: SafeCasteUtil.safeCast<int>(map['intValue']) ?? 42,
+      stringValue:
+          SafeCasteUtil.safeCast<String>(map['stringValue']) ?? 'default',
+      boolValue: SafeCasteUtil.safeCast<bool>(map['boolValue']) ?? true,
+      doubleValue: SafeCasteUtil.safeCast<double>(map['doubleValue']) ?? 3.14,
       listValue: (map['listValue'] as List<dynamic>?)
               ?.map((e) => e.toString())
               .toList() ??
@@ -150,13 +150,11 @@ mixin _NestedDefaultValues {
 
   static NestedDefaultValues fromJson(Map<String, dynamic> map) {
     return NestedDefaultValues(
-      name: (map['name'])?.toString() ?? 'nested_default',
+      name: SafeCasteUtil.safeCast<String>(map['name']) ?? 'nested_default',
       nested: map['nested'] != null
           ? DefaultValues.fromJson(map['nested'] as Map<String, dynamic>)
           : const DefaultValues(),
-      nullableValue: map['nullableValue'] != null
-          ? int.tryParse(map['nullableValue'].toString())
-          : null,
+      nullableValue: SafeCasteUtil.safeCast<int>(map['nullableValue']),
     );
   }
 }
