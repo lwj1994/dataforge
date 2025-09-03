@@ -170,16 +170,28 @@ mixin _DateTimeTypes {
       optionalEventDates:
           (map['optionalEventDates'] as List<dynamic>?)?.cast<DateTime>(),
       namedDates: (map['namedDates'] as Map<String, DateTime>?) ?? {},
-      isoDateTime: DateTimeTypes._readValue(map, 'isoDateTime') as DateTime?,
-      timestampDate: DateTimeTypes._readValue(map, 'timestampDate') as DateTime,
-      parsedDate: DateTimeTypes._readValue(map, 'parsedDate') as DateTime?,
-      dateTimeList:
-          DateTimeTypes._readValue(map, 'dateTimeList') as List<DateTime>?,
+      isoDateTime: DateTimeTypes._readValue(map, 'isoDateTime') != null
+          ? DateTime.tryParse(
+              DateTimeTypes._readValue(map, 'isoDateTime').toString())
+          : null,
+      timestampDate: DateTime.parse(
+          (DateTimeTypes._readValue(map, 'timestampDate') ?? '').toString()),
+      parsedDate: DateTimeTypes._readValue(map, 'parsedDate') != null
+          ? DateTime.tryParse(
+              DateTimeTypes._readValue(map, 'parsedDate').toString())
+          : null,
+      dateTimeList: DateTimeTypes._readValue(map, 'dateTimeList') != null
+          ? (DateTimeTypes._readValue(map, 'dateTimeList') as List?)
+              ?.cast<DateTime>()
+          : null,
       duration: map['duration'] != null
           ? const DurationConverter().fromJson(map['duration'])
           : null,
-      customDuration:
-          DateTimeTypes._readValue(map, 'customDuration') as Duration?,
+      customDuration: DateTimeTypes._readValue(map, 'customDuration') != null
+          ? Duration(
+              milliseconds:
+                  DateTimeTypes._readValue(map, 'customDuration') as int? ?? 0)
+          : null,
     );
   }
 }
@@ -260,7 +272,10 @@ mixin _TimeZoneTest {
       localTime: map['localTime'] != null
           ? const DateTimeConverter().fromJson(map['localTime'])
           : throw ArgumentError('Required field localTime is missing'),
-      timeZoneAware: TimeZoneTest._readValue(map, 'timeZoneAware') as DateTime?,
+      timeZoneAware: TimeZoneTest._readValue(map, 'timeZoneAware') != null
+          ? DateTime.tryParse(
+              TimeZoneTest._readValue(map, 'timeZoneAware').toString())
+          : null,
       timeList: (map['timeList'] as List<dynamic>?)?.cast<DateTime>() ?? [],
     );
   }

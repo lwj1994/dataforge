@@ -127,9 +127,11 @@ mixin _AutoMatchingExample {
       map['timeout'] =
           timeout != null ? const DurationConverter().toJson(timeout!) : null;
     }
-    map['priority'] = priority;
+    map['priority'] = const EnumConverter(Priority.values).toJson(priority);
     if (status != null) {
-      map['status'] = status;
+      map['status'] = status != null
+          ? const EnumConverter(Status.values).toJson(status!)
+          : null;
     }
     map['title'] = title;
     map['count'] = count;
@@ -157,8 +159,12 @@ mixin _AutoMatchingExample {
       timeout: map['timeout'] != null
           ? const DurationConverter().fromJson(map['timeout'])
           : null,
-      priority: (map['priority'] as Priority),
-      status: (map['status'] as Status?),
+      priority: map['priority'] != null
+          ? const EnumConverter(Priority.values).fromJson(map['priority'])
+          : throw ArgumentError('Required field priority is missing'),
+      status: map['status'] != null
+          ? const EnumConverter(Status.values).fromJson(map['status'])
+          : null,
       title: (map['title'])?.toString() ?? "",
       count: int.tryParse((map['count'] ?? '').toString()) ?? 0,
       price: double.tryParse((map['price'] ?? '').toString()) ?? 0.0,

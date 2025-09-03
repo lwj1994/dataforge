@@ -53,9 +53,9 @@ mixin _User {
 
   static User fromJson(Map<String, dynamic> map) {
     return User(
-      name: (map['name'])?.toString() ?? "",
-      age: int.tryParse((map['age'] ?? '').toString()) ?? 0,
-      email: (map['email'])?.toString(),
+      name: SafeCasteUtil.safeCast<String>(map['name']) ?? "",
+      age: SafeCasteUtil.safeCast<int>(map['age']) ?? 0,
+      email: SafeCasteUtil.safeCast<String>(map['email']),
     );
   }
 }
@@ -110,9 +110,9 @@ mixin _Address {
 
   static Address fromJson(Map<String, dynamic> map) {
     return Address(
-      street: (map['street'])?.toString() ?? "",
-      city: (map['city'])?.toString() ?? "",
-      zipCode: (map['zipCode'])?.toString(),
+      street: SafeCasteUtil.safeCast<String>(map['street']) ?? "",
+      city: SafeCasteUtil.safeCast<String>(map['city']) ?? "",
+      zipCode: SafeCasteUtil.safeCast<String>(map['zipCode']),
     );
   }
 }

@@ -61,9 +61,9 @@ mixin _AutoFromJsonTest {
 
   static AutoFromJsonTest fromJson(Map<String, dynamic> map) {
     return AutoFromJsonTest(
-      name: (map['name'])?.toString() ?? "",
-      age: int.tryParse((map['age'] ?? '').toString()) ?? 0,
-      isActive: (map['isActive'] as bool?) ?? true,
+      name: SafeCasteUtil.safeCast<String>(map['name']) ?? "",
+      age: SafeCasteUtil.safeCast<int>(map['age']) ?? 0,
+      isActive: SafeCasteUtil.safeCast<bool>(map['isActive']) ?? true,
     );
   }
 }

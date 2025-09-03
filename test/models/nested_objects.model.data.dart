@@ -87,12 +87,12 @@ mixin _Address {
 
   static Address fromJson(Map<String, dynamic> map) {
     return Address(
-      street: (map['street'])?.toString() ?? "",
-      city: (map['city'])?.toString() ?? "",
-      state: (map['state'])?.toString(),
-      zipCode: (map['zipCode'])?.toString() ?? "",
-      country: (map['country'])?.toString() ?? "",
-      isPrimary: (map['is_primary'] as bool?) ?? false,
+      street: SafeCasteUtil.safeCast<String>(map['street']) ?? "",
+      city: SafeCasteUtil.safeCast<String>(map['city']) ?? "",
+      state: SafeCasteUtil.safeCast<String>(map['state']),
+      zipCode: SafeCasteUtil.safeCast<String>(map['zipCode']) ?? "",
+      country: SafeCasteUtil.safeCast<String>(map['country']) ?? "",
+      isPrimary: SafeCasteUtil.safeCast<bool>(map['is_primary']) ?? false,
     );
   }
 }
@@ -157,9 +157,9 @@ mixin _Contact {
 
   static Contact fromJson(Map<String, dynamic> map) {
     return Contact(
-      email: (map['email'])?.toString() ?? "",
-      phone: (map['phone'])?.toString(),
-      contactType: (map['contact_type'])?.toString() ?? "",
+      email: SafeCasteUtil.safeCast<String>(map['email']) ?? "",
+      phone: SafeCasteUtil.safeCast<String>(map['phone']),
+      contactType: SafeCasteUtil.safeCast<String>(map['contact_type']) ?? "",
     );
   }
 }
@@ -243,7 +243,7 @@ mixin _Company {
 
   static Company fromJson(Map<String, dynamic> map) {
     return Company(
-      name: (map['name'])?.toString() ?? "",
+      name: SafeCasteUtil.safeCast<String>(map['name']) ?? "",
       headquarters:
           Address.fromJson((map['headquarters'] ?? {}) as Map<String, dynamic>),
       branches: (map['branches'] as List<dynamic>?)
@@ -389,7 +389,7 @@ mixin _NestedObjects {
 
   static NestedObjects fromJson(Map<String, dynamic> map) {
     return NestedObjects(
-      name: (map['name'])?.toString() ?? "",
+      name: SafeCasteUtil.safeCast<String>(map['name']) ?? "",
       homeAddress:
           Address.fromJson((map['homeAddress'] ?? {}) as Map<String, dynamic>),
       workAddress: map['workAddress'] != null
@@ -411,8 +411,10 @@ mixin _NestedObjects {
           ? Company.fromJson(map['employer'] as Map<String, dynamic>)
           : null,
       customAddress: NestedObjects._readValue(map, 'customAddress') as Address?,
-      parsedContacts:
-          NestedObjects._readValue(map, 'parsedContacts') as List<Contact>?,
+      parsedContacts: NestedObjects._readValue(map, 'parsedContacts') != null
+          ? (NestedObjects._readValue(map, 'parsedContacts') as List?)
+              ?.cast<Contact>()
+          : null,
     );
   }
 }

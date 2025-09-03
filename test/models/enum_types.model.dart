@@ -21,7 +21,6 @@ class EnumTypes with _EnumTypes {
   @override
   final Priority priority;
   @override
-  @JsonKey(readValue: EnumTypes._readValue)
   final Status parsedStatus;
   @override
   @JsonKey(readValue: EnumTypes._readValue)
@@ -50,25 +49,6 @@ class EnumTypes with _EnumTypes {
     final value = map[key];
 
     switch (key) {
-      case 'parsedStatus':
-        if (value == null) return null;
-        final statusStr = value.toString().toLowerCase();
-        switch (statusStr) {
-          case 'active':
-          case '1':
-          case 'true':
-            return Status.active;
-          case 'inactive':
-          case '0':
-          case 'false':
-            return Status.inactive;
-          case 'pending':
-          case '2':
-            return Status.pending;
-          default:
-            return Status.pending;
-        }
-
       case 'roleFromInt':
         if (value == null) return null;
         final roleInt = int.tryParse(value.toString()) ?? 0;

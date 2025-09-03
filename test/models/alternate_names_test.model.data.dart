@@ -77,17 +77,18 @@ mixin _AlternateNamesTest {
 
   static AlternateNamesTest fromJson(Map<String, dynamic> map) {
     return AlternateNamesTest(
-      name: (map['name'])?.toString() ?? "",
-      age: int.tryParse((map['user_age'] ?? map['age'] ?? map['years'] ?? '')
-              .toString()) ??
+      name: SafeCasteUtil.safeCast<String>(map['name']) ?? "",
+      age: SafeCasteUtil.safeCast<int>(
+              map['user_age'] ?? map['age'] ?? map['years']) ??
           0,
-      email:
-          (map['email'] ?? map['email_address'] ?? map['mail'] ?? map['e_mail'])
-                  ?.toString() ??
-              "",
-      isActive:
-          (map['is_active'] ?? map['active'] ?? map['enabled'] as bool?) ??
-              false,
+      email: SafeCasteUtil.safeCast<String>(map['email'] ??
+              map['email_address'] ??
+              map['mail'] ??
+              map['e_mail']) ??
+          "",
+      isActive: SafeCasteUtil.safeCast<bool>(
+              map['is_active'] ?? map['active'] ?? map['enabled']) ??
+          false,
       tags: ((map['tags'] as List<dynamic>?) ??
                   (map['tags_list'] as List<dynamic>?) ??
                   (map['labels'] as List<dynamic>?))

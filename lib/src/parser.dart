@@ -201,14 +201,26 @@ class Parser {
             final type = member.fields.type?.toSource() ?? 'dynamic';
             JsonKeyInfo? jsonKeyInfo;
 
-            // Parse JsonKey annotation
+            // Parse JsonKey annotation and @ignore annotation
             for (var annotation in member.metadata) {
               final annotationName = annotation.name.name;
               final cleanName = annotationName.contains(".")
                   ? annotationName.split(".").last
                   : annotationName;
 
-              if (cleanName == "JsonKey") {
+              // Handle @ignore annotation
+              if (cleanName == "ignore") {
+                jsonKeyInfo = JsonKeyInfo(
+                  name: "",
+                  readValue: "",
+                  ignore: true,
+                  alternateNames: [],
+                  converter: "",
+                  includeIfNull: null,
+                );
+              }
+              // Handle @JsonKey annotation
+              else if (cleanName == "JsonKey") {
                 jsonKeyInfo = JsonKeyInfo(
                   name: "",
                   readValue: "",

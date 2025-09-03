@@ -1,6 +1,7 @@
 // Example demonstrating the usage of built-in type converters
 
 import 'package:dataforge_annotation/dataforge_annotation.dart';
+
 part 'builtin_converters_example.data.dart';
 
 // Example enum for demonstration
@@ -13,33 +14,41 @@ enum Priority {
 
 // Example data class using built-in converters
 @dataforge
-class Task {
+class Task with _Task {
+  @override
   final String title;
 
   // Using DateTimeConverter to serialize DateTime as ISO 8601 string
+  @override
   @JsonKey(converter: DateTimeConverter())
   final DateTime createdAt;
 
   // Using DateTimeMillisecondsConverter to serialize DateTime as timestamp
+  @override
   @JsonKey(converter: DateTimeMillisecondsConverter())
   final DateTime? dueDate;
 
   // Using DurationConverter to serialize Duration as microseconds
+  @override
   @JsonKey(converter: DurationConverter())
   final Duration estimatedTime;
 
   // Using DurationMillisecondsConverter to serialize Duration as milliseconds
+  @override
   @JsonKey(converter: DurationMillisecondsConverter())
   final Duration? actualTime;
 
   // Using EnumConverter to serialize enum as string name
+  @override
   @JsonKey(converter: EnumConverter(Priority.values))
   final Priority priority;
 
   // Using EnumIndexConverter to serialize enum as index
+  @override
   @JsonKey(converter: EnumIndexConverter(Priority.values))
   final Priority? secondaryPriority;
 
+  @override
   final bool isCompleted;
 
   const Task({
@@ -52,6 +61,9 @@ class Task {
     this.secondaryPriority,
     this.isCompleted = false,
   });
+  factory Task.fromJson(Map<String, dynamic> json) {
+    return _Task.fromJson(json);
+  }
 }
 
 void main() {

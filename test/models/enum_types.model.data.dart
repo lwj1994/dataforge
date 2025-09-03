@@ -126,7 +126,9 @@ mixin _EnumTypes {
       priority: map['priority'] != null
           ? const EnumConverter(Priority.values).fromJson(map['priority'])
           : throw ArgumentError('Required field priority is missing'),
-      parsedStatus: EnumTypes._readValue(map, 'parsedStatus') as Status,
+      parsedStatus: map['parsedStatus'] != null
+          ? const EnumConverter(Status.values).fromJson(map['parsedStatus'])
+          : throw ArgumentError('Required field parsedStatus is missing'),
       roleFromInt: EnumTypes._readValue(map, 'roleFromInt') as UserRole?,
       statusList: (map['statusList'] as List<dynamic>?)
           ?.map((e) => const EnumConverter(Status.values).fromJson(e))

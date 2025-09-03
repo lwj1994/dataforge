@@ -109,15 +109,28 @@ mixin _CustomReadValue {
 
   static CustomReadValue fromJson(Map<String, dynamic> map) {
     return CustomReadValue(
-      id: (map['id'])?.toString() ?? "",
-      name: (map['name'])?.toString() ?? "",
-      title: CustomReadValue._readValue(map, 'title') as String,
-      count: CustomReadValue._readValue(map, 'count') as int,
-      enabled: CustomReadValue._readValue(map, 'enabled') as bool,
-      createdDate: CustomReadValue._readValue(map, 'createdDate') as DateTime?,
-      config:
-          CustomReadValue._readValue(map, 'config') as Map<String, dynamic>?,
-      tags: CustomReadValue._readValue(map, 'tags') as List<String>?,
+      id: SafeCasteUtil.safeCast<String>(map['id']) ?? "",
+      name: SafeCasteUtil.safeCast<String>(map['name']) ?? "",
+      title: SafeCasteUtil.safeCast<String>(
+              CustomReadValue._readValue(map, 'title')) ??
+          '',
+      count: SafeCasteUtil.safeCast<int>(
+              CustomReadValue._readValue(map, 'count')) ??
+          0,
+      enabled: SafeCasteUtil.safeCast<bool>(
+              CustomReadValue._readValue(map, 'enabled')) ??
+          false,
+      createdDate: CustomReadValue._readValue(map, 'createdDate') != null
+          ? DateTime.tryParse(
+              CustomReadValue._readValue(map, 'createdDate').toString())
+          : null,
+      config: CustomReadValue._readValue(map, 'config') != null
+          ? (CustomReadValue._readValue(map, 'config') as Map?)
+              ?.cast<String, dynamic>()
+          : null,
+      tags: CustomReadValue._readValue(map, 'tags') != null
+          ? (CustomReadValue._readValue(map, 'tags') as List?)?.cast<String>()
+          : null,
     );
   }
 }

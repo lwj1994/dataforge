@@ -167,11 +167,17 @@ mixin _MapTypes {
       listMap: (map['listMap'] as Map<String, List<String>>?) ?? {},
       nestedMap: (map['nestedMap'] as Map<String, Map<String, String>>?) ?? {},
       namedMap: (map['str_map'] as Map<String, String>?) ?? {},
-      parsedMap: MapTypes._readValue(map, 'parsedMap') as Map<String, String>?,
-      customIntMap:
-          MapTypes._readValue(map, 'customIntMap') as Map<String, int>,
-      complexMap: MapTypes._readValue(map, 'complexMap')
-          as Map<String, Map<String, dynamic>>?,
+      parsedMap: MapTypes._readValue(map, 'parsedMap') != null
+          ? (MapTypes._readValue(map, 'parsedMap') as Map?)
+              ?.cast<String, String>()
+          : null,
+      customIntMap: (MapTypes._readValue(map, 'customIntMap') as Map?)
+              ?.cast<String, int>() ??
+          {},
+      complexMap: MapTypes._readValue(map, 'complexMap') != null
+          ? (MapTypes._readValue(map, 'complexMap') as Map?)
+              ?.cast<String, Map<String, dynamic>>()
+          : null,
       mapList:
           (map['mapList'] as List<dynamic>?)?.cast<Map<String, String>>() ?? [],
       intKeyMap: (map['intKeyMap'] as Map<int, String>?),
@@ -256,8 +262,11 @@ mixin _MapWithObjects {
       contactListMap:
           (map['contactListMap'] as Map<String, List<Contact>>?) ?? {},
       optionalAddressMap: (map['optionalAddressMap'] as Map<String, Address>?),
-      parsedAddressMap: MapWithObjects._readValue(map, 'parsedAddressMap')
-          as Map<String, Address>?,
+      parsedAddressMap:
+          MapWithObjects._readValue(map, 'parsedAddressMap') != null
+              ? (MapWithObjects._readValue(map, 'parsedAddressMap') as Map?)
+                  ?.cast<String, Address>()
+              : null,
     );
   }
 }
@@ -320,9 +329,9 @@ mixin _Address {
 
   static Address fromJson(Map<String, dynamic> map) {
     return Address(
-      street: (map['street'])?.toString() ?? "",
-      city: (map['city'])?.toString() ?? "",
-      zipCode: (map['zipCode'])?.toString() ?? "",
+      street: SafeCasteUtil.safeCast<String>(map['street']) ?? "",
+      city: SafeCasteUtil.safeCast<String>(map['city']) ?? "",
+      zipCode: SafeCasteUtil.safeCast<String>(map['zipCode']) ?? "",
     );
   }
 }
@@ -379,8 +388,8 @@ mixin _Contact {
 
   static Contact fromJson(Map<String, dynamic> map) {
     return Contact(
-      email: (map['email'])?.toString() ?? "",
-      phone: (map['phone'])?.toString(),
+      email: SafeCasteUtil.safeCast<String>(map['email']) ?? "",
+      phone: SafeCasteUtil.safeCast<String>(map['phone']),
     );
   }
 }
