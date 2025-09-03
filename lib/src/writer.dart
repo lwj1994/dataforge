@@ -35,8 +35,7 @@ class Writer {
     final enumCheckStartTime = DateTime.now();
 
     // Remove nullable marker and generic parameters
-    final cleanType =
-        type.replaceAll('?', '').replaceAll(RegExp(r'<[^>]*>'), '');
+    final cleanType = _removeGenericParameters(type.replaceAll('?', ''));
     if (debugMode) {
       print(
           '[PERF] $enumCheckStartTime: Starting enum type check for: $cleanType');
@@ -106,6 +105,30 @@ class Writer {
     return false;
   }
 
+  /// Remove generic parameters from a type string, handling nested generics correctly
+  String _removeGenericParameters(String type) {
+    if (!type.contains('<')) {
+      return type;
+    }
+
+    final buffer = StringBuffer();
+    int depth = 0;
+
+    for (int i = 0; i < type.length; i++) {
+      final char = type[i];
+
+      if (char == '<') {
+        depth++;
+      } else if (char == '>') {
+        depth--;
+      } else if (depth == 0) {
+        buffer.write(char);
+      }
+    }
+
+    return buffer.toString();
+  }
+
   /// Auto-match converter based on field type
   /// Returns the appropriate converter name for common types
   String? _getAutoMatchedConverter(String type) {
@@ -130,11 +153,20 @@ class Writer {
       if (!file.existsSync()) return false;
 
       final content = file.readAsStringSync();
+
       // Check if fromJson factory method already exists
       final fromJsonPattern = RegExp(
         r'factory\s+' + RegExp.escape(className) + r'\.fromJson\s*\(',
         multiLine: true,
       );
+
+      // Check if this is a generic class
+      final isGenericClass = RegExp(
+        r'class\s+' + RegExp.escape(className) + r'<.+>',
+        multiLine: true,
+      ).hasMatch(content);
+
+      // Only check for fromJson method
       return fromJsonPattern.hasMatch(content);
     } catch (e) {
       print('Error checking fromJson method in $filePath: $e');
@@ -237,17 +269,47 @@ class Writer {
       }
 
       if (insertIndex != -1) {
-        // Insert fromJson method before the last } of the class
-        final fromJsonMethod = '''
+        // Check if this is a generic class
+        bool isGeneric = false;
+        String genericParams = '';
+
+        for (int i = 0; i < lines.length; i++) {
+          final line = lines[i].trim();
+          if (line.contains('class $className') && !line.contains('mixin')) {
+            if (line.contains('<') && line.contains('>')) {
+              isGeneric = true;
+              // Extract generic parameters
+              final start = line.indexOf('<');
+              final end = line.indexOf('>');
+              if (start != -1 && end != -1 && end > start) {
+                genericParams = line.substring(start, end + 1);
+              }
+            }
+            break;
+          }
+        }
+
+        // Check if fromJson method already exists to avoid duplication
+        final hasFromJson = content.contains('factory $className.fromJson(');
+
+        String fromJsonMethod = '';
+
+        // Add fromJson method if it doesn't exist
+        if (!hasFromJson) {
+          fromJsonMethod += '''
   factory $className.fromJson(Map<String, dynamic> json) {
     return _$className.fromJson(json);
   }
 ''';
-        lines.insert(insertIndex, fromJsonMethod);
+        }
 
-        // Write back to file
-        file.writeAsStringSync(lines.join('\n'));
-        // Added fromJson method silently
+        // Only insert if there are methods to add
+        if (fromJsonMethod.isNotEmpty) {
+          lines.insert(insertIndex, fromJsonMethod);
+          // Write back to file
+          file.writeAsStringSync(lines.join('\n'));
+          // Added fromJson method silently
+        }
       }
     } catch (e) {
       print('Error adding fromJson method to $filePath: $e');
@@ -381,17 +443,13 @@ class Writer {
       }
     }
 
-    // If no import found, insert at the beginning
-    int insertIndex = lastImportIndex >= 0 ? lastImportIndex + 1 : 0;
-
-    // Add collection import
-    final collectionImport = "import 'package:collection/collection.dart';";
-    lines.insert(insertIndex, collectionImport);
-
-    // Add empty line after import if the next line is not empty
-    if (insertIndex + 1 < lines.length &&
-        lines[insertIndex + 1].trim().isNotEmpty) {
-      lines.insert(insertIndex + 1, '');
+    // Insert collection import after the last import
+    if (lastImportIndex >= 0) {
+      lines.insert(
+          lastImportIndex + 1, "import 'package:collection/collection.dart';");
+    } else {
+      // If no imports found, insert at the beginning
+      lines.insert(0, "import 'package:collection/collection.dart';");
     }
   }
 
@@ -982,9 +1040,9 @@ class Writer {
         continue;
       }
 
-      // Generate generic parameters string
+      // Generate generic parameters string with bounds
       final genericParams = clazz.genericParameters.isNotEmpty
-          ? '<${clazz.genericParameters.join(', ')}>'
+          ? '<${clazz.genericParameters.map((p) => p.toString()).join(', ')}>'
           : '';
 
       buffer.writeln("mixin ${clazz.mixinName}$genericParams {");
@@ -1223,7 +1281,7 @@ class Writer {
   void _buildCopyWith(StringBuffer buffer, ClassInfo clazz) {
     // Generate generic parameter string
     final genericParams = clazz.genericParameters.isNotEmpty
-        ? '<${clazz.genericParameters.join(', ')}>'
+        ? '<${clazz.genericParameters.map((p) => p.name).join(', ')}>'
         : '';
 
     final validFields = clazz.fields
@@ -1347,39 +1405,56 @@ class Writer {
         key = field.jsonKey!.name;
       }
 
-      // Check for explicit TypeConverter first, then auto-match
+      // Check for custom toJson function first
       String valueExpression = field.name;
-      String? converterName = field.jsonKey?.converter.isNotEmpty == true
-          ? field.jsonKey!.converter
-          : null;
-
-      // If no explicit converter, try to auto-match based on type
-      if (converterName == null || converterName.isEmpty) {
-        final cleanType = field.type.replaceAll('?', '');
-        converterName = _getAutoMatchedConverter(cleanType);
-      }
-
-      // If there is a TypeConverter (explicit or auto-matched), use converter's toJson method
-      if (converterName != null && converterName.isNotEmpty) {
-        // Check if converterName already contains parentheses, if so use directly, otherwise add parentheses
-        String converterInstance;
-        if (converterName.contains('(')) {
-          converterInstance = 'const $converterName';
-        } else {
-          // For EnumConverter, add values parameter
-          if (converterName == 'EnumConverter') {
-            final cleanType = field.type.replaceAll('?', '');
-            converterInstance = 'const $converterName($cleanType.values)';
-          } else {
-            converterInstance = 'const $converterName()';
-          }
-        }
+      if (field.jsonKey?.toJson.isNotEmpty == true) {
+        final toJsonFunc = field.jsonKey!.toJson;
         final isNullable = field.type.endsWith('?');
+        // Check if toJsonFunc needs class prefix (for static methods starting with _)
+        final fullToJsonFunc =
+            toJsonFunc.startsWith('_') && !toJsonFunc.contains('.')
+                ? '${clazz.name}.$toJsonFunc'
+                : toJsonFunc;
         if (isNullable) {
           valueExpression =
-              "${field.name} != null ? $converterInstance.toJson(${field.name}!) : null";
+              "${field.name} != null ? $fullToJsonFunc(${field.name}!) : null";
         } else {
-          valueExpression = "$converterInstance.toJson(${field.name})";
+          valueExpression = "$fullToJsonFunc(${field.name})";
+        }
+      } else {
+        // Check for explicit TypeConverter, then auto-match
+        String? converterName = field.jsonKey?.converter.isNotEmpty == true
+            ? field.jsonKey!.converter
+            : null;
+
+        // If no explicit converter, try to auto-match based on type
+        if (converterName == null || converterName.isEmpty) {
+          final cleanType = field.type.replaceAll('?', '');
+          converterName = _getAutoMatchedConverter(cleanType);
+        }
+
+        // If there is a TypeConverter (explicit or auto-matched), use converter's toJson method
+        if (converterName != null && converterName.isNotEmpty) {
+          // Check if converterName already contains parentheses, if so use directly, otherwise add parentheses
+          String converterInstance;
+          if (converterName.contains('(')) {
+            converterInstance = 'const $converterName';
+          } else {
+            // For EnumConverter, add values parameter
+            if (converterName == 'EnumConverter') {
+              final cleanType = field.type.replaceAll('?', '');
+              converterInstance = 'const $converterName($cleanType.values)';
+            } else {
+              converterInstance = 'const $converterName()';
+            }
+          }
+          final isNullable = field.type.endsWith('?');
+          if (isNullable) {
+            valueExpression =
+                "${field.name} != null ? $converterInstance.toJson(${field.name}!) : null";
+          } else {
+            valueExpression = "$converterInstance.toJson(${field.name})";
+          }
         }
       }
 
@@ -1403,16 +1478,44 @@ class Writer {
   }
 
   void _buildFromJson(StringBuffer buffer, ClassInfo clazz) {
-    // For generic classes, static methods cannot use class generic parameters, so return dynamic
-    final returnType =
-        clazz.genericParameters.isNotEmpty ? 'dynamic' : clazz.name;
-    final constructorCall =
-        clazz.genericParameters.isNotEmpty ? clazz.name : clazz.name;
+    // For generic classes, generate both static fromJson and factory method
+    if (clazz.genericParameters.isNotEmpty) {
+      _buildGenericFromJson(buffer, clazz);
+    } else {
+      _buildRegularFromJson(buffer, clazz);
+    }
+  }
 
-    buffer
-        .writeln('\n  static $returnType fromJson(Map<String, dynamic> map) {');
-    buffer.writeln('    return $constructorCall(');
+  /// Build fromJson methods for generic classes
+  void _buildGenericFromJson(StringBuffer buffer, ClassInfo clazz) {
+    // Generate static fromJson method that returns the generic type
+    final genericParams = clazz.genericParameters.map((p) => p.name).join(', ');
+    final genericConstraints =
+        clazz.genericParameters.map((p) => p.toString()).join(', ');
+    buffer.writeln(
+        '\n  static ${clazz.name}<$genericParams> fromJson<$genericConstraints>(Map<String, dynamic> map) {');
+    buffer.writeln('    return ${clazz.name}<$genericParams>(');
 
+    _buildFromJsonFields(buffer, clazz);
+
+    buffer.writeln('    );');
+    buffer.writeln('  }');
+  }
+
+  /// Build fromJson method for regular (non-generic) classes
+  void _buildRegularFromJson(StringBuffer buffer, ClassInfo clazz) {
+    buffer.writeln(
+        '\n  static ${clazz.name} fromJson(Map<String, dynamic> map) {');
+    buffer.writeln('    return ${clazz.name}(');
+
+    _buildFromJsonFields(buffer, clazz);
+
+    buffer.writeln('    );');
+    buffer.writeln('  }');
+  }
+
+  /// Build field assignments for fromJson methods
+  void _buildFromJsonFields(StringBuffer buffer, ClassInfo clazz) {
     for (final field in clazz.fields) {
       if (field.jsonKey?.ignore == true ||
           field.name.isEmpty ||
@@ -1446,9 +1549,28 @@ class Writer {
         valueExpression = jsonKeys.map((key) => "map['$key']").join(' ?? ');
       }
 
-      // If there is a custom readValue expression
+      // Check for custom fromJson function first
       String getValueExpression;
-      if (field.jsonKey?.readValue.isNotEmpty == true) {
+      if (field.jsonKey?.fromJson.isNotEmpty == true) {
+        final fromJsonFunc = field.jsonKey!.fromJson;
+        final isNullable = field.type.endsWith('?');
+        // Check if fromJsonFunc needs class prefix (for static methods starting with _)
+        final fullFromJsonFunc =
+            fromJsonFunc.startsWith('_') && !fromJsonFunc.contains('.')
+                ? '${clazz.name}.$fromJsonFunc'
+                : fromJsonFunc;
+        if (isNullable) {
+          getValueExpression =
+              "$valueExpression != null ? $fullFromJsonFunc($valueExpression) : null$defaultValue";
+        } else {
+          if (defaultValue.isNotEmpty) {
+            getValueExpression =
+                "$valueExpression != null ? $fullFromJsonFunc($valueExpression) : ${defaultValue.substring(4)}";
+          } else {
+            getValueExpression = "$fullFromJsonFunc($valueExpression ?? {})";
+          }
+        }
+      } else if (field.jsonKey?.readValue.isNotEmpty == true) {
         final readValue = field.jsonKey!.readValue;
         // readValue is a static method call, needs to pass map and key parameters
         // If readValue doesn't contain class name prefix, add current class name
@@ -1475,19 +1597,137 @@ class Writer {
               field, valueExpression, defaultValue);
         }
       } else {
-        getValueExpression =
-            _generateFromMapExpression(field, valueExpression, defaultValue);
+        getValueExpression = _generateFromMapExpression(
+            field, valueExpression, defaultValue, clazz);
       }
 
       buffer.writeln("      ${field.name}: $getValueExpression,");
     }
+  }
 
-    buffer.writeln('    );');
-    buffer.writeln('  }');
+  /// Build field assignments for fromJson methods with type converters
+  void _buildFromJsonFieldsWithConverters(
+      StringBuffer buffer, ClassInfo clazz) {
+    for (final field in clazz.fields) {
+      if (field.jsonKey?.ignore == true ||
+          field.name.isEmpty ||
+          field.type.isEmpty ||
+          field.type == 'dynamic') {
+        continue;
+      }
+
+      final jsonKeys = <String>[];
+      if (field.jsonKey?.name.isNotEmpty == true) {
+        jsonKeys.add(field.jsonKey!.name);
+      } else {
+        jsonKeys.add(field.name);
+      }
+
+      if (field.jsonKey?.alternateNames.isNotEmpty == true) {
+        jsonKeys.addAll(field.jsonKey!.alternateNames);
+      }
+
+      String defaultValue = "";
+      if (field.defaultValue.isNotEmpty) {
+        defaultValue = " ?? ${field.defaultValue}";
+      }
+
+      // Build value extraction expression
+      String valueExpression;
+      if (jsonKeys.length == 1) {
+        valueExpression = "map['${jsonKeys[0]}']";
+      } else {
+        valueExpression = jsonKeys.map((key) => "map['$key']").join(' ?? ');
+      }
+
+      String getValueExpression;
+      if (field.jsonKey?.fromJson.isNotEmpty == true) {
+        final fromJsonFunc = field.jsonKey!.fromJson;
+        final isNullable = field.type.endsWith('?');
+        if (isNullable) {
+          getValueExpression =
+              "$valueExpression != null ? $fromJsonFunc($valueExpression) : null$defaultValue";
+        } else {
+          if (defaultValue.isNotEmpty) {
+            getValueExpression =
+                "$valueExpression != null ? $fromJsonFunc($valueExpression) : ${defaultValue.substring(4)}";
+          } else {
+            getValueExpression = "$fromJsonFunc($valueExpression ?? {})";
+          }
+        }
+      } else if (field.jsonKey?.readValue.isNotEmpty == true) {
+        final readValue = field.jsonKey!.readValue;
+        if (readValue.startsWith('_') && !readValue.contains('.')) {
+          valueExpression = "${clazz.name}.$readValue(map, '${jsonKeys[0]}')";
+        } else {
+          valueExpression = "$readValue(map, '${jsonKeys[0]}')";
+        }
+        getValueExpression = "$valueExpression as ${field.type}$defaultValue";
+      } else {
+        getValueExpression = _generateFromMapExpressionWithConverters(
+            field, valueExpression, defaultValue, clazz);
+      }
+
+      buffer.writeln("      ${field.name}: $getValueExpression,");
+    }
+  }
+
+  /// Generate fromMap expression with type converters for generic types
+  String _generateFromMapExpressionWithConverters(FieldInfo field,
+      String valueExpression, String defaultValue, ClassInfo clazz) {
+    final type = field.type.replaceAll('?', '');
+    final isNullable = field.type.endsWith('?');
+
+    // Check if field type is a generic parameter
+    if (clazz.genericParameters.any((p) => p.name == type)) {
+      final converterName = '${type.toLowerCase()}Converter';
+      if (isNullable) {
+        return "$valueExpression != null && $converterName != null ? $converterName($valueExpression) : null";
+      } else {
+        return "$converterName != null ? $converterName($valueExpression) : $valueExpression as $type";
+      }
+    }
+
+    // Check if field type contains generic parameters (like List<T>)
+    bool containsGenericParam = false;
+    for (final param in clazz.genericParameters) {
+      if (field.type.contains(param.name)) {
+        containsGenericParam = true;
+        break;
+      }
+    }
+
+    if (containsGenericParam) {
+      // Handle collection types with generic parameters
+      if (field.type.startsWith('List<')) {
+        final itemType =
+            field.type.substring(5, field.type.length - 1).replaceAll('?', '');
+        if (clazz.genericParameters.any((p) => p.name == itemType)) {
+          final converterName = '${itemType.toLowerCase()}Converter';
+          if (isNullable) {
+            return "($valueExpression as List<dynamic>?)?.map((e) => $converterName != null ? $converterName(e) : e as $itemType).toList()$defaultValue";
+          } else {
+            return "(($valueExpression as List<dynamic>?) ?? []).map((e) => $converterName != null ? $converterName(e) : e as $itemType).toList()$defaultValue";
+          }
+        }
+      } else if (field.type.startsWith('Map<')) {
+        // Handle Map types with generic parameters
+        if (isNullable) {
+          return "($valueExpression as Map<dynamic, dynamic>?)$defaultValue";
+        } else {
+          return "($valueExpression as Map<dynamic, dynamic>?) ?? {}$defaultValue";
+        }
+      }
+    }
+
+    // For non-generic types, use the regular expression generator
+    return _generateFromMapExpression(
+        field, valueExpression, defaultValue, clazz);
   }
 
   String _generateFromMapExpression(
-      FieldInfo field, String valueExpression, String defaultValue) {
+      FieldInfo field, String valueExpression, String defaultValue,
+      [ClassInfo? clazz]) {
     final type = field.type.replaceAll('?', '');
     final isNullable = field.type.endsWith('?');
 
@@ -1606,7 +1846,7 @@ class Writer {
           }
         default:
           return _generateDefaultFromMapExpression(
-              field, valueExpression, defaultValue);
+              field, valueExpression, defaultValue, clazz);
       }
     } catch (e) {
       print(
@@ -1616,9 +1856,22 @@ class Writer {
   }
 
   String _generateDefaultFromMapExpression(
-      FieldInfo field, String valueExpression, String defaultValue) {
+      FieldInfo field, String valueExpression, String defaultValue,
+      [ClassInfo? clazz]) {
     final type = field.type;
     final isNullable = type.endsWith('?');
+    final cleanType = type.replaceAll('?', '');
+
+    // Check if this is a generic parameter
+    if (clazz != null &&
+        clazz.genericParameters.any((p) => p.name == cleanType)) {
+      // For generic parameters, cast directly without fromJson
+      if (isNullable) {
+        return "$valueExpression as $cleanType?$defaultValue";
+      } else {
+        return "$valueExpression as $cleanType$defaultValue";
+      }
+    }
 
     try {
       if (type.isList()) {
@@ -1651,20 +1904,56 @@ class Writer {
               final expressions = jsonKeys
                   .map((key) => "(map['$key'] as List<dynamic>?)")
                   .join(' ?? ');
-              return "($expressions)?.map((e) => e.toString()).toList()$defaultValue";
+              if (isNullable) {
+                return "($expressions)?.map((e) => e.toString()).toList()$defaultValue";
+              } else {
+                if (defaultValue.isNotEmpty) {
+                  return "($expressions)?.map((e) => e.toString()).toList()$defaultValue";
+                } else {
+                  return "(($expressions) ?? []).map((e) => e.toString()).toList()";
+                }
+              }
             } else {
-              if (defaultValue.isNotEmpty) {
+              if (isNullable) {
                 return "($valueExpression as List<dynamic>?)?.map((e) => e.toString()).toList()$defaultValue";
               } else {
-                return "($valueExpression as List<dynamic>?)?.map((e) => e.toString()).toList() ?? []";
+                if (defaultValue.isNotEmpty) {
+                  return "($valueExpression as List<dynamic>?)?.map((e) => e.toString()).toList()$defaultValue";
+                } else {
+                  return "(($valueExpression as List<dynamic>?) ?? []).map((e) => e.toString()).toList()";
+                }
               }
             }
           } else if (itemType == 'int') {
-            return "($valueExpression as List<dynamic>?)?.map((e) => int.tryParse(e.toString()) ?? 0).toList()$defaultValue";
+            if (isNullable) {
+              return "($valueExpression as List<dynamic>?)?.map((e) => int.tryParse(e.toString()) ?? 0).toList()$defaultValue";
+            } else {
+              if (defaultValue.isNotEmpty) {
+                return "($valueExpression as List<dynamic>?)?.map((e) => int.tryParse(e.toString()) ?? 0).toList()$defaultValue";
+              } else {
+                return "(($valueExpression as List<dynamic>?) ?? []).map((e) => int.tryParse(e.toString()) ?? 0).toList()";
+              }
+            }
           } else if (itemType == 'double') {
-            return "($valueExpression as List<dynamic>?)?.map((e) => double.tryParse(e.toString()) ?? 0.0).toList()$defaultValue";
+            if (isNullable) {
+              return "($valueExpression as List<dynamic>?)?.map((e) => double.tryParse(e.toString()) ?? 0.0).toList()$defaultValue";
+            } else {
+              if (defaultValue.isNotEmpty) {
+                return "($valueExpression as List<dynamic>?)?.map((e) => double.tryParse(e.toString()) ?? 0.0).toList()$defaultValue";
+              } else {
+                return "(($valueExpression as List<dynamic>?) ?? []).map((e) => double.tryParse(e.toString()) ?? 0.0).toList()";
+              }
+            }
           } else if (itemType == 'bool') {
-            return "($valueExpression as List<dynamic>?)?.map((e) => e as bool? ?? false).toList()$defaultValue";
+            if (isNullable) {
+              return "($valueExpression as List<dynamic>?)?.map((e) => e as bool? ?? false).toList()$defaultValue";
+            } else {
+              if (defaultValue.isNotEmpty) {
+                return "($valueExpression as List<dynamic>?)?.map((e) => e as bool? ?? false).toList()$defaultValue";
+              } else {
+                return "(($valueExpression as List<dynamic>?) ?? []).map((e) => e as bool? ?? false).toList()";
+              }
+            }
           } else if (['DateTime', 'Uri', 'Duration'].contains(itemType)) {
             // Built-in types, convert directly
             if (isNullable) {
@@ -1678,8 +1967,8 @@ class Writer {
             }
           } else {
             // Custom types - use static method
-            final cleanItemType = itemType.replaceAll(
-                RegExp(r'<[^>]*>'), ''); // Remove generic parameters
+            final cleanItemType =
+                _removeGenericParameters(itemType); // Remove generic parameters
 
             // Check if itemType contains generic parameters
             final castType =
@@ -1687,14 +1976,14 @@ class Writer {
 
             // Check if it's a single generic type parameter (like T, U, etc.)
             if (RegExp(r'^[A-Z]$').hasMatch(cleanItemType)) {
-              // For single generic type parameters, convert directly to dynamic
+              // For single generic type parameters, cast to the generic type
               if (isNullable) {
-                return "($valueExpression as List<dynamic>?)?.cast<dynamic>()$defaultValue";
+                return "($valueExpression as List<dynamic>?)?.cast<$cleanItemType>()$defaultValue";
               } else {
                 if (defaultValue.isNotEmpty) {
-                  return "($valueExpression as List<dynamic>?)?.cast<dynamic>()$defaultValue";
+                  return "($valueExpression as List<dynamic>?)?.cast<$cleanItemType>()$defaultValue";
                 } else {
-                  return "($valueExpression as List<dynamic>?)?.cast<dynamic>() ?? []";
+                  return "($valueExpression as List<dynamic>?)?.cast<$cleanItemType>() ?? []";
                 }
               }
             }
@@ -1727,20 +2016,88 @@ class Writer {
           }
         }
       } else if (type.isMap()) {
-        // For Map type, check if it contains generic parameters
-        if (RegExp(r'\b[A-Z]\b').hasMatch(type)) {
-          // Map type containing generic parameters, convert to dynamic
+        // Extract Map key and value types
+        final mapMatch = RegExp(r'Map<([^,]+),\s*(.+)>').firstMatch(type);
+        if (mapMatch != null) {
+          final keyType = mapMatch.group(1)?.trim() ?? 'String';
+          final valueType = mapMatch.group(2)?.trim() ?? 'dynamic';
+          final cleanValueType = valueType.replaceAll('?', '');
+
+          // Check if valueType is a single generic parameter (like T, U, etc.)
+          if (RegExp(r'^[A-Z]$').hasMatch(cleanValueType)) {
+            // For generic type parameters, use direct cast to avoid fromJson calls
+            if (isNullable) {
+              return "($valueExpression as Map<dynamic, dynamic>?)?.map((key, value) => MapEntry(key as $keyType, value as $valueType))$defaultValue";
+            } else {
+              return "(($valueExpression as Map<dynamic, dynamic>?) ?? {}).map((key, value) => MapEntry(key as $keyType, value as $valueType))$defaultValue";
+            }
+          } else if (![
+                'String',
+                'int',
+                'double',
+                'bool',
+                'DateTime',
+                'Uri',
+                'Duration',
+                'dynamic'
+              ].contains(cleanValueType) &&
+              !cleanValueType.startsWith('Map<')) {
+            // Check if it's an enum type
+            if (_isEnumType(cleanValueType)) {
+              // Enum type, use EnumConverter
+              if (isNullable) {
+                return "($valueExpression as Map<String, dynamic>?)?.map((key, value) => MapEntry(key, const EnumConverter($cleanValueType.values).fromJson(value)))$defaultValue";
+              } else {
+                return "($valueExpression as Map<String, dynamic>?)?.map((key, value) => MapEntry(key, const EnumConverter($cleanValueType.values).fromJson(value))) ?? {}$defaultValue";
+              }
+            } else {
+              // Check if valueType is a List type
+              if (valueType.startsWith('List<')) {
+                final listItemType = valueType
+                    .substring(5, valueType.length - 1)
+                    .replaceAll('?', '');
+                final cleanListItemType = _removeGenericParameters(
+                    listItemType); // Remove generic parameters
+
+                // Check if it's a built-in type list
+                if (['String', 'int', 'double', 'bool']
+                    .contains(cleanListItemType)) {
+                  if (isNullable) {
+                    return "($valueExpression as Map<String, dynamic>?)?.map((key, value) => MapEntry(key, (value as List<dynamic>).cast<$cleanListItemType>()))$defaultValue";
+                  } else {
+                    return "($valueExpression as Map<String, dynamic>?)?.map((key, value) => MapEntry(key, (value as List<dynamic>).cast<$cleanListItemType>())) ?? {}$defaultValue";
+                  }
+                } else {
+                  // Custom type list
+                  if (isNullable) {
+                    return "($valueExpression as Map<String, dynamic>?)?.map((key, value) => MapEntry(key, (value as List<dynamic>).map((item) => $cleanListItemType.fromJson(item as Map<String, dynamic>)).toList()))$defaultValue";
+                  } else {
+                    return "($valueExpression as Map<String, dynamic>?)?.map((key, value) => MapEntry(key, (value as List<dynamic>).map((item) => $cleanListItemType.fromJson(item as Map<String, dynamic>)).toList())) ?? {}$defaultValue";
+                  }
+                }
+              } else {
+                // Custom type, need fromJson conversion
+                if (isNullable) {
+                  return "($valueExpression as Map<String, dynamic>?)?.map((key, value) => MapEntry(key, $cleanValueType.fromJson(value as Map<String, dynamic>)))$defaultValue";
+                } else {
+                  return "($valueExpression as Map<String, dynamic>?)?.map((key, value) => MapEntry(key, $cleanValueType.fromJson(value as Map<String, dynamic>))) ?? {}$defaultValue";
+                }
+              }
+            }
+          } else {
+            // Built-in types, direct cast
+            if (isNullable) {
+              return "($valueExpression as Map<$keyType, $valueType>?)$defaultValue";
+            } else {
+              return "($valueExpression as Map<$keyType, $valueType>?) ?? {}$defaultValue";
+            }
+          }
+        } else {
+          // Fallback for unmatched Map types
           if (isNullable) {
             return "($valueExpression as Map<dynamic, dynamic>?)$defaultValue";
           } else {
             return "($valueExpression as Map<dynamic, dynamic>?) ?? {}$defaultValue";
-          }
-        } else {
-          // Map type not containing generic parameters, convert directly
-          if (isNullable) {
-            return "($valueExpression as $type)$defaultValue";
-          } else {
-            return "($valueExpression as $type?) ?? {}$defaultValue";
           }
         }
       } else if (type.startsWith('List<') && type.contains('Map<')) {
@@ -1772,8 +2129,8 @@ class Writer {
           }
         } else {
           // Custom type, use static method
-          final cleanItemType = itemType.replaceAll(
-              RegExp(r'<[^>]*>'), ''); // Remove generic parameters
+          final cleanItemType =
+              _removeGenericParameters(itemType); // Remove generic parameters
 
           // Check if itemType contains generic parameters
           final castType =
@@ -1781,11 +2138,11 @@ class Writer {
 
           // Check if it's a single generic type parameter (like T, U, etc.)
           if (RegExp(r'^[A-Z]$').hasMatch(cleanItemType)) {
-            // For single generic type parameters, convert directly to dynamic
+            // For single generic type parameters, cast to the generic type
             if (isNullable) {
-              return "($valueExpression as List<dynamic>?)?.cast<dynamic>()$defaultValue";
+              return "($valueExpression as List<dynamic>?)?.cast<$cleanItemType>()$defaultValue";
             } else {
-              return "(($valueExpression as List<dynamic>?) ?? []).cast<dynamic>()$defaultValue";
+              return "(($valueExpression as List<dynamic>?) ?? []).cast<$cleanItemType>()$defaultValue";
             }
           }
 
@@ -1808,9 +2165,8 @@ class Writer {
         }
       } else {
         // Custom type - use top-level function
-        String cleanType = type
-            .replaceAll('?', '')
-            .replaceAll(RegExp(r'<[^>]*>'), ''); // Remove generic parameters
+        String cleanType = _removeGenericParameters(
+            type.replaceAll('?', '')); // Remove generic parameters
 
         // Skip built-in types
         if (['DateTime', 'Uri', 'Duration'].contains(cleanType)) {
@@ -1819,31 +2175,60 @@ class Writer {
 
         // Check if it's a single generic type parameter (like T, U, etc.)
         if (RegExp(r'^[A-Z]$').hasMatch(cleanType)) {
-          // For generic type parameters, use dynamic conversion (runtime generic types are not available)
+          // For generic type parameters, use dynamic conversion to avoid bound constraint issues
           if (isNullable) {
-            return "$valueExpression as dynamic$defaultValue";
+            return "$valueExpression as dynamic";
           } else {
-            return "($valueExpression ?? {}) as dynamic$defaultValue";
+            return "$valueExpression as dynamic";
           }
         }
 
-        // Check if it's a Map type containing generic parameters (like Map<T,U>)
+        // Check if it's a Map type containing generic parameters (like Map<String,T>)
         if (type.startsWith('Map<') && RegExp(r'\b[A-Z]\b').hasMatch(type)) {
-          // For Map types containing generic parameters, use dynamic conversion
-          if (isNullable) {
-            return "($valueExpression as Map<dynamic, dynamic>?)$defaultValue";
+          // Extract the key and value types
+          final mapMatch = RegExp(r'Map<([^,]+),\s*(.+)>').firstMatch(type);
+          if (mapMatch != null) {
+            final keyType = mapMatch.group(1)?.trim() ?? 'dynamic';
+            final valueType = mapMatch.group(2)?.trim() ?? 'dynamic';
+
+            // Check if valueType is a single generic parameter (like T, U, etc.)
+            if (RegExp(r'^[A-Z]$').hasMatch(valueType)) {
+              // For generic type parameters, use direct cast to avoid fromJson calls
+              if (isNullable) {
+                return "($valueExpression as Map<dynamic, dynamic>?)?.map((key, value) => MapEntry(key as $keyType, value as $valueType))$defaultValue";
+              } else {
+                return "(($valueExpression as Map<dynamic, dynamic>?) ?? {}).map((key, value) => MapEntry(key as $keyType, value as $valueType))$defaultValue";
+              }
+            } else {
+              // For Map types containing generic parameters, cast appropriately
+              if (isNullable) {
+                return "($valueExpression as Map<dynamic, dynamic>?)?.cast<$keyType, $valueType>()$defaultValue";
+              } else {
+                return "(($valueExpression as Map<dynamic, dynamic>?) ?? {}).cast<$keyType, $valueType>()$defaultValue";
+              }
+            }
           } else {
-            return "($valueExpression as Map<dynamic, dynamic>?) ?? {}$defaultValue";
+            // Fallback to dynamic conversion
+            if (isNullable) {
+              return "($valueExpression as Map<dynamic, dynamic>?)$defaultValue";
+            } else {
+              return "($valueExpression as Map<dynamic, dynamic>?) ?? {}$defaultValue";
+            }
           }
         }
 
         // Check if it's a List type containing generic parameters (like List<GenericContainer<T>>)
         if (type.startsWith('List<') && RegExp(r'\b[A-Z]\b').hasMatch(type)) {
-          // For List types containing generic parameters, use dynamic conversion
-          if (isNullable) {
-            return "($valueExpression as List<dynamic>?)?.cast<dynamic>()$defaultValue";
-          } else {
-            return "(($valueExpression as List<dynamic>?) ?? []).cast<dynamic>()$defaultValue";
+          // Extract the item type
+          final listMatch = RegExp(r'List<(.+)>').firstMatch(type);
+          if (listMatch != null) {
+            final itemType = listMatch.group(1)?.trim() ?? 'dynamic';
+            // For List types containing generic parameters, cast appropriately
+            if (isNullable) {
+              return "($valueExpression as List<dynamic>?)?.cast<$itemType>()$defaultValue";
+            } else {
+              return "(($valueExpression as List<dynamic>?) ?? []).cast<$itemType>()$defaultValue";
+            }
           }
         }
 

@@ -59,14 +59,35 @@ class ParseResult {
   }
 }
 
+class GenericParameter {
+  final String name;
+  final String? bound;
+
+  const GenericParameter(this.name, [this.bound]);
+
+  @override
+  String toString() => bound != null ? '$name extends $bound' : name;
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+    return other is GenericParameter &&
+        other.name == name &&
+        other.bound == bound;
+  }
+
+  @override
+  int get hashCode => Object.hash(name, bound);
+}
+
 class ClassInfo {
   final String name;
   final String mixinName;
   final List<FieldInfo> fields;
   final bool includeFromJson;
   final bool includeToJson;
-  final List<String> genericParameters;
   final bool chainedCopyWith;
+  final List<GenericParameter> genericParameters;
 
   const ClassInfo({
     required this.name,
@@ -84,7 +105,7 @@ class ClassInfo {
     List<FieldInfo>? fields,
     bool? includeFromJson,
     bool? includeToJson,
-    List<String>? genericParameters,
+    List<GenericParameter>? genericParameters,
     bool? chainedCopyWith,
   }) {
     return ClassInfo(
@@ -105,7 +126,9 @@ class ClassInfo {
       'fields': fields.map((x) => x.toMap()).toList(),
       'includeFromJson': includeFromJson,
       'includeToJson': includeToJson,
-      'genericParameters': genericParameters,
+      'genericParameters': genericParameters
+          .map((x) => {'name': x.name, 'bound': x.bound})
+          .toList(),
       'chainedCopyWith': chainedCopyWith,
     };
   }
@@ -127,7 +150,9 @@ class ClassInfo {
       includeFromJson: map['includeFromJson'] as bool? ?? legacyIncludeFromMap,
       includeToJson: map['includeToJson'] as bool? ?? legacyIncludeToMap,
       genericParameters: (map['genericParameters'] as List<dynamic>?)
-              ?.map((e) => e.toString())
+              ?.map((e) => e is Map<String, dynamic>
+                  ? GenericParameter(e['name'] as String, e['bound'] as String?)
+                  : GenericParameter(e.toString()))
               .toList() ??
           [],
       chainedCopyWith: map['chainedCopyWith'] as bool? ?? false,
@@ -267,6 +292,8 @@ class JsonKeyInfo {
   final bool ignore;
   final String converter;
   final bool? includeIfNull;
+  final String fromJson;
+  final String toJson;
 
   const JsonKeyInfo({
     required this.name,
@@ -275,6 +302,8 @@ class JsonKeyInfo {
     required this.ignore,
     this.converter = '',
     this.includeIfNull,
+    this.fromJson = '',
+    this.toJson = '',
   });
 
   JsonKeyInfo copyWith({
@@ -284,6 +313,8 @@ class JsonKeyInfo {
     bool? ignore,
     String? converter,
     bool? includeIfNull,
+    String? fromJson,
+    String? toJson,
   }) {
     return JsonKeyInfo(
       name: name ?? this.name,
@@ -292,6 +323,8 @@ class JsonKeyInfo {
       ignore: ignore ?? this.ignore,
       converter: converter ?? this.converter,
       includeIfNull: includeIfNull ?? this.includeIfNull,
+      fromJson: fromJson ?? this.fromJson,
+      toJson: toJson ?? this.toJson,
     );
   }
 
@@ -303,6 +336,8 @@ class JsonKeyInfo {
       'ignore': ignore,
       'converter': converter,
       'includeIfNull': includeIfNull,
+      'fromJson': fromJson,
+      'toJson': toJson,
     };
   }
 
@@ -317,12 +352,14 @@ class JsonKeyInfo {
       ignore: map['ignore'] as bool? ?? false,
       converter: map['converter'] as String? ?? '',
       includeIfNull: map['includeIfNull'] as bool?,
+      fromJson: map['fromJson'] as String? ?? '',
+      toJson: map['toJson'] as String? ?? '',
     );
   }
 
   @override
   String toString() {
-    return 'JsonKeyInfo(name: $name, alternateNames: $alternateNames, readValue: $readValue, ignore: $ignore, converter: $converter, includeIfNull: $includeIfNull)';
+    return 'JsonKeyInfo(name: $name, alternateNames: $alternateNames, readValue: $readValue, ignore: $ignore, converter: $converter, includeIfNull: $includeIfNull, fromJson: $fromJson, toJson: $toJson)';
   }
 
   @override
@@ -335,7 +372,9 @@ class JsonKeyInfo {
         other.readValue == readValue &&
         other.ignore == ignore &&
         other.converter == converter &&
-        other.includeIfNull == includeIfNull;
+        other.includeIfNull == includeIfNull &&
+        other.fromJson == fromJson &&
+        other.toJson == toJson;
   }
 
   @override
@@ -346,5 +385,7 @@ class JsonKeyInfo {
         ignore,
         converter,
         includeIfNull,
+        fromJson,
+        toJson,
       ]);
 }

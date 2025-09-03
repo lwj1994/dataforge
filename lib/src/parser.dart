@@ -139,10 +139,12 @@ class Parser {
         }
 
         // Parse generic parameters
-        final genericParameters = <String>[];
+        final genericParameters = <GenericParameter>[];
         if (declaration.typeParameters != null) {
           for (final typeParam in declaration.typeParameters!.typeParameters) {
-            genericParameters.add(typeParam.name.lexeme);
+            final name = typeParam.name.lexeme;
+            final bound = typeParam.bound?.toSource();
+            genericParameters.add(GenericParameter(name, bound));
           }
         }
 
@@ -316,6 +318,16 @@ class Parser {
                       case "includeIfNull":
                         jsonKeyInfo = jsonKeyInfo!.copyWith(
                           includeIfNull: expressionSource == "true",
+                        );
+                        break;
+                      case "fromJson":
+                        jsonKeyInfo = jsonKeyInfo!.copyWith(
+                          fromJson: expressionSource,
+                        );
+                        break;
+                      case "toJson":
+                        jsonKeyInfo = jsonKeyInfo!.copyWith(
+                          toJson: expressionSource,
                         );
                         break;
                     }
