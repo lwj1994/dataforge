@@ -52,7 +52,7 @@ mixin _ValidExample1 {
 
   static ValidExample1 fromJson(Map<String, dynamic> map) {
     return ValidExample1(
-      name: (map['name'])?.toString() ?? "",
+      name: SafeCasteUtil.safeCast<String>(map['name']) ?? "",
     );
   }
 }
@@ -106,7 +106,7 @@ mixin _ValidExample2 {
 
   static ValidExample2 fromJson(Map<String, dynamic> map) {
     return ValidExample2(
-      name: (map['name'])?.toString() ?? "",
+      name: SafeCasteUtil.safeCast<String>(map['name']) ?? "",
     );
   }
 }

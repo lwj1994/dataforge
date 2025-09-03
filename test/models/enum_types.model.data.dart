@@ -134,7 +134,8 @@ mixin _EnumTypes {
           ?.map((e) => const EnumConverter(Status.values).fromJson(e))
           .toList()
           .cast<Status>(),
-      roleMap: (map['roleMap'] as Map<String, UserRole>?),
+      roleMap: (map['roleMap'] as Map<String, dynamic>?)?.map((key, value) =>
+          MapEntry(key, const EnumConverter(UserRole.values).fromJson(value))),
     );
   }
 }

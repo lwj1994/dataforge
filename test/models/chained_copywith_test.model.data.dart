@@ -167,9 +167,9 @@ mixin _Profile {
     return Profile(
       user: User.fromJson((map['user'] ?? {}) as Map<String, dynamic>),
       address: Address.fromJson((map['address'] ?? {}) as Map<String, dynamic>),
-      tags:
-          (map['tags'] as List<dynamic>?)?.map((e) => e.toString()).toList() ??
-              [],
+      tags: ((map['tags'] as List<dynamic>?) ?? [])
+          .map((e) => e.toString())
+          .toList(),
     );
   }
 }

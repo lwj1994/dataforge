@@ -38,6 +38,14 @@ class JsonKey {
   final TypeConverter? converter;
   final bool? includeIfNull;
 
+  /// Custom function for deserializing field value from JSON
+  /// Similar to json_serializable's fromJson parameter
+  final Function? fromJson;
+
+  /// Custom function for serializing field value to JSON
+  /// Similar to json_serializable's toJson parameter
+  final Function? toJson;
+
   const JsonKey({
     this.name = "",
     this.alternateNames = const [],
@@ -45,5 +53,7 @@ class JsonKey {
     this.ignore = false,
     this.converter,
     this.includeIfNull,
+    this.fromJson,
+    this.toJson,
   });
 }

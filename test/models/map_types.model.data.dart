@@ -164,7 +164,9 @@ mixin _MapTypes {
       boolMap: (map['boolMap'] as Map<String, bool>?) ?? {},
       dynamicMap: (map['dynamicMap'] as Map<String, dynamic>?) ?? {},
       optionalStringMap: (map['optionalStringMap'] as Map<String, String>?),
-      listMap: (map['listMap'] as Map<String, List<String>>?) ?? {},
+      listMap: (map['listMap'] as Map<String, dynamic>?)?.map((key, value) =>
+              MapEntry(key, (value as List<dynamic>).cast<String>())) ??
+          {},
       nestedMap: (map['nestedMap'] as Map<String, Map<String, String>>?) ?? {},
       namedMap: (map['str_map'] as Map<String, String>?) ?? {},
       parsedMap: MapTypes._readValue(map, 'parsedMap') != null
@@ -258,10 +260,21 @@ mixin _MapWithObjects {
 
   static MapWithObjects fromJson(Map<String, dynamic> map) {
     return MapWithObjects(
-      addressMap: (map['addressMap'] as Map<String, Address>?) ?? {},
-      contactListMap:
-          (map['contactListMap'] as Map<String, List<Contact>>?) ?? {},
-      optionalAddressMap: (map['optionalAddressMap'] as Map<String, Address>?),
+      addressMap: (map['addressMap'] as Map<String, dynamic>?)?.map((key,
+                  value) =>
+              MapEntry(key, Address.fromJson(value as Map<String, dynamic>))) ??
+          {},
+      contactListMap: (map['contactListMap'] as Map<String, dynamic>?)?.map(
+              (key, value) => MapEntry(
+                  key,
+                  (value as List<dynamic>)
+                      .map((item) =>
+                          Contact.fromJson(item as Map<String, dynamic>))
+                      .toList())) ??
+          {},
+      optionalAddressMap: (map['optionalAddressMap'] as Map<String, dynamic>?)
+          ?.map((key, value) =>
+              MapEntry(key, Address.fromJson(value as Map<String, dynamic>))),
       parsedAddressMap:
           MapWithObjects._readValue(map, 'parsedAddressMap') != null
               ? (MapWithObjects._readValue(map, 'parsedAddressMap') as Map?)

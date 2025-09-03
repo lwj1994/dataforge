@@ -400,7 +400,9 @@ mixin _NestedObjects {
               .toList()
               .cast<Address>() ??
           [],
-      namedAddresses: (map['namedAddresses'] as Map<String, Address>?),
+      namedAddresses: (map['namedAddresses'] as Map<String, dynamic>?)?.map(
+          (key, value) =>
+              MapEntry(key, Address.fromJson(value as Map<String, dynamic>))),
       primaryContact: Contact.fromJson(
           (map['primaryContact'] ?? {}) as Map<String, dynamic>),
       contacts: (map['contacts'] as List<dynamic>?)
