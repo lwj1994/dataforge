@@ -69,7 +69,9 @@ Future<List<String>> generate(String path, {bool debugMode = false}) async {
     }
 
     if (candidateFiles.isEmpty) {
-      print('No files with @Dataforge annotations found.');
+      if (debugMode) {
+        print('No files with @Dataforge annotations found. in $absolutePath');
+      }
       return generatedFiles;
     }
 
