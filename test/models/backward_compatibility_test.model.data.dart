@@ -8,17 +8,7 @@ mixin _UserDataforge {
   abstract final int age;
   abstract final String? email;
 
-  UserDataforge copyWith({
-    String? name,
-    int? age,
-    String? email,
-  }) {
-    return UserDataforge(
-      name: name ?? this.name,
-      age: age ?? this.age,
-      email: email ?? this.email,
-    );
-  }
+  _UserDataforgeCopyWith get copyWith => _UserDataforgeCopyWith._(this);
 
   @override
   bool operator ==(Object other) {
@@ -75,17 +65,7 @@ mixin _UserDataClass {
   abstract final int age;
   abstract final String? email;
 
-  UserDataClass copyWith({
-    String? name,
-    int? age,
-    String? email,
-  }) {
-    return UserDataClass(
-      name: name ?? this.name,
-      age: age ?? this.age,
-      email: email ?? this.email,
-    );
-  }
+  _UserDataClassCopyWith get copyWith => _UserDataClassCopyWith._(this);
 
   @override
   bool operator ==(Object other) {
@@ -141,15 +121,8 @@ mixin _UserDataClassConstant {
   abstract final String name;
   abstract final int age;
 
-  UserDataClassConstant copyWith({
-    String? name,
-    int? age,
-  }) {
-    return UserDataClassConstant(
-      name: name ?? this.name,
-      age: age ?? this.age,
-    );
-  }
+  _UserDataClassConstantCopyWith get copyWith =>
+      _UserDataClassConstantCopyWith._(this);
 
   @override
   bool operator ==(Object other) {
@@ -197,15 +170,8 @@ mixin _UserDataforgeConstant {
   abstract final String name;
   abstract final int age;
 
-  UserDataforgeConstant copyWith({
-    String? name,
-    int? age,
-  }) {
-    return UserDataforgeConstant(
-      name: name ?? this.name,
-      age: age ?? this.age,
-    );
-  }
+  _UserDataforgeConstantCopyWith get copyWith =>
+      _UserDataforgeConstantCopyWith._(this);
 
   @override
   bool operator ==(Object other) {
@@ -245,6 +211,164 @@ mixin _UserDataforgeConstant {
     return UserDataforgeConstant(
       name: SafeCasteUtil.safeCast<String>(map['name']) ?? "",
       age: SafeCasteUtil.safeCast<int>(map['age']) ?? 0,
+    );
+  }
+}
+
+/// Helper class for chained copyWith operations
+class _UserDataforgeCopyWith {
+  final _UserDataforge _instance;
+  const _UserDataforgeCopyWith._(this._instance);
+
+  /// Update name field
+  UserDataforge name(String? value) {
+    return UserDataforge(
+      name: value ?? _instance.name,
+      age: _instance.age,
+      email: _instance.email,
+    );
+  }
+
+  /// Update age field
+  UserDataforge age(int? value) {
+    return UserDataforge(
+      name: _instance.name,
+      age: value ?? _instance.age,
+      email: _instance.email,
+    );
+  }
+
+  /// Update email field
+  UserDataforge email(String? value) {
+    return UserDataforge(
+      name: _instance.name,
+      age: _instance.age,
+      email: value,
+    );
+  }
+
+  /// Traditional copyWith method
+  UserDataforge call({
+    String? name,
+    int? age,
+    String? email,
+  }) {
+    return UserDataforge(
+      name: name ?? _instance.name,
+      age: age ?? _instance.age,
+      email: email ?? _instance.email,
+    );
+  }
+}
+
+/// Helper class for chained copyWith operations
+class _UserDataClassCopyWith {
+  final _UserDataClass _instance;
+  const _UserDataClassCopyWith._(this._instance);
+
+  /// Update name field
+  UserDataClass name(String? value) {
+    return UserDataClass(
+      name: value ?? _instance.name,
+      age: _instance.age,
+      email: _instance.email,
+    );
+  }
+
+  /// Update age field
+  UserDataClass age(int? value) {
+    return UserDataClass(
+      name: _instance.name,
+      age: value ?? _instance.age,
+      email: _instance.email,
+    );
+  }
+
+  /// Update email field
+  UserDataClass email(String? value) {
+    return UserDataClass(
+      name: _instance.name,
+      age: _instance.age,
+      email: value,
+    );
+  }
+
+  /// Traditional copyWith method
+  UserDataClass call({
+    String? name,
+    int? age,
+    String? email,
+  }) {
+    return UserDataClass(
+      name: name ?? _instance.name,
+      age: age ?? _instance.age,
+      email: email ?? _instance.email,
+    );
+  }
+}
+
+/// Helper class for chained copyWith operations
+class _UserDataClassConstantCopyWith {
+  final _UserDataClassConstant _instance;
+  const _UserDataClassConstantCopyWith._(this._instance);
+
+  /// Update name field
+  UserDataClassConstant name(String? value) {
+    return UserDataClassConstant(
+      name: value ?? _instance.name,
+      age: _instance.age,
+    );
+  }
+
+  /// Update age field
+  UserDataClassConstant age(int? value) {
+    return UserDataClassConstant(
+      name: _instance.name,
+      age: value ?? _instance.age,
+    );
+  }
+
+  /// Traditional copyWith method
+  UserDataClassConstant call({
+    String? name,
+    int? age,
+  }) {
+    return UserDataClassConstant(
+      name: name ?? _instance.name,
+      age: age ?? _instance.age,
+    );
+  }
+}
+
+/// Helper class for chained copyWith operations
+class _UserDataforgeConstantCopyWith {
+  final _UserDataforgeConstant _instance;
+  const _UserDataforgeConstantCopyWith._(this._instance);
+
+  /// Update name field
+  UserDataforgeConstant name(String? value) {
+    return UserDataforgeConstant(
+      name: value ?? _instance.name,
+      age: _instance.age,
+    );
+  }
+
+  /// Update age field
+  UserDataforgeConstant age(int? value) {
+    return UserDataforgeConstant(
+      name: _instance.name,
+      age: value ?? _instance.age,
+    );
+  }
+
+  /// Traditional copyWith method
+  UserDataforgeConstant call({
+    String? name,
+    int? age,
+  }) {
+    return UserDataforgeConstant(
+      name: name ?? _instance.name,
+      age: age ?? _instance.age,
     );
   }
 }

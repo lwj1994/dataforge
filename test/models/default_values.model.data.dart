@@ -10,21 +10,7 @@ mixin _DefaultValues {
   abstract final double doubleValue;
   abstract final List<String> listValue;
 
-  DefaultValues copyWith({
-    int? intValue,
-    String? stringValue,
-    bool? boolValue,
-    double? doubleValue,
-    List<String>? listValue,
-  }) {
-    return DefaultValues(
-      intValue: intValue ?? this.intValue,
-      stringValue: stringValue ?? this.stringValue,
-      boolValue: boolValue ?? this.boolValue,
-      doubleValue: doubleValue ?? this.doubleValue,
-      listValue: listValue ?? this.listValue,
-    );
-  }
+  _DefaultValuesCopyWith get copyWith => _DefaultValuesCopyWith._(this);
 
   @override
   bool operator ==(Object other) {
@@ -95,17 +81,8 @@ mixin _NestedDefaultValues {
   abstract final DefaultValues nested;
   abstract final int? nullableValue;
 
-  NestedDefaultValues copyWith({
-    String? name,
-    DefaultValues? nested,
-    int? nullableValue,
-  }) {
-    return NestedDefaultValues(
-      name: name ?? this.name,
-      nested: nested ?? this.nested,
-      nullableValue: nullableValue ?? this.nullableValue,
-    );
-  }
+  _NestedDefaultValuesCopyWith get copyWith =>
+      _NestedDefaultValuesCopyWith._(this);
 
   @override
   bool operator ==(Object other) {
@@ -155,6 +132,152 @@ mixin _NestedDefaultValues {
           ? DefaultValues.fromJson(map['nested'] as Map<String, dynamic>)
           : const DefaultValues(),
       nullableValue: SafeCasteUtil.safeCast<int>(map['nullableValue']),
+    );
+  }
+}
+
+/// Helper class for chained copyWith operations
+class _DefaultValuesCopyWith {
+  final _DefaultValues _instance;
+  const _DefaultValuesCopyWith._(this._instance);
+
+  /// Update intValue field
+  DefaultValues intValue(int? value) {
+    return DefaultValues(
+      intValue: value ?? _instance.intValue,
+      stringValue: _instance.stringValue,
+      boolValue: _instance.boolValue,
+      doubleValue: _instance.doubleValue,
+      listValue: _instance.listValue,
+    );
+  }
+
+  /// Update stringValue field
+  DefaultValues stringValue(String? value) {
+    return DefaultValues(
+      intValue: _instance.intValue,
+      stringValue: value ?? _instance.stringValue,
+      boolValue: _instance.boolValue,
+      doubleValue: _instance.doubleValue,
+      listValue: _instance.listValue,
+    );
+  }
+
+  /// Update boolValue field
+  DefaultValues boolValue(bool? value) {
+    return DefaultValues(
+      intValue: _instance.intValue,
+      stringValue: _instance.stringValue,
+      boolValue: value ?? _instance.boolValue,
+      doubleValue: _instance.doubleValue,
+      listValue: _instance.listValue,
+    );
+  }
+
+  /// Update doubleValue field
+  DefaultValues doubleValue(double? value) {
+    return DefaultValues(
+      intValue: _instance.intValue,
+      stringValue: _instance.stringValue,
+      boolValue: _instance.boolValue,
+      doubleValue: value ?? _instance.doubleValue,
+      listValue: _instance.listValue,
+    );
+  }
+
+  /// Update listValue field
+  DefaultValues listValue(List<String>? value) {
+    return DefaultValues(
+      intValue: _instance.intValue,
+      stringValue: _instance.stringValue,
+      boolValue: _instance.boolValue,
+      doubleValue: _instance.doubleValue,
+      listValue: value ?? _instance.listValue,
+    );
+  }
+
+  /// Traditional copyWith method
+  DefaultValues call({
+    int? intValue,
+    String? stringValue,
+    bool? boolValue,
+    double? doubleValue,
+    List<String>? listValue,
+  }) {
+    return DefaultValues(
+      intValue: intValue ?? _instance.intValue,
+      stringValue: stringValue ?? _instance.stringValue,
+      boolValue: boolValue ?? _instance.boolValue,
+      doubleValue: doubleValue ?? _instance.doubleValue,
+      listValue: listValue ?? _instance.listValue,
+    );
+  }
+}
+
+/// Helper class for chained copyWith operations
+class _NestedDefaultValuesCopyWith {
+  final _NestedDefaultValues _instance;
+  const _NestedDefaultValuesCopyWith._(this._instance);
+
+  /// Update name field
+  NestedDefaultValues name(String? value) {
+    return NestedDefaultValues(
+      name: value ?? _instance.name,
+      nested: _instance.nested,
+      nullableValue: _instance.nullableValue,
+    );
+  }
+
+  /// Update nested field
+  NestedDefaultValues nested(DefaultValues? value) {
+    return NestedDefaultValues(
+      name: _instance.name,
+      nested: value ?? _instance.nested,
+      nullableValue: _instance.nullableValue,
+    );
+  }
+
+  /// Update nullableValue field
+  NestedDefaultValues nullableValue(int? value) {
+    return NestedDefaultValues(
+      name: _instance.name,
+      nested: _instance.nested,
+      nullableValue: value,
+    );
+  }
+
+  /// Nested copyWith for nested field
+  _NestedDefaultValuesNestedCopyWithNested get nestedBuilder {
+    return _NestedDefaultValuesNestedCopyWithNested._(_instance);
+  }
+
+  /// Traditional copyWith method
+  NestedDefaultValues call({
+    String? name,
+    DefaultValues? nested,
+    int? nullableValue,
+  }) {
+    return NestedDefaultValues(
+      name: name ?? _instance.name,
+      nested: nested ?? _instance.nested,
+      nullableValue: nullableValue ?? _instance.nullableValue,
+    );
+  }
+}
+
+/// Nested copyWith helper class for nested field
+class _NestedDefaultValuesNestedCopyWithNested {
+  final _NestedDefaultValues _instance;
+  const _NestedDefaultValuesNestedCopyWithNested._(this._instance);
+
+  /// Update nested field using a copyWith function
+  NestedDefaultValues call(DefaultValues Function(DefaultValues) updater) {
+    final currentValue = _instance.nested;
+    final updatedValue = updater(currentValue);
+    return NestedDefaultValues(
+      name: _instance.name,
+      nested: updatedValue,
+      nullableValue: _instance.nullableValue,
     );
   }
 }

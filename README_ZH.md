@@ -3,24 +3,21 @@
 [![Pub Version](https://img.shields.io/pub/v/dataforge)](https://pub.dev/packages/dataforge)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-一个高性能的 Dart 数据类锻造工具，专为替代缓慢的 `build_runner` 而设计。将原始数据结构锻造成完美的代码结构，速度比 `build_runner` 快数倍。
+高性能的 Dart 数据类生成器，比 `build_runner` **快数倍**。自动生成完美的数据类，包含 `copyWith`、`==`、`hashCode`、`toJson`、`fromJson` 等方法。
 
 ## ✨ 功能特性
 
-- 🚀 **闪电般快速**：比 `build_runner` 快数倍
-- 🎯 **零配置**：开箱即用，最少设置
-- 🔧 **高度可定制**：支持自定义方法名、字段映射等
-- 📦 **功能完整**：自动生成 `copyWith`、`==`、`hashCode`、`toJson`、`fromJson`
-- 🌟 **智能类型处理**：支持嵌套对象、集合、可选类型等
-- 🔄 **JSON 序列化**：完整的 JSON 序列化/反序列化支持，与 `dart:convert` 完美兼容
-- 🎨 **注解驱动**：简单注解控制代码生成
-- 🌐 **标准兼容**：生成的 `fromJson`/`toJson` 方法与 `jsonEncode`/`jsonDecode` 无缝配合
+- ⚡ **闪电般快速**：比 `build_runner` 快数倍
+- 🎯 **零配置**：开箱即用
+- 📦 **完整生成**：`copyWith`、`==`、`hashCode`、`toJson`、`fromJson`、`toString`
+- 🔗 **链式 CopyWith**：高级嵌套对象更新
+- 🔧 **灵活配置**：自定义字段映射、忽略字段、备用名称
+- 🌟 **类型安全**：完整的编译时类型检查
+- 🚀 **易于使用**：简单注解，最少设置
 
 ## 📦 安装
 
 ### 1. 添加依赖
-
-首先，在你的 `pubspec.yaml` 中添加 `dataforge_annotation`：
 
 ```yaml
 dependencies:
@@ -32,8 +29,6 @@ dependencies:
 ```
 
 ### 2. 安装 CLI 工具
-
-然后，安装 CLI 工具：
 
 ```bash
 dart pub global activate --source git https://github.com/lwj1994/dataforge
@@ -48,294 +43,244 @@ import 'package:dataforge_annotation/dataforge_annotation.dart';
 
 part 'user.data.dart';
 
-@Dataforge(includeFromJson: true, includeToJson: true)
+@Dataforge()
 class User with _User {
   @override
   final String name;
   
   @override
-  @JsonKey(name: "user_age", alternateNames: ["age"])
   final int age;
   
   @override
   final List<String> hobbies;
-  
-  @override
-  @JsonKey(ignore: true)
-  final String? password;
 
   const User({
     required this.name,
     this.age = 0,
     this.hobbies = const [],
-    this.password,
   });
 }
 ```
 
-### 2. 运行代码生成
+### 2. 生成代码
 
 ```bash
 # 为当前目录生成
-dataforge
+dataforge .
 
-# 为指定目录生成
-dataforge --path ./lib/models
+# 为指定文件生成
+dataforge lib/models/user.dart
 ```
 
-### 3. 使用生成的代码
+### 3. 使用生成的方法
 
 ```dart
 void main() {
-  // 创建对象
-  final user = User(name: "John", age: 25, hobbies: ["coding", "reading"]);
+  // 创建实例
+  final user = User(name: "张三", age: 25, hobbies: ["编程"]);
   
-  // 使用 copyWith 创建副本
-  final updatedUser = user.copyWith(age: 26);
+  // 复制并修改
+  final updated = user.copyWith(age: 26);
   
   // JSON 序列化
   final json = user.toJson();
-  print(json); // {name: John, user_age: 25, hobbies: [coding, reading]}
-  
-  // JSON 反序列化
-  final userFromJson = User.fromJson(json);
+  final fromJson = User.fromJson(json);
   
   // 对象比较
-  print(user == updatedUser); // false
-  print(user.hashCode != updatedUser.hashCode); // true
-  
-  // 与 dart:convert 无缝配合
-  final jsonString = jsonEncode(user); // 自动调用 user.toJson()
-  final decodedUser = User.fromJson(jsonDecode(jsonString));
+  print(user == updated); // false
+  print(user.toString()); // User(name: 张三, age: 25, hobbies: [编程])
 }
 ```
 
-## 📚 详细使用
+## 🔧 配置选项
 
-### Dataforge 注解
+### @Dataforge 注解
 
 ```dart
 @Dataforge(
-  name: "CustomMixin",        // 自定义 mixin 名称，默认为 _ClassName
-  includeFromJson: true,      // 是否生成 fromJson 方法
-  includeToJson: true,        // 是否生成 toJson 方法
+  includeFromJson: true,    // 生成 fromJson 方法（默认：false）
+  includeToJson: true,      // 生成 toJson 方法（默认：false）
+  chainedCopyWith: false,   // 禁用链式 copyWith（默认：true）
 )
 class MyClass with _MyClass {
   // ...
 }
 ```
 
-### JsonKey 注解
+### @JsonKey 注解
 
 ```dart
 class User with _User {
-  // 字段重命名
+  // 自定义 JSON 字段名
   @JsonKey(name: "user_name")
   final String name;
   
-  // 多个备用字段名
+  // 多个可能的字段名
   @JsonKey(alternateNames: ["user_age", "age"])
   final int age;
   
-  // 忽略字段（不包含在 JSON 序列化中）
+  // 在 JSON 中忽略字段
   @JsonKey(ignore: true)
   final String? password;
   
-  // 控制null值是否包含在JSON中
+  // 从 JSON 中排除 null 值
   @JsonKey(includeIfNull: false)
-  final String? optionalField;
+  final String? nickname;
   
-  // 自定义读取逻辑（readValue 是函数引用）
-  @JsonKey(readValue: User.parseDate)
+  // 自定义值读取
+  @JsonKey(readValue: parseDate)
   final DateTime createdAt;
   
-  static Object? parseDate(Map<dynamic, dynamic> map, String key) {
+  static Object? parseDate(Map map, String key) {
     final value = map[key];
     return value is String ? DateTime.parse(value) : value;
   }
 }
 ```
 
-## 🔄 向后兼容性
+## 🔗 链式 CopyWith
 
-**⚠️ 从 data_class_gen 迁移**
-
-如果您正在从旧的 `data_class_gen` 包迁移，`@DataClass` 注解仍然受支持但已**弃用**。我们建议新项目迁移到 `@Dataforge`。
-
-**旧版支持（已弃用）：**
-```dart
-// ❌ 已弃用 - 仍然可用但不推荐
-@DataClass(includeFromJson: true, includeToJson: true)
-class User with _User {
-  // ...
-}
-
-// ✅ 推荐 - 使用新注解
-@Dataforge(includeFromJson: true, includeToJson: true)
-class User with _User {
-  // ...
-}
-```
-
-**迁移步骤：**
-1. 将 `@DataClass` 替换为 `@Dataforge`
-2. 将 `@dataClass` 替换为 `@dataforge`
-3. 将导入从 `data_class_annotation` 更新为 `dataforge_annotation`
-4. 将CLI命令从 `data_class_gen` 更新为 `dataforge`
-
-**为什么要迁移？**
-- 更好的命名，体现工具作为"数据锻造厂"的用途
-- 未来功能将仅在 `@Dataforge` 中提供
-- 更清洁、更直观的API
-```
-
-## 🔧 支持的类型
-
-### 基本类型
-- `String`、`int`、`double`、`num`、`bool`
-- `DateTime`、`Uri`、`Duration`
-- 可选类型：`String?`、`int?` 等
-- 带默认值的类型
-
-### 集合类型
-- `List<T>`
-- `Map<String, dynamic>`、`Map<K, V>`
-- 嵌套集合：`List<Map<String, dynamic>>`
-
-### 复杂类型
-- 嵌套对象：`User`、`List<User>`
-- 自定义类（需要有对应的 fromJson 方法）
-
-### 示例
+对于复杂的嵌套对象，启用强大的链式更新：
 
 ```dart
-@Dataforge(includeFromJson: true, includeToJson: true)
-class ComplexModel with _ComplexModel {
+@Dataforge(chainedCopyWith: true)
+class Address with _Address {
+  @override
+  final String street;
+  @override
+  final String city;
+  @override
+  final String zipCode;
+
+  const Address({required this.street, required this.city, required this.zipCode});
+}
+
+@Dataforge(chainedCopyWith: true)
+class Person with _Person {
   @override
   final String name;
-  
   @override
-  final List<User> users;
-  
+  final int age;
   @override
-  final Map<String, dynamic> metadata;
-  
+  final Address address;
   @override
-  final List<Map<String, dynamic>> configs;
-  
+  final Address? workAddress;
+
+  const Person({required this.name, required this.age, required this.address, this.workAddress});
+}
+
+@Dataforge(chainedCopyWith: true)
+class Company with _Company {
   @override
-  final DateTime createdAt;
-  
+  final String name;
   @override
-  final Uri? website;
-  
-  const ComplexModel({
-    required this.name,
-    this.users = const [],
-    this.metadata = const {},
-    this.configs = const [],
-    required this.createdAt,
-    this.website,
-  });
+  final Person ceo;
+  @override
+  final List<Person> employees;
+
+  const Company({required this.name, required this.ceo, required this.employees});
 }
 ```
 
-## 🎯 生成的代码
-
-对于上面的 `User` 类，将生成以下代码：
+### 使用示例
 
 ```dart
-// user.data.dart
-// Generated by data class generator
-// DO NOT MODIFY BY HAND
+final company = Company(
+  name: '科技公司',
+  ceo: Person(
+    name: '张三',
+    age: 30,
+    address: Address(street: '中山路123号', city: '北京', zipCode: '100001'),
+  ),
+  employees: [],
+);
 
-part of 'user.dart';
+// 简单链式 copyWith
+final newCompany1 = company.copyWith.name('新科技公司');
 
-mixin _User {
-  abstract final String name;
-  abstract final int age;
-  abstract final List<String> hobbies;
+// 嵌套更新
+final newCompany2 = company.copyWith.ceoBuilder((ceo) => 
+  ceo.copyWith.name('李四')
+);
 
-  User copyWith({
-    String? name,
-    int? age,
-    List<String>? hobbies,
-  }) {
-    return User(
-      name: name ?? this.name,
-      age: age ?? this.age,
-      hobbies: hobbies ?? this.hobbies,
-    );
-  }
+// 多层嵌套更新
+final newCompany3 = company.copyWith.ceoBuilder((ceo) => 
+  ceo.copyWith.addressBuilder((addr) => 
+    addr.copyWith.street('长安街999号')
+  )
+);
 
-  @override
-  bool operator ==(Object other) {
-    if (identical(this, other)) return true;
-    if (other is! User) return false;
+// 复杂多字段更新
+final newCompany4 = company.copyWith.ceoBuilder((ceo) => 
+  ceo.copyWith
+    .name('王五')
+    .copyWith.age(35)
+    .copyWith.addressBuilder((addr) => 
+      addr.copyWith
+        .street('天安门大街777号')
+        .copyWith.city('上海')
+        .copyWith.zipCode('200001')
+    )
+);
+```
 
-    if (name != other.name) {
-      return false;
-    }
-    if (age != other.age) {
-      return false;
-    }
-    if (hobbies != other.hobbies) {
-      return false;
-    }
-    return true;
-  }
+## 📋 支持的类型
 
-  @override
-  int get hashCode {
-    return Object.hashAll([
-      name,
-      age,
-      hobbies,
-    ]);
-  }
+- **基础类型**：`String`、`int`、`double`、`bool`、`num`
+- **日期时间**：`DateTime`、`Duration`
+- **集合类型**：`List<T>`、`Set<T>`、`Map<K, V>`
+- **可选类型**：`String?`、`int?` 等
+- **嵌套对象**：带有 `fromJson` 的自定义类
+- **复杂集合**：`List<User>`、`Map<String, User>` 等
 
-  @override
-  String toString() {
-    return 'User(name: $name, age: $age, hobbies: $hobbies)';
-  }
+## 🔄 从 build_runner 迁移
 
-  Map<String, dynamic> toJson() {
-    final map = <String, dynamic>{};
-    map['name'] = name;
-    map['user_age'] = age;
-    map['hobbies'] = hobbies;
-    return map;
-  }
+从 `json_annotation` + `build_runner` 迁移？很简单：
 
-  static User fromJson(Map<String, dynamic> map) {
-    return User(
-      name: (map['name'])?.toString() ?? "",
-      age: int.tryParse((map['user_age'] ?? map['age'] ?? '').toString()) ?? 0,
-      hobbies: (map['hobbies'] as List<dynamic>?)?.map((e) => e.toString()).toList() ?? const [],
-    );
-  }
+**之前（build_runner）：**
+```dart
+@JsonSerializable()
+class User {
+  final String name;
+  final int age;
+  
+  User({required this.name, required this.age});
+  
+  factory User.fromJson(Map<String, dynamic> json) => _$UserFromJson(json);
+  Map<String, dynamic> toJson() => _$UserToJson(this);
 }
 ```
 
-## 🔄 与 build_runner 的对比
+**现在（Dataforge）：**
+```dart
+@Dataforge(includeFromJson: true, includeToJson: true)
+class User with _User {
+  @override
+  final String name;
+  @override
+  final int age;
+  
+  const User({required this.name, required this.age});
+}
+```
 
-| 功能 | dart_data_class_gen | build_runner |
-|------|---------------------|---------------|
-| 生成速度 | ⚡ 极快 | 🐌 缓慢 |
-| 配置复杂度 | ✅ 零配置 | ❌ 复杂 |
-| 依赖大小 | ✅ 轻量级 | ❌ 重量级 |
-| 增量构建 | ✅ 支持 | ✅ 支持 |
-| 自定义能力 | ✅ 高 | ✅ 高 |
-| 学习曲线 | ✅ 低 | ❌ 高 |
+## 🎯 为什么选择 Dataforge？
+
+| 功能 | Dataforge | build_runner |
+|------|-----------|-------------|
+| **速度** | ⚡ 快数倍 | 🐌 缓慢 |
+| **设置** | ✅ 零配置 | ❌ 复杂设置 |
+| **依赖** | ✅ 轻量级 | ❌ 重量级 |
+| **生成代码** | ✅ 清晰易读 | ❌ 复杂 |
+| **链式 CopyWith** | ✅ 内置支持 | ❌ 不可用 |
+| **学习曲线** | ✅ 最小 | ❌ 陡峭 |
 
 ## 🛠️ 开发
 
-### 本地开发
-
 ```bash
-# 克隆项目
-git clone https://github.com/lwj1994/dart_data_class_gen.git
-cd dart_data_class_gen
+# 克隆仓库
+git clone https://github.com/lwj1994/dataforge.git
+cd dataforge
 
 # 安装依赖
 dart pub get
@@ -343,39 +288,13 @@ dart pub get
 # 运行测试
 dart test
 
-# 本地运行
-dart run bin/data_class_gen.dart --path ./test
-```
-
-### 项目结构
-
-```
-dart_data_class_gen/
-├── annotation/           # 注解包
-│   ├── lib/
-│   │   ├── dataforge_annotation.dart
-│   │   └── src/
-│   │       └── annotation.dart
-│   └── pubspec.yaml
-├── bin/                  # CLI 入口
-│   └── data_class_gen.dart
-├── lib/                  # 核心库
-│   ├── data_class_gen.dart
-│   └── src/
-│       ├── model.dart
-│       ├── parser.dart
-│       ├── util.dart
-│       └── writer.dart
-├── test/                 # 测试文件
-│   ├── data_class_generator_test.dart
-│   ├── models/           # 测试模型
-│   └── run_tests.dart    # 测试运行脚本
-└── pubspec.yaml
+# 格式化代码
+dart tools/format_project.dart
 ```
 
 ## 📄 许可证
 
-本项目采用 MIT 许可证 - 查看 [LICENSE](LICENSE) 文件了解详情。
+MIT 许可证 - 查看 [LICENSE](LICENSE) 文件了解详情。
 
 ## 🤝 贡献
 
@@ -383,8 +302,4 @@ dart_data_class_gen/
 
 ## 📞 支持
 
-如果您遇到任何问题或有功能请求，请在 [GitHub Issues](https://github.com/lwj1994/dart_data_class_gen/issues) 中创建一个 issue。
-
-## 🙏 致谢
-
-感谢所有为这个项目做出贡献的开发者！
+如果您遇到任何问题或有功能请求，请在 [GitHub](https://github.com/lwj1994/dataforge/issues) 上创建 issue。

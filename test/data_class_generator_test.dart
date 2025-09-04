@@ -25,12 +25,21 @@ void main() {
     test('should generate code for existing models',
         timeout: Timeout(Duration(minutes: 2)), () async {
       // 1. Verify test models exist
-      final modelFiles = testModelsDir
+      final allDartFiles = testModelsDir
           .listSync()
           .where((file) =>
               file.path.endsWith('.dart') && !file.path.endsWith('.data.dart'))
           .cast<File>()
           .toList();
+
+      // Filter files that contain @dataforge or @Dataforge annotations
+      final modelFiles = <File>[];
+      for (final file in allDartFiles) {
+        final content = file.readAsStringSync();
+        if (content.contains('@dataforge') || content.contains('@Dataforge')) {
+          modelFiles.add(file);
+        }
+      }
 
       expect(modelFiles.isNotEmpty, isTrue,
           reason: 'Should have at least one model file');

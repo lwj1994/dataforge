@@ -7,15 +7,7 @@ mixin _NoFromJsonTest {
   abstract final String name;
   abstract final int age;
 
-  NoFromJsonTest copyWith({
-    String? name,
-    int? age,
-  }) {
-    return NoFromJsonTest(
-      name: name ?? this.name,
-      age: age ?? this.age,
-    );
-  }
+  _NoFromJsonTestCopyWith get copyWith => _NoFromJsonTestCopyWith._(this);
 
   @override
   bool operator ==(Object other) {
@@ -49,5 +41,38 @@ mixin _NoFromJsonTest {
     map['name'] = name;
     map['age'] = age;
     return map;
+  }
+}
+
+/// Helper class for chained copyWith operations
+class _NoFromJsonTestCopyWith {
+  final _NoFromJsonTest _instance;
+  const _NoFromJsonTestCopyWith._(this._instance);
+
+  /// Update name field
+  NoFromJsonTest name(String? value) {
+    return NoFromJsonTest(
+      name: value ?? _instance.name,
+      age: _instance.age,
+    );
+  }
+
+  /// Update age field
+  NoFromJsonTest age(int? value) {
+    return NoFromJsonTest(
+      name: _instance.name,
+      age: value ?? _instance.age,
+    );
+  }
+
+  /// Traditional copyWith method
+  NoFromJsonTest call({
+    String? name,
+    int? age,
+  }) {
+    return NoFromJsonTest(
+      name: name ?? _instance.name,
+      age: age ?? _instance.age,
+    );
   }
 }

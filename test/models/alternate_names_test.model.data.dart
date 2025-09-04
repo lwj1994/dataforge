@@ -10,21 +10,8 @@ mixin _AlternateNamesTest {
   abstract final bool isActive;
   abstract final List<String> tags;
 
-  AlternateNamesTest copyWith({
-    String? name,
-    int? age,
-    String? email,
-    bool? isActive,
-    List<String>? tags,
-  }) {
-    return AlternateNamesTest(
-      name: name ?? this.name,
-      age: age ?? this.age,
-      email: email ?? this.email,
-      isActive: isActive ?? this.isActive,
-      tags: tags ?? this.tags,
-    );
-  }
+  _AlternateNamesTestCopyWith get copyWith =>
+      _AlternateNamesTestCopyWith._(this);
 
   @override
   bool operator ==(Object other) {
@@ -95,6 +82,84 @@ mixin _AlternateNamesTest {
               ?.map((e) => e.toString())
               .toList() ??
           const [],
+    );
+  }
+}
+
+/// Helper class for chained copyWith operations
+class _AlternateNamesTestCopyWith {
+  final _AlternateNamesTest _instance;
+  const _AlternateNamesTestCopyWith._(this._instance);
+
+  /// Update name field
+  AlternateNamesTest name(String? value) {
+    return AlternateNamesTest(
+      name: value ?? _instance.name,
+      age: _instance.age,
+      email: _instance.email,
+      isActive: _instance.isActive,
+      tags: _instance.tags,
+    );
+  }
+
+  /// Update age field
+  AlternateNamesTest age(int? value) {
+    return AlternateNamesTest(
+      name: _instance.name,
+      age: value ?? _instance.age,
+      email: _instance.email,
+      isActive: _instance.isActive,
+      tags: _instance.tags,
+    );
+  }
+
+  /// Update email field
+  AlternateNamesTest email(String? value) {
+    return AlternateNamesTest(
+      name: _instance.name,
+      age: _instance.age,
+      email: value ?? _instance.email,
+      isActive: _instance.isActive,
+      tags: _instance.tags,
+    );
+  }
+
+  /// Update isActive field
+  AlternateNamesTest isActive(bool? value) {
+    return AlternateNamesTest(
+      name: _instance.name,
+      age: _instance.age,
+      email: _instance.email,
+      isActive: value ?? _instance.isActive,
+      tags: _instance.tags,
+    );
+  }
+
+  /// Update tags field
+  AlternateNamesTest tags(List<String>? value) {
+    return AlternateNamesTest(
+      name: _instance.name,
+      age: _instance.age,
+      email: _instance.email,
+      isActive: _instance.isActive,
+      tags: value ?? _instance.tags,
+    );
+  }
+
+  /// Traditional copyWith method
+  AlternateNamesTest call({
+    String? name,
+    int? age,
+    String? email,
+    bool? isActive,
+    List<String>? tags,
+  }) {
+    return AlternateNamesTest(
+      name: name ?? _instance.name,
+      age: age ?? _instance.age,
+      email: email ?? _instance.email,
+      isActive: isActive ?? _instance.isActive,
+      tags: tags ?? _instance.tags,
     );
   }
 }

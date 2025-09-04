@@ -17,7 +17,7 @@ class Dataforge {
     @Deprecated('Use includeFromJson and includeToJson instead') this.fromMap,
     this.includeFromJson,
     this.includeToJson,
-    this.chainedCopyWith = false,
+    this.chainedCopyWith = true,
   });
 }
 

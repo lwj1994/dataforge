@@ -191,9 +191,9 @@ class Parser {
                 }
                 break;
               case "chainedCopyWith":
-                // If null, default to false
+                // If null, default to true (matches annotation default)
                 if (expressionSource == "null") {
-                  chainedCopyWith = false;
+                  chainedCopyWith = true;
                 } else {
                   chainedCopyWith = expressionSource == "true";
                 }
@@ -393,7 +393,7 @@ class Parser {
         // Handle backward compatibility: if new parameters are not specified, use fromMap parameter or configuration defaults
         final finalIncludeFromJson = includeFromJson ?? fromMap ?? true;
         final finalIncludeToJson = includeToJson ?? fromMap ?? true;
-        final finalChainedCopyWith = chainedCopyWith ?? false;
+        final finalChainedCopyWith = chainedCopyWith ?? true;
 
         classes.add(
           ClassInfo(

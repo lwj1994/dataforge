@@ -13,27 +13,7 @@ mixin _CustomReadValue {
   abstract final Map<String, dynamic>? config;
   abstract final List<String>? tags;
 
-  CustomReadValue copyWith({
-    String? id,
-    String? name,
-    String? title,
-    int? count,
-    bool? enabled,
-    DateTime? createdDate,
-    Map<String, dynamic>? config,
-    List<String>? tags,
-  }) {
-    return CustomReadValue(
-      id: id ?? this.id,
-      name: name ?? this.name,
-      title: title ?? this.title,
-      count: count ?? this.count,
-      enabled: enabled ?? this.enabled,
-      createdDate: createdDate ?? this.createdDate,
-      config: config ?? this.config,
-      tags: tags ?? this.tags,
-    );
-  }
+  _CustomReadValueCopyWith get copyWith => _CustomReadValueCopyWith._(this);
 
   @override
   bool operator ==(Object other) {
@@ -131,6 +111,147 @@ mixin _CustomReadValue {
       tags: CustomReadValue._readValue(map, 'tags') != null
           ? (CustomReadValue._readValue(map, 'tags') as List?)?.cast<String>()
           : null,
+    );
+  }
+}
+
+/// Helper class for chained copyWith operations
+class _CustomReadValueCopyWith {
+  final _CustomReadValue _instance;
+  const _CustomReadValueCopyWith._(this._instance);
+
+  /// Update id field
+  CustomReadValue id(String? value) {
+    return CustomReadValue(
+      id: value ?? _instance.id,
+      name: _instance.name,
+      title: _instance.title,
+      count: _instance.count,
+      enabled: _instance.enabled,
+      createdDate: _instance.createdDate,
+      config: _instance.config,
+      tags: _instance.tags,
+    );
+  }
+
+  /// Update name field
+  CustomReadValue name(String? value) {
+    return CustomReadValue(
+      id: _instance.id,
+      name: value ?? _instance.name,
+      title: _instance.title,
+      count: _instance.count,
+      enabled: _instance.enabled,
+      createdDate: _instance.createdDate,
+      config: _instance.config,
+      tags: _instance.tags,
+    );
+  }
+
+  /// Update title field
+  CustomReadValue title(String? value) {
+    return CustomReadValue(
+      id: _instance.id,
+      name: _instance.name,
+      title: value ?? _instance.title,
+      count: _instance.count,
+      enabled: _instance.enabled,
+      createdDate: _instance.createdDate,
+      config: _instance.config,
+      tags: _instance.tags,
+    );
+  }
+
+  /// Update count field
+  CustomReadValue count(int? value) {
+    return CustomReadValue(
+      id: _instance.id,
+      name: _instance.name,
+      title: _instance.title,
+      count: value ?? _instance.count,
+      enabled: _instance.enabled,
+      createdDate: _instance.createdDate,
+      config: _instance.config,
+      tags: _instance.tags,
+    );
+  }
+
+  /// Update enabled field
+  CustomReadValue enabled(bool? value) {
+    return CustomReadValue(
+      id: _instance.id,
+      name: _instance.name,
+      title: _instance.title,
+      count: _instance.count,
+      enabled: value ?? _instance.enabled,
+      createdDate: _instance.createdDate,
+      config: _instance.config,
+      tags: _instance.tags,
+    );
+  }
+
+  /// Update createdDate field
+  CustomReadValue createdDate(DateTime? value) {
+    return CustomReadValue(
+      id: _instance.id,
+      name: _instance.name,
+      title: _instance.title,
+      count: _instance.count,
+      enabled: _instance.enabled,
+      createdDate: value,
+      config: _instance.config,
+      tags: _instance.tags,
+    );
+  }
+
+  /// Update config field
+  CustomReadValue config(Map<String, dynamic>? value) {
+    return CustomReadValue(
+      id: _instance.id,
+      name: _instance.name,
+      title: _instance.title,
+      count: _instance.count,
+      enabled: _instance.enabled,
+      createdDate: _instance.createdDate,
+      config: value,
+      tags: _instance.tags,
+    );
+  }
+
+  /// Update tags field
+  CustomReadValue tags(List<String>? value) {
+    return CustomReadValue(
+      id: _instance.id,
+      name: _instance.name,
+      title: _instance.title,
+      count: _instance.count,
+      enabled: _instance.enabled,
+      createdDate: _instance.createdDate,
+      config: _instance.config,
+      tags: value,
+    );
+  }
+
+  /// Traditional copyWith method
+  CustomReadValue call({
+    String? id,
+    String? name,
+    String? title,
+    int? count,
+    bool? enabled,
+    DateTime? createdDate,
+    Map<String, dynamic>? config,
+    List<String>? tags,
+  }) {
+    return CustomReadValue(
+      id: id ?? _instance.id,
+      name: name ?? _instance.name,
+      title: title ?? _instance.title,
+      count: count ?? _instance.count,
+      enabled: enabled ?? _instance.enabled,
+      createdDate: createdDate ?? _instance.createdDate,
+      config: config ?? _instance.config,
+      tags: tags ?? _instance.tags,
     );
   }
 }
