@@ -1330,6 +1330,39 @@ class Writer {
         '\n  $copyWithClassName get copyWith => $copyWithClassName._(this);');
   }
 
+  /// Check if a field is a nested object that supports copyWith
+  bool _isNestedCopyWithField(FieldInfo field) {
+    // Check if the field type is a custom class (not primitive types)
+    final baseType =
+        field.type.replaceAll('?', '').replaceAll(RegExp(r'<.*>'), '');
+    return !_isPrimitiveType(baseType) &&
+        !baseType.startsWith('List') &&
+        !baseType.startsWith('Map');
+  }
+
+  /// Get the nested type for copyWith operations
+  String _getNestedCopyWithType(FieldInfo field) {
+    return field.type.replaceAll('?', '').replaceAll(RegExp(r'<.*>'), '');
+  }
+
+  /// Check if a type is primitive
+  bool _isPrimitiveType(String type) {
+    const primitiveTypes = {
+      'String',
+      'int',
+      'double',
+      'bool',
+      'num',
+      'Object',
+      'dynamic',
+      'DateTime',
+      'Duration',
+      'Uri',
+      'BigInt'
+    };
+    return primitiveTypes.contains(type);
+  }
+
   /// Build chained copyWith helper class (outside mixin)
   void _buildChainedCopyWithHelperClass(StringBuffer buffer, ClassInfo clazz,
       String genericParams, List<FieldInfo> validFields) {
@@ -1339,7 +1372,11 @@ class Writer {
     buffer.writeln('\n/// Helper class for chained copyWith operations');
     buffer.writeln('class $copyWithClassName {');
     buffer.writeln('  final _${clazz.name}$genericParams _instance;');
-    buffer.writeln('  const $copyWithClassName._(this._instance);');
+    // Constructor name should not include generic parameters
+    final constructorName = clazz.genericParameters.isNotEmpty
+        ? '_${clazz.name}CopyWith._'
+        : '$copyWithClassName._';
+    buffer.writeln('  const $constructorName(this._instance);');
 
     // Generate method for each field
     for (final field in validFields) {
@@ -1366,6 +1403,22 @@ class Writer {
       buffer.writeln('  }');
     }
 
+    // Generate nested copyWith getters for complex object fields
+    for (final field in validFields) {
+      if (_isNestedCopyWithField(field)) {
+        final nestedType = _getNestedCopyWithType(field);
+        final nestedCopyWithClass = '_${nestedType}CopyWith';
+        final capitalizedFieldName =
+            field.name[0].toUpperCase() + field.name.substring(1);
+        buffer.writeln('\n  /// Nested copyWith for ${field.name} field');
+        buffer.writeln(
+            '  _${clazz.name}NestedCopyWith$capitalizedFieldName$genericParams get ${field.name}Builder {');
+        buffer.writeln(
+            '    return _${clazz.name}NestedCopyWith$capitalizedFieldName$genericParams._(_instance);');
+        buffer.writeln('  }');
+      }
+    }
+
     // Generate call method for traditional copyWith syntax
     buffer.writeln('\n  /// Traditional copyWith method');
     buffer.writeln('  ${clazz.name}$genericParams call({');
@@ -1381,6 +1434,65 @@ class Writer {
     for (final field in validFields) {
       buffer.writeln(
           '      ${field.name}: ${field.name} ?? _instance.${field.name},');
+    }
+
+    buffer.writeln('    );');
+    buffer.writeln('  }');
+    buffer.writeln('}');
+
+    // Generate nested copyWith helper classes for complex object fields
+    for (final field in validFields) {
+      if (_isNestedCopyWithField(field)) {
+        _buildNestedCopyWithHelperClass(
+            buffer, clazz, field, genericParams, validFields);
+      }
+    }
+  }
+
+  /// Build nested copyWith helper class for a specific field
+  void _buildNestedCopyWithHelperClass(
+      StringBuffer buffer,
+      ClassInfo parentClazz,
+      FieldInfo nestedField,
+      String genericParams,
+      List<FieldInfo> parentFields) {
+    final capitalizedFieldName =
+        nestedField.name[0].toUpperCase() + nestedField.name.substring(1);
+    final nestedType = _getNestedCopyWithType(nestedField);
+    final nestedCopyWithClassName =
+        '_${parentClazz.name}NestedCopyWith$capitalizedFieldName$genericParams';
+
+    buffer.writeln(
+        '\n/// Nested copyWith helper class for ${nestedField.name} field');
+    buffer.writeln('class $nestedCopyWithClassName {');
+    buffer.writeln('  final _${parentClazz.name}$genericParams _instance;');
+    // Constructor name should not include generic parameters
+    final nestedConstructorName = parentClazz.genericParameters.isNotEmpty
+        ? '_${parentClazz.name}NestedCopyWith$capitalizedFieldName._'
+        : '$nestedCopyWithClassName._';
+    buffer.writeln('  const $nestedConstructorName(this._instance);');
+
+    // Generate a method that takes a function to update the nested object
+    buffer.writeln(
+        '\n  /// Update ${nestedField.name} field using a copyWith function');
+    buffer.writeln(
+        '  ${parentClazz.name}$genericParams call($nestedType Function($nestedType) updater) {');
+    buffer.writeln('    final currentValue = _instance.${nestedField.name};');
+    if (nestedField.type.endsWith('?')) {
+      buffer.writeln(
+          '    if (currentValue == null) return _instance as ${parentClazz.name}$genericParams;');
+      buffer.writeln('    final updatedValue = updater(currentValue);');
+    } else {
+      buffer.writeln('    final updatedValue = updater(currentValue);');
+    }
+    buffer.writeln('    return ${parentClazz.name}$genericParams(');
+
+    for (final f in parentFields) {
+      if (f.name == nestedField.name) {
+        buffer.writeln('      ${f.name}: updatedValue,');
+      } else {
+        buffer.writeln('      ${f.name}: _instance.${f.name},');
+      }
     }
 
     buffer.writeln('    );');

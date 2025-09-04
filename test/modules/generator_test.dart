@@ -88,7 +88,7 @@ class SimpleModel {
       expect(content, contains('mixin _SimpleModel'));
       expect(content, contains('toJson()'));
       expect(content, contains('fromJson('));
-      expect(content, contains('copyWith('));
+      expect(content, contains('call({'));
       expect(content, contains('toString()'));
       expect(content, contains('operator ==('));
       expect(content, contains('hashCode'));
@@ -281,7 +281,7 @@ class FormattingTest {
       expect(content, contains('abstract final String name'));
       expect(content, contains('abstract final int value'));
       // Check that the code has proper structure
-      expect(content, contains('copyWith('));
+      expect(content, contains('call({'));
       expect(content, contains('toJson()'));
       expect(content, contains('fromJson('));
     });

@@ -7,15 +7,7 @@ mixin _TestUser {
   abstract final String name;
   abstract final int age;
 
-  TestUser copyWith({
-    String? name,
-    int? age,
-  }) {
-    return TestUser(
-      name: name ?? this.name,
-      age: age ?? this.age,
-    );
-  }
+  _TestUserCopyWith get copyWith => _TestUserCopyWith._(this);
 
   @override
   bool operator ==(Object other) {
@@ -63,15 +55,7 @@ mixin _TestAdmin {
   abstract final String username;
   abstract final String role;
 
-  TestAdmin copyWith({
-    String? username,
-    String? role,
-  }) {
-    return TestAdmin(
-      username: username ?? this.username,
-      role: role ?? this.role,
-    );
-  }
+  _TestAdminCopyWith get copyWith => _TestAdminCopyWith._(this);
 
   @override
   bool operator ==(Object other) {
@@ -111,6 +95,72 @@ mixin _TestAdmin {
     return TestAdmin(
       username: SafeCasteUtil.safeCast<String>(map['username']) ?? "",
       role: SafeCasteUtil.safeCast<String>(map['role']) ?? "",
+    );
+  }
+}
+
+/// Helper class for chained copyWith operations
+class _TestUserCopyWith {
+  final _TestUser _instance;
+  const _TestUserCopyWith._(this._instance);
+
+  /// Update name field
+  TestUser name(String? value) {
+    return TestUser(
+      name: value ?? _instance.name,
+      age: _instance.age,
+    );
+  }
+
+  /// Update age field
+  TestUser age(int? value) {
+    return TestUser(
+      name: _instance.name,
+      age: value ?? _instance.age,
+    );
+  }
+
+  /// Traditional copyWith method
+  TestUser call({
+    String? name,
+    int? age,
+  }) {
+    return TestUser(
+      name: name ?? _instance.name,
+      age: age ?? _instance.age,
+    );
+  }
+}
+
+/// Helper class for chained copyWith operations
+class _TestAdminCopyWith {
+  final _TestAdmin _instance;
+  const _TestAdminCopyWith._(this._instance);
+
+  /// Update username field
+  TestAdmin username(String? value) {
+    return TestAdmin(
+      username: value ?? _instance.username,
+      role: _instance.role,
+    );
+  }
+
+  /// Update role field
+  TestAdmin role(String? value) {
+    return TestAdmin(
+      username: _instance.username,
+      role: value ?? _instance.role,
+    );
+  }
+
+  /// Traditional copyWith method
+  TestAdmin call({
+    String? username,
+    String? role,
+  }) {
+    return TestAdmin(
+      username: username ?? _instance.username,
+      role: role ?? _instance.role,
     );
   }
 }

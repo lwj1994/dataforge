@@ -298,6 +298,16 @@ class _ProfileCopyWith {
     );
   }
 
+  /// Nested copyWith for user field
+  _ProfileNestedCopyWithUser get userBuilder {
+    return _ProfileNestedCopyWithUser._(_instance);
+  }
+
+  /// Nested copyWith for address field
+  _ProfileNestedCopyWithAddress get addressBuilder {
+    return _ProfileNestedCopyWithAddress._(_instance);
+  }
+
   /// Traditional copyWith method
   Profile call({
     User? user,
@@ -308,6 +318,40 @@ class _ProfileCopyWith {
       user: user ?? _instance.user,
       address: address ?? _instance.address,
       tags: tags ?? _instance.tags,
+    );
+  }
+}
+
+/// Nested copyWith helper class for user field
+class _ProfileNestedCopyWithUser {
+  final _Profile _instance;
+  const _ProfileNestedCopyWithUser._(this._instance);
+
+  /// Update user field using a copyWith function
+  Profile call(User Function(User) updater) {
+    final currentValue = _instance.user;
+    final updatedValue = updater(currentValue);
+    return Profile(
+      user: updatedValue,
+      address: _instance.address,
+      tags: _instance.tags,
+    );
+  }
+}
+
+/// Nested copyWith helper class for address field
+class _ProfileNestedCopyWithAddress {
+  final _Profile _instance;
+  const _ProfileNestedCopyWithAddress._(this._instance);
+
+  /// Update address field using a copyWith function
+  Profile call(Address Function(Address) updater) {
+    final currentValue = _instance.address;
+    final updatedValue = updater(currentValue);
+    return Profile(
+      user: _instance.user,
+      address: updatedValue,
+      tags: _instance.tags,
     );
   }
 }

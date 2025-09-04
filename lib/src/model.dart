@@ -96,7 +96,7 @@ class ClassInfo {
     this.includeFromJson = true,
     this.includeToJson = true,
     this.genericParameters = const [],
-    this.chainedCopyWith = false,
+    this.chainedCopyWith = true,
   });
 
   ClassInfo copyWith({

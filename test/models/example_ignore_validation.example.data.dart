@@ -7,15 +7,7 @@ mixin _ValidExample1 {
   abstract final String name;
   abstract final String? password;
 
-  ValidExample1 copyWith({
-    String? name,
-    String? password,
-  }) {
-    return ValidExample1(
-      name: name ?? this.name,
-      password: password ?? this.password,
-    );
-  }
+  _ValidExample1CopyWith get copyWith => _ValidExample1CopyWith._(this);
 
   @override
   bool operator ==(Object other) {
@@ -61,15 +53,7 @@ mixin _ValidExample2 {
   abstract final String name;
   abstract final String secret;
 
-  ValidExample2 copyWith({
-    String? name,
-    String? secret,
-  }) {
-    return ValidExample2(
-      name: name ?? this.name,
-      secret: secret ?? this.secret,
-    );
-  }
+  _ValidExample2CopyWith get copyWith => _ValidExample2CopyWith._(this);
 
   @override
   bool operator ==(Object other) {
@@ -107,6 +91,72 @@ mixin _ValidExample2 {
   static ValidExample2 fromJson(Map<String, dynamic> map) {
     return ValidExample2(
       name: SafeCasteUtil.safeCast<String>(map['name']) ?? "",
+    );
+  }
+}
+
+/// Helper class for chained copyWith operations
+class _ValidExample1CopyWith {
+  final _ValidExample1 _instance;
+  const _ValidExample1CopyWith._(this._instance);
+
+  /// Update name field
+  ValidExample1 name(String? value) {
+    return ValidExample1(
+      name: value ?? _instance.name,
+      password: _instance.password,
+    );
+  }
+
+  /// Update password field
+  ValidExample1 password(String? value) {
+    return ValidExample1(
+      name: _instance.name,
+      password: value,
+    );
+  }
+
+  /// Traditional copyWith method
+  ValidExample1 call({
+    String? name,
+    String? password,
+  }) {
+    return ValidExample1(
+      name: name ?? _instance.name,
+      password: password ?? _instance.password,
+    );
+  }
+}
+
+/// Helper class for chained copyWith operations
+class _ValidExample2CopyWith {
+  final _ValidExample2 _instance;
+  const _ValidExample2CopyWith._(this._instance);
+
+  /// Update name field
+  ValidExample2 name(String? value) {
+    return ValidExample2(
+      name: value ?? _instance.name,
+      secret: _instance.secret,
+    );
+  }
+
+  /// Update secret field
+  ValidExample2 secret(String? value) {
+    return ValidExample2(
+      name: _instance.name,
+      secret: value ?? _instance.secret,
+    );
+  }
+
+  /// Traditional copyWith method
+  ValidExample2 call({
+    String? name,
+    String? secret,
+  }) {
+    return ValidExample2(
+      name: name ?? _instance.name,
+      secret: secret ?? _instance.secret,
     );
   }
 }

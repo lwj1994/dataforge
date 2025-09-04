@@ -12,25 +12,8 @@ mixin _NoPrefixValidationTest {
   abstract final String customField;
   abstract final String ignoredField;
 
-  NoPrefixValidationTest copyWith({
-    String? name,
-    int? age,
-    bool? isActive,
-    double? score,
-    String? description,
-    String? customField,
-    String? ignoredField,
-  }) {
-    return NoPrefixValidationTest(
-      name: name ?? this.name,
-      age: age ?? this.age,
-      isActive: isActive ?? this.isActive,
-      score: score ?? this.score,
-      description: description ?? this.description,
-      customField: customField ?? this.customField,
-      ignoredField: ignoredField ?? this.ignoredField,
-    );
-  }
+  _NoPrefixValidationTestCopyWith get copyWith =>
+      _NoPrefixValidationTestCopyWith._(this);
 
   @override
   bool operator ==(Object other) {
@@ -100,6 +83,124 @@ mixin _NoPrefixValidationTest {
       score: SafeCasteUtil.safeCast<double>(map['score']) ?? 0.0,
       description: SafeCasteUtil.safeCast<String>(map['description']),
       customField: SafeCasteUtil.safeCast<String>(map['custom_field']) ?? "",
+    );
+  }
+}
+
+/// Helper class for chained copyWith operations
+class _NoPrefixValidationTestCopyWith {
+  final _NoPrefixValidationTest _instance;
+  const _NoPrefixValidationTestCopyWith._(this._instance);
+
+  /// Update name field
+  NoPrefixValidationTest name(String? value) {
+    return NoPrefixValidationTest(
+      name: value ?? _instance.name,
+      age: _instance.age,
+      isActive: _instance.isActive,
+      score: _instance.score,
+      description: _instance.description,
+      customField: _instance.customField,
+      ignoredField: _instance.ignoredField,
+    );
+  }
+
+  /// Update age field
+  NoPrefixValidationTest age(int? value) {
+    return NoPrefixValidationTest(
+      name: _instance.name,
+      age: value ?? _instance.age,
+      isActive: _instance.isActive,
+      score: _instance.score,
+      description: _instance.description,
+      customField: _instance.customField,
+      ignoredField: _instance.ignoredField,
+    );
+  }
+
+  /// Update isActive field
+  NoPrefixValidationTest isActive(bool? value) {
+    return NoPrefixValidationTest(
+      name: _instance.name,
+      age: _instance.age,
+      isActive: value ?? _instance.isActive,
+      score: _instance.score,
+      description: _instance.description,
+      customField: _instance.customField,
+      ignoredField: _instance.ignoredField,
+    );
+  }
+
+  /// Update score field
+  NoPrefixValidationTest score(double? value) {
+    return NoPrefixValidationTest(
+      name: _instance.name,
+      age: _instance.age,
+      isActive: _instance.isActive,
+      score: value ?? _instance.score,
+      description: _instance.description,
+      customField: _instance.customField,
+      ignoredField: _instance.ignoredField,
+    );
+  }
+
+  /// Update description field
+  NoPrefixValidationTest description(String? value) {
+    return NoPrefixValidationTest(
+      name: _instance.name,
+      age: _instance.age,
+      isActive: _instance.isActive,
+      score: _instance.score,
+      description: value,
+      customField: _instance.customField,
+      ignoredField: _instance.ignoredField,
+    );
+  }
+
+  /// Update customField field
+  NoPrefixValidationTest customField(String? value) {
+    return NoPrefixValidationTest(
+      name: _instance.name,
+      age: _instance.age,
+      isActive: _instance.isActive,
+      score: _instance.score,
+      description: _instance.description,
+      customField: value ?? _instance.customField,
+      ignoredField: _instance.ignoredField,
+    );
+  }
+
+  /// Update ignoredField field
+  NoPrefixValidationTest ignoredField(String? value) {
+    return NoPrefixValidationTest(
+      name: _instance.name,
+      age: _instance.age,
+      isActive: _instance.isActive,
+      score: _instance.score,
+      description: _instance.description,
+      customField: _instance.customField,
+      ignoredField: value ?? _instance.ignoredField,
+    );
+  }
+
+  /// Traditional copyWith method
+  NoPrefixValidationTest call({
+    String? name,
+    int? age,
+    bool? isActive,
+    double? score,
+    String? description,
+    String? customField,
+    String? ignoredField,
+  }) {
+    return NoPrefixValidationTest(
+      name: name ?? _instance.name,
+      age: age ?? _instance.age,
+      isActive: isActive ?? _instance.isActive,
+      score: score ?? _instance.score,
+      description: description ?? _instance.description,
+      customField: customField ?? _instance.customField,
+      ignoredField: ignoredField ?? _instance.ignoredField,
     );
   }
 }

@@ -17,35 +17,7 @@ mixin _DateTimeTypes {
   abstract final Duration? duration;
   abstract final Duration? customDuration;
 
-  DateTimeTypes copyWith({
-    DateTime? createdAt,
-    DateTime? updatedAt,
-    DateTime? birthDate,
-    List<DateTime>? eventDates,
-    List<DateTime>? optionalEventDates,
-    Map<String, DateTime>? namedDates,
-    DateTime? isoDateTime,
-    DateTime? timestampDate,
-    DateTime? parsedDate,
-    List<DateTime>? dateTimeList,
-    Duration? duration,
-    Duration? customDuration,
-  }) {
-    return DateTimeTypes(
-      createdAt: createdAt ?? this.createdAt,
-      updatedAt: updatedAt ?? this.updatedAt,
-      birthDate: birthDate ?? this.birthDate,
-      eventDates: eventDates ?? this.eventDates,
-      optionalEventDates: optionalEventDates ?? this.optionalEventDates,
-      namedDates: namedDates ?? this.namedDates,
-      isoDateTime: isoDateTime ?? this.isoDateTime,
-      timestampDate: timestampDate ?? this.timestampDate,
-      parsedDate: parsedDate ?? this.parsedDate,
-      dateTimeList: dateTimeList ?? this.dateTimeList,
-      duration: duration ?? this.duration,
-      customDuration: customDuration ?? this.customDuration,
-    );
-  }
+  _DateTimeTypesCopyWith get copyWith => _DateTimeTypesCopyWith._(this);
 
   @override
   bool operator ==(Object other) {
@@ -202,19 +174,7 @@ mixin _TimeZoneTest {
   abstract final DateTime? timeZoneAware;
   abstract final List<DateTime> timeList;
 
-  TimeZoneTest copyWith({
-    DateTime? utcTime,
-    DateTime? localTime,
-    DateTime? timeZoneAware,
-    List<DateTime>? timeList,
-  }) {
-    return TimeZoneTest(
-      utcTime: utcTime ?? this.utcTime,
-      localTime: localTime ?? this.localTime,
-      timeZoneAware: timeZoneAware ?? this.timeZoneAware,
-      timeList: timeList ?? this.timeList,
-    );
-  }
+  _TimeZoneTestCopyWith get copyWith => _TimeZoneTestCopyWith._(this);
 
   @override
   bool operator ==(Object other) {
@@ -277,6 +237,320 @@ mixin _TimeZoneTest {
               TimeZoneTest._readValue(map, 'timeZoneAware').toString())
           : null,
       timeList: (map['timeList'] as List<dynamic>?)?.cast<DateTime>() ?? [],
+    );
+  }
+}
+
+/// Helper class for chained copyWith operations
+class _DateTimeTypesCopyWith {
+  final _DateTimeTypes _instance;
+  const _DateTimeTypesCopyWith._(this._instance);
+
+  /// Update createdAt field
+  DateTimeTypes createdAt(DateTime? value) {
+    return DateTimeTypes(
+      createdAt: value ?? _instance.createdAt,
+      updatedAt: _instance.updatedAt,
+      birthDate: _instance.birthDate,
+      eventDates: _instance.eventDates,
+      optionalEventDates: _instance.optionalEventDates,
+      namedDates: _instance.namedDates,
+      isoDateTime: _instance.isoDateTime,
+      timestampDate: _instance.timestampDate,
+      parsedDate: _instance.parsedDate,
+      dateTimeList: _instance.dateTimeList,
+      duration: _instance.duration,
+      customDuration: _instance.customDuration,
+    );
+  }
+
+  /// Update updatedAt field
+  DateTimeTypes updatedAt(DateTime? value) {
+    return DateTimeTypes(
+      createdAt: _instance.createdAt,
+      updatedAt: value,
+      birthDate: _instance.birthDate,
+      eventDates: _instance.eventDates,
+      optionalEventDates: _instance.optionalEventDates,
+      namedDates: _instance.namedDates,
+      isoDateTime: _instance.isoDateTime,
+      timestampDate: _instance.timestampDate,
+      parsedDate: _instance.parsedDate,
+      dateTimeList: _instance.dateTimeList,
+      duration: _instance.duration,
+      customDuration: _instance.customDuration,
+    );
+  }
+
+  /// Update birthDate field
+  DateTimeTypes birthDate(DateTime? value) {
+    return DateTimeTypes(
+      createdAt: _instance.createdAt,
+      updatedAt: _instance.updatedAt,
+      birthDate: value ?? _instance.birthDate,
+      eventDates: _instance.eventDates,
+      optionalEventDates: _instance.optionalEventDates,
+      namedDates: _instance.namedDates,
+      isoDateTime: _instance.isoDateTime,
+      timestampDate: _instance.timestampDate,
+      parsedDate: _instance.parsedDate,
+      dateTimeList: _instance.dateTimeList,
+      duration: _instance.duration,
+      customDuration: _instance.customDuration,
+    );
+  }
+
+  /// Update eventDates field
+  DateTimeTypes eventDates(List<DateTime>? value) {
+    return DateTimeTypes(
+      createdAt: _instance.createdAt,
+      updatedAt: _instance.updatedAt,
+      birthDate: _instance.birthDate,
+      eventDates: value ?? _instance.eventDates,
+      optionalEventDates: _instance.optionalEventDates,
+      namedDates: _instance.namedDates,
+      isoDateTime: _instance.isoDateTime,
+      timestampDate: _instance.timestampDate,
+      parsedDate: _instance.parsedDate,
+      dateTimeList: _instance.dateTimeList,
+      duration: _instance.duration,
+      customDuration: _instance.customDuration,
+    );
+  }
+
+  /// Update optionalEventDates field
+  DateTimeTypes optionalEventDates(List<DateTime>? value) {
+    return DateTimeTypes(
+      createdAt: _instance.createdAt,
+      updatedAt: _instance.updatedAt,
+      birthDate: _instance.birthDate,
+      eventDates: _instance.eventDates,
+      optionalEventDates: value,
+      namedDates: _instance.namedDates,
+      isoDateTime: _instance.isoDateTime,
+      timestampDate: _instance.timestampDate,
+      parsedDate: _instance.parsedDate,
+      dateTimeList: _instance.dateTimeList,
+      duration: _instance.duration,
+      customDuration: _instance.customDuration,
+    );
+  }
+
+  /// Update namedDates field
+  DateTimeTypes namedDates(Map<String, DateTime>? value) {
+    return DateTimeTypes(
+      createdAt: _instance.createdAt,
+      updatedAt: _instance.updatedAt,
+      birthDate: _instance.birthDate,
+      eventDates: _instance.eventDates,
+      optionalEventDates: _instance.optionalEventDates,
+      namedDates: value ?? _instance.namedDates,
+      isoDateTime: _instance.isoDateTime,
+      timestampDate: _instance.timestampDate,
+      parsedDate: _instance.parsedDate,
+      dateTimeList: _instance.dateTimeList,
+      duration: _instance.duration,
+      customDuration: _instance.customDuration,
+    );
+  }
+
+  /// Update isoDateTime field
+  DateTimeTypes isoDateTime(DateTime? value) {
+    return DateTimeTypes(
+      createdAt: _instance.createdAt,
+      updatedAt: _instance.updatedAt,
+      birthDate: _instance.birthDate,
+      eventDates: _instance.eventDates,
+      optionalEventDates: _instance.optionalEventDates,
+      namedDates: _instance.namedDates,
+      isoDateTime: value,
+      timestampDate: _instance.timestampDate,
+      parsedDate: _instance.parsedDate,
+      dateTimeList: _instance.dateTimeList,
+      duration: _instance.duration,
+      customDuration: _instance.customDuration,
+    );
+  }
+
+  /// Update timestampDate field
+  DateTimeTypes timestampDate(DateTime? value) {
+    return DateTimeTypes(
+      createdAt: _instance.createdAt,
+      updatedAt: _instance.updatedAt,
+      birthDate: _instance.birthDate,
+      eventDates: _instance.eventDates,
+      optionalEventDates: _instance.optionalEventDates,
+      namedDates: _instance.namedDates,
+      isoDateTime: _instance.isoDateTime,
+      timestampDate: value ?? _instance.timestampDate,
+      parsedDate: _instance.parsedDate,
+      dateTimeList: _instance.dateTimeList,
+      duration: _instance.duration,
+      customDuration: _instance.customDuration,
+    );
+  }
+
+  /// Update parsedDate field
+  DateTimeTypes parsedDate(DateTime? value) {
+    return DateTimeTypes(
+      createdAt: _instance.createdAt,
+      updatedAt: _instance.updatedAt,
+      birthDate: _instance.birthDate,
+      eventDates: _instance.eventDates,
+      optionalEventDates: _instance.optionalEventDates,
+      namedDates: _instance.namedDates,
+      isoDateTime: _instance.isoDateTime,
+      timestampDate: _instance.timestampDate,
+      parsedDate: value,
+      dateTimeList: _instance.dateTimeList,
+      duration: _instance.duration,
+      customDuration: _instance.customDuration,
+    );
+  }
+
+  /// Update dateTimeList field
+  DateTimeTypes dateTimeList(List<DateTime>? value) {
+    return DateTimeTypes(
+      createdAt: _instance.createdAt,
+      updatedAt: _instance.updatedAt,
+      birthDate: _instance.birthDate,
+      eventDates: _instance.eventDates,
+      optionalEventDates: _instance.optionalEventDates,
+      namedDates: _instance.namedDates,
+      isoDateTime: _instance.isoDateTime,
+      timestampDate: _instance.timestampDate,
+      parsedDate: _instance.parsedDate,
+      dateTimeList: value,
+      duration: _instance.duration,
+      customDuration: _instance.customDuration,
+    );
+  }
+
+  /// Update duration field
+  DateTimeTypes duration(Duration? value) {
+    return DateTimeTypes(
+      createdAt: _instance.createdAt,
+      updatedAt: _instance.updatedAt,
+      birthDate: _instance.birthDate,
+      eventDates: _instance.eventDates,
+      optionalEventDates: _instance.optionalEventDates,
+      namedDates: _instance.namedDates,
+      isoDateTime: _instance.isoDateTime,
+      timestampDate: _instance.timestampDate,
+      parsedDate: _instance.parsedDate,
+      dateTimeList: _instance.dateTimeList,
+      duration: value,
+      customDuration: _instance.customDuration,
+    );
+  }
+
+  /// Update customDuration field
+  DateTimeTypes customDuration(Duration? value) {
+    return DateTimeTypes(
+      createdAt: _instance.createdAt,
+      updatedAt: _instance.updatedAt,
+      birthDate: _instance.birthDate,
+      eventDates: _instance.eventDates,
+      optionalEventDates: _instance.optionalEventDates,
+      namedDates: _instance.namedDates,
+      isoDateTime: _instance.isoDateTime,
+      timestampDate: _instance.timestampDate,
+      parsedDate: _instance.parsedDate,
+      dateTimeList: _instance.dateTimeList,
+      duration: _instance.duration,
+      customDuration: value,
+    );
+  }
+
+  /// Traditional copyWith method
+  DateTimeTypes call({
+    DateTime? createdAt,
+    DateTime? updatedAt,
+    DateTime? birthDate,
+    List<DateTime>? eventDates,
+    List<DateTime>? optionalEventDates,
+    Map<String, DateTime>? namedDates,
+    DateTime? isoDateTime,
+    DateTime? timestampDate,
+    DateTime? parsedDate,
+    List<DateTime>? dateTimeList,
+    Duration? duration,
+    Duration? customDuration,
+  }) {
+    return DateTimeTypes(
+      createdAt: createdAt ?? _instance.createdAt,
+      updatedAt: updatedAt ?? _instance.updatedAt,
+      birthDate: birthDate ?? _instance.birthDate,
+      eventDates: eventDates ?? _instance.eventDates,
+      optionalEventDates: optionalEventDates ?? _instance.optionalEventDates,
+      namedDates: namedDates ?? _instance.namedDates,
+      isoDateTime: isoDateTime ?? _instance.isoDateTime,
+      timestampDate: timestampDate ?? _instance.timestampDate,
+      parsedDate: parsedDate ?? _instance.parsedDate,
+      dateTimeList: dateTimeList ?? _instance.dateTimeList,
+      duration: duration ?? _instance.duration,
+      customDuration: customDuration ?? _instance.customDuration,
+    );
+  }
+}
+
+/// Helper class for chained copyWith operations
+class _TimeZoneTestCopyWith {
+  final _TimeZoneTest _instance;
+  const _TimeZoneTestCopyWith._(this._instance);
+
+  /// Update utcTime field
+  TimeZoneTest utcTime(DateTime? value) {
+    return TimeZoneTest(
+      utcTime: value ?? _instance.utcTime,
+      localTime: _instance.localTime,
+      timeZoneAware: _instance.timeZoneAware,
+      timeList: _instance.timeList,
+    );
+  }
+
+  /// Update localTime field
+  TimeZoneTest localTime(DateTime? value) {
+    return TimeZoneTest(
+      utcTime: _instance.utcTime,
+      localTime: value ?? _instance.localTime,
+      timeZoneAware: _instance.timeZoneAware,
+      timeList: _instance.timeList,
+    );
+  }
+
+  /// Update timeZoneAware field
+  TimeZoneTest timeZoneAware(DateTime? value) {
+    return TimeZoneTest(
+      utcTime: _instance.utcTime,
+      localTime: _instance.localTime,
+      timeZoneAware: value,
+      timeList: _instance.timeList,
+    );
+  }
+
+  /// Update timeList field
+  TimeZoneTest timeList(List<DateTime>? value) {
+    return TimeZoneTest(
+      utcTime: _instance.utcTime,
+      localTime: _instance.localTime,
+      timeZoneAware: _instance.timeZoneAware,
+      timeList: value ?? _instance.timeList,
+    );
+  }
+
+  /// Traditional copyWith method
+  TimeZoneTest call({
+    DateTime? utcTime,
+    DateTime? localTime,
+    DateTime? timeZoneAware,
+    List<DateTime>? timeList,
+  }) {
+    return TimeZoneTest(
+      utcTime: utcTime ?? _instance.utcTime,
+      localTime: localTime ?? _instance.localTime,
+      timeZoneAware: timeZoneAware ?? _instance.timeZoneAware,
+      timeList: timeList ?? _instance.timeList,
     );
   }
 }

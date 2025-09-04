@@ -19,39 +19,7 @@ mixin _MapTypes {
   abstract final List<Map<String, String>> mapList;
   abstract final Map<int, String>? intKeyMap;
 
-  MapTypes copyWith({
-    Map<String, String>? stringMap,
-    Map<String, int>? intMap,
-    Map<String, double>? doubleMap,
-    Map<String, bool>? boolMap,
-    Map<String, dynamic>? dynamicMap,
-    Map<String, String>? optionalStringMap,
-    Map<String, List<String>>? listMap,
-    Map<String, Map<String, String>>? nestedMap,
-    Map<String, String>? namedMap,
-    Map<String, String>? parsedMap,
-    Map<String, int>? customIntMap,
-    Map<String, Map<String, dynamic>>? complexMap,
-    List<Map<String, String>>? mapList,
-    Map<int, String>? intKeyMap,
-  }) {
-    return MapTypes(
-      stringMap: stringMap ?? this.stringMap,
-      intMap: intMap ?? this.intMap,
-      doubleMap: doubleMap ?? this.doubleMap,
-      boolMap: boolMap ?? this.boolMap,
-      dynamicMap: dynamicMap ?? this.dynamicMap,
-      optionalStringMap: optionalStringMap ?? this.optionalStringMap,
-      listMap: listMap ?? this.listMap,
-      nestedMap: nestedMap ?? this.nestedMap,
-      namedMap: namedMap ?? this.namedMap,
-      parsedMap: parsedMap ?? this.parsedMap,
-      customIntMap: customIntMap ?? this.customIntMap,
-      complexMap: complexMap ?? this.complexMap,
-      mapList: mapList ?? this.mapList,
-      intKeyMap: intKeyMap ?? this.intKeyMap,
-    );
-  }
+  _MapTypesCopyWith get copyWith => _MapTypesCopyWith._(this);
 
   @override
   bool operator ==(Object other) {
@@ -193,19 +161,7 @@ mixin _MapWithObjects {
   abstract final Map<String, Address>? optionalAddressMap;
   abstract final Map<String, Address>? parsedAddressMap;
 
-  MapWithObjects copyWith({
-    Map<String, Address>? addressMap,
-    Map<String, List<Contact>>? contactListMap,
-    Map<String, Address>? optionalAddressMap,
-    Map<String, Address>? parsedAddressMap,
-  }) {
-    return MapWithObjects(
-      addressMap: addressMap ?? this.addressMap,
-      contactListMap: contactListMap ?? this.contactListMap,
-      optionalAddressMap: optionalAddressMap ?? this.optionalAddressMap,
-      parsedAddressMap: parsedAddressMap ?? this.parsedAddressMap,
-    );
-  }
+  _MapWithObjectsCopyWith get copyWith => _MapWithObjectsCopyWith._(this);
 
   @override
   bool operator ==(Object other) {
@@ -289,17 +245,7 @@ mixin _Address {
   abstract final String city;
   abstract final String zipCode;
 
-  Address copyWith({
-    String? street,
-    String? city,
-    String? zipCode,
-  }) {
-    return Address(
-      street: street ?? this.street,
-      city: city ?? this.city,
-      zipCode: zipCode ?? this.zipCode,
-    );
-  }
+  _AddressCopyWith get copyWith => _AddressCopyWith._(this);
 
   @override
   bool operator ==(Object other) {
@@ -353,15 +299,7 @@ mixin _Contact {
   abstract final String email;
   abstract final String? phone;
 
-  Contact copyWith({
-    String? email,
-    String? phone,
-  }) {
-    return Contact(
-      email: email ?? this.email,
-      phone: phone ?? this.phone,
-    );
-  }
+  _ContactCopyWith get copyWith => _ContactCopyWith._(this);
 
   @override
   bool operator ==(Object other) {
@@ -403,6 +341,467 @@ mixin _Contact {
     return Contact(
       email: SafeCasteUtil.safeCast<String>(map['email']) ?? "",
       phone: SafeCasteUtil.safeCast<String>(map['phone']),
+    );
+  }
+}
+
+/// Helper class for chained copyWith operations
+class _MapTypesCopyWith {
+  final _MapTypes _instance;
+  const _MapTypesCopyWith._(this._instance);
+
+  /// Update stringMap field
+  MapTypes stringMap(Map<String, String>? value) {
+    return MapTypes(
+      stringMap: value ?? _instance.stringMap,
+      intMap: _instance.intMap,
+      doubleMap: _instance.doubleMap,
+      boolMap: _instance.boolMap,
+      dynamicMap: _instance.dynamicMap,
+      optionalStringMap: _instance.optionalStringMap,
+      listMap: _instance.listMap,
+      nestedMap: _instance.nestedMap,
+      namedMap: _instance.namedMap,
+      parsedMap: _instance.parsedMap,
+      customIntMap: _instance.customIntMap,
+      complexMap: _instance.complexMap,
+      mapList: _instance.mapList,
+      intKeyMap: _instance.intKeyMap,
+    );
+  }
+
+  /// Update intMap field
+  MapTypes intMap(Map<String, int>? value) {
+    return MapTypes(
+      stringMap: _instance.stringMap,
+      intMap: value ?? _instance.intMap,
+      doubleMap: _instance.doubleMap,
+      boolMap: _instance.boolMap,
+      dynamicMap: _instance.dynamicMap,
+      optionalStringMap: _instance.optionalStringMap,
+      listMap: _instance.listMap,
+      nestedMap: _instance.nestedMap,
+      namedMap: _instance.namedMap,
+      parsedMap: _instance.parsedMap,
+      customIntMap: _instance.customIntMap,
+      complexMap: _instance.complexMap,
+      mapList: _instance.mapList,
+      intKeyMap: _instance.intKeyMap,
+    );
+  }
+
+  /// Update doubleMap field
+  MapTypes doubleMap(Map<String, double>? value) {
+    return MapTypes(
+      stringMap: _instance.stringMap,
+      intMap: _instance.intMap,
+      doubleMap: value ?? _instance.doubleMap,
+      boolMap: _instance.boolMap,
+      dynamicMap: _instance.dynamicMap,
+      optionalStringMap: _instance.optionalStringMap,
+      listMap: _instance.listMap,
+      nestedMap: _instance.nestedMap,
+      namedMap: _instance.namedMap,
+      parsedMap: _instance.parsedMap,
+      customIntMap: _instance.customIntMap,
+      complexMap: _instance.complexMap,
+      mapList: _instance.mapList,
+      intKeyMap: _instance.intKeyMap,
+    );
+  }
+
+  /// Update boolMap field
+  MapTypes boolMap(Map<String, bool>? value) {
+    return MapTypes(
+      stringMap: _instance.stringMap,
+      intMap: _instance.intMap,
+      doubleMap: _instance.doubleMap,
+      boolMap: value ?? _instance.boolMap,
+      dynamicMap: _instance.dynamicMap,
+      optionalStringMap: _instance.optionalStringMap,
+      listMap: _instance.listMap,
+      nestedMap: _instance.nestedMap,
+      namedMap: _instance.namedMap,
+      parsedMap: _instance.parsedMap,
+      customIntMap: _instance.customIntMap,
+      complexMap: _instance.complexMap,
+      mapList: _instance.mapList,
+      intKeyMap: _instance.intKeyMap,
+    );
+  }
+
+  /// Update dynamicMap field
+  MapTypes dynamicMap(Map<String, dynamic>? value) {
+    return MapTypes(
+      stringMap: _instance.stringMap,
+      intMap: _instance.intMap,
+      doubleMap: _instance.doubleMap,
+      boolMap: _instance.boolMap,
+      dynamicMap: value ?? _instance.dynamicMap,
+      optionalStringMap: _instance.optionalStringMap,
+      listMap: _instance.listMap,
+      nestedMap: _instance.nestedMap,
+      namedMap: _instance.namedMap,
+      parsedMap: _instance.parsedMap,
+      customIntMap: _instance.customIntMap,
+      complexMap: _instance.complexMap,
+      mapList: _instance.mapList,
+      intKeyMap: _instance.intKeyMap,
+    );
+  }
+
+  /// Update optionalStringMap field
+  MapTypes optionalStringMap(Map<String, String>? value) {
+    return MapTypes(
+      stringMap: _instance.stringMap,
+      intMap: _instance.intMap,
+      doubleMap: _instance.doubleMap,
+      boolMap: _instance.boolMap,
+      dynamicMap: _instance.dynamicMap,
+      optionalStringMap: value,
+      listMap: _instance.listMap,
+      nestedMap: _instance.nestedMap,
+      namedMap: _instance.namedMap,
+      parsedMap: _instance.parsedMap,
+      customIntMap: _instance.customIntMap,
+      complexMap: _instance.complexMap,
+      mapList: _instance.mapList,
+      intKeyMap: _instance.intKeyMap,
+    );
+  }
+
+  /// Update listMap field
+  MapTypes listMap(Map<String, List<String>>? value) {
+    return MapTypes(
+      stringMap: _instance.stringMap,
+      intMap: _instance.intMap,
+      doubleMap: _instance.doubleMap,
+      boolMap: _instance.boolMap,
+      dynamicMap: _instance.dynamicMap,
+      optionalStringMap: _instance.optionalStringMap,
+      listMap: value ?? _instance.listMap,
+      nestedMap: _instance.nestedMap,
+      namedMap: _instance.namedMap,
+      parsedMap: _instance.parsedMap,
+      customIntMap: _instance.customIntMap,
+      complexMap: _instance.complexMap,
+      mapList: _instance.mapList,
+      intKeyMap: _instance.intKeyMap,
+    );
+  }
+
+  /// Update nestedMap field
+  MapTypes nestedMap(Map<String, Map<String, String>>? value) {
+    return MapTypes(
+      stringMap: _instance.stringMap,
+      intMap: _instance.intMap,
+      doubleMap: _instance.doubleMap,
+      boolMap: _instance.boolMap,
+      dynamicMap: _instance.dynamicMap,
+      optionalStringMap: _instance.optionalStringMap,
+      listMap: _instance.listMap,
+      nestedMap: value ?? _instance.nestedMap,
+      namedMap: _instance.namedMap,
+      parsedMap: _instance.parsedMap,
+      customIntMap: _instance.customIntMap,
+      complexMap: _instance.complexMap,
+      mapList: _instance.mapList,
+      intKeyMap: _instance.intKeyMap,
+    );
+  }
+
+  /// Update namedMap field
+  MapTypes namedMap(Map<String, String>? value) {
+    return MapTypes(
+      stringMap: _instance.stringMap,
+      intMap: _instance.intMap,
+      doubleMap: _instance.doubleMap,
+      boolMap: _instance.boolMap,
+      dynamicMap: _instance.dynamicMap,
+      optionalStringMap: _instance.optionalStringMap,
+      listMap: _instance.listMap,
+      nestedMap: _instance.nestedMap,
+      namedMap: value ?? _instance.namedMap,
+      parsedMap: _instance.parsedMap,
+      customIntMap: _instance.customIntMap,
+      complexMap: _instance.complexMap,
+      mapList: _instance.mapList,
+      intKeyMap: _instance.intKeyMap,
+    );
+  }
+
+  /// Update parsedMap field
+  MapTypes parsedMap(Map<String, String>? value) {
+    return MapTypes(
+      stringMap: _instance.stringMap,
+      intMap: _instance.intMap,
+      doubleMap: _instance.doubleMap,
+      boolMap: _instance.boolMap,
+      dynamicMap: _instance.dynamicMap,
+      optionalStringMap: _instance.optionalStringMap,
+      listMap: _instance.listMap,
+      nestedMap: _instance.nestedMap,
+      namedMap: _instance.namedMap,
+      parsedMap: value,
+      customIntMap: _instance.customIntMap,
+      complexMap: _instance.complexMap,
+      mapList: _instance.mapList,
+      intKeyMap: _instance.intKeyMap,
+    );
+  }
+
+  /// Update customIntMap field
+  MapTypes customIntMap(Map<String, int>? value) {
+    return MapTypes(
+      stringMap: _instance.stringMap,
+      intMap: _instance.intMap,
+      doubleMap: _instance.doubleMap,
+      boolMap: _instance.boolMap,
+      dynamicMap: _instance.dynamicMap,
+      optionalStringMap: _instance.optionalStringMap,
+      listMap: _instance.listMap,
+      nestedMap: _instance.nestedMap,
+      namedMap: _instance.namedMap,
+      parsedMap: _instance.parsedMap,
+      customIntMap: value ?? _instance.customIntMap,
+      complexMap: _instance.complexMap,
+      mapList: _instance.mapList,
+      intKeyMap: _instance.intKeyMap,
+    );
+  }
+
+  /// Update complexMap field
+  MapTypes complexMap(Map<String, Map<String, dynamic>>? value) {
+    return MapTypes(
+      stringMap: _instance.stringMap,
+      intMap: _instance.intMap,
+      doubleMap: _instance.doubleMap,
+      boolMap: _instance.boolMap,
+      dynamicMap: _instance.dynamicMap,
+      optionalStringMap: _instance.optionalStringMap,
+      listMap: _instance.listMap,
+      nestedMap: _instance.nestedMap,
+      namedMap: _instance.namedMap,
+      parsedMap: _instance.parsedMap,
+      customIntMap: _instance.customIntMap,
+      complexMap: value,
+      mapList: _instance.mapList,
+      intKeyMap: _instance.intKeyMap,
+    );
+  }
+
+  /// Update mapList field
+  MapTypes mapList(List<Map<String, String>>? value) {
+    return MapTypes(
+      stringMap: _instance.stringMap,
+      intMap: _instance.intMap,
+      doubleMap: _instance.doubleMap,
+      boolMap: _instance.boolMap,
+      dynamicMap: _instance.dynamicMap,
+      optionalStringMap: _instance.optionalStringMap,
+      listMap: _instance.listMap,
+      nestedMap: _instance.nestedMap,
+      namedMap: _instance.namedMap,
+      parsedMap: _instance.parsedMap,
+      customIntMap: _instance.customIntMap,
+      complexMap: _instance.complexMap,
+      mapList: value ?? _instance.mapList,
+      intKeyMap: _instance.intKeyMap,
+    );
+  }
+
+  /// Update intKeyMap field
+  MapTypes intKeyMap(Map<int, String>? value) {
+    return MapTypes(
+      stringMap: _instance.stringMap,
+      intMap: _instance.intMap,
+      doubleMap: _instance.doubleMap,
+      boolMap: _instance.boolMap,
+      dynamicMap: _instance.dynamicMap,
+      optionalStringMap: _instance.optionalStringMap,
+      listMap: _instance.listMap,
+      nestedMap: _instance.nestedMap,
+      namedMap: _instance.namedMap,
+      parsedMap: _instance.parsedMap,
+      customIntMap: _instance.customIntMap,
+      complexMap: _instance.complexMap,
+      mapList: _instance.mapList,
+      intKeyMap: value,
+    );
+  }
+
+  /// Traditional copyWith method
+  MapTypes call({
+    Map<String, String>? stringMap,
+    Map<String, int>? intMap,
+    Map<String, double>? doubleMap,
+    Map<String, bool>? boolMap,
+    Map<String, dynamic>? dynamicMap,
+    Map<String, String>? optionalStringMap,
+    Map<String, List<String>>? listMap,
+    Map<String, Map<String, String>>? nestedMap,
+    Map<String, String>? namedMap,
+    Map<String, String>? parsedMap,
+    Map<String, int>? customIntMap,
+    Map<String, Map<String, dynamic>>? complexMap,
+    List<Map<String, String>>? mapList,
+    Map<int, String>? intKeyMap,
+  }) {
+    return MapTypes(
+      stringMap: stringMap ?? _instance.stringMap,
+      intMap: intMap ?? _instance.intMap,
+      doubleMap: doubleMap ?? _instance.doubleMap,
+      boolMap: boolMap ?? _instance.boolMap,
+      dynamicMap: dynamicMap ?? _instance.dynamicMap,
+      optionalStringMap: optionalStringMap ?? _instance.optionalStringMap,
+      listMap: listMap ?? _instance.listMap,
+      nestedMap: nestedMap ?? _instance.nestedMap,
+      namedMap: namedMap ?? _instance.namedMap,
+      parsedMap: parsedMap ?? _instance.parsedMap,
+      customIntMap: customIntMap ?? _instance.customIntMap,
+      complexMap: complexMap ?? _instance.complexMap,
+      mapList: mapList ?? _instance.mapList,
+      intKeyMap: intKeyMap ?? _instance.intKeyMap,
+    );
+  }
+}
+
+/// Helper class for chained copyWith operations
+class _MapWithObjectsCopyWith {
+  final _MapWithObjects _instance;
+  const _MapWithObjectsCopyWith._(this._instance);
+
+  /// Update addressMap field
+  MapWithObjects addressMap(Map<String, Address>? value) {
+    return MapWithObjects(
+      addressMap: value ?? _instance.addressMap,
+      contactListMap: _instance.contactListMap,
+      optionalAddressMap: _instance.optionalAddressMap,
+      parsedAddressMap: _instance.parsedAddressMap,
+    );
+  }
+
+  /// Update contactListMap field
+  MapWithObjects contactListMap(Map<String, List<Contact>>? value) {
+    return MapWithObjects(
+      addressMap: _instance.addressMap,
+      contactListMap: value ?? _instance.contactListMap,
+      optionalAddressMap: _instance.optionalAddressMap,
+      parsedAddressMap: _instance.parsedAddressMap,
+    );
+  }
+
+  /// Update optionalAddressMap field
+  MapWithObjects optionalAddressMap(Map<String, Address>? value) {
+    return MapWithObjects(
+      addressMap: _instance.addressMap,
+      contactListMap: _instance.contactListMap,
+      optionalAddressMap: value,
+      parsedAddressMap: _instance.parsedAddressMap,
+    );
+  }
+
+  /// Update parsedAddressMap field
+  MapWithObjects parsedAddressMap(Map<String, Address>? value) {
+    return MapWithObjects(
+      addressMap: _instance.addressMap,
+      contactListMap: _instance.contactListMap,
+      optionalAddressMap: _instance.optionalAddressMap,
+      parsedAddressMap: value,
+    );
+  }
+
+  /// Traditional copyWith method
+  MapWithObjects call({
+    Map<String, Address>? addressMap,
+    Map<String, List<Contact>>? contactListMap,
+    Map<String, Address>? optionalAddressMap,
+    Map<String, Address>? parsedAddressMap,
+  }) {
+    return MapWithObjects(
+      addressMap: addressMap ?? _instance.addressMap,
+      contactListMap: contactListMap ?? _instance.contactListMap,
+      optionalAddressMap: optionalAddressMap ?? _instance.optionalAddressMap,
+      parsedAddressMap: parsedAddressMap ?? _instance.parsedAddressMap,
+    );
+  }
+}
+
+/// Helper class for chained copyWith operations
+class _AddressCopyWith {
+  final _Address _instance;
+  const _AddressCopyWith._(this._instance);
+
+  /// Update street field
+  Address street(String? value) {
+    return Address(
+      street: value ?? _instance.street,
+      city: _instance.city,
+      zipCode: _instance.zipCode,
+    );
+  }
+
+  /// Update city field
+  Address city(String? value) {
+    return Address(
+      street: _instance.street,
+      city: value ?? _instance.city,
+      zipCode: _instance.zipCode,
+    );
+  }
+
+  /// Update zipCode field
+  Address zipCode(String? value) {
+    return Address(
+      street: _instance.street,
+      city: _instance.city,
+      zipCode: value ?? _instance.zipCode,
+    );
+  }
+
+  /// Traditional copyWith method
+  Address call({
+    String? street,
+    String? city,
+    String? zipCode,
+  }) {
+    return Address(
+      street: street ?? _instance.street,
+      city: city ?? _instance.city,
+      zipCode: zipCode ?? _instance.zipCode,
+    );
+  }
+}
+
+/// Helper class for chained copyWith operations
+class _ContactCopyWith {
+  final _Contact _instance;
+  const _ContactCopyWith._(this._instance);
+
+  /// Update email field
+  Contact email(String? value) {
+    return Contact(
+      email: value ?? _instance.email,
+      phone: _instance.phone,
+    );
+  }
+
+  /// Update phone field
+  Contact phone(String? value) {
+    return Contact(
+      email: _instance.email,
+      phone: value,
+    );
+  }
+
+  /// Traditional copyWith method
+  Contact call({
+    String? email,
+    String? phone,
+  }) {
+    return Contact(
+      email: email ?? _instance.email,
+      phone: phone ?? _instance.phone,
     );
   }
 }
