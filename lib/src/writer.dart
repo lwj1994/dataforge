@@ -1342,7 +1342,9 @@ class Writer {
 
   /// Get the nested type for copyWith operations
   String _getNestedCopyWithType(FieldInfo field) {
-    return field.type.replaceAll('?', '').replaceAll(RegExp(r'<.*>'), '');
+    // For nested copyWith, we need to preserve the full type including generics
+    // Only remove the nullable marker
+    return field.type.replaceAll('?', '');
   }
 
   /// Check if a type is primitive
@@ -1553,11 +1555,14 @@ class Writer {
             converterInstance = 'const $converterName';
           } else {
             // For EnumConverter, add values parameter
-            if (converterName == 'EnumConverter') {
+            if (converterName == 'EnumConverter' ||
+                converterName == 'EnumIndexConverter') {
               final cleanType = field.type.replaceAll('?', '');
-              converterInstance = 'const $converterName($cleanType.values)';
+              converterInstance =
+                  'const $_dataforgeAnnotationPrefix$converterName<$cleanType>($cleanType.values)';
             } else {
-              converterInstance = 'const $converterName()';
+              converterInstance =
+                  'const $_dataforgeAnnotationPrefix$converterName()';
             }
           }
           final isNullable = field.type.endsWith('?');
@@ -1566,6 +1571,48 @@ class Writer {
                 "${field.name} != null ? $converterInstance.toJson(${field.name}!) : null";
           } else {
             valueExpression = "$converterInstance.toJson(${field.name})";
+          }
+        } else {
+          // Handle complex types that contain enums
+          final cleanType = field.type.replaceAll('?', '');
+          final isNullable = field.type.endsWith('?');
+
+          if (cleanType.startsWith('List<')) {
+            // Extract item type from List<ItemType>
+            final listMatch = RegExp(r'List<(.+)>').firstMatch(cleanType);
+            if (listMatch != null) {
+              final itemType = listMatch.group(1)?.trim() ?? 'dynamic';
+              final cleanItemType = itemType.replaceAll('?', '');
+
+              if (_isEnumType(cleanItemType)) {
+                if (isNullable) {
+                  valueExpression =
+                      "${field.name}?.map((e) => const ${_dataforgeAnnotationPrefix}EnumConverter<$cleanItemType>($cleanItemType.values).toJson(e)).toList()";
+                } else {
+                  valueExpression =
+                      "${field.name}.map((e) => const ${_dataforgeAnnotationPrefix}EnumConverter<$cleanItemType>($cleanItemType.values).toJson(e)).toList()";
+                }
+              }
+            }
+          } else if (cleanType.startsWith('Map<')) {
+            // Extract key and value types from Map<KeyType, ValueType>
+            final mapMatch =
+                RegExp(r'Map<([^,]+),\s*(.+)>').firstMatch(cleanType);
+            if (mapMatch != null) {
+              final keyType = mapMatch.group(1)?.trim() ?? 'String';
+              final valueType = mapMatch.group(2)?.trim() ?? 'dynamic';
+              final cleanValueType = valueType.replaceAll('?', '');
+
+              if (_isEnumType(cleanValueType)) {
+                if (isNullable) {
+                  valueExpression =
+                      "${field.name}?.map((key, value) => MapEntry(key, const ${_dataforgeAnnotationPrefix}EnumConverter<$cleanValueType>($cleanValueType.values).toJson(value)))";
+                } else {
+                  valueExpression =
+                      "${field.name}.map((key, value) => MapEntry(key, const ${_dataforgeAnnotationPrefix}EnumConverter<$cleanValueType>($cleanValueType.values).toJson(value)))";
+                }
+              }
+            }
           }
         }
       }
@@ -1860,11 +1907,14 @@ class Writer {
       if (converterName.contains('(')) {
         converterInstance = 'const $converterName';
       } else {
-        // For EnumConverter, add generic type parameter and values
-        if (converterName == 'EnumConverter') {
-          converterInstance = 'const $converterName($type.values)';
+        // For EnumConverter and EnumIndexConverter, add generic type parameter and values
+        if (converterName == 'EnumConverter' ||
+            converterName == 'EnumIndexConverter') {
+          converterInstance =
+              'const $_dataforgeAnnotationPrefix$converterName($type.values)';
         } else {
-          converterInstance = 'const $converterName()';
+          converterInstance =
+              'const $_dataforgeAnnotationPrefix$converterName()';
         }
       }
 
@@ -2104,12 +2154,12 @@ class Writer {
             if (_isEnumType(cleanItemType)) {
               // Enum type, use EnumConverter
               if (isNullable) {
-                return "($valueExpression as List<dynamic>?)?.map((e) => const EnumConverter($cleanItemType.values).fromJson(e)).toList()?.cast<$castType>()$defaultValue";
+                return "($valueExpression as List<dynamic>?)?.map((e) => const ${_dataforgeAnnotationPrefix}EnumConverter<$cleanItemType>($cleanItemType.values).fromJson(e)).toList()?.cast<$castType>()$defaultValue";
               } else {
                 if (defaultValue.isNotEmpty) {
-                  return "($valueExpression as List<dynamic>?)?.map((e) => const EnumConverter($cleanItemType.values).fromJson(e)).toList()?.cast<$castType>()$defaultValue";
+                  return "($valueExpression as List<dynamic>?)?.map((e) => const ${_dataforgeAnnotationPrefix}EnumConverter<$cleanItemType>($cleanItemType.values).fromJson(e)).toList()?.cast<$castType>()$defaultValue";
                 } else {
-                  return "($valueExpression as List<dynamic>?)?.map((e) => const EnumConverter($cleanItemType.values).fromJson(e)).toList()?.cast<$castType>() ?? []";
+                  return "($valueExpression as List<dynamic>?)?.map((e) => const ${_dataforgeAnnotationPrefix}EnumConverter<$cleanItemType>($cleanItemType.values).fromJson(e)).toList()?.cast<$castType>() ?? []";
                 }
               }
             } else {
@@ -2158,9 +2208,9 @@ class Writer {
             if (_isEnumType(cleanValueType)) {
               // Enum type, use EnumConverter
               if (isNullable) {
-                return "($valueExpression as Map<String, dynamic>?)?.map((key, value) => MapEntry(key, const EnumConverter($cleanValueType.values).fromJson(value)))$defaultValue";
+                return "($valueExpression as Map<String, dynamic>?)?.map((key, value) => MapEntry(key, const ${_dataforgeAnnotationPrefix}EnumConverter<$cleanValueType>($cleanValueType.values).fromJson(value)))$defaultValue";
               } else {
-                return "($valueExpression as Map<String, dynamic>?)?.map((key, value) => MapEntry(key, const EnumConverter($cleanValueType.values).fromJson(value))) ?? {}$defaultValue";
+                return "($valueExpression as Map<String, dynamic>?)?.map((key, value) => MapEntry(key, const ${_dataforgeAnnotationPrefix}EnumConverter<$cleanValueType>($cleanValueType.values).fromJson(value))) ?? {}$defaultValue";
               }
             } else {
               // Check if valueType is a List type
@@ -2262,9 +2312,9 @@ class Writer {
           if (_isEnumType(cleanItemType)) {
             // Enum type, use EnumConverter
             if (isNullable) {
-              return "($valueExpression as List<dynamic>?)?.map((e) => const EnumConverter($cleanItemType.values).fromJson(e)).toList()?.cast<$castType>()$defaultValue";
+              return "($valueExpression as List<dynamic>?)?.map((e) => const ${_dataforgeAnnotationPrefix}EnumConverter<$cleanItemType>($cleanItemType.values).fromJson(e)).toList()?.cast<$castType>()$defaultValue";
             } else {
-              return "(($valueExpression as List<dynamic>?) ?? []).map((e) => const EnumConverter($cleanItemType.values).fromJson(e)).toList().cast<$castType>()$defaultValue";
+              return "(($valueExpression as List<dynamic>?) ?? []).map((e) => const ${_dataforgeAnnotationPrefix}EnumConverter<$cleanItemType>($cleanItemType.values).fromJson(e)).toList().cast<$castType>()$defaultValue";
             }
           } else {
             // Custom type, use fromJson
@@ -2348,12 +2398,12 @@ class Writer {
         if (_isEnumType(cleanType)) {
           // Enum type, use EnumConverter
           if (isNullable) {
-            return "$valueExpression != null ? const EnumConverter($cleanType.values).fromJson($valueExpression) : null$defaultValue";
+            return "$valueExpression != null ? const ${_dataforgeAnnotationPrefix}EnumConverter<$cleanType>($cleanType.values).fromJson($valueExpression) : null$defaultValue";
           } else {
             if (defaultValue.isNotEmpty) {
-              return "$valueExpression != null ? const EnumConverter($cleanType.values).fromJson($valueExpression) : ${defaultValue.substring(4)}";
+              return "$valueExpression != null ? const ${_dataforgeAnnotationPrefix}EnumConverter<$cleanType>($cleanType.values).fromJson($valueExpression) : ${defaultValue.substring(4)}";
             } else {
-              return "const EnumConverter($cleanType.values).fromJson($valueExpression ?? '')";
+              return "const ${_dataforgeAnnotationPrefix}EnumConverter<$cleanType>($cleanType.values).fromJson($valueExpression ?? '')";
             }
           }
         } else {
