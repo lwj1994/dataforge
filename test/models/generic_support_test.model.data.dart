@@ -275,7 +275,8 @@ mixin _GenericWithFeatures<T> {
     final map = <String, dynamic>{};
     map['data'] = data;
     map['custom_name'] = customField;
-    map['status'] = const EnumConverter(TestStatus.values).toJson(status);
+    map['status'] =
+        const EnumConverter<TestStatus>(TestStatus.values).toJson(status);
     map['createdAt'] = const DateTimeConverter().toJson(createdAt);
     return map;
   }

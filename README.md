@@ -21,17 +21,13 @@ A high-performance Dart data class generator that's **multiple times faster** th
 
 ```yaml
 dependencies:
-  dataforge_annotation:
-    git:
-      url: https://github.com/lwj1994/dataforge
-      ref: main
-      path: annotation
+  dataforge_annotation: ^0.2.0
 ```
 
 ### 2. Install CLI Tool
 
 ```bash
-dart pub global activate --source git https://github.com/lwj1994/dataforge
+dart pub global activate dataforge
 ```
 
 ## 🚀 Quick Start
