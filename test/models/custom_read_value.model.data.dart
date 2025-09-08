@@ -75,7 +75,7 @@ mixin _CustomReadValue {
     map['enabled'] = enabled;
     if (createdDate != null) {
       map['createdDate'] = createdDate != null
-          ? const DateTimeConverter().toJson(createdDate!)
+          ? const DefaultDateTimeConverter().toJson(createdDate!)
           : null;
     }
     if (config != null) {
@@ -88,28 +88,26 @@ mixin _CustomReadValue {
   }
 
   static CustomReadValue fromJson(Map<String, dynamic> map) {
+    final titleReadValue = CustomReadValue._readValue(map, 'title');
+    final countReadValue = CustomReadValue._readValue(map, 'count');
+    final enabledReadValue = CustomReadValue._readValue(map, 'enabled');
+    final createdDateReadValue = CustomReadValue._readValue(map, 'createdDate');
+    final configReadValue = CustomReadValue._readValue(map, 'config');
+    final tagsReadValue = CustomReadValue._readValue(map, 'tags');
     return CustomReadValue(
       id: SafeCasteUtil.safeCast<String>(map['id']) ?? "",
       name: SafeCasteUtil.safeCast<String>(map['name']) ?? "",
-      title: SafeCasteUtil.safeCast<String>(
-              CustomReadValue._readValue(map, 'title')) ??
-          '',
-      count: SafeCasteUtil.safeCast<int>(
-              CustomReadValue._readValue(map, 'count')) ??
-          0,
-      enabled: SafeCasteUtil.safeCast<bool>(
-              CustomReadValue._readValue(map, 'enabled')) ??
-          false,
-      createdDate: CustomReadValue._readValue(map, 'createdDate') != null
-          ? DateTime.tryParse(
-              CustomReadValue._readValue(map, 'createdDate').toString())
+      title: SafeCasteUtil.safeCast<String>(titleReadValue) ?? '',
+      count: SafeCasteUtil.safeCast<int>(countReadValue) ?? 0,
+      enabled: SafeCasteUtil.safeCast<bool>(enabledReadValue) ?? false,
+      createdDate: createdDateReadValue != null
+          ? DateTime.tryParse(createdDateReadValue.toString())
           : null,
-      config: CustomReadValue._readValue(map, 'config') != null
-          ? (CustomReadValue._readValue(map, 'config') as Map?)
-              ?.cast<String, dynamic>()
+      config: configReadValue != null
+          ? (configReadValue as Map?)?.cast<String, dynamic>()
           : null,
-      tags: CustomReadValue._readValue(map, 'tags') != null
-          ? (CustomReadValue._readValue(map, 'tags') as List?)?.cast<String>()
+      tags: tagsReadValue != null
+          ? (tagsReadValue as List?)?.cast<String>()
           : null,
     );
   }

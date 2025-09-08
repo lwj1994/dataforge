@@ -13,9 +13,6 @@ mixin _DateTimeTypes {
   abstract final DateTime? isoDateTime;
   abstract final DateTime timestampDate;
   abstract final DateTime? parsedDate;
-  abstract final List<DateTime>? dateTimeList;
-  abstract final Duration? duration;
-  abstract final Duration? customDuration;
 
   _DateTimeTypesCopyWith get copyWith => _DateTimeTypesCopyWith._(this);
 
@@ -52,15 +49,6 @@ mixin _DateTimeTypes {
     if (parsedDate != other.parsedDate) {
       return false;
     }
-    if (!DeepCollectionEquality().equals(dateTimeList, other.dateTimeList)) {
-      return false;
-    }
-    if (duration != other.duration) {
-      return false;
-    }
-    if (customDuration != other.customDuration) {
-      return false;
-    }
     return true;
   }
 
@@ -76,26 +64,23 @@ mixin _DateTimeTypes {
       isoDateTime,
       timestampDate,
       parsedDate,
-      DeepCollectionEquality().hash(dateTimeList),
-      duration,
-      customDuration,
     ]);
   }
 
   @override
   String toString() {
-    return 'DateTimeTypes(createdAt: $createdAt, updatedAt: $updatedAt, birthDate: $birthDate, eventDates: $eventDates, optionalEventDates: $optionalEventDates, namedDates: $namedDates, isoDateTime: $isoDateTime, timestampDate: $timestampDate, parsedDate: $parsedDate, dateTimeList: $dateTimeList, duration: $duration, customDuration: $customDuration)';
+    return 'DateTimeTypes(createdAt: $createdAt, updatedAt: $updatedAt, birthDate: $birthDate, eventDates: $eventDates, optionalEventDates: $optionalEventDates, namedDates: $namedDates, isoDateTime: $isoDateTime, timestampDate: $timestampDate, parsedDate: $parsedDate)';
   }
 
   Map<String, dynamic> toJson() {
     final map = <String, dynamic>{};
-    map['createdAt'] = const DateTimeConverter().toJson(createdAt);
+    map['createdAt'] = const DefaultDateTimeConverter().toJson(createdAt);
     if (updatedAt != null) {
       map['updatedAt'] = updatedAt != null
-          ? const DateTimeConverter().toJson(updatedAt!)
+          ? const DefaultDateTimeConverter().toJson(updatedAt!)
           : null;
     }
-    map['birth_date'] = const DateTimeConverter().toJson(birthDate);
+    map['birth_date'] = const DefaultDateTimeConverter().toJson(birthDate);
     map['eventDates'] = eventDates;
     if (optionalEventDates != null) {
       map['optionalEventDates'] = optionalEventDates;
@@ -103,66 +88,46 @@ mixin _DateTimeTypes {
     map['namedDates'] = namedDates;
     if (isoDateTime != null) {
       map['isoDateTime'] = isoDateTime != null
-          ? const DateTimeConverter().toJson(isoDateTime!)
+          ? const DefaultDateTimeConverter().toJson(isoDateTime!)
           : null;
     }
-    map['timestampDate'] = const DateTimeConverter().toJson(timestampDate);
+    map['timestampDate'] =
+        const DefaultDateTimeConverter().toJson(timestampDate);
     if (parsedDate != null) {
       map['parsedDate'] = parsedDate != null
-          ? const DateTimeConverter().toJson(parsedDate!)
-          : null;
-    }
-    if (dateTimeList != null) {
-      map['dateTimeList'] = dateTimeList;
-    }
-    if (duration != null) {
-      map['duration'] =
-          duration != null ? const DurationConverter().toJson(duration!) : null;
-    }
-    if (customDuration != null) {
-      map['customDuration'] = customDuration != null
-          ? const DurationConverter().toJson(customDuration!)
+          ? const DefaultDateTimeConverter().toJson(parsedDate!)
           : null;
     }
     return map;
   }
 
   static DateTimeTypes fromJson(Map<String, dynamic> map) {
+    final isoDateTimeReadValue = DateTimeTypes._readValue(map, 'isoDateTime');
+    final timestampDateReadValue =
+        DateTimeTypes._readValue(map, 'timestampDate');
+    final parsedDateReadValue = DateTimeTypes._readValue(map, 'parsedDate');
     return DateTimeTypes(
       createdAt: map['createdAt'] != null
-          ? const DateTimeConverter().fromJson(map['createdAt'])
+          ? const DefaultDateTimeConverter().fromJson(map['createdAt'])
+              as DateTime
           : throw ArgumentError('Required field createdAt is missing'),
       updatedAt: map['updatedAt'] != null
-          ? const DateTimeConverter().fromJson(map['updatedAt'])
+          ? const DefaultDateTimeConverter().fromJson(map['updatedAt'])
           : null,
       birthDate: map['birth_date'] != null
-          ? const DateTimeConverter().fromJson(map['birth_date'])
+          ? const DefaultDateTimeConverter().fromJson(map['birth_date'])
+              as DateTime
           : throw ArgumentError('Required field birthDate is missing'),
       eventDates: (map['eventDates'] as List<dynamic>?)?.cast<DateTime>() ?? [],
       optionalEventDates:
           (map['optionalEventDates'] as List<dynamic>?)?.cast<DateTime>(),
       namedDates: (map['namedDates'] as Map<String, DateTime>?) ?? {},
-      isoDateTime: DateTimeTypes._readValue(map, 'isoDateTime') != null
-          ? DateTime.tryParse(
-              DateTimeTypes._readValue(map, 'isoDateTime').toString())
+      isoDateTime: isoDateTimeReadValue != null
+          ? DateTime.tryParse(isoDateTimeReadValue.toString())
           : null,
-      timestampDate: DateTime.parse(
-          (DateTimeTypes._readValue(map, 'timestampDate') ?? '').toString()),
-      parsedDate: DateTimeTypes._readValue(map, 'parsedDate') != null
-          ? DateTime.tryParse(
-              DateTimeTypes._readValue(map, 'parsedDate').toString())
-          : null,
-      dateTimeList: DateTimeTypes._readValue(map, 'dateTimeList') != null
-          ? (DateTimeTypes._readValue(map, 'dateTimeList') as List?)
-              ?.cast<DateTime>()
-          : null,
-      duration: map['duration'] != null
-          ? const DurationConverter().fromJson(map['duration'])
-          : null,
-      customDuration: DateTimeTypes._readValue(map, 'customDuration') != null
-          ? Duration(
-              milliseconds:
-                  DateTimeTypes._readValue(map, 'customDuration') as int? ?? 0)
+      timestampDate: DateTime.parse((timestampDateReadValue ?? '').toString()),
+      parsedDate: parsedDateReadValue != null
+          ? DateTime.tryParse(parsedDateReadValue.toString())
           : null,
     );
   }
@@ -213,11 +178,11 @@ mixin _TimeZoneTest {
 
   Map<String, dynamic> toJson() {
     final map = <String, dynamic>{};
-    map['utcTime'] = const DateTimeConverter().toJson(utcTime);
-    map['localTime'] = const DateTimeConverter().toJson(localTime);
+    map['utcTime'] = const DefaultDateTimeConverter().toJson(utcTime);
+    map['localTime'] = const DefaultDateTimeConverter().toJson(localTime);
     if (timeZoneAware != null) {
       map['timeZoneAware'] = timeZoneAware != null
-          ? const DateTimeConverter().toJson(timeZoneAware!)
+          ? const DefaultDateTimeConverter().toJson(timeZoneAware!)
           : null;
     }
     map['timeList'] = timeList;
@@ -225,16 +190,19 @@ mixin _TimeZoneTest {
   }
 
   static TimeZoneTest fromJson(Map<String, dynamic> map) {
+    final timeZoneAwareReadValue =
+        TimeZoneTest._readValue(map, 'timeZoneAware');
     return TimeZoneTest(
       utcTime: map['utcTime'] != null
-          ? const DateTimeConverter().fromJson(map['utcTime'])
+          ? const DefaultDateTimeConverter().fromJson(map['utcTime'])
+              as DateTime
           : throw ArgumentError('Required field utcTime is missing'),
       localTime: map['localTime'] != null
-          ? const DateTimeConverter().fromJson(map['localTime'])
+          ? const DefaultDateTimeConverter().fromJson(map['localTime'])
+              as DateTime
           : throw ArgumentError('Required field localTime is missing'),
-      timeZoneAware: TimeZoneTest._readValue(map, 'timeZoneAware') != null
-          ? DateTime.tryParse(
-              TimeZoneTest._readValue(map, 'timeZoneAware').toString())
+      timeZoneAware: timeZoneAwareReadValue != null
+          ? DateTime.tryParse(timeZoneAwareReadValue.toString())
           : null,
       timeList: (map['timeList'] as List<dynamic>?)?.cast<DateTime>() ?? [],
     );
@@ -258,9 +226,6 @@ class _DateTimeTypesCopyWith {
       isoDateTime: _instance.isoDateTime,
       timestampDate: _instance.timestampDate,
       parsedDate: _instance.parsedDate,
-      dateTimeList: _instance.dateTimeList,
-      duration: _instance.duration,
-      customDuration: _instance.customDuration,
     );
   }
 
@@ -276,9 +241,6 @@ class _DateTimeTypesCopyWith {
       isoDateTime: _instance.isoDateTime,
       timestampDate: _instance.timestampDate,
       parsedDate: _instance.parsedDate,
-      dateTimeList: _instance.dateTimeList,
-      duration: _instance.duration,
-      customDuration: _instance.customDuration,
     );
   }
 
@@ -294,9 +256,6 @@ class _DateTimeTypesCopyWith {
       isoDateTime: _instance.isoDateTime,
       timestampDate: _instance.timestampDate,
       parsedDate: _instance.parsedDate,
-      dateTimeList: _instance.dateTimeList,
-      duration: _instance.duration,
-      customDuration: _instance.customDuration,
     );
   }
 
@@ -312,9 +271,6 @@ class _DateTimeTypesCopyWith {
       isoDateTime: _instance.isoDateTime,
       timestampDate: _instance.timestampDate,
       parsedDate: _instance.parsedDate,
-      dateTimeList: _instance.dateTimeList,
-      duration: _instance.duration,
-      customDuration: _instance.customDuration,
     );
   }
 
@@ -330,9 +286,6 @@ class _DateTimeTypesCopyWith {
       isoDateTime: _instance.isoDateTime,
       timestampDate: _instance.timestampDate,
       parsedDate: _instance.parsedDate,
-      dateTimeList: _instance.dateTimeList,
-      duration: _instance.duration,
-      customDuration: _instance.customDuration,
     );
   }
 
@@ -348,9 +301,6 @@ class _DateTimeTypesCopyWith {
       isoDateTime: _instance.isoDateTime,
       timestampDate: _instance.timestampDate,
       parsedDate: _instance.parsedDate,
-      dateTimeList: _instance.dateTimeList,
-      duration: _instance.duration,
-      customDuration: _instance.customDuration,
     );
   }
 
@@ -366,9 +316,6 @@ class _DateTimeTypesCopyWith {
       isoDateTime: value,
       timestampDate: _instance.timestampDate,
       parsedDate: _instance.parsedDate,
-      dateTimeList: _instance.dateTimeList,
-      duration: _instance.duration,
-      customDuration: _instance.customDuration,
     );
   }
 
@@ -384,9 +331,6 @@ class _DateTimeTypesCopyWith {
       isoDateTime: _instance.isoDateTime,
       timestampDate: value ?? _instance.timestampDate,
       parsedDate: _instance.parsedDate,
-      dateTimeList: _instance.dateTimeList,
-      duration: _instance.duration,
-      customDuration: _instance.customDuration,
     );
   }
 
@@ -402,63 +346,6 @@ class _DateTimeTypesCopyWith {
       isoDateTime: _instance.isoDateTime,
       timestampDate: _instance.timestampDate,
       parsedDate: value,
-      dateTimeList: _instance.dateTimeList,
-      duration: _instance.duration,
-      customDuration: _instance.customDuration,
-    );
-  }
-
-  /// Update dateTimeList field
-  DateTimeTypes dateTimeList(List<DateTime>? value) {
-    return DateTimeTypes(
-      createdAt: _instance.createdAt,
-      updatedAt: _instance.updatedAt,
-      birthDate: _instance.birthDate,
-      eventDates: _instance.eventDates,
-      optionalEventDates: _instance.optionalEventDates,
-      namedDates: _instance.namedDates,
-      isoDateTime: _instance.isoDateTime,
-      timestampDate: _instance.timestampDate,
-      parsedDate: _instance.parsedDate,
-      dateTimeList: value,
-      duration: _instance.duration,
-      customDuration: _instance.customDuration,
-    );
-  }
-
-  /// Update duration field
-  DateTimeTypes duration(Duration? value) {
-    return DateTimeTypes(
-      createdAt: _instance.createdAt,
-      updatedAt: _instance.updatedAt,
-      birthDate: _instance.birthDate,
-      eventDates: _instance.eventDates,
-      optionalEventDates: _instance.optionalEventDates,
-      namedDates: _instance.namedDates,
-      isoDateTime: _instance.isoDateTime,
-      timestampDate: _instance.timestampDate,
-      parsedDate: _instance.parsedDate,
-      dateTimeList: _instance.dateTimeList,
-      duration: value,
-      customDuration: _instance.customDuration,
-    );
-  }
-
-  /// Update customDuration field
-  DateTimeTypes customDuration(Duration? value) {
-    return DateTimeTypes(
-      createdAt: _instance.createdAt,
-      updatedAt: _instance.updatedAt,
-      birthDate: _instance.birthDate,
-      eventDates: _instance.eventDates,
-      optionalEventDates: _instance.optionalEventDates,
-      namedDates: _instance.namedDates,
-      isoDateTime: _instance.isoDateTime,
-      timestampDate: _instance.timestampDate,
-      parsedDate: _instance.parsedDate,
-      dateTimeList: _instance.dateTimeList,
-      duration: _instance.duration,
-      customDuration: value,
     );
   }
 
@@ -473,9 +360,6 @@ class _DateTimeTypesCopyWith {
     DateTime? isoDateTime,
     DateTime? timestampDate,
     DateTime? parsedDate,
-    List<DateTime>? dateTimeList,
-    Duration? duration,
-    Duration? customDuration,
   }) {
     return DateTimeTypes(
       createdAt: createdAt ?? _instance.createdAt,
@@ -487,9 +371,6 @@ class _DateTimeTypesCopyWith {
       isoDateTime: isoDateTime ?? _instance.isoDateTime,
       timestampDate: timestampDate ?? _instance.timestampDate,
       parsedDate: parsedDate ?? _instance.parsedDate,
-      dateTimeList: dateTimeList ?? _instance.dateTimeList,
-      duration: duration ?? _instance.duration,
-      customDuration: customDuration ?? _instance.customDuration,
     );
   }
 }

@@ -9,115 +9,110 @@ abstract class TypeConverter<T, S> {
 
   /// Converts a JSON value [json] of type [S] to a Dart object of type [T].
   /// This method is called during deserialization (fromJson).
-  T fromJson(S json);
+  ///
+  /// [json] can be null, and the return value can also be null.
+  /// If the field is declared as non-nullable but receives a null value,
+  /// an exception will be thrown during deserialization.
+  T? fromJson(S? json);
 
   /// Converts a Dart object [object] of type [T] to a JSON value of type [S].
   /// This method is called during serialization (toJson).
-  S toJson(T object);
+  ///
+  /// [object] can be null, and the return value can also be null.
+  /// If the field is declared as non-nullable but receives a null value,
+  /// an exception will be thrown during serialization.
+  S? toJson(T? object);
 }
 
-/// Built-in converter for DateTime objects.
-/// Converts DateTime to/from ISO 8601 string format.
-class DateTimeConverter extends TypeConverter<DateTime, String> {
-  const DateTimeConverter();
+/// Built-in converter for DateTime objects that supports nullable values.
+/// Accepts any object type and tries to convert it to DateTime.
+/// - If input is a number (13-digit milliseconds timestamp), uses DateTime.fromMillisecondsSinceEpoch
+/// - If input is a number with less than 13 digits, pads it to 13 digits
+/// - Otherwise tries to parse using DateTime.parse as fallback
+class DefaultDateTimeConverter extends TypeConverter<DateTime, String> {
+  const DefaultDateTimeConverter();
 
   @override
-  DateTime fromJson(String json) {
-    return DateTime.parse(json);
+  DateTime? fromJson(Object? json) {
+    if (json == null) return null;
+
+    // Handle numeric timestamps (milliseconds since epoch)
+    if (json is int) {
+      final timestamp = json.toString();
+      if (timestamp.length <= 13) {
+        // Pad to 13 digits if needed (to handle seconds or other shorter timestamps)
+        final paddedTimestamp = timestamp.padRight(13, '0');
+        return DateTime.fromMillisecondsSinceEpoch(int.parse(paddedTimestamp));
+      }
+      return DateTime.fromMillisecondsSinceEpoch(json);
+    }
+
+    // Handle string timestamps
+    if (json is String) {
+      // Handle empty string
+      if (json.isEmpty) {
+        return null;
+      }
+
+      // Try to parse as number first
+      if (RegExp(r'^\d+$').hasMatch(json)) {
+        final timestamp = json;
+        if (timestamp.length <= 13) {
+          // Pad to 13 digits if needed
+          final paddedTimestamp = timestamp.padRight(13, '0');
+          return DateTime.fromMillisecondsSinceEpoch(
+              int.parse(paddedTimestamp));
+        }
+        return DateTime.fromMillisecondsSinceEpoch(int.parse(timestamp));
+      }
+
+      // Otherwise try to parse as ISO date string
+      try {
+        return DateTime.parse(json);
+      } catch (e) {
+        // Ignore parsing errors and try next method
+      }
+    }
+
+    // Last resort: try to convert to string and parse
+    try {
+      return DateTime.parse(json.toString());
+    } catch (e) {
+      // If all conversion attempts fail, return null instead of throwing
+      return null;
+    }
   }
 
   @override
-  String toJson(DateTime object) {
-    return object.toIso8601String();
-  }
-}
-
-/// Built-in converter for DateTime objects to/from milliseconds timestamp.
-/// Converts DateTime to/from integer milliseconds since epoch.
-class DateTimeMillisecondsConverter extends TypeConverter<DateTime, int> {
-  const DateTimeMillisecondsConverter();
-
-  @override
-  DateTime fromJson(int json) {
-    return DateTime.fromMillisecondsSinceEpoch(json);
-  }
-
-  @override
-  int toJson(DateTime object) {
-    return object.millisecondsSinceEpoch;
-  }
-}
-
-/// Built-in converter for Duration objects.
-/// Converts Duration to/from microseconds integer.
-class DurationConverter extends TypeConverter<Duration, int> {
-  const DurationConverter();
-
-  @override
-  Duration fromJson(int json) {
-    return Duration(microseconds: json);
-  }
-
-  @override
-  int toJson(Duration object) {
-    return object.inMicroseconds;
-  }
-}
-
-/// Built-in converter for Duration objects to/from milliseconds.
-/// Converts Duration to/from milliseconds integer.
-class DurationMillisecondsConverter extends TypeConverter<Duration, int> {
-  const DurationMillisecondsConverter();
-
-  @override
-  Duration fromJson(int json) {
-    return Duration(milliseconds: json);
-  }
-
-  @override
-  int toJson(Duration object) {
-    return object.inMilliseconds;
+  String? toJson(DateTime? object) {
+    if (object == null) return null;
+    return object.millisecondsSinceEpoch.toString();
   }
 }
 
 /// Built-in converter for Enum objects.
 /// Converts Enum to/from string using the enum name.
-class EnumConverter<T extends Enum> extends TypeConverter<T, String> {
+class DefaultEnumConverter<T extends Enum> extends TypeConverter<T, String> {
   final List<T> values;
 
-  const EnumConverter(this.values);
+  const DefaultEnumConverter(this.values);
 
   @override
-  T fromJson(String json) {
-    return values.firstWhere(
-      (e) => e.name == json,
-      orElse: () => throw ArgumentError('Unknown enum value: $json'),
-    );
-  }
-
-  @override
-  String toJson(T object) {
-    return object.name;
-  }
-}
-
-/// Built-in converter for Enum objects to/from index.
-/// Converts Enum to/from integer index.
-class EnumIndexConverter<T extends Enum> extends TypeConverter<T, int> {
-  final List<T> values;
-
-  const EnumIndexConverter(this.values);
-
-  @override
-  T fromJson(int json) {
-    if (json < 0 || json >= values.length) {
-      throw ArgumentError('Enum index out of range: $json');
+  T? fromJson(String? json) {
+    if (json == null) return null;
+    try {
+      return values.firstWhere(
+        (e) => e.name == json,
+      );
+    } catch (e) {
+      //
+      return null;
     }
-    return values[json];
   }
 
   @override
-  int toJson(T object) {
-    return object.index;
+  String? toJson(T? object) {
+    if (object == null) return null;
+    return object.name;
   }
 }

@@ -99,7 +99,6 @@ class NestedObjects with _NestedObjects {
   @override
   final Company? employer;
   @override
-  @JsonKey(readValue: NestedObjects._readValue)
   final Address? customAddress;
   @override
   @JsonKey(readValue: NestedObjects._readValue)
@@ -144,7 +143,7 @@ class NestedObjects with _NestedObjects {
             };
           }
         }
-        return null;
+        return value; // Return the original value for other types
 
       case 'parsedContacts':
         if (value == null) return null;

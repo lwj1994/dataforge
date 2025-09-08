@@ -324,6 +324,8 @@ mixin _NestedObjects {
   }
 
   static NestedObjects fromJson(Map<String, dynamic> map) {
+    final parsedContactsReadValue =
+        NestedObjects._readValue(map, 'parsedContacts');
     return NestedObjects(
       name: SafeCasteUtil.safeCast<String>(map['name']) ?? "",
       homeAddress:
@@ -348,10 +350,13 @@ mixin _NestedObjects {
       employer: map['employer'] != null
           ? Company.fromJson(map['employer'] as Map<String, dynamic>)
           : null,
-      customAddress: NestedObjects._readValue(map, 'customAddress') as Address?,
-      parsedContacts: NestedObjects._readValue(map, 'parsedContacts') != null
-          ? (NestedObjects._readValue(map, 'parsedContacts') as List?)
-              ?.cast<Contact>()
+      customAddress: map['customAddress'] != null
+          ? Address.fromJson(map['customAddress'] as Map<String, dynamic>)
+          : null,
+      parsedContacts: parsedContactsReadValue != null
+          ? (parsedContactsReadValue as List?)
+              ?.map((e) => Contact.fromJson(e as Map<String, dynamic>))
+              .toList()
           : null,
     );
   }
