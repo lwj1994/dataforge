@@ -134,15 +134,14 @@ class Writer {
   /// Auto-match converter based on field type
   /// Returns the appropriate converter name for common types
   String? _getAutoMatchedConverter(String type) {
-    switch (type) {
+    final cleanType = type.replaceAll('?', '');
+    switch (cleanType) {
       case 'DateTime':
-        return 'DateTimeConverter';
-      case 'Duration':
-        return 'DurationConverter';
+        return 'DefaultDateTimeConverter';
       default:
         // Check if it's an enum type
-        if (_isEnumType(type)) {
-          return 'EnumConverter';
+        if (_isEnumType(cleanType)) {
+          return 'DefaultEnumConverter';
         }
         return null;
     }
@@ -1214,8 +1213,7 @@ class Writer {
 
         // If no explicit converter, try to auto-match based on type
         if (converterName == null || converterName.isEmpty) {
-          final cleanType = field.type.replaceAll('?', '');
-          converterName = _getAutoMatchedConverter(cleanType);
+          converterName = _getAutoMatchedConverter(field.type);
         }
 
         // If there is a TypeConverter (explicit or auto-matched), use converter's toJson method
@@ -1225,9 +1223,8 @@ class Writer {
           if (converterName.contains('(')) {
             converterInstance = 'const $converterName';
           } else {
-            // For EnumConverter, add values parameter
-            if (converterName == 'EnumConverter' ||
-                converterName == 'EnumIndexConverter') {
+            // For DefaultEnumConverter, add values parameter
+            if (converterName == 'DefaultEnumConverter') {
               final cleanType = field.type.replaceAll('?', '');
               converterInstance =
                   'const $_dataforgeAnnotationPrefix$converterName<$cleanType>($cleanType.values)';
@@ -1258,10 +1255,10 @@ class Writer {
               if (_isEnumType(cleanItemType)) {
                 if (isNullable) {
                   valueExpression =
-                      "${field.name}?.map((e) => const ${_dataforgeAnnotationPrefix}EnumConverter<$cleanItemType>($cleanItemType.values).toJson(e)).toList()";
+                      "${field.name}?.map((e) => const ${_dataforgeAnnotationPrefix}DefaultEnumConverter<$cleanItemType>($cleanItemType.values).toJson(e)).toList()";
                 } else {
                   valueExpression =
-                      "${field.name}.map((e) => const ${_dataforgeAnnotationPrefix}EnumConverter<$cleanItemType>($cleanItemType.values).toJson(e)).toList()";
+                      "${field.name}.map((e) => const ${_dataforgeAnnotationPrefix}DefaultEnumConverter<$cleanItemType>($cleanItemType.values).toJson(e)).toList()";
                 }
               }
             }
@@ -1276,10 +1273,10 @@ class Writer {
               if (_isEnumType(cleanValueType)) {
                 if (isNullable) {
                   valueExpression =
-                      "${field.name}?.map((key, value) => MapEntry(key, const ${_dataforgeAnnotationPrefix}EnumConverter<$cleanValueType>($cleanValueType.values).toJson(value)))";
+                      "${field.name}?.map((key, value) => MapEntry(key, const ${_dataforgeAnnotationPrefix}DefaultEnumConverter<$cleanValueType>($cleanValueType.values).toJson(value)))";
                 } else {
                   valueExpression =
-                      "${field.name}.map((key, value) => MapEntry(key, const ${_dataforgeAnnotationPrefix}EnumConverter<$cleanValueType>($cleanValueType.values).toJson(value)))";
+                      "${field.name}.map((key, value) => MapEntry(key, const ${_dataforgeAnnotationPrefix}DefaultEnumConverter<$cleanValueType>($cleanValueType.values).toJson(value)))";
                 }
               }
             }
@@ -1331,10 +1328,43 @@ class Writer {
     buffer.writeln('  }');
   }
 
+  /// Build cached readValue variables for fromJson methods
+  void _buildReadValueCacheVariables(StringBuffer buffer, ClassInfo clazz) {
+    for (final field in clazz.fields) {
+      if (field.jsonKey?.ignore == true ||
+          field.name.isEmpty ||
+          field.type.isEmpty ||
+          field.type == 'dynamic' ||
+          field.jsonKey?.readValue.isEmpty != false) {
+        continue;
+      }
+
+      final jsonKeys = <String>[];
+      if (field.jsonKey?.name.isNotEmpty == true) {
+        jsonKeys.add(field.jsonKey!.name);
+      } else {
+        jsonKeys.add(field.name);
+      }
+
+      final readValue = field.jsonKey!.readValue;
+      final readValueCall =
+          readValue.startsWith('_') && !readValue.contains('.')
+              ? '${clazz.name}.$readValue(map, \'${jsonKeys[0]}\')'
+              : '$readValue(map, \'${jsonKeys[0]}\')';
+
+      final cachedVarName = '${field.name}ReadValue';
+      buffer.writeln('    final $cachedVarName = $readValueCall;');
+    }
+  }
+
   /// Build fromJson method for regular (non-generic) classes
   void _buildRegularFromJson(StringBuffer buffer, ClassInfo clazz) {
     buffer.writeln(
         '\n  static ${clazz.name} fromJson(Map<String, dynamic> map) {');
+
+    // First, generate all cached readValue variables
+    _buildReadValueCacheVariables(buffer, clazz);
+
     buffer.writeln('    return ${clazz.name}(');
 
     _buildFromJsonFields(buffer, clazz);
@@ -1400,14 +1430,10 @@ class Writer {
           }
         }
       } else if (field.jsonKey?.readValue.isNotEmpty == true) {
-        final readValue = field.jsonKey!.readValue;
-        // readValue is a static method call, needs to pass map and key parameters
-        // If readValue doesn't contain class name prefix, add current class name
-        if (readValue.startsWith('_') && !readValue.contains('.')) {
-          valueExpression = "${clazz.name}.$readValue(map, '${jsonKeys[0]}')";
-        } else {
-          valueExpression = "$readValue(map, '${jsonKeys[0]}')";
-        }
+        // Use the cached readValue result to avoid duplicate calls
+        final cachedVarName = '${field.name}ReadValue';
+        valueExpression = cachedVarName;
+
         // For fields with readValue, apply safe type conversion for basic types
         // But for generic classes, need special handling for type parameters
         if (clazz.genericParameters.isNotEmpty &&
@@ -1422,6 +1448,7 @@ class Writer {
         } else {
           // For fields with readValue, use safe type conversion for basic types
           // The readValue method returns Object?, so we need to safely convert it
+
           getValueExpression = _generateSafeReadValueExpression(
               field, valueExpression, defaultValue);
         }
@@ -1447,7 +1474,7 @@ class Writer {
 
     // If no explicit converter, try to auto-match based on type
     if (converterName == null || converterName.isEmpty) {
-      converterName = _getAutoMatchedConverter(type);
+      converterName = _getAutoMatchedConverter(field.type);
     }
 
     // If there is a TypeConverter (explicit or auto-matched), use converter's fromJson method
@@ -1457,11 +1484,10 @@ class Writer {
       if (converterName.contains('(')) {
         converterInstance = 'const $converterName';
       } else {
-        // For EnumConverter and EnumIndexConverter, add generic type parameter and values
-        if (converterName == 'EnumConverter' ||
-            converterName == 'EnumIndexConverter') {
+        // For DefaultEnumConverter and EnumIndexConverter, add generic type parameter and values
+        if (converterName == 'DefaultEnumConverter') {
           converterInstance =
-              'const $_dataforgeAnnotationPrefix$converterName($type.values)';
+              'const $_dataforgeAnnotationPrefix$converterName<$type>($type.values)';
         } else {
           converterInstance =
               'const $_dataforgeAnnotationPrefix$converterName()';
@@ -1473,15 +1499,16 @@ class Writer {
       final convertedValueExpression =
           hasReadValue ? "($valueExpression as dynamic)" : valueExpression;
 
+      // For all converters, add type cast to ensure type safety when field is not nullable
       if (isNullable) {
         return "$convertedValueExpression != null ? $converterInstance.fromJson($convertedValueExpression) : null$defaultValue";
       } else {
         if (defaultValue.isNotEmpty) {
           // If there is defaultValue, use defaultValue directly when field is missing, otherwise use converter to convert actual value
-          return "$convertedValueExpression != null ? $converterInstance.fromJson($convertedValueExpression) : ${defaultValue.substring(4)}";
+          return "$convertedValueExpression != null ? $converterInstance.fromJson($convertedValueExpression) as $type : ${defaultValue.substring(4)}";
         } else {
           // For required fields, if there is no defaultValue, need to throw exception or provide reasonable handling
-          return "$convertedValueExpression != null ? $converterInstance.fromJson($convertedValueExpression) : throw ArgumentError('Required field ${field.name} is missing')";
+          return "$convertedValueExpression != null ? $converterInstance.fromJson($convertedValueExpression) as $type : throw ArgumentError('Required field ${field.name} is missing')";
         }
       }
     }
@@ -1561,6 +1588,10 @@ class Writer {
               field, valueExpression, defaultValue, clazz);
       }
     } catch (e) {
+      // Re-throw ArgumentError for readValue type restrictions
+      if (e is ArgumentError) {
+        rethrow;
+      }
       print(
           'Warning: Error generating fromMap expression for ${field.name}: $e');
       return "$valueExpression$defaultValue";
@@ -1702,14 +1733,14 @@ class Writer {
 
             // Check if it's an enum type
             if (_isEnumType(cleanItemType)) {
-              // Enum type, use EnumConverter
+              // Enum type, use DefaultEnumConverter
               if (isNullable) {
-                return "($valueExpression as List<dynamic>?)?.map((e) => const ${_dataforgeAnnotationPrefix}EnumConverter<$cleanItemType>($cleanItemType.values).fromJson(e)).toList()?.cast<$castType>()$defaultValue";
+                return "($valueExpression as List<dynamic>?)?.map((e) => const ${_dataforgeAnnotationPrefix}DefaultEnumConverter<$cleanItemType>($cleanItemType.values).fromJson(e)).toList()?.cast<$castType>()$defaultValue";
               } else {
                 if (defaultValue.isNotEmpty) {
-                  return "($valueExpression as List<dynamic>?)?.map((e) => const ${_dataforgeAnnotationPrefix}EnumConverter<$cleanItemType>($cleanItemType.values).fromJson(e)).toList()?.cast<$castType>()$defaultValue";
+                  return "($valueExpression as List<dynamic>?)?.map((e) => const ${_dataforgeAnnotationPrefix}DefaultEnumConverter<$cleanItemType>($cleanItemType.values).fromJson(e)).toList()?.cast<$castType>()$defaultValue";
                 } else {
-                  return "($valueExpression as List<dynamic>?)?.map((e) => const ${_dataforgeAnnotationPrefix}EnumConverter<$cleanItemType>($cleanItemType.values).fromJson(e)).toList()?.cast<$castType>() ?? []";
+                  return "($valueExpression as List<dynamic>?)?.map((e) => const ${_dataforgeAnnotationPrefix}DefaultEnumConverter<$cleanItemType>($cleanItemType.values).fromJson(e)).toList()?.cast<$castType>() ?? []";
                 }
               }
             } else {
@@ -1756,11 +1787,11 @@ class Writer {
               !cleanValueType.startsWith('Map<')) {
             // Check if it's an enum type
             if (_isEnumType(cleanValueType)) {
-              // Enum type, use EnumConverter
+              // Enum type, use DefaultEnumConverter
               if (isNullable) {
-                return "($valueExpression as Map<String, dynamic>?)?.map((key, value) => MapEntry(key, const ${_dataforgeAnnotationPrefix}EnumConverter<$cleanValueType>($cleanValueType.values).fromJson(value)))$defaultValue";
+                return "($valueExpression as Map<String, dynamic>?)?.map((key, value) => MapEntry(key, const ${_dataforgeAnnotationPrefix}DefaultEnumConverter<$cleanValueType>($cleanValueType.values).fromJson(value)!))$defaultValue";
               } else {
-                return "($valueExpression as Map<String, dynamic>?)?.map((key, value) => MapEntry(key, const ${_dataforgeAnnotationPrefix}EnumConverter<$cleanValueType>($cleanValueType.values).fromJson(value))) ?? {}$defaultValue";
+                return "($valueExpression as Map<String, dynamic>?)?.map((key, value) => MapEntry(key, const ${_dataforgeAnnotationPrefix}DefaultEnumConverter<$cleanValueType>($cleanValueType.values).fromJson(value)!)) ?? {}$defaultValue";
               }
             } else {
               // Check if valueType is a List type
@@ -1860,11 +1891,11 @@ class Writer {
 
           // Check if it's an enum type
           if (_isEnumType(cleanItemType)) {
-            // Enum type, use EnumConverter
+            // Enum type, use DefaultEnumConverter
             if (isNullable) {
-              return "($valueExpression as List<dynamic>?)?.map((e) => const ${_dataforgeAnnotationPrefix}EnumConverter<$cleanItemType>($cleanItemType.values).fromJson(e)).toList()?.cast<$castType>()$defaultValue";
+              return "($valueExpression as List<dynamic>?)?.map((e) => const ${_dataforgeAnnotationPrefix}DefaultEnumConverter<$cleanItemType>($cleanItemType.values).fromJson(e)).toList()?.cast<$castType>()$defaultValue";
             } else {
-              return "(($valueExpression as List<dynamic>?) ?? []).map((e) => const ${_dataforgeAnnotationPrefix}EnumConverter<$cleanItemType>($cleanItemType.values).fromJson(e)).toList().cast<$castType>()$defaultValue";
+              return "(($valueExpression as List<dynamic>?) ?? []).map((e) => const ${_dataforgeAnnotationPrefix}DefaultEnumConverter<$cleanItemType>($cleanItemType.values).fromJson(e)).toList().cast<$castType>()$defaultValue";
             }
           } else {
             // Custom type, use fromJson
@@ -1946,14 +1977,14 @@ class Writer {
 
         // Check if it's an enum type
         if (_isEnumType(cleanType)) {
-          // Enum type, use EnumConverter
+          // Enum type, use DefaultEnumConverter
           if (isNullable) {
-            return "$valueExpression != null ? const ${_dataforgeAnnotationPrefix}EnumConverter<$cleanType>($cleanType.values).fromJson($valueExpression) : null$defaultValue";
+            return "$valueExpression != null ? const ${_dataforgeAnnotationPrefix}DefaultEnumConverter<$cleanType>($cleanType.values).fromJson($valueExpression) : null$defaultValue";
           } else {
             if (defaultValue.isNotEmpty) {
-              return "$valueExpression != null ? const ${_dataforgeAnnotationPrefix}EnumConverter<$cleanType>($cleanType.values).fromJson($valueExpression) : ${defaultValue.substring(4)}";
+              return "$valueExpression != null ? const ${_dataforgeAnnotationPrefix}DefaultEnumConverter<$cleanType>($cleanType.values).fromJson($valueExpression) : ${defaultValue.substring(4)}";
             } else {
-              return "const ${_dataforgeAnnotationPrefix}EnumConverter<$cleanType>($cleanType.values).fromJson($valueExpression ?? '')";
+              return "const ${_dataforgeAnnotationPrefix}DefaultEnumConverter<$cleanType>($cleanType.values).fromJson($valueExpression ?? '')";
             }
           }
         } else {
@@ -1970,6 +2001,10 @@ class Writer {
         }
       }
     } catch (e) {
+      // Re-throw ArgumentError for readValue type restrictions
+      if (e is ArgumentError) {
+        rethrow;
+      }
       print(
           'Warning: Error generating default fromMap expression for ${field.name}: $e');
       return "$valueExpression$defaultValue";
@@ -2032,10 +2067,38 @@ class Writer {
 
     // For complex types, use safer conversion logic
     if (type.startsWith('List<')) {
-      if (isNullable) {
-        return "$valueExpression != null ? ($valueExpression as List?)?.cast<${type.substring(5, type.length - 1)}>() : null$defaultValue";
+      final itemType = type.substring(5, type.length - 1);
+      final cleanItemType = _removeGenericParameters(itemType);
+
+      // Check if it's a basic type that can use cast
+      if ([
+            'String',
+            'int',
+            'double',
+            'bool',
+            'num',
+            'DateTime',
+            'Uri',
+            'Duration',
+            'dynamic',
+            'Object'
+          ].contains(cleanItemType) ||
+          RegExp(r'^[A-Z]$')
+              .hasMatch(cleanItemType) || // Generic type parameter
+          _isEnumType(cleanItemType)) {
+        // Use cast for basic types
+        if (isNullable) {
+          return "$valueExpression != null ? ($valueExpression as List?)?.cast<$itemType>() : null$defaultValue";
+        } else {
+          return "($valueExpression as List?)?.cast<$itemType>() ?? []$defaultValue";
+        }
       } else {
-        return "($valueExpression as List?)?.cast<${type.substring(5, type.length - 1)}>() ?? []$defaultValue";
+        // For custom types, use map and fromJson for each element
+        if (isNullable) {
+          return "$valueExpression != null ? ($valueExpression as List?)?.map((e) => $cleanItemType.fromJson(e as Map<String, dynamic>)).toList() : null$defaultValue";
+        } else {
+          return "(($valueExpression as List?) ?? []).map((e) => $cleanItemType.fromJson(e as Map<String, dynamic>)).toList()$defaultValue";
+        }
       }
     } else if (type.startsWith('Map<')) {
       // Extract the key and value types from Map<K, V>
@@ -2057,11 +2120,33 @@ class Writer {
         }
       }
     } else {
-      // For other complex types, use safer casting with null check
+      // For custom types (classes), check if json is not null and call fromJson
+      final cleanType = _removeGenericParameters(type);
+
+      // Check if it's a built-in type that doesn't need fromJson
+      if (['dynamic', 'Object'].contains(cleanType)) {
+        if (isNullable) {
+          return "$valueExpression as ${field.type}$defaultValue";
+        } else {
+          return "$valueExpression as ${field.type}$defaultValue";
+        }
+      }
+
+      // Check if it's an enum type - enums don't have fromJson methods
+      if (_isEnumType(cleanType)) {
+        if (isNullable) {
+          return "$valueExpression as ${field.type}$defaultValue";
+        } else {
+          return "$valueExpression as ${field.type}$defaultValue";
+        }
+      }
+
+      // For custom types (classes), check if the value is not null and call fromJson
+      // readValue can return any type, we need to handle the conversion properly
       if (isNullable) {
-        return "$valueExpression as ${field.type}$defaultValue";
+        return "$valueExpression != null ? $cleanType.fromJson(Map<String, dynamic>.from($valueExpression as Map)) : null$defaultValue";
       } else {
-        return "$valueExpression as ${field.type}$defaultValue";
+        return "$cleanType.fromJson(Map<String, dynamic>.from(($valueExpression ?? {}) as Map))$defaultValue";
       }
     }
   }

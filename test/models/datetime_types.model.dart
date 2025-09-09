@@ -1,5 +1,5 @@
-import 'package:dataforge_annotation/dataforge_annotation.dart';
 import 'package:collection/collection.dart';
+import 'package:dataforge_annotation/dataforge_annotation.dart';
 
 part 'datetime_types.model.data.dart';
 
@@ -27,14 +27,6 @@ class DateTimeTypes with _DateTimeTypes {
   @override
   @JsonKey(readValue: DateTimeTypes._readValue)
   final DateTime? parsedDate;
-  @override
-  @JsonKey(readValue: DateTimeTypes._readValue)
-  final List<DateTime>? dateTimeList;
-  @override
-  final Duration? duration;
-  @override
-  @JsonKey(readValue: DateTimeTypes._readValue)
-  final Duration? customDuration;
 
   const DateTimeTypes({
     required this.createdAt,
@@ -46,9 +38,6 @@ class DateTimeTypes with _DateTimeTypes {
     this.isoDateTime,
     required this.timestampDate,
     this.parsedDate,
-    this.dateTimeList,
-    this.duration,
-    this.customDuration,
   });
 
   factory DateTimeTypes.fromJson(Map<String, dynamic> json) {

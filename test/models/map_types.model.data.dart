@@ -125,6 +125,9 @@ mixin _MapTypes {
   }
 
   static MapTypes fromJson(Map<String, dynamic> map) {
+    final parsedMapReadValue = MapTypes._readValue(map, 'parsedMap');
+    final customIntMapReadValue = MapTypes._readValue(map, 'customIntMap');
+    final complexMapReadValue = MapTypes._readValue(map, 'complexMap');
     return MapTypes(
       stringMap: (map['stringMap'] as Map<String, String>?) ?? {},
       intMap: (map['intMap'] as Map<String, int>?) ?? {},
@@ -137,16 +140,12 @@ mixin _MapTypes {
           {},
       nestedMap: (map['nestedMap'] as Map<String, Map<String, String>>?) ?? {},
       namedMap: (map['str_map'] as Map<String, String>?) ?? {},
-      parsedMap: MapTypes._readValue(map, 'parsedMap') != null
-          ? (MapTypes._readValue(map, 'parsedMap') as Map?)
-              ?.cast<String, String>()
+      parsedMap: parsedMapReadValue != null
+          ? (parsedMapReadValue as Map?)?.cast<String, String>()
           : null,
-      customIntMap: (MapTypes._readValue(map, 'customIntMap') as Map?)
-              ?.cast<String, int>() ??
-          {},
-      complexMap: MapTypes._readValue(map, 'complexMap') != null
-          ? (MapTypes._readValue(map, 'complexMap') as Map?)
-              ?.cast<String, Map<String, dynamic>>()
+      customIntMap: (customIntMapReadValue as Map?)?.cast<String, int>() ?? {},
+      complexMap: complexMapReadValue != null
+          ? (complexMapReadValue as Map?)?.cast<String, Map<String, dynamic>>()
           : null,
       mapList:
           (map['mapList'] as List<dynamic>?)?.cast<Map<String, String>>() ?? [],
@@ -215,6 +214,8 @@ mixin _MapWithObjects {
   }
 
   static MapWithObjects fromJson(Map<String, dynamic> map) {
+    final parsedAddressMapReadValue =
+        MapWithObjects._readValue(map, 'parsedAddressMap');
     return MapWithObjects(
       addressMap: (map['addressMap'] as Map<String, dynamic>?)?.map((key,
                   value) =>
@@ -231,11 +232,9 @@ mixin _MapWithObjects {
       optionalAddressMap: (map['optionalAddressMap'] as Map<String, dynamic>?)
           ?.map((key, value) =>
               MapEntry(key, Address.fromJson(value as Map<String, dynamic>))),
-      parsedAddressMap:
-          MapWithObjects._readValue(map, 'parsedAddressMap') != null
-              ? (MapWithObjects._readValue(map, 'parsedAddressMap') as Map?)
-                  ?.cast<String, Address>()
-              : null,
+      parsedAddressMap: parsedAddressMapReadValue != null
+          ? (parsedAddressMapReadValue as Map?)?.cast<String, Address>()
+          : null,
     );
   }
 }

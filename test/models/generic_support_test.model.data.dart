@@ -275,9 +275,9 @@ mixin _GenericWithFeatures<T> {
     final map = <String, dynamic>{};
     map['data'] = data;
     map['custom_name'] = customField;
-    map['status'] =
-        const EnumConverter<TestStatus>(TestStatus.values).toJson(status);
-    map['createdAt'] = const DateTimeConverter().toJson(createdAt);
+    map['status'] = const DefaultEnumConverter<TestStatus>(TestStatus.values)
+        .toJson(status);
+    map['createdAt'] = const DefaultDateTimeConverter().toJson(createdAt);
     return map;
   }
 
@@ -286,10 +286,12 @@ mixin _GenericWithFeatures<T> {
       data: map['data'] as T,
       customField: SafeCasteUtil.safeCast<String>(map['custom_name']) ?? "",
       status: map['status'] != null
-          ? const EnumConverter(TestStatus.values).fromJson(map['status'])
+          ? const DefaultEnumConverter<TestStatus>(TestStatus.values)
+              .fromJson(map['status']) as TestStatus
           : throw ArgumentError('Required field status is missing'),
       createdAt: map['createdAt'] != null
-          ? const DateTimeConverter().fromJson(map['createdAt'])
+          ? const DefaultDateTimeConverter().fromJson(map['createdAt'])
+              as DateTime
           : throw ArgumentError('Required field createdAt is missing'),
     );
   }

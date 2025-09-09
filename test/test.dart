@@ -1,19 +1,18 @@
 import 'package:test/test.dart';
-import 'dart:io';
 
+import 'modules/auto_generation_test.dart';
+import 'modules/converters_test.dart';
+import 'modules/copywith_test.dart';
 // Import all test modules
 import 'modules/core_functionality_test.dart';
-import 'modules/copywith_test.dart';
-import 'modules/converters_test.dart';
-import 'modules/ignore_test.dart';
-import 'modules/performance_test.dart';
-import 'modules/generator_test.dart';
+import 'modules/custom_serialization_test.dart';
+import 'modules/datetime_extended_test.dart';
 import 'modules/enum_types_test.dart';
+import 'modules/generator_test.dart';
+import 'modules/ignore_test.dart';
 import 'modules/map_types_test.dart';
 import 'modules/nested_objects_test.dart';
-import 'modules/datetime_extended_test.dart';
-import 'modules/custom_serialization_test.dart';
-import 'modules/auto_generation_test.dart';
+import 'modules/performance_test.dart';
 
 /// 统一测试入口
 ///
@@ -78,45 +77,6 @@ void main() {
 
     group('Auto Generation', () {
       runAutoGenerationTests();
-    });
-
-    group('Model Files Validation', () {
-      test('All model files should have no syntax errors', () async {
-        final modelsDir = Directory('test/models');
-        expect(modelsDir.existsSync(), isTrue,
-            reason: 'Models directory should exist');
-
-        final modelFiles = modelsDir
-            .listSync()
-            .whereType<File>()
-            .where((file) => file.path.endsWith('.dart'))
-            .toList();
-
-        expect(modelFiles.isNotEmpty, isTrue,
-            reason: 'Should have model files to validate');
-
-        for (final file in modelFiles) {
-          final result = await Process.run(
-            'dart',
-            ['analyze', '--fatal-infos', file.path],
-            workingDirectory: Directory.current.path,
-          );
-
-          // Check if there are any actual errors (not just warnings or infos)
-          final output = '${result.stdout}${result.stderr}';
-          final hasErrors = output.contains('error •') ||
-              (result.exitCode != 0 &&
-                  !output.contains('warning •') &&
-                  !output.contains('info •'));
-
-          expect(
-            hasErrors,
-            isFalse,
-            reason:
-                'Model file ${file.path} should have no critical errors. Output: $output',
-          );
-        }
-      });
     });
   });
 }

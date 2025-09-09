@@ -68,60 +68,73 @@ mixin _EnumTypes {
 
   Map<String, dynamic> toJson() {
     final map = <String, dynamic>{};
-    map['status'] = const EnumConverter<Status>(Status.values).toJson(status);
+    map['status'] =
+        const DefaultEnumConverter<Status>(Status.values).toJson(status);
     if (optionalRole != null) {
       map['optionalRole'] = optionalRole != null
-          ? const EnumConverter<UserRole>(UserRole.values).toJson(optionalRole!)
+          ? const DefaultEnumConverter<UserRole>(UserRole.values)
+              .toJson(optionalRole!)
           : null;
     }
     map['user_type'] =
-        const EnumConverter<UserRole>(UserRole.values).toJson(userType);
+        const DefaultEnumConverter<UserRole>(UserRole.values).toJson(userType);
     map['priority'] =
-        const EnumConverter<Priority>(Priority.values).toJson(priority);
+        const DefaultEnumConverter<Priority>(Priority.values).toJson(priority);
     map['parsedStatus'] =
-        const EnumConverter<Status>(Status.values).toJson(parsedStatus);
+        const DefaultEnumConverter<Status>(Status.values).toJson(parsedStatus);
     if (roleFromInt != null) {
       map['roleFromInt'] = roleFromInt != null
-          ? const EnumConverter<UserRole>(UserRole.values).toJson(roleFromInt!)
+          ? const DefaultEnumConverter<UserRole>(UserRole.values)
+              .toJson(roleFromInt!)
           : null;
     }
     if (statusList != null) {
       map['statusList'] = statusList
-          ?.map((e) => const EnumConverter<Status>(Status.values).toJson(e))
+          ?.map((e) =>
+              const DefaultEnumConverter<Status>(Status.values).toJson(e))
           .toList();
     }
     if (roleMap != null) {
-      map['roleMap'] = roleMap?.map((key, value) => MapEntry(
-          key, const EnumConverter<UserRole>(UserRole.values).toJson(value)));
+      map['roleMap'] = roleMap?.map((key, value) => MapEntry(key,
+          const DefaultEnumConverter<UserRole>(UserRole.values).toJson(value)));
     }
     return map;
   }
 
   static EnumTypes fromJson(Map<String, dynamic> map) {
+    final roleFromIntReadValue = EnumTypes._readValue(map, 'roleFromInt');
     return EnumTypes(
       status: map['status'] != null
-          ? const EnumConverter(Status.values).fromJson(map['status'])
+          ? const DefaultEnumConverter<Status>(Status.values)
+              .fromJson(map['status']) as Status
           : throw ArgumentError('Required field status is missing'),
       optionalRole: map['optionalRole'] != null
-          ? const EnumConverter(UserRole.values).fromJson(map['optionalRole'])
+          ? const DefaultEnumConverter<UserRole>(UserRole.values)
+              .fromJson(map['optionalRole'])
           : null,
       userType: map['user_type'] != null
-          ? const EnumConverter(UserRole.values).fromJson(map['user_type'])
+          ? const DefaultEnumConverter<UserRole>(UserRole.values)
+              .fromJson(map['user_type']) as UserRole
           : throw ArgumentError('Required field userType is missing'),
       priority: map['priority'] != null
-          ? const EnumConverter(Priority.values).fromJson(map['priority'])
+          ? const DefaultEnumConverter<Priority>(Priority.values)
+              .fromJson(map['priority']) as Priority
           : throw ArgumentError('Required field priority is missing'),
       parsedStatus: map['parsedStatus'] != null
-          ? const EnumConverter(Status.values).fromJson(map['parsedStatus'])
+          ? const DefaultEnumConverter<Status>(Status.values)
+              .fromJson(map['parsedStatus']) as Status
           : throw ArgumentError('Required field parsedStatus is missing'),
-      roleFromInt: EnumTypes._readValue(map, 'roleFromInt') as UserRole?,
+      roleFromInt: roleFromIntReadValue as UserRole?,
       statusList: (map['statusList'] as List<dynamic>?)
-          ?.map((e) => const EnumConverter<Status>(Status.values).fromJson(e))
+          ?.map((e) =>
+              const DefaultEnumConverter<Status>(Status.values).fromJson(e))
           .toList()
           .cast<Status>(),
       roleMap: (map['roleMap'] as Map<String, dynamic>?)?.map((key, value) =>
-          MapEntry(key,
-              const EnumConverter<UserRole>(UserRole.values).fromJson(value))),
+          MapEntry(
+              key,
+              const DefaultEnumConverter<UserRole>(UserRole.values)
+                  .fromJson(value)!)),
     );
   }
 }
