@@ -8,7 +8,8 @@ mixin _AutoFromJsonTest {
   abstract final int age;
   abstract final bool isActive;
 
-  _AutoFromJsonTestCopyWith get copyWith => _AutoFromJsonTestCopyWith._(this);
+  _AutoFromJsonTestCopyWith get copyWith =>
+      _AutoFromJsonTestCopyWith._(this as AutoFromJsonTest);
 
   @override
   bool operator ==(Object other) {
@@ -60,34 +61,39 @@ mixin _AutoFromJsonTest {
 
 /// Helper class for chained copyWith operations
 class _AutoFromJsonTestCopyWith {
-  final _AutoFromJsonTest _instance;
+  final AutoFromJsonTest _instance;
   const _AutoFromJsonTestCopyWith._(this._instance);
 
   /// Update name field
-  AutoFromJsonTest name(String? value) {
-    return AutoFromJsonTest(
-      name: value ?? _instance.name,
+  _AutoFromJsonTestCopyWith name(String value) {
+    return _AutoFromJsonTestCopyWith._(AutoFromJsonTest(
+      name: value,
       age: _instance.age,
       isActive: _instance.isActive,
-    );
+    ));
   }
 
   /// Update age field
-  AutoFromJsonTest age(int? value) {
-    return AutoFromJsonTest(
+  _AutoFromJsonTestCopyWith age(int value) {
+    return _AutoFromJsonTestCopyWith._(AutoFromJsonTest(
       name: _instance.name,
-      age: value ?? _instance.age,
+      age: value,
       isActive: _instance.isActive,
-    );
+    ));
   }
 
   /// Update isActive field
-  AutoFromJsonTest isActive(bool? value) {
-    return AutoFromJsonTest(
+  _AutoFromJsonTestCopyWith isActive(bool value) {
+    return _AutoFromJsonTestCopyWith._(AutoFromJsonTest(
       name: _instance.name,
       age: _instance.age,
-      isActive: value ?? _instance.isActive,
-    );
+      isActive: value,
+    ));
+  }
+
+  /// Build the final instance
+  AutoFromJsonTest build() {
+    return _instance;
   }
 
   /// Traditional copyWith method

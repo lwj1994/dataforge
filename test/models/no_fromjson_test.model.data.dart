@@ -7,7 +7,8 @@ mixin _NoFromJsonTest {
   abstract final String name;
   abstract final int age;
 
-  _NoFromJsonTestCopyWith get copyWith => _NoFromJsonTestCopyWith._(this);
+  _NoFromJsonTestCopyWith get copyWith =>
+      _NoFromJsonTestCopyWith._(this as NoFromJsonTest);
 
   @override
   bool operator ==(Object other) {
@@ -46,23 +47,28 @@ mixin _NoFromJsonTest {
 
 /// Helper class for chained copyWith operations
 class _NoFromJsonTestCopyWith {
-  final _NoFromJsonTest _instance;
+  final NoFromJsonTest _instance;
   const _NoFromJsonTestCopyWith._(this._instance);
 
   /// Update name field
-  NoFromJsonTest name(String? value) {
-    return NoFromJsonTest(
-      name: value ?? _instance.name,
+  _NoFromJsonTestCopyWith name(String value) {
+    return _NoFromJsonTestCopyWith._(NoFromJsonTest(
+      name: value,
       age: _instance.age,
-    );
+    ));
   }
 
   /// Update age field
-  NoFromJsonTest age(int? value) {
-    return NoFromJsonTest(
+  _NoFromJsonTestCopyWith age(int value) {
+    return _NoFromJsonTestCopyWith._(NoFromJsonTest(
       name: _instance.name,
-      age: value ?? _instance.age,
-    );
+      age: value,
+    ));
+  }
+
+  /// Build the final instance
+  NoFromJsonTest build() {
+    return _instance;
   }
 
   /// Traditional copyWith method

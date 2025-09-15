@@ -8,7 +8,7 @@ mixin _WidgetSkeletonModel {
   abstract final String value;
 
   _WidgetSkeletonModelCopyWith get copyWith =>
-      _WidgetSkeletonModelCopyWith._(this);
+      _WidgetSkeletonModelCopyWith._(this as WidgetSkeletonModel);
 
   @override
   bool operator ==(Object other) {
@@ -54,23 +54,28 @@ mixin _WidgetSkeletonModel {
 
 /// Helper class for chained copyWith operations
 class _WidgetSkeletonModelCopyWith {
-  final _WidgetSkeletonModel _instance;
+  final WidgetSkeletonModel _instance;
   const _WidgetSkeletonModelCopyWith._(this._instance);
 
   /// Update name field
-  WidgetSkeletonModel name(String? value) {
-    return WidgetSkeletonModel(
-      name: value ?? _instance.name,
+  _WidgetSkeletonModelCopyWith name(String value) {
+    return _WidgetSkeletonModelCopyWith._(WidgetSkeletonModel(
+      name: value,
       value: _instance.value,
-    );
+    ));
   }
 
   /// Update value field
-  WidgetSkeletonModel value(String? value) {
-    return WidgetSkeletonModel(
+  _WidgetSkeletonModelCopyWith value(String value) {
+    return _WidgetSkeletonModelCopyWith._(WidgetSkeletonModel(
       name: _instance.name,
-      value: value ?? _instance.value,
-    );
+      value: value,
+    ));
+  }
+
+  /// Build the final instance
+  WidgetSkeletonModel build() {
+    return _instance;
   }
 
   /// Traditional copyWith method

@@ -13,7 +13,7 @@ mixin _EnumTypes {
   abstract final List<Status>? statusList;
   abstract final Map<String, UserRole>? roleMap;
 
-  _EnumTypesCopyWith get copyWith => _EnumTypesCopyWith._(this);
+  _EnumTypesCopyWith get copyWith => _EnumTypesCopyWith._(this as EnumTypes);
 
   @override
   bool operator ==(Object other) {
@@ -141,13 +141,13 @@ mixin _EnumTypes {
 
 /// Helper class for chained copyWith operations
 class _EnumTypesCopyWith {
-  final _EnumTypes _instance;
+  final EnumTypes _instance;
   const _EnumTypesCopyWith._(this._instance);
 
   /// Update status field
-  EnumTypes status(Status? value) {
-    return EnumTypes(
-      status: value ?? _instance.status,
+  _EnumTypesCopyWith status(Status value) {
+    return _EnumTypesCopyWith._(EnumTypes(
+      status: value,
       optionalRole: _instance.optionalRole,
       userType: _instance.userType,
       priority: _instance.priority,
@@ -155,12 +155,12 @@ class _EnumTypesCopyWith {
       roleFromInt: _instance.roleFromInt,
       statusList: _instance.statusList,
       roleMap: _instance.roleMap,
-    );
+    ));
   }
 
   /// Update optionalRole field
-  EnumTypes optionalRole(UserRole? value) {
-    return EnumTypes(
+  _EnumTypesCopyWith optionalRole(UserRole? value) {
+    return _EnumTypesCopyWith._(EnumTypes(
       status: _instance.status,
       optionalRole: value,
       userType: _instance.userType,
@@ -169,54 +169,54 @@ class _EnumTypesCopyWith {
       roleFromInt: _instance.roleFromInt,
       statusList: _instance.statusList,
       roleMap: _instance.roleMap,
-    );
+    ));
   }
 
   /// Update userType field
-  EnumTypes userType(UserRole? value) {
-    return EnumTypes(
+  _EnumTypesCopyWith userType(UserRole value) {
+    return _EnumTypesCopyWith._(EnumTypes(
       status: _instance.status,
       optionalRole: _instance.optionalRole,
-      userType: value ?? _instance.userType,
+      userType: value,
       priority: _instance.priority,
       parsedStatus: _instance.parsedStatus,
       roleFromInt: _instance.roleFromInt,
       statusList: _instance.statusList,
       roleMap: _instance.roleMap,
-    );
+    ));
   }
 
   /// Update priority field
-  EnumTypes priority(Priority? value) {
-    return EnumTypes(
+  _EnumTypesCopyWith priority(Priority value) {
+    return _EnumTypesCopyWith._(EnumTypes(
       status: _instance.status,
       optionalRole: _instance.optionalRole,
       userType: _instance.userType,
-      priority: value ?? _instance.priority,
+      priority: value,
       parsedStatus: _instance.parsedStatus,
       roleFromInt: _instance.roleFromInt,
       statusList: _instance.statusList,
       roleMap: _instance.roleMap,
-    );
+    ));
   }
 
   /// Update parsedStatus field
-  EnumTypes parsedStatus(Status? value) {
-    return EnumTypes(
+  _EnumTypesCopyWith parsedStatus(Status value) {
+    return _EnumTypesCopyWith._(EnumTypes(
       status: _instance.status,
       optionalRole: _instance.optionalRole,
       userType: _instance.userType,
       priority: _instance.priority,
-      parsedStatus: value ?? _instance.parsedStatus,
+      parsedStatus: value,
       roleFromInt: _instance.roleFromInt,
       statusList: _instance.statusList,
       roleMap: _instance.roleMap,
-    );
+    ));
   }
 
   /// Update roleFromInt field
-  EnumTypes roleFromInt(UserRole? value) {
-    return EnumTypes(
+  _EnumTypesCopyWith roleFromInt(UserRole? value) {
+    return _EnumTypesCopyWith._(EnumTypes(
       status: _instance.status,
       optionalRole: _instance.optionalRole,
       userType: _instance.userType,
@@ -225,12 +225,12 @@ class _EnumTypesCopyWith {
       roleFromInt: value,
       statusList: _instance.statusList,
       roleMap: _instance.roleMap,
-    );
+    ));
   }
 
   /// Update statusList field
-  EnumTypes statusList(List<Status>? value) {
-    return EnumTypes(
+  _EnumTypesCopyWith statusList(List<Status>? value) {
+    return _EnumTypesCopyWith._(EnumTypes(
       status: _instance.status,
       optionalRole: _instance.optionalRole,
       userType: _instance.userType,
@@ -239,12 +239,12 @@ class _EnumTypesCopyWith {
       roleFromInt: _instance.roleFromInt,
       statusList: value,
       roleMap: _instance.roleMap,
-    );
+    ));
   }
 
   /// Update roleMap field
-  EnumTypes roleMap(Map<String, UserRole>? value) {
-    return EnumTypes(
+  _EnumTypesCopyWith roleMap(Map<String, UserRole>? value) {
+    return _EnumTypesCopyWith._(EnumTypes(
       status: _instance.status,
       optionalRole: _instance.optionalRole,
       userType: _instance.userType,
@@ -253,7 +253,12 @@ class _EnumTypesCopyWith {
       roleFromInt: _instance.roleFromInt,
       statusList: _instance.statusList,
       roleMap: value,
-    );
+    ));
+  }
+
+  /// Build the final instance
+  EnumTypes build() {
+    return _instance;
   }
 
   /// Nested copyWith for status field
@@ -312,7 +317,7 @@ class _EnumTypesCopyWith {
 
 /// Nested copyWith helper class for status field
 class _EnumTypesNestedCopyWithStatus {
-  final _EnumTypes _instance;
+  final EnumTypes _instance;
   const _EnumTypesNestedCopyWithStatus._(this._instance);
 
   /// Update status field using a copyWith function
@@ -334,13 +339,13 @@ class _EnumTypesNestedCopyWithStatus {
 
 /// Nested copyWith helper class for optionalRole field
 class _EnumTypesNestedCopyWithOptionalRole {
-  final _EnumTypes _instance;
+  final EnumTypes _instance;
   const _EnumTypesNestedCopyWithOptionalRole._(this._instance);
 
   /// Update optionalRole field using a copyWith function
   EnumTypes call(UserRole Function(UserRole) updater) {
     final currentValue = _instance.optionalRole;
-    if (currentValue == null) return _instance as EnumTypes;
+    if (currentValue == null) return _instance;
     final updatedValue = updater(currentValue);
     return EnumTypes(
       status: _instance.status,
@@ -357,7 +362,7 @@ class _EnumTypesNestedCopyWithOptionalRole {
 
 /// Nested copyWith helper class for userType field
 class _EnumTypesNestedCopyWithUserType {
-  final _EnumTypes _instance;
+  final EnumTypes _instance;
   const _EnumTypesNestedCopyWithUserType._(this._instance);
 
   /// Update userType field using a copyWith function
@@ -379,7 +384,7 @@ class _EnumTypesNestedCopyWithUserType {
 
 /// Nested copyWith helper class for priority field
 class _EnumTypesNestedCopyWithPriority {
-  final _EnumTypes _instance;
+  final EnumTypes _instance;
   const _EnumTypesNestedCopyWithPriority._(this._instance);
 
   /// Update priority field using a copyWith function
@@ -401,7 +406,7 @@ class _EnumTypesNestedCopyWithPriority {
 
 /// Nested copyWith helper class for parsedStatus field
 class _EnumTypesNestedCopyWithParsedStatus {
-  final _EnumTypes _instance;
+  final EnumTypes _instance;
   const _EnumTypesNestedCopyWithParsedStatus._(this._instance);
 
   /// Update parsedStatus field using a copyWith function
@@ -423,13 +428,13 @@ class _EnumTypesNestedCopyWithParsedStatus {
 
 /// Nested copyWith helper class for roleFromInt field
 class _EnumTypesNestedCopyWithRoleFromInt {
-  final _EnumTypes _instance;
+  final EnumTypes _instance;
   const _EnumTypesNestedCopyWithRoleFromInt._(this._instance);
 
   /// Update roleFromInt field using a copyWith function
   EnumTypes call(UserRole Function(UserRole) updater) {
     final currentValue = _instance.roleFromInt;
-    if (currentValue == null) return _instance as EnumTypes;
+    if (currentValue == null) return _instance;
     final updatedValue = updater(currentValue);
     return EnumTypes(
       status: _instance.status,

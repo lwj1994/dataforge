@@ -7,7 +7,7 @@ mixin _Test {
   abstract final DateTime createdAt;
   abstract final DateTime? createdAtNull;
 
-  _TestCopyWith get copyWith => _TestCopyWith._(this);
+  _TestCopyWith get copyWith => _TestCopyWith._(this as Test);
 
   @override
   bool operator ==(Object other) {
@@ -62,23 +62,28 @@ mixin _Test {
 
 /// Helper class for chained copyWith operations
 class _TestCopyWith {
-  final _Test _instance;
+  final Test _instance;
   const _TestCopyWith._(this._instance);
 
   /// Update createdAt field
-  Test createdAt(DateTime? value) {
-    return Test(
-      createdAt: value ?? _instance.createdAt,
+  _TestCopyWith createdAt(DateTime value) {
+    return _TestCopyWith._(Test(
+      createdAt: value,
       createdAtNull: _instance.createdAtNull,
-    );
+    ));
   }
 
   /// Update createdAtNull field
-  Test createdAtNull(DateTime? value) {
-    return Test(
+  _TestCopyWith createdAtNull(DateTime? value) {
+    return _TestCopyWith._(Test(
       createdAt: _instance.createdAt,
       createdAtNull: value,
-    );
+    ));
+  }
+
+  /// Build the final instance
+  Test build() {
+    return _instance;
   }
 
   /// Traditional copyWith method

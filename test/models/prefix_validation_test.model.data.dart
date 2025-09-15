@@ -13,7 +13,7 @@ mixin _PrefixValidationTest {
   abstract final String ignoredField;
 
   _PrefixValidationTestCopyWith get copyWith =>
-      _PrefixValidationTestCopyWith._(this);
+      _PrefixValidationTestCopyWith._(this as PrefixValidationTest);
 
   @override
   bool operator ==(Object other) {
@@ -97,64 +97,64 @@ mixin _PrefixValidationTest {
 
 /// Helper class for chained copyWith operations
 class _PrefixValidationTestCopyWith {
-  final _PrefixValidationTest _instance;
+  final PrefixValidationTest _instance;
   const _PrefixValidationTestCopyWith._(this._instance);
 
   /// Update name field
-  PrefixValidationTest name(String? value) {
-    return PrefixValidationTest(
-      name: value ?? _instance.name,
+  _PrefixValidationTestCopyWith name(String value) {
+    return _PrefixValidationTestCopyWith._(PrefixValidationTest(
+      name: value,
       age: _instance.age,
       isActive: _instance.isActive,
       score: _instance.score,
       description: _instance.description,
       customField: _instance.customField,
       ignoredField: _instance.ignoredField,
-    );
+    ));
   }
 
   /// Update age field
-  PrefixValidationTest age(int? value) {
-    return PrefixValidationTest(
+  _PrefixValidationTestCopyWith age(int value) {
+    return _PrefixValidationTestCopyWith._(PrefixValidationTest(
       name: _instance.name,
-      age: value ?? _instance.age,
+      age: value,
       isActive: _instance.isActive,
       score: _instance.score,
       description: _instance.description,
       customField: _instance.customField,
       ignoredField: _instance.ignoredField,
-    );
+    ));
   }
 
   /// Update isActive field
-  PrefixValidationTest isActive(bool? value) {
-    return PrefixValidationTest(
+  _PrefixValidationTestCopyWith isActive(bool value) {
+    return _PrefixValidationTestCopyWith._(PrefixValidationTest(
       name: _instance.name,
       age: _instance.age,
-      isActive: value ?? _instance.isActive,
+      isActive: value,
       score: _instance.score,
       description: _instance.description,
       customField: _instance.customField,
       ignoredField: _instance.ignoredField,
-    );
+    ));
   }
 
   /// Update score field
-  PrefixValidationTest score(double? value) {
-    return PrefixValidationTest(
+  _PrefixValidationTestCopyWith score(double value) {
+    return _PrefixValidationTestCopyWith._(PrefixValidationTest(
       name: _instance.name,
       age: _instance.age,
       isActive: _instance.isActive,
-      score: value ?? _instance.score,
+      score: value,
       description: _instance.description,
       customField: _instance.customField,
       ignoredField: _instance.ignoredField,
-    );
+    ));
   }
 
   /// Update description field
-  PrefixValidationTest description(String? value) {
-    return PrefixValidationTest(
+  _PrefixValidationTestCopyWith description(String? value) {
+    return _PrefixValidationTestCopyWith._(PrefixValidationTest(
       name: _instance.name,
       age: _instance.age,
       isActive: _instance.isActive,
@@ -162,33 +162,38 @@ class _PrefixValidationTestCopyWith {
       description: value,
       customField: _instance.customField,
       ignoredField: _instance.ignoredField,
-    );
+    ));
   }
 
   /// Update customField field
-  PrefixValidationTest customField(String? value) {
-    return PrefixValidationTest(
+  _PrefixValidationTestCopyWith customField(String value) {
+    return _PrefixValidationTestCopyWith._(PrefixValidationTest(
       name: _instance.name,
       age: _instance.age,
       isActive: _instance.isActive,
       score: _instance.score,
       description: _instance.description,
-      customField: value ?? _instance.customField,
+      customField: value,
       ignoredField: _instance.ignoredField,
-    );
+    ));
   }
 
   /// Update ignoredField field
-  PrefixValidationTest ignoredField(String? value) {
-    return PrefixValidationTest(
+  _PrefixValidationTestCopyWith ignoredField(String value) {
+    return _PrefixValidationTestCopyWith._(PrefixValidationTest(
       name: _instance.name,
       age: _instance.age,
       isActive: _instance.isActive,
       score: _instance.score,
       description: _instance.description,
       customField: _instance.customField,
-      ignoredField: value ?? _instance.ignoredField,
-    );
+      ignoredField: value,
+    ));
+  }
+
+  /// Build the final instance
+  PrefixValidationTest build() {
+    return _instance;
   }
 
   /// Traditional copyWith method

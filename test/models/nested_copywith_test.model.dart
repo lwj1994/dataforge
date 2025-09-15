@@ -65,3 +65,78 @@ class Company with _Company {
     return _Company.fromJson(json);
   }
 }
+
+/// Test model for department with nested company
+@Dataforge(chainedCopyWith: true)
+class Department with _Department {
+  @override
+  final String name;
+  @override
+  final Person manager;
+  @override
+  final Company parentCompany;
+  @override
+  final Address? location;
+
+  const Department({
+    required this.name,
+    required this.manager,
+    required this.parentCompany,
+    this.location,
+  });
+  factory Department.fromJson(Map<String, dynamic> json) {
+    return _Department.fromJson(json);
+  }
+}
+
+/// Test model for organization with multiple nested levels
+@Dataforge(chainedCopyWith: true)
+class Organization with _Organization {
+  @override
+  final String name;
+  @override
+  final Address headquarters;
+  @override
+  final List<Department> departments;
+  @override
+  final Person founder;
+  @override
+  final Company? parentCompany;
+
+  const Organization({
+    required this.name,
+    required this.headquarters,
+    required this.departments,
+    required this.founder,
+    this.parentCompany,
+  });
+  factory Organization.fromJson(Map<String, dynamic> json) {
+    return _Organization.fromJson(json);
+  }
+}
+
+/// Test model for corporate group with deep nesting
+@Dataforge(chainedCopyWith: true)
+class CorporateGroup with _CorporateGroup {
+  @override
+  final String name;
+  @override
+  final Organization mainOrganization;
+  @override
+  final List<Organization> subsidiaries;
+  @override
+  final Person chairman;
+  @override
+  final Address? registeredAddress;
+
+  const CorporateGroup({
+    required this.name,
+    required this.mainOrganization,
+    required this.subsidiaries,
+    required this.chairman,
+    this.registeredAddress,
+  });
+  factory CorporateGroup.fromJson(Map<String, dynamic> json) {
+    return _CorporateGroup.fromJson(json);
+  }
+}

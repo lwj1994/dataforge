@@ -13,7 +13,7 @@ mixin _NoPrefixValidationTest {
   abstract final String ignoredField;
 
   _NoPrefixValidationTestCopyWith get copyWith =>
-      _NoPrefixValidationTestCopyWith._(this);
+      _NoPrefixValidationTestCopyWith._(this as NoPrefixValidationTest);
 
   @override
   bool operator ==(Object other) {
@@ -89,64 +89,64 @@ mixin _NoPrefixValidationTest {
 
 /// Helper class for chained copyWith operations
 class _NoPrefixValidationTestCopyWith {
-  final _NoPrefixValidationTest _instance;
+  final NoPrefixValidationTest _instance;
   const _NoPrefixValidationTestCopyWith._(this._instance);
 
   /// Update name field
-  NoPrefixValidationTest name(String? value) {
-    return NoPrefixValidationTest(
-      name: value ?? _instance.name,
+  _NoPrefixValidationTestCopyWith name(String value) {
+    return _NoPrefixValidationTestCopyWith._(NoPrefixValidationTest(
+      name: value,
       age: _instance.age,
       isActive: _instance.isActive,
       score: _instance.score,
       description: _instance.description,
       customField: _instance.customField,
       ignoredField: _instance.ignoredField,
-    );
+    ));
   }
 
   /// Update age field
-  NoPrefixValidationTest age(int? value) {
-    return NoPrefixValidationTest(
+  _NoPrefixValidationTestCopyWith age(int value) {
+    return _NoPrefixValidationTestCopyWith._(NoPrefixValidationTest(
       name: _instance.name,
-      age: value ?? _instance.age,
+      age: value,
       isActive: _instance.isActive,
       score: _instance.score,
       description: _instance.description,
       customField: _instance.customField,
       ignoredField: _instance.ignoredField,
-    );
+    ));
   }
 
   /// Update isActive field
-  NoPrefixValidationTest isActive(bool? value) {
-    return NoPrefixValidationTest(
+  _NoPrefixValidationTestCopyWith isActive(bool value) {
+    return _NoPrefixValidationTestCopyWith._(NoPrefixValidationTest(
       name: _instance.name,
       age: _instance.age,
-      isActive: value ?? _instance.isActive,
+      isActive: value,
       score: _instance.score,
       description: _instance.description,
       customField: _instance.customField,
       ignoredField: _instance.ignoredField,
-    );
+    ));
   }
 
   /// Update score field
-  NoPrefixValidationTest score(double? value) {
-    return NoPrefixValidationTest(
+  _NoPrefixValidationTestCopyWith score(double value) {
+    return _NoPrefixValidationTestCopyWith._(NoPrefixValidationTest(
       name: _instance.name,
       age: _instance.age,
       isActive: _instance.isActive,
-      score: value ?? _instance.score,
+      score: value,
       description: _instance.description,
       customField: _instance.customField,
       ignoredField: _instance.ignoredField,
-    );
+    ));
   }
 
   /// Update description field
-  NoPrefixValidationTest description(String? value) {
-    return NoPrefixValidationTest(
+  _NoPrefixValidationTestCopyWith description(String? value) {
+    return _NoPrefixValidationTestCopyWith._(NoPrefixValidationTest(
       name: _instance.name,
       age: _instance.age,
       isActive: _instance.isActive,
@@ -154,33 +154,38 @@ class _NoPrefixValidationTestCopyWith {
       description: value,
       customField: _instance.customField,
       ignoredField: _instance.ignoredField,
-    );
+    ));
   }
 
   /// Update customField field
-  NoPrefixValidationTest customField(String? value) {
-    return NoPrefixValidationTest(
+  _NoPrefixValidationTestCopyWith customField(String value) {
+    return _NoPrefixValidationTestCopyWith._(NoPrefixValidationTest(
       name: _instance.name,
       age: _instance.age,
       isActive: _instance.isActive,
       score: _instance.score,
       description: _instance.description,
-      customField: value ?? _instance.customField,
+      customField: value,
       ignoredField: _instance.ignoredField,
-    );
+    ));
   }
 
   /// Update ignoredField field
-  NoPrefixValidationTest ignoredField(String? value) {
-    return NoPrefixValidationTest(
+  _NoPrefixValidationTestCopyWith ignoredField(String value) {
+    return _NoPrefixValidationTestCopyWith._(NoPrefixValidationTest(
       name: _instance.name,
       age: _instance.age,
       isActive: _instance.isActive,
       score: _instance.score,
       description: _instance.description,
       customField: _instance.customField,
-      ignoredField: value ?? _instance.ignoredField,
-    );
+      ignoredField: value,
+    ));
+  }
+
+  /// Build the final instance
+  NoPrefixValidationTest build() {
+    return _instance;
   }
 
   /// Traditional copyWith method

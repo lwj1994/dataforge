@@ -9,7 +9,7 @@ mixin _GenericContainer<T> {
   abstract final int? count;
 
   _GenericContainerCopyWith<T> get copyWith =>
-      _GenericContainerCopyWith<T>._(this);
+      _GenericContainerCopyWith<T>._(this as GenericContainer<T>);
 
   @override
   bool operator ==(Object other) {
@@ -66,7 +66,8 @@ mixin _GenericPair<T, U> {
   abstract final U second;
   abstract final String label;
 
-  _GenericPairCopyWith<T, U> get copyWith => _GenericPairCopyWith<T, U>._(this);
+  _GenericPairCopyWith<T, U> get copyWith =>
+      _GenericPairCopyWith<T, U>._(this as GenericPair<T, U>);
 
   @override
   bool operator ==(Object other) {
@@ -121,7 +122,8 @@ mixin _GenericWrapper<T> {
   abstract final Map<String, T> namedItems;
   abstract final T? optionalItem;
 
-  _GenericWrapperCopyWith<T> get copyWith => _GenericWrapperCopyWith<T>._(this);
+  _GenericWrapperCopyWith<T> get copyWith =>
+      _GenericWrapperCopyWith<T>._(this as GenericWrapper<T>);
 
   @override
   bool operator ==(Object other) {
@@ -178,7 +180,8 @@ mixin _GenericBounded<T> {
   abstract final T value;
   abstract final List<T> values;
 
-  _GenericBoundedCopyWith<T> get copyWith => _GenericBoundedCopyWith<T>._(this);
+  _GenericBoundedCopyWith<T> get copyWith =>
+      _GenericBoundedCopyWith<T>._(this as GenericBounded<T>);
 
   @override
   bool operator ==(Object other) {
@@ -230,7 +233,7 @@ mixin _GenericWithFeatures<T> {
   abstract final DateTime createdAt;
 
   _GenericWithFeaturesCopyWith<T> get copyWith =>
-      _GenericWithFeaturesCopyWith<T>._(this);
+      _GenericWithFeaturesCopyWith<T>._(this as GenericWithFeatures<T>);
 
   @override
   bool operator ==(Object other) {
@@ -299,34 +302,39 @@ mixin _GenericWithFeatures<T> {
 
 /// Helper class for chained copyWith operations
 class _GenericContainerCopyWith<T> {
-  final _GenericContainer<T> _instance;
+  final GenericContainer<T> _instance;
   const _GenericContainerCopyWith._(this._instance);
 
   /// Update data field
-  GenericContainer<T> data(T? value) {
-    return GenericContainer<T>(
-      data: value ?? _instance.data,
+  _GenericContainerCopyWith<T> data(T value) {
+    return _GenericContainerCopyWith<T>._(GenericContainer<T>(
+      data: value,
       name: _instance.name,
       count: _instance.count,
-    );
+    ));
   }
 
   /// Update name field
-  GenericContainer<T> name(String? value) {
-    return GenericContainer<T>(
+  _GenericContainerCopyWith<T> name(String value) {
+    return _GenericContainerCopyWith<T>._(GenericContainer<T>(
       data: _instance.data,
-      name: value ?? _instance.name,
+      name: value,
       count: _instance.count,
-    );
+    ));
   }
 
   /// Update count field
-  GenericContainer<T> count(int? value) {
-    return GenericContainer<T>(
+  _GenericContainerCopyWith<T> count(int? value) {
+    return _GenericContainerCopyWith<T>._(GenericContainer<T>(
       data: _instance.data,
       name: _instance.name,
       count: value,
-    );
+    ));
+  }
+
+  /// Build the final instance
+  GenericContainer<T> build() {
+    return _instance;
   }
 
   /// Nested copyWith for data field
@@ -350,7 +358,7 @@ class _GenericContainerCopyWith<T> {
 
 /// Nested copyWith helper class for data field
 class _GenericContainerNestedCopyWithData<T> {
-  final _GenericContainer<T> _instance;
+  final GenericContainer<T> _instance;
   const _GenericContainerNestedCopyWithData._(this._instance);
 
   /// Update data field using a copyWith function
@@ -367,34 +375,39 @@ class _GenericContainerNestedCopyWithData<T> {
 
 /// Helper class for chained copyWith operations
 class _GenericPairCopyWith<T, U> {
-  final _GenericPair<T, U> _instance;
+  final GenericPair<T, U> _instance;
   const _GenericPairCopyWith._(this._instance);
 
   /// Update first field
-  GenericPair<T, U> first(T? value) {
-    return GenericPair<T, U>(
-      first: value ?? _instance.first,
+  _GenericPairCopyWith<T, U> first(T value) {
+    return _GenericPairCopyWith<T, U>._(GenericPair<T, U>(
+      first: value,
       second: _instance.second,
       label: _instance.label,
-    );
+    ));
   }
 
   /// Update second field
-  GenericPair<T, U> second(U? value) {
-    return GenericPair<T, U>(
+  _GenericPairCopyWith<T, U> second(U value) {
+    return _GenericPairCopyWith<T, U>._(GenericPair<T, U>(
       first: _instance.first,
-      second: value ?? _instance.second,
+      second: value,
       label: _instance.label,
-    );
+    ));
   }
 
   /// Update label field
-  GenericPair<T, U> label(String? value) {
-    return GenericPair<T, U>(
+  _GenericPairCopyWith<T, U> label(String value) {
+    return _GenericPairCopyWith<T, U>._(GenericPair<T, U>(
       first: _instance.first,
       second: _instance.second,
-      label: value ?? _instance.label,
-    );
+      label: value,
+    ));
+  }
+
+  /// Build the final instance
+  GenericPair<T, U> build() {
+    return _instance;
   }
 
   /// Nested copyWith for first field
@@ -423,7 +436,7 @@ class _GenericPairCopyWith<T, U> {
 
 /// Nested copyWith helper class for first field
 class _GenericPairNestedCopyWithFirst<T, U> {
-  final _GenericPair<T, U> _instance;
+  final GenericPair<T, U> _instance;
   const _GenericPairNestedCopyWithFirst._(this._instance);
 
   /// Update first field using a copyWith function
@@ -440,7 +453,7 @@ class _GenericPairNestedCopyWithFirst<T, U> {
 
 /// Nested copyWith helper class for second field
 class _GenericPairNestedCopyWithSecond<T, U> {
-  final _GenericPair<T, U> _instance;
+  final GenericPair<T, U> _instance;
   const _GenericPairNestedCopyWithSecond._(this._instance);
 
   /// Update second field using a copyWith function
@@ -457,34 +470,39 @@ class _GenericPairNestedCopyWithSecond<T, U> {
 
 /// Helper class for chained copyWith operations
 class _GenericWrapperCopyWith<T> {
-  final _GenericWrapper<T> _instance;
+  final GenericWrapper<T> _instance;
   const _GenericWrapperCopyWith._(this._instance);
 
   /// Update items field
-  GenericWrapper<T> items(List<T>? value) {
-    return GenericWrapper<T>(
-      items: value ?? _instance.items,
+  _GenericWrapperCopyWith<T> items(List<T> value) {
+    return _GenericWrapperCopyWith<T>._(GenericWrapper<T>(
+      items: value,
       namedItems: _instance.namedItems,
       optionalItem: _instance.optionalItem,
-    );
+    ));
   }
 
   /// Update namedItems field
-  GenericWrapper<T> namedItems(Map<String, T>? value) {
-    return GenericWrapper<T>(
+  _GenericWrapperCopyWith<T> namedItems(Map<String, T> value) {
+    return _GenericWrapperCopyWith<T>._(GenericWrapper<T>(
       items: _instance.items,
-      namedItems: value ?? _instance.namedItems,
+      namedItems: value,
       optionalItem: _instance.optionalItem,
-    );
+    ));
   }
 
   /// Update optionalItem field
-  GenericWrapper<T> optionalItem(T? value) {
-    return GenericWrapper<T>(
+  _GenericWrapperCopyWith<T> optionalItem(T? value) {
+    return _GenericWrapperCopyWith<T>._(GenericWrapper<T>(
       items: _instance.items,
       namedItems: _instance.namedItems,
       optionalItem: value,
-    );
+    ));
+  }
+
+  /// Build the final instance
+  GenericWrapper<T> build() {
+    return _instance;
   }
 
   /// Nested copyWith for optionalItem field
@@ -508,13 +526,13 @@ class _GenericWrapperCopyWith<T> {
 
 /// Nested copyWith helper class for optionalItem field
 class _GenericWrapperNestedCopyWithOptionalItem<T> {
-  final _GenericWrapper<T> _instance;
+  final GenericWrapper<T> _instance;
   const _GenericWrapperNestedCopyWithOptionalItem._(this._instance);
 
   /// Update optionalItem field using a copyWith function
   GenericWrapper<T> call(T Function(T) updater) {
     final currentValue = _instance.optionalItem;
-    if (currentValue == null) return _instance as GenericWrapper<T>;
+    if (currentValue == null) return _instance;
     final updatedValue = updater(currentValue);
     return GenericWrapper<T>(
       items: _instance.items,
@@ -526,23 +544,28 @@ class _GenericWrapperNestedCopyWithOptionalItem<T> {
 
 /// Helper class for chained copyWith operations
 class _GenericBoundedCopyWith<T> {
-  final _GenericBounded<T> _instance;
+  final GenericBounded<T> _instance;
   const _GenericBoundedCopyWith._(this._instance);
 
   /// Update value field
-  GenericBounded<T> value(T? value) {
-    return GenericBounded<T>(
-      value: value ?? _instance.value,
+  _GenericBoundedCopyWith<T> value(T value) {
+    return _GenericBoundedCopyWith<T>._(GenericBounded<T>(
+      value: value,
       values: _instance.values,
-    );
+    ));
   }
 
   /// Update values field
-  GenericBounded<T> values(List<T>? value) {
-    return GenericBounded<T>(
+  _GenericBoundedCopyWith<T> values(List<T> value) {
+    return _GenericBoundedCopyWith<T>._(GenericBounded<T>(
       value: _instance.value,
-      values: value ?? _instance.values,
-    );
+      values: value,
+    ));
+  }
+
+  /// Build the final instance
+  GenericBounded<T> build() {
+    return _instance;
   }
 
   /// Nested copyWith for value field
@@ -564,7 +587,7 @@ class _GenericBoundedCopyWith<T> {
 
 /// Nested copyWith helper class for value field
 class _GenericBoundedNestedCopyWithValue<T> {
-  final _GenericBounded<T> _instance;
+  final GenericBounded<T> _instance;
   const _GenericBoundedNestedCopyWithValue._(this._instance);
 
   /// Update value field using a copyWith function
@@ -580,62 +603,67 @@ class _GenericBoundedNestedCopyWithValue<T> {
 
 /// Helper class for chained copyWith operations
 class _GenericWithFeaturesCopyWith<T> {
-  final _GenericWithFeatures<T> _instance;
+  final GenericWithFeatures<T> _instance;
   const _GenericWithFeaturesCopyWith._(this._instance);
 
   /// Update data field
-  GenericWithFeatures<T> data(T? value) {
-    return GenericWithFeatures<T>(
-      data: value ?? _instance.data,
+  _GenericWithFeaturesCopyWith<T> data(T value) {
+    return _GenericWithFeaturesCopyWith<T>._(GenericWithFeatures<T>(
+      data: value,
       customField: _instance.customField,
       ignoredField: _instance.ignoredField,
       status: _instance.status,
       createdAt: _instance.createdAt,
-    );
+    ));
   }
 
   /// Update customField field
-  GenericWithFeatures<T> customField(String? value) {
-    return GenericWithFeatures<T>(
+  _GenericWithFeaturesCopyWith<T> customField(String value) {
+    return _GenericWithFeaturesCopyWith<T>._(GenericWithFeatures<T>(
       data: _instance.data,
-      customField: value ?? _instance.customField,
+      customField: value,
       ignoredField: _instance.ignoredField,
       status: _instance.status,
       createdAt: _instance.createdAt,
-    );
+    ));
   }
 
   /// Update ignoredField field
-  GenericWithFeatures<T> ignoredField(String? value) {
-    return GenericWithFeatures<T>(
+  _GenericWithFeaturesCopyWith<T> ignoredField(String value) {
+    return _GenericWithFeaturesCopyWith<T>._(GenericWithFeatures<T>(
       data: _instance.data,
       customField: _instance.customField,
-      ignoredField: value ?? _instance.ignoredField,
+      ignoredField: value,
       status: _instance.status,
       createdAt: _instance.createdAt,
-    );
+    ));
   }
 
   /// Update status field
-  GenericWithFeatures<T> status(TestStatus? value) {
-    return GenericWithFeatures<T>(
+  _GenericWithFeaturesCopyWith<T> status(TestStatus value) {
+    return _GenericWithFeaturesCopyWith<T>._(GenericWithFeatures<T>(
       data: _instance.data,
       customField: _instance.customField,
       ignoredField: _instance.ignoredField,
-      status: value ?? _instance.status,
+      status: value,
       createdAt: _instance.createdAt,
-    );
+    ));
   }
 
   /// Update createdAt field
-  GenericWithFeatures<T> createdAt(DateTime? value) {
-    return GenericWithFeatures<T>(
+  _GenericWithFeaturesCopyWith<T> createdAt(DateTime value) {
+    return _GenericWithFeaturesCopyWith<T>._(GenericWithFeatures<T>(
       data: _instance.data,
       customField: _instance.customField,
       ignoredField: _instance.ignoredField,
       status: _instance.status,
-      createdAt: value ?? _instance.createdAt,
-    );
+      createdAt: value,
+    ));
+  }
+
+  /// Build the final instance
+  GenericWithFeatures<T> build() {
+    return _instance;
   }
 
   /// Nested copyWith for data field
@@ -668,7 +696,7 @@ class _GenericWithFeaturesCopyWith<T> {
 
 /// Nested copyWith helper class for data field
 class _GenericWithFeaturesNestedCopyWithData<T> {
-  final _GenericWithFeatures<T> _instance;
+  final GenericWithFeatures<T> _instance;
   const _GenericWithFeaturesNestedCopyWithData._(this._instance);
 
   /// Update data field using a copyWith function
@@ -687,7 +715,7 @@ class _GenericWithFeaturesNestedCopyWithData<T> {
 
 /// Nested copyWith helper class for status field
 class _GenericWithFeaturesNestedCopyWithStatus<T> {
-  final _GenericWithFeatures<T> _instance;
+  final GenericWithFeatures<T> _instance;
   const _GenericWithFeaturesNestedCopyWithStatus._(this._instance);
 
   /// Update status field using a copyWith function

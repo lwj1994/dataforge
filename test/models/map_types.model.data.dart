@@ -19,7 +19,7 @@ mixin _MapTypes {
   abstract final List<Map<String, String>> mapList;
   abstract final Map<int, String>? intKeyMap;
 
-  _MapTypesCopyWith get copyWith => _MapTypesCopyWith._(this);
+  _MapTypesCopyWith get copyWith => _MapTypesCopyWith._(this as MapTypes);
 
   @override
   bool operator ==(Object other) {
@@ -160,7 +160,8 @@ mixin _MapWithObjects {
   abstract final Map<String, Address>? optionalAddressMap;
   abstract final Map<String, Address>? parsedAddressMap;
 
-  _MapWithObjectsCopyWith get copyWith => _MapWithObjectsCopyWith._(this);
+  _MapWithObjectsCopyWith get copyWith =>
+      _MapWithObjectsCopyWith._(this as MapWithObjects);
 
   @override
   bool operator ==(Object other) {
@@ -244,7 +245,7 @@ mixin _Address {
   abstract final String city;
   abstract final String zipCode;
 
-  _AddressCopyWith get copyWith => _AddressCopyWith._(this);
+  _AddressCopyWith get copyWith => _AddressCopyWith._(this as Address);
 
   @override
   bool operator ==(Object other) {
@@ -298,7 +299,7 @@ mixin _Contact {
   abstract final String email;
   abstract final String? phone;
 
-  _ContactCopyWith get copyWith => _ContactCopyWith._(this);
+  _ContactCopyWith get copyWith => _ContactCopyWith._(this as Contact);
 
   @override
   bool operator ==(Object other) {
@@ -346,13 +347,13 @@ mixin _Contact {
 
 /// Helper class for chained copyWith operations
 class _MapTypesCopyWith {
-  final _MapTypes _instance;
+  final MapTypes _instance;
   const _MapTypesCopyWith._(this._instance);
 
   /// Update stringMap field
-  MapTypes stringMap(Map<String, String>? value) {
-    return MapTypes(
-      stringMap: value ?? _instance.stringMap,
+  _MapTypesCopyWith stringMap(Map<String, String> value) {
+    return _MapTypesCopyWith._(MapTypes(
+      stringMap: value,
       intMap: _instance.intMap,
       doubleMap: _instance.doubleMap,
       boolMap: _instance.boolMap,
@@ -366,14 +367,14 @@ class _MapTypesCopyWith {
       complexMap: _instance.complexMap,
       mapList: _instance.mapList,
       intKeyMap: _instance.intKeyMap,
-    );
+    ));
   }
 
   /// Update intMap field
-  MapTypes intMap(Map<String, int>? value) {
-    return MapTypes(
+  _MapTypesCopyWith intMap(Map<String, int> value) {
+    return _MapTypesCopyWith._(MapTypes(
       stringMap: _instance.stringMap,
-      intMap: value ?? _instance.intMap,
+      intMap: value,
       doubleMap: _instance.doubleMap,
       boolMap: _instance.boolMap,
       dynamicMap: _instance.dynamicMap,
@@ -386,15 +387,15 @@ class _MapTypesCopyWith {
       complexMap: _instance.complexMap,
       mapList: _instance.mapList,
       intKeyMap: _instance.intKeyMap,
-    );
+    ));
   }
 
   /// Update doubleMap field
-  MapTypes doubleMap(Map<String, double>? value) {
-    return MapTypes(
+  _MapTypesCopyWith doubleMap(Map<String, double> value) {
+    return _MapTypesCopyWith._(MapTypes(
       stringMap: _instance.stringMap,
       intMap: _instance.intMap,
-      doubleMap: value ?? _instance.doubleMap,
+      doubleMap: value,
       boolMap: _instance.boolMap,
       dynamicMap: _instance.dynamicMap,
       optionalStringMap: _instance.optionalStringMap,
@@ -406,16 +407,16 @@ class _MapTypesCopyWith {
       complexMap: _instance.complexMap,
       mapList: _instance.mapList,
       intKeyMap: _instance.intKeyMap,
-    );
+    ));
   }
 
   /// Update boolMap field
-  MapTypes boolMap(Map<String, bool>? value) {
-    return MapTypes(
+  _MapTypesCopyWith boolMap(Map<String, bool> value) {
+    return _MapTypesCopyWith._(MapTypes(
       stringMap: _instance.stringMap,
       intMap: _instance.intMap,
       doubleMap: _instance.doubleMap,
-      boolMap: value ?? _instance.boolMap,
+      boolMap: value,
       dynamicMap: _instance.dynamicMap,
       optionalStringMap: _instance.optionalStringMap,
       listMap: _instance.listMap,
@@ -426,17 +427,17 @@ class _MapTypesCopyWith {
       complexMap: _instance.complexMap,
       mapList: _instance.mapList,
       intKeyMap: _instance.intKeyMap,
-    );
+    ));
   }
 
   /// Update dynamicMap field
-  MapTypes dynamicMap(Map<String, dynamic>? value) {
-    return MapTypes(
+  _MapTypesCopyWith dynamicMap(Map<String, dynamic> value) {
+    return _MapTypesCopyWith._(MapTypes(
       stringMap: _instance.stringMap,
       intMap: _instance.intMap,
       doubleMap: _instance.doubleMap,
       boolMap: _instance.boolMap,
-      dynamicMap: value ?? _instance.dynamicMap,
+      dynamicMap: value,
       optionalStringMap: _instance.optionalStringMap,
       listMap: _instance.listMap,
       nestedMap: _instance.nestedMap,
@@ -446,12 +447,12 @@ class _MapTypesCopyWith {
       complexMap: _instance.complexMap,
       mapList: _instance.mapList,
       intKeyMap: _instance.intKeyMap,
-    );
+    ));
   }
 
   /// Update optionalStringMap field
-  MapTypes optionalStringMap(Map<String, String>? value) {
-    return MapTypes(
+  _MapTypesCopyWith optionalStringMap(Map<String, String>? value) {
+    return _MapTypesCopyWith._(MapTypes(
       stringMap: _instance.stringMap,
       intMap: _instance.intMap,
       doubleMap: _instance.doubleMap,
@@ -466,19 +467,19 @@ class _MapTypesCopyWith {
       complexMap: _instance.complexMap,
       mapList: _instance.mapList,
       intKeyMap: _instance.intKeyMap,
-    );
+    ));
   }
 
   /// Update listMap field
-  MapTypes listMap(Map<String, List<String>>? value) {
-    return MapTypes(
+  _MapTypesCopyWith listMap(Map<String, List<String>> value) {
+    return _MapTypesCopyWith._(MapTypes(
       stringMap: _instance.stringMap,
       intMap: _instance.intMap,
       doubleMap: _instance.doubleMap,
       boolMap: _instance.boolMap,
       dynamicMap: _instance.dynamicMap,
       optionalStringMap: _instance.optionalStringMap,
-      listMap: value ?? _instance.listMap,
+      listMap: value,
       nestedMap: _instance.nestedMap,
       namedMap: _instance.namedMap,
       parsedMap: _instance.parsedMap,
@@ -486,12 +487,12 @@ class _MapTypesCopyWith {
       complexMap: _instance.complexMap,
       mapList: _instance.mapList,
       intKeyMap: _instance.intKeyMap,
-    );
+    ));
   }
 
   /// Update nestedMap field
-  MapTypes nestedMap(Map<String, Map<String, String>>? value) {
-    return MapTypes(
+  _MapTypesCopyWith nestedMap(Map<String, Map<String, String>> value) {
+    return _MapTypesCopyWith._(MapTypes(
       stringMap: _instance.stringMap,
       intMap: _instance.intMap,
       doubleMap: _instance.doubleMap,
@@ -499,19 +500,19 @@ class _MapTypesCopyWith {
       dynamicMap: _instance.dynamicMap,
       optionalStringMap: _instance.optionalStringMap,
       listMap: _instance.listMap,
-      nestedMap: value ?? _instance.nestedMap,
+      nestedMap: value,
       namedMap: _instance.namedMap,
       parsedMap: _instance.parsedMap,
       customIntMap: _instance.customIntMap,
       complexMap: _instance.complexMap,
       mapList: _instance.mapList,
       intKeyMap: _instance.intKeyMap,
-    );
+    ));
   }
 
   /// Update namedMap field
-  MapTypes namedMap(Map<String, String>? value) {
-    return MapTypes(
+  _MapTypesCopyWith namedMap(Map<String, String> value) {
+    return _MapTypesCopyWith._(MapTypes(
       stringMap: _instance.stringMap,
       intMap: _instance.intMap,
       doubleMap: _instance.doubleMap,
@@ -520,18 +521,18 @@ class _MapTypesCopyWith {
       optionalStringMap: _instance.optionalStringMap,
       listMap: _instance.listMap,
       nestedMap: _instance.nestedMap,
-      namedMap: value ?? _instance.namedMap,
+      namedMap: value,
       parsedMap: _instance.parsedMap,
       customIntMap: _instance.customIntMap,
       complexMap: _instance.complexMap,
       mapList: _instance.mapList,
       intKeyMap: _instance.intKeyMap,
-    );
+    ));
   }
 
   /// Update parsedMap field
-  MapTypes parsedMap(Map<String, String>? value) {
-    return MapTypes(
+  _MapTypesCopyWith parsedMap(Map<String, String>? value) {
+    return _MapTypesCopyWith._(MapTypes(
       stringMap: _instance.stringMap,
       intMap: _instance.intMap,
       doubleMap: _instance.doubleMap,
@@ -546,12 +547,12 @@ class _MapTypesCopyWith {
       complexMap: _instance.complexMap,
       mapList: _instance.mapList,
       intKeyMap: _instance.intKeyMap,
-    );
+    ));
   }
 
   /// Update customIntMap field
-  MapTypes customIntMap(Map<String, int>? value) {
-    return MapTypes(
+  _MapTypesCopyWith customIntMap(Map<String, int> value) {
+    return _MapTypesCopyWith._(MapTypes(
       stringMap: _instance.stringMap,
       intMap: _instance.intMap,
       doubleMap: _instance.doubleMap,
@@ -562,16 +563,16 @@ class _MapTypesCopyWith {
       nestedMap: _instance.nestedMap,
       namedMap: _instance.namedMap,
       parsedMap: _instance.parsedMap,
-      customIntMap: value ?? _instance.customIntMap,
+      customIntMap: value,
       complexMap: _instance.complexMap,
       mapList: _instance.mapList,
       intKeyMap: _instance.intKeyMap,
-    );
+    ));
   }
 
   /// Update complexMap field
-  MapTypes complexMap(Map<String, Map<String, dynamic>>? value) {
-    return MapTypes(
+  _MapTypesCopyWith complexMap(Map<String, Map<String, dynamic>>? value) {
+    return _MapTypesCopyWith._(MapTypes(
       stringMap: _instance.stringMap,
       intMap: _instance.intMap,
       doubleMap: _instance.doubleMap,
@@ -586,12 +587,12 @@ class _MapTypesCopyWith {
       complexMap: value,
       mapList: _instance.mapList,
       intKeyMap: _instance.intKeyMap,
-    );
+    ));
   }
 
   /// Update mapList field
-  MapTypes mapList(List<Map<String, String>>? value) {
-    return MapTypes(
+  _MapTypesCopyWith mapList(List<Map<String, String>> value) {
+    return _MapTypesCopyWith._(MapTypes(
       stringMap: _instance.stringMap,
       intMap: _instance.intMap,
       doubleMap: _instance.doubleMap,
@@ -604,14 +605,14 @@ class _MapTypesCopyWith {
       parsedMap: _instance.parsedMap,
       customIntMap: _instance.customIntMap,
       complexMap: _instance.complexMap,
-      mapList: value ?? _instance.mapList,
+      mapList: value,
       intKeyMap: _instance.intKeyMap,
-    );
+    ));
   }
 
   /// Update intKeyMap field
-  MapTypes intKeyMap(Map<int, String>? value) {
-    return MapTypes(
+  _MapTypesCopyWith intKeyMap(Map<int, String>? value) {
+    return _MapTypesCopyWith._(MapTypes(
       stringMap: _instance.stringMap,
       intMap: _instance.intMap,
       doubleMap: _instance.doubleMap,
@@ -626,7 +627,12 @@ class _MapTypesCopyWith {
       complexMap: _instance.complexMap,
       mapList: _instance.mapList,
       intKeyMap: value,
-    );
+    ));
+  }
+
+  /// Build the final instance
+  MapTypes build() {
+    return _instance;
   }
 
   /// Traditional copyWith method
@@ -667,47 +673,52 @@ class _MapTypesCopyWith {
 
 /// Helper class for chained copyWith operations
 class _MapWithObjectsCopyWith {
-  final _MapWithObjects _instance;
+  final MapWithObjects _instance;
   const _MapWithObjectsCopyWith._(this._instance);
 
   /// Update addressMap field
-  MapWithObjects addressMap(Map<String, Address>? value) {
-    return MapWithObjects(
-      addressMap: value ?? _instance.addressMap,
+  _MapWithObjectsCopyWith addressMap(Map<String, Address> value) {
+    return _MapWithObjectsCopyWith._(MapWithObjects(
+      addressMap: value,
       contactListMap: _instance.contactListMap,
       optionalAddressMap: _instance.optionalAddressMap,
       parsedAddressMap: _instance.parsedAddressMap,
-    );
+    ));
   }
 
   /// Update contactListMap field
-  MapWithObjects contactListMap(Map<String, List<Contact>>? value) {
-    return MapWithObjects(
+  _MapWithObjectsCopyWith contactListMap(Map<String, List<Contact>> value) {
+    return _MapWithObjectsCopyWith._(MapWithObjects(
       addressMap: _instance.addressMap,
-      contactListMap: value ?? _instance.contactListMap,
+      contactListMap: value,
       optionalAddressMap: _instance.optionalAddressMap,
       parsedAddressMap: _instance.parsedAddressMap,
-    );
+    ));
   }
 
   /// Update optionalAddressMap field
-  MapWithObjects optionalAddressMap(Map<String, Address>? value) {
-    return MapWithObjects(
+  _MapWithObjectsCopyWith optionalAddressMap(Map<String, Address>? value) {
+    return _MapWithObjectsCopyWith._(MapWithObjects(
       addressMap: _instance.addressMap,
       contactListMap: _instance.contactListMap,
       optionalAddressMap: value,
       parsedAddressMap: _instance.parsedAddressMap,
-    );
+    ));
   }
 
   /// Update parsedAddressMap field
-  MapWithObjects parsedAddressMap(Map<String, Address>? value) {
-    return MapWithObjects(
+  _MapWithObjectsCopyWith parsedAddressMap(Map<String, Address>? value) {
+    return _MapWithObjectsCopyWith._(MapWithObjects(
       addressMap: _instance.addressMap,
       contactListMap: _instance.contactListMap,
       optionalAddressMap: _instance.optionalAddressMap,
       parsedAddressMap: value,
-    );
+    ));
+  }
+
+  /// Build the final instance
+  MapWithObjects build() {
+    return _instance;
   }
 
   /// Traditional copyWith method
@@ -728,34 +739,39 @@ class _MapWithObjectsCopyWith {
 
 /// Helper class for chained copyWith operations
 class _AddressCopyWith {
-  final _Address _instance;
+  final Address _instance;
   const _AddressCopyWith._(this._instance);
 
   /// Update street field
-  Address street(String? value) {
-    return Address(
-      street: value ?? _instance.street,
+  _AddressCopyWith street(String value) {
+    return _AddressCopyWith._(Address(
+      street: value,
       city: _instance.city,
       zipCode: _instance.zipCode,
-    );
+    ));
   }
 
   /// Update city field
-  Address city(String? value) {
-    return Address(
+  _AddressCopyWith city(String value) {
+    return _AddressCopyWith._(Address(
       street: _instance.street,
-      city: value ?? _instance.city,
+      city: value,
       zipCode: _instance.zipCode,
-    );
+    ));
   }
 
   /// Update zipCode field
-  Address zipCode(String? value) {
-    return Address(
+  _AddressCopyWith zipCode(String value) {
+    return _AddressCopyWith._(Address(
       street: _instance.street,
       city: _instance.city,
-      zipCode: value ?? _instance.zipCode,
-    );
+      zipCode: value,
+    ));
+  }
+
+  /// Build the final instance
+  Address build() {
+    return _instance;
   }
 
   /// Traditional copyWith method
@@ -774,23 +790,28 @@ class _AddressCopyWith {
 
 /// Helper class for chained copyWith operations
 class _ContactCopyWith {
-  final _Contact _instance;
+  final Contact _instance;
   const _ContactCopyWith._(this._instance);
 
   /// Update email field
-  Contact email(String? value) {
-    return Contact(
-      email: value ?? _instance.email,
+  _ContactCopyWith email(String value) {
+    return _ContactCopyWith._(Contact(
+      email: value,
       phone: _instance.phone,
-    );
+    ));
   }
 
   /// Update phone field
-  Contact phone(String? value) {
-    return Contact(
+  _ContactCopyWith phone(String? value) {
+    return _ContactCopyWith._(Contact(
       email: _instance.email,
       phone: value,
-    );
+    ));
+  }
+
+  /// Build the final instance
+  Contact build() {
+    return _instance;
   }
 
   /// Traditional copyWith method

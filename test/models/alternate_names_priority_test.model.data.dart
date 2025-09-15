@@ -9,7 +9,7 @@ mixin _AlternateNamesPriorityTest {
   abstract final String? description;
 
   _AlternateNamesPriorityTestCopyWith get copyWith =>
-      _AlternateNamesPriorityTestCopyWith._(this);
+      _AlternateNamesPriorityTestCopyWith._(this as AlternateNamesPriorityTest);
 
   @override
   bool operator ==(Object other) {
@@ -69,34 +69,39 @@ mixin _AlternateNamesPriorityTest {
 
 /// Helper class for chained copyWith operations
 class _AlternateNamesPriorityTestCopyWith {
-  final _AlternateNamesPriorityTest _instance;
+  final AlternateNamesPriorityTest _instance;
   const _AlternateNamesPriorityTestCopyWith._(this._instance);
 
   /// Update owner field
-  AlternateNamesPriorityTest owner(String? value) {
-    return AlternateNamesPriorityTest(
+  _AlternateNamesPriorityTestCopyWith owner(String? value) {
+    return _AlternateNamesPriorityTestCopyWith._(AlternateNamesPriorityTest(
       owner: value,
       title: _instance.title,
       description: _instance.description,
-    );
+    ));
   }
 
   /// Update title field
-  AlternateNamesPriorityTest title(String? value) {
-    return AlternateNamesPriorityTest(
+  _AlternateNamesPriorityTestCopyWith title(String? value) {
+    return _AlternateNamesPriorityTestCopyWith._(AlternateNamesPriorityTest(
       owner: _instance.owner,
       title: value,
       description: _instance.description,
-    );
+    ));
   }
 
   /// Update description field
-  AlternateNamesPriorityTest description(String? value) {
-    return AlternateNamesPriorityTest(
+  _AlternateNamesPriorityTestCopyWith description(String? value) {
+    return _AlternateNamesPriorityTestCopyWith._(AlternateNamesPriorityTest(
       owner: _instance.owner,
       title: _instance.title,
       description: value,
-    );
+    ));
+  }
+
+  /// Build the final instance
+  AlternateNamesPriorityTest build() {
+    return _instance;
   }
 
   /// Traditional copyWith method

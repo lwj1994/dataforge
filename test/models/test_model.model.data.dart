@@ -7,7 +7,7 @@ mixin _TestModel {
   abstract final String name;
   abstract final Params? param;
 
-  _TestModelCopyWith get copyWith => _TestModelCopyWith._(this);
+  _TestModelCopyWith get copyWith => _TestModelCopyWith._(this as TestModel);
 
   @override
   bool operator ==(Object other) {
@@ -58,7 +58,7 @@ mixin _TestModel {
 mixin _Params {
   abstract final String value;
 
-  _ParamsCopyWith get copyWith => _ParamsCopyWith._(this);
+  _ParamsCopyWith get copyWith => _ParamsCopyWith._(this as Params);
 
   @override
   bool operator ==(Object other) {
@@ -98,28 +98,41 @@ mixin _Params {
 
 /// Helper class for chained copyWith operations
 class _TestModelCopyWith {
-  final _TestModel _instance;
+  final TestModel _instance;
   const _TestModelCopyWith._(this._instance);
 
   /// Update name field
-  TestModel name(String? value) {
-    return TestModel(
-      name: value ?? _instance.name,
+  _TestModelCopyWith name(String value) {
+    return _TestModelCopyWith._(TestModel(
+      name: value,
       param: _instance.param,
-    );
+    ));
   }
 
   /// Update param field
-  TestModel param(Params? value) {
-    return TestModel(
+  _TestModelCopyWith param(Params? value) {
+    return _TestModelCopyWith._(TestModel(
       name: _instance.name,
       param: value,
-    );
+    ));
+  }
+
+  /// Build the final instance
+  TestModel build() {
+    return _instance;
   }
 
   /// Nested copyWith for param field
   _TestModelNestedCopyWithParam get paramBuilder {
     return _TestModelNestedCopyWithParam._(_instance);
+  }
+
+  /// Update param_value field
+  _TestModelCopyWith $param_value(String value) {
+    return _TestModelCopyWith._(TestModel(
+      name: _instance.name,
+      param: _instance.param?.copyWith.value(value).build(),
+    ));
   }
 
   /// Traditional copyWith method
@@ -136,13 +149,13 @@ class _TestModelCopyWith {
 
 /// Nested copyWith helper class for param field
 class _TestModelNestedCopyWithParam {
-  final _TestModel _instance;
+  final TestModel _instance;
   const _TestModelNestedCopyWithParam._(this._instance);
 
   /// Update param field using a copyWith function
   TestModel call(Params Function(Params) updater) {
     final currentValue = _instance.param;
-    if (currentValue == null) return _instance as TestModel;
+    if (currentValue == null) return _instance;
     final updatedValue = updater(currentValue);
     return TestModel(
       name: _instance.name,
@@ -153,14 +166,19 @@ class _TestModelNestedCopyWithParam {
 
 /// Helper class for chained copyWith operations
 class _ParamsCopyWith {
-  final _Params _instance;
+  final Params _instance;
   const _ParamsCopyWith._(this._instance);
 
   /// Update value field
-  Params value(String? value) {
-    return Params(
-      value: value ?? _instance.value,
-    );
+  _ParamsCopyWith value(String value) {
+    return _ParamsCopyWith._(Params(
+      value: value,
+    ));
+  }
+
+  /// Build the final instance
+  Params build() {
+    return _instance;
   }
 
   /// Traditional copyWith method

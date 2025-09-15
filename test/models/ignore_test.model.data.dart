@@ -10,7 +10,7 @@ mixin _IgnoreTest {
   abstract final String? secretToken;
   abstract final bool isActive;
 
-  _IgnoreTestCopyWith get copyWith => _IgnoreTestCopyWith._(this);
+  _IgnoreTestCopyWith get copyWith => _IgnoreTestCopyWith._(this as IgnoreTest);
 
   @override
   bool operator ==(Object other) {
@@ -70,62 +70,67 @@ mixin _IgnoreTest {
 
 /// Helper class for chained copyWith operations
 class _IgnoreTestCopyWith {
-  final _IgnoreTest _instance;
+  final IgnoreTest _instance;
   const _IgnoreTestCopyWith._(this._instance);
 
   /// Update name field
-  IgnoreTest name(String? value) {
-    return IgnoreTest(
-      name: value ?? _instance.name,
+  _IgnoreTestCopyWith name(String value) {
+    return _IgnoreTestCopyWith._(IgnoreTest(
+      name: value,
       password: _instance.password,
       age: _instance.age,
       secretToken: _instance.secretToken,
       isActive: _instance.isActive,
-    );
+    ));
   }
 
   /// Update password field
-  IgnoreTest password(String? value) {
-    return IgnoreTest(
+  _IgnoreTestCopyWith password(String? value) {
+    return _IgnoreTestCopyWith._(IgnoreTest(
       name: _instance.name,
       password: value,
       age: _instance.age,
       secretToken: _instance.secretToken,
       isActive: _instance.isActive,
-    );
+    ));
   }
 
   /// Update age field
-  IgnoreTest age(int? value) {
-    return IgnoreTest(
+  _IgnoreTestCopyWith age(int value) {
+    return _IgnoreTestCopyWith._(IgnoreTest(
       name: _instance.name,
       password: _instance.password,
-      age: value ?? _instance.age,
+      age: value,
       secretToken: _instance.secretToken,
       isActive: _instance.isActive,
-    );
+    ));
   }
 
   /// Update secretToken field
-  IgnoreTest secretToken(String? value) {
-    return IgnoreTest(
+  _IgnoreTestCopyWith secretToken(String? value) {
+    return _IgnoreTestCopyWith._(IgnoreTest(
       name: _instance.name,
       password: _instance.password,
       age: _instance.age,
       secretToken: value,
       isActive: _instance.isActive,
-    );
+    ));
   }
 
   /// Update isActive field
-  IgnoreTest isActive(bool? value) {
-    return IgnoreTest(
+  _IgnoreTestCopyWith isActive(bool value) {
+    return _IgnoreTestCopyWith._(IgnoreTest(
       name: _instance.name,
       password: _instance.password,
       age: _instance.age,
       secretToken: _instance.secretToken,
-      isActive: value ?? _instance.isActive,
-    );
+      isActive: value,
+    ));
+  }
+
+  /// Build the final instance
+  IgnoreTest build() {
+    return _instance;
   }
 
   /// Traditional copyWith method

@@ -8,7 +8,7 @@ mixin _User {
   abstract final int age;
   abstract final String? email;
 
-  _UserCopyWith get copyWith => _UserCopyWith._(this);
+  _UserCopyWith get copyWith => _UserCopyWith._(this as User);
 
   @override
   bool operator ==(Object other) {
@@ -65,7 +65,7 @@ mixin _Address {
   abstract final String city;
   abstract final String? zipCode;
 
-  _AddressCopyWith get copyWith => _AddressCopyWith._(this);
+  _AddressCopyWith get copyWith => _AddressCopyWith._(this as Address);
 
   @override
   bool operator ==(Object other) {
@@ -122,7 +122,7 @@ mixin _Profile {
   abstract final Address address;
   abstract final List<String> tags;
 
-  _ProfileCopyWith get copyWith => _ProfileCopyWith._(this);
+  _ProfileCopyWith get copyWith => _ProfileCopyWith._(this as Profile);
 
   @override
   bool operator ==(Object other) {
@@ -176,34 +176,39 @@ mixin _Profile {
 
 /// Helper class for chained copyWith operations
 class _UserCopyWith {
-  final _User _instance;
+  final User _instance;
   const _UserCopyWith._(this._instance);
 
   /// Update name field
-  User name(String value) {
-    return User(
+  _UserCopyWith name(String value) {
+    return _UserCopyWith._(User(
       name: value,
       age: _instance.age,
       email: _instance.email,
-    );
+    ));
   }
 
   /// Update age field
-  User age(int value) {
-    return User(
+  _UserCopyWith age(int value) {
+    return _UserCopyWith._(User(
       name: _instance.name,
       age: value,
       email: _instance.email,
-    );
+    ));
   }
 
   /// Update email field
-  User email(String? value) {
-    return User(
+  _UserCopyWith email(String? value) {
+    return _UserCopyWith._(User(
       name: _instance.name,
       age: _instance.age,
       email: value,
-    );
+    ));
+  }
+
+  /// Build the final instance
+  User build() {
+    return _instance;
   }
 
   /// Traditional copyWith method
@@ -222,34 +227,39 @@ class _UserCopyWith {
 
 /// Helper class for chained copyWith operations
 class _AddressCopyWith {
-  final _Address _instance;
+  final Address _instance;
   const _AddressCopyWith._(this._instance);
 
   /// Update street field
-  Address street(String value) {
-    return Address(
+  _AddressCopyWith street(String value) {
+    return _AddressCopyWith._(Address(
       street: value,
       city: _instance.city,
       zipCode: _instance.zipCode,
-    );
+    ));
   }
 
   /// Update city field
-  Address city(String value) {
-    return Address(
+  _AddressCopyWith city(String value) {
+    return _AddressCopyWith._(Address(
       street: _instance.street,
       city: value,
       zipCode: _instance.zipCode,
-    );
+    ));
   }
 
   /// Update zipCode field
-  Address zipCode(String? value) {
-    return Address(
+  _AddressCopyWith zipCode(String? value) {
+    return _AddressCopyWith._(Address(
       street: _instance.street,
       city: _instance.city,
       zipCode: value,
-    );
+    ));
+  }
+
+  /// Build the final instance
+  Address build() {
+    return _instance;
   }
 
   /// Traditional copyWith method
@@ -268,34 +278,39 @@ class _AddressCopyWith {
 
 /// Helper class for chained copyWith operations
 class _ProfileCopyWith {
-  final _Profile _instance;
+  final Profile _instance;
   const _ProfileCopyWith._(this._instance);
 
   /// Update user field
-  Profile user(User value) {
-    return Profile(
+  _ProfileCopyWith user(User value) {
+    return _ProfileCopyWith._(Profile(
       user: value,
       address: _instance.address,
       tags: _instance.tags,
-    );
+    ));
   }
 
   /// Update address field
-  Profile address(Address value) {
-    return Profile(
+  _ProfileCopyWith address(Address value) {
+    return _ProfileCopyWith._(Profile(
       user: _instance.user,
       address: value,
       tags: _instance.tags,
-    );
+    ));
   }
 
   /// Update tags field
-  Profile tags(List<String> value) {
-    return Profile(
+  _ProfileCopyWith tags(List<String> value) {
+    return _ProfileCopyWith._(Profile(
       user: _instance.user,
       address: _instance.address,
       tags: value,
-    );
+    ));
+  }
+
+  /// Build the final instance
+  Profile build() {
+    return _instance;
   }
 
   /// Nested copyWith for user field
@@ -306,6 +321,60 @@ class _ProfileCopyWith {
   /// Nested copyWith for address field
   _ProfileNestedCopyWithAddress get addressBuilder {
     return _ProfileNestedCopyWithAddress._(_instance);
+  }
+
+  /// Update user_name field
+  _ProfileCopyWith $user_name(String value) {
+    return _ProfileCopyWith._(Profile(
+      user: _instance.user.copyWith.name(value).build(),
+      address: _instance.address,
+      tags: _instance.tags,
+    ));
+  }
+
+  /// Update user_age field
+  _ProfileCopyWith $user_age(int value) {
+    return _ProfileCopyWith._(Profile(
+      user: _instance.user.copyWith.age(value).build(),
+      address: _instance.address,
+      tags: _instance.tags,
+    ));
+  }
+
+  /// Update user_email field
+  _ProfileCopyWith $user_email(String? value) {
+    return _ProfileCopyWith._(Profile(
+      user: _instance.user.copyWith.email(value).build(),
+      address: _instance.address,
+      tags: _instance.tags,
+    ));
+  }
+
+  /// Update address_street field
+  _ProfileCopyWith $address_street(String value) {
+    return _ProfileCopyWith._(Profile(
+      user: _instance.user,
+      address: _instance.address.copyWith.street(value).build(),
+      tags: _instance.tags,
+    ));
+  }
+
+  /// Update address_city field
+  _ProfileCopyWith $address_city(String value) {
+    return _ProfileCopyWith._(Profile(
+      user: _instance.user,
+      address: _instance.address.copyWith.city(value).build(),
+      tags: _instance.tags,
+    ));
+  }
+
+  /// Update address_zipCode field
+  _ProfileCopyWith $address_zipCode(String? value) {
+    return _ProfileCopyWith._(Profile(
+      user: _instance.user,
+      address: _instance.address.copyWith.zipCode(value).build(),
+      tags: _instance.tags,
+    ));
   }
 
   /// Traditional copyWith method
@@ -324,7 +393,7 @@ class _ProfileCopyWith {
 
 /// Nested copyWith helper class for user field
 class _ProfileNestedCopyWithUser {
-  final _Profile _instance;
+  final Profile _instance;
   const _ProfileNestedCopyWithUser._(this._instance);
 
   /// Update user field using a copyWith function
@@ -341,7 +410,7 @@ class _ProfileNestedCopyWithUser {
 
 /// Nested copyWith helper class for address field
 class _ProfileNestedCopyWithAddress {
-  final _Profile _instance;
+  final Profile _instance;
   const _ProfileNestedCopyWithAddress._(this._instance);
 
   /// Update address field using a copyWith function

@@ -9,7 +9,8 @@ mixin _DateTimeNullableAutoMatchTest {
   abstract final String name;
 
   _DateTimeNullableAutoMatchTestCopyWith get copyWith =>
-      _DateTimeNullableAutoMatchTestCopyWith._(this);
+      _DateTimeNullableAutoMatchTestCopyWith._(
+          this as DateTimeNullableAutoMatchTest);
 
   @override
   bool operator ==(Object other) {
@@ -70,34 +71,42 @@ mixin _DateTimeNullableAutoMatchTest {
 
 /// Helper class for chained copyWith operations
 class _DateTimeNullableAutoMatchTestCopyWith {
-  final _DateTimeNullableAutoMatchTest _instance;
+  final DateTimeNullableAutoMatchTest _instance;
   const _DateTimeNullableAutoMatchTestCopyWith._(this._instance);
 
   /// Update createdAt field
-  DateTimeNullableAutoMatchTest createdAt(DateTime? value) {
-    return DateTimeNullableAutoMatchTest(
+  _DateTimeNullableAutoMatchTestCopyWith createdAt(DateTime? value) {
+    return _DateTimeNullableAutoMatchTestCopyWith._(
+        DateTimeNullableAutoMatchTest(
       createdAt: value,
       updatedAt: _instance.updatedAt,
       name: _instance.name,
-    );
+    ));
   }
 
   /// Update updatedAt field
-  DateTimeNullableAutoMatchTest updatedAt(DateTime? value) {
-    return DateTimeNullableAutoMatchTest(
+  _DateTimeNullableAutoMatchTestCopyWith updatedAt(DateTime value) {
+    return _DateTimeNullableAutoMatchTestCopyWith._(
+        DateTimeNullableAutoMatchTest(
       createdAt: _instance.createdAt,
-      updatedAt: value ?? _instance.updatedAt,
+      updatedAt: value,
       name: _instance.name,
-    );
+    ));
   }
 
   /// Update name field
-  DateTimeNullableAutoMatchTest name(String? value) {
-    return DateTimeNullableAutoMatchTest(
+  _DateTimeNullableAutoMatchTestCopyWith name(String value) {
+    return _DateTimeNullableAutoMatchTestCopyWith._(
+        DateTimeNullableAutoMatchTest(
       createdAt: _instance.createdAt,
       updatedAt: _instance.updatedAt,
-      name: value ?? _instance.name,
-    );
+      name: value,
+    ));
+  }
+
+  /// Build the final instance
+  DateTimeNullableAutoMatchTest build() {
+    return _instance;
   }
 
   /// Traditional copyWith method

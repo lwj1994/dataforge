@@ -220,6 +220,46 @@ final newCompany4 = company.copyWith.ceoBuilder((ceo) =>
 );
 ```
 
+### Builder Pattern Style (Alternative)
+
+For a more fluent API approach, you can use the `copyWithBuilder` getter that returns a builder object:
+
+```dart
+// Single field update
+final updatedCompany = company.copyWithBuilder
+  .name('New Tech Corp')
+  .build();
+
+// Multiple field updates
+final updatedCompany = company.copyWithBuilder
+  .name('New Tech Corp')
+  .ceo(ceo.copyWithBuilder.name('Jane Smith').build())
+  .build();
+
+// Complex nested updates with chaining
+final updatedCompany = company.copyWithBuilder
+  .ceo(
+    ceo.copyWithBuilder
+      .name('Bob Wilson')
+      .age(40)
+      .address(
+        address.copyWithBuilder
+          .street('456 Oak Ave')
+          .city('Los Angeles')
+          .build()
+      )
+      .build()
+  )
+  .build();
+
+// Clean multi-line chaining
+final updatedUser = user.copyWithBuilder
+  .name('Jane Doe')
+  .age(25)
+  .email('jane@example.com')
+  .build();
+```
+
 ## 📋 Supported Types
 
 - **Basic Types**: `String`, `int`, `double`, `bool`, `num`

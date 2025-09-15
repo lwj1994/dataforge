@@ -14,7 +14,8 @@ mixin _DateTimeTypes {
   abstract final DateTime timestampDate;
   abstract final DateTime? parsedDate;
 
-  _DateTimeTypesCopyWith get copyWith => _DateTimeTypesCopyWith._(this);
+  _DateTimeTypesCopyWith get copyWith =>
+      _DateTimeTypesCopyWith._(this as DateTimeTypes);
 
   @override
   bool operator ==(Object other) {
@@ -139,7 +140,8 @@ mixin _TimeZoneTest {
   abstract final DateTime? timeZoneAware;
   abstract final List<DateTime> timeList;
 
-  _TimeZoneTestCopyWith get copyWith => _TimeZoneTestCopyWith._(this);
+  _TimeZoneTestCopyWith get copyWith =>
+      _TimeZoneTestCopyWith._(this as TimeZoneTest);
 
   @override
   bool operator ==(Object other) {
@@ -211,13 +213,13 @@ mixin _TimeZoneTest {
 
 /// Helper class for chained copyWith operations
 class _DateTimeTypesCopyWith {
-  final _DateTimeTypes _instance;
+  final DateTimeTypes _instance;
   const _DateTimeTypesCopyWith._(this._instance);
 
   /// Update createdAt field
-  DateTimeTypes createdAt(DateTime? value) {
-    return DateTimeTypes(
-      createdAt: value ?? _instance.createdAt,
+  _DateTimeTypesCopyWith createdAt(DateTime value) {
+    return _DateTimeTypesCopyWith._(DateTimeTypes(
+      createdAt: value,
       updatedAt: _instance.updatedAt,
       birthDate: _instance.birthDate,
       eventDates: _instance.eventDates,
@@ -226,12 +228,12 @@ class _DateTimeTypesCopyWith {
       isoDateTime: _instance.isoDateTime,
       timestampDate: _instance.timestampDate,
       parsedDate: _instance.parsedDate,
-    );
+    ));
   }
 
   /// Update updatedAt field
-  DateTimeTypes updatedAt(DateTime? value) {
-    return DateTimeTypes(
+  _DateTimeTypesCopyWith updatedAt(DateTime? value) {
+    return _DateTimeTypesCopyWith._(DateTimeTypes(
       createdAt: _instance.createdAt,
       updatedAt: value,
       birthDate: _instance.birthDate,
@@ -241,42 +243,42 @@ class _DateTimeTypesCopyWith {
       isoDateTime: _instance.isoDateTime,
       timestampDate: _instance.timestampDate,
       parsedDate: _instance.parsedDate,
-    );
+    ));
   }
 
   /// Update birthDate field
-  DateTimeTypes birthDate(DateTime? value) {
-    return DateTimeTypes(
+  _DateTimeTypesCopyWith birthDate(DateTime value) {
+    return _DateTimeTypesCopyWith._(DateTimeTypes(
       createdAt: _instance.createdAt,
       updatedAt: _instance.updatedAt,
-      birthDate: value ?? _instance.birthDate,
+      birthDate: value,
       eventDates: _instance.eventDates,
       optionalEventDates: _instance.optionalEventDates,
       namedDates: _instance.namedDates,
       isoDateTime: _instance.isoDateTime,
       timestampDate: _instance.timestampDate,
       parsedDate: _instance.parsedDate,
-    );
+    ));
   }
 
   /// Update eventDates field
-  DateTimeTypes eventDates(List<DateTime>? value) {
-    return DateTimeTypes(
+  _DateTimeTypesCopyWith eventDates(List<DateTime> value) {
+    return _DateTimeTypesCopyWith._(DateTimeTypes(
       createdAt: _instance.createdAt,
       updatedAt: _instance.updatedAt,
       birthDate: _instance.birthDate,
-      eventDates: value ?? _instance.eventDates,
+      eventDates: value,
       optionalEventDates: _instance.optionalEventDates,
       namedDates: _instance.namedDates,
       isoDateTime: _instance.isoDateTime,
       timestampDate: _instance.timestampDate,
       parsedDate: _instance.parsedDate,
-    );
+    ));
   }
 
   /// Update optionalEventDates field
-  DateTimeTypes optionalEventDates(List<DateTime>? value) {
-    return DateTimeTypes(
+  _DateTimeTypesCopyWith optionalEventDates(List<DateTime>? value) {
+    return _DateTimeTypesCopyWith._(DateTimeTypes(
       createdAt: _instance.createdAt,
       updatedAt: _instance.updatedAt,
       birthDate: _instance.birthDate,
@@ -286,27 +288,27 @@ class _DateTimeTypesCopyWith {
       isoDateTime: _instance.isoDateTime,
       timestampDate: _instance.timestampDate,
       parsedDate: _instance.parsedDate,
-    );
+    ));
   }
 
   /// Update namedDates field
-  DateTimeTypes namedDates(Map<String, DateTime>? value) {
-    return DateTimeTypes(
+  _DateTimeTypesCopyWith namedDates(Map<String, DateTime> value) {
+    return _DateTimeTypesCopyWith._(DateTimeTypes(
       createdAt: _instance.createdAt,
       updatedAt: _instance.updatedAt,
       birthDate: _instance.birthDate,
       eventDates: _instance.eventDates,
       optionalEventDates: _instance.optionalEventDates,
-      namedDates: value ?? _instance.namedDates,
+      namedDates: value,
       isoDateTime: _instance.isoDateTime,
       timestampDate: _instance.timestampDate,
       parsedDate: _instance.parsedDate,
-    );
+    ));
   }
 
   /// Update isoDateTime field
-  DateTimeTypes isoDateTime(DateTime? value) {
-    return DateTimeTypes(
+  _DateTimeTypesCopyWith isoDateTime(DateTime? value) {
+    return _DateTimeTypesCopyWith._(DateTimeTypes(
       createdAt: _instance.createdAt,
       updatedAt: _instance.updatedAt,
       birthDate: _instance.birthDate,
@@ -316,12 +318,12 @@ class _DateTimeTypesCopyWith {
       isoDateTime: value,
       timestampDate: _instance.timestampDate,
       parsedDate: _instance.parsedDate,
-    );
+    ));
   }
 
   /// Update timestampDate field
-  DateTimeTypes timestampDate(DateTime? value) {
-    return DateTimeTypes(
+  _DateTimeTypesCopyWith timestampDate(DateTime value) {
+    return _DateTimeTypesCopyWith._(DateTimeTypes(
       createdAt: _instance.createdAt,
       updatedAt: _instance.updatedAt,
       birthDate: _instance.birthDate,
@@ -329,14 +331,14 @@ class _DateTimeTypesCopyWith {
       optionalEventDates: _instance.optionalEventDates,
       namedDates: _instance.namedDates,
       isoDateTime: _instance.isoDateTime,
-      timestampDate: value ?? _instance.timestampDate,
+      timestampDate: value,
       parsedDate: _instance.parsedDate,
-    );
+    ));
   }
 
   /// Update parsedDate field
-  DateTimeTypes parsedDate(DateTime? value) {
-    return DateTimeTypes(
+  _DateTimeTypesCopyWith parsedDate(DateTime? value) {
+    return _DateTimeTypesCopyWith._(DateTimeTypes(
       createdAt: _instance.createdAt,
       updatedAt: _instance.updatedAt,
       birthDate: _instance.birthDate,
@@ -346,7 +348,12 @@ class _DateTimeTypesCopyWith {
       isoDateTime: _instance.isoDateTime,
       timestampDate: _instance.timestampDate,
       parsedDate: value,
-    );
+    ));
+  }
+
+  /// Build the final instance
+  DateTimeTypes build() {
+    return _instance;
   }
 
   /// Traditional copyWith method
@@ -377,47 +384,52 @@ class _DateTimeTypesCopyWith {
 
 /// Helper class for chained copyWith operations
 class _TimeZoneTestCopyWith {
-  final _TimeZoneTest _instance;
+  final TimeZoneTest _instance;
   const _TimeZoneTestCopyWith._(this._instance);
 
   /// Update utcTime field
-  TimeZoneTest utcTime(DateTime? value) {
-    return TimeZoneTest(
-      utcTime: value ?? _instance.utcTime,
+  _TimeZoneTestCopyWith utcTime(DateTime value) {
+    return _TimeZoneTestCopyWith._(TimeZoneTest(
+      utcTime: value,
       localTime: _instance.localTime,
       timeZoneAware: _instance.timeZoneAware,
       timeList: _instance.timeList,
-    );
+    ));
   }
 
   /// Update localTime field
-  TimeZoneTest localTime(DateTime? value) {
-    return TimeZoneTest(
+  _TimeZoneTestCopyWith localTime(DateTime value) {
+    return _TimeZoneTestCopyWith._(TimeZoneTest(
       utcTime: _instance.utcTime,
-      localTime: value ?? _instance.localTime,
+      localTime: value,
       timeZoneAware: _instance.timeZoneAware,
       timeList: _instance.timeList,
-    );
+    ));
   }
 
   /// Update timeZoneAware field
-  TimeZoneTest timeZoneAware(DateTime? value) {
-    return TimeZoneTest(
+  _TimeZoneTestCopyWith timeZoneAware(DateTime? value) {
+    return _TimeZoneTestCopyWith._(TimeZoneTest(
       utcTime: _instance.utcTime,
       localTime: _instance.localTime,
       timeZoneAware: value,
       timeList: _instance.timeList,
-    );
+    ));
   }
 
   /// Update timeList field
-  TimeZoneTest timeList(List<DateTime>? value) {
-    return TimeZoneTest(
+  _TimeZoneTestCopyWith timeList(List<DateTime> value) {
+    return _TimeZoneTestCopyWith._(TimeZoneTest(
       utcTime: _instance.utcTime,
       localTime: _instance.localTime,
       timeZoneAware: _instance.timeZoneAware,
-      timeList: value ?? _instance.timeList,
-    );
+      timeList: value,
+    ));
+  }
+
+  /// Build the final instance
+  TimeZoneTest build() {
+    return _instance;
   }
 
   /// Traditional copyWith method

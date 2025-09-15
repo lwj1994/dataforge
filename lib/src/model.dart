@@ -389,3 +389,43 @@ class JsonKeyInfo {
         toJson,
       ]);
 }
+
+/// Represents a flattened field path for nested copyWith operations
+class FlattenedField {
+  /// The full path of the field (e.g., "ceo_address_street")
+  final String path;
+
+  /// The original field name (e.g., "street")
+  final String fieldName;
+
+  /// The type of the field
+  final String type;
+
+  /// The original FieldInfo object
+  final FieldInfo originalField;
+
+  const FlattenedField({
+    required this.path,
+    required this.fieldName,
+    required this.type,
+    required this.originalField,
+  });
+
+  @override
+  String toString() {
+    return 'FlattenedField{path: $path, fieldName: $fieldName, type: $type}';
+  }
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+    return other is FlattenedField &&
+        other.path == path &&
+        other.fieldName == fieldName &&
+        other.type == type &&
+        other.originalField == originalField;
+  }
+
+  @override
+  int get hashCode => Object.hash(path, fieldName, type, originalField);
+}

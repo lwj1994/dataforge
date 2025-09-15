@@ -5,8 +5,7 @@ import 'package:path/path.dart' as p;
 import 'package:dataforge/src/parser.dart';
 import 'package:dataforge/src/writer.dart';
 
-Future<List<String>> generate(String path,
-    {bool debugMode = false, bool autoModify = false}) async {
+Future<List<String>> generate(String path, {bool debugMode = false}) async {
   final startTime = DateTime.now();
   if (debugMode) {
     print('[DEBUG] $startTime: generate() called with path: "$path"');
@@ -79,7 +78,7 @@ Future<List<String>> generate(String path,
     // Process files in parallel with controlled concurrency
     final maxConcurrency = Platform.numberOfProcessors;
     final processedResults = await _processFilesInParallel(
-        candidateFiles, absolutePath, maxConcurrency, debugMode, autoModify);
+        candidateFiles, absolutePath, maxConcurrency, debugMode);
 
     // Collect results
     int processedCount = 0;
@@ -162,9 +161,7 @@ Future<List<String>> generate(String path,
       }
       final writeStartTime = DateTime.now();
       final writer = Writer(parseRes,
-          projectRoot: p.dirname(absolutePath),
-          debugMode: debugMode,
-          autoModify: autoModify);
+          projectRoot: p.dirname(absolutePath), debugMode: debugMode);
       if (debugMode) {
         print(
             '[DEBUG] ${DateTime.now()}: Starting writeCode() for single file: $absolutePath');
@@ -325,7 +322,6 @@ Future<List<String>> _processFilesInParallel(
   String projectRoot,
   int maxConcurrency,
   bool debugMode,
-  bool autoModify,
 ) async {
   final results = <String>[];
 
@@ -354,8 +350,8 @@ Future<List<String>> _processFilesInParallel(
     }
 
     // Process files in current batch concurrently
-    final batchFutures = batch.map((filePath) =>
-        _processFile(filePath, projectRoot, debugMode, autoModify));
+    final batchFutures =
+        batch.map((filePath) => _processFile(filePath, projectRoot, debugMode));
     final batchResults = await Future.wait(batchFutures);
 
     results.addAll(batchResults);
@@ -374,8 +370,8 @@ Future<List<String>> _processFilesInParallel(
 }
 
 /// Process a single file and return the generated file path
-Future<String> _processFile(String filePath, String projectRoot, bool debugMode,
-    bool autoModify) async {
+Future<String> _processFile(
+    String filePath, String projectRoot, bool debugMode) async {
   try {
     final fileStartTime = DateTime.now();
 
@@ -402,8 +398,8 @@ Future<String> _processFile(String filePath, String projectRoot, bool debugMode,
 
     // Generate code
     final writeStartTime = DateTime.now();
-    final writer = Writer(parseRes,
-        projectRoot: projectRoot, debugMode: debugMode, autoModify: autoModify);
+    final writer =
+        Writer(parseRes, projectRoot: projectRoot, debugMode: debugMode);
     final generatedFile = writer.writeCode();
     final writeEndTime = DateTime.now();
 

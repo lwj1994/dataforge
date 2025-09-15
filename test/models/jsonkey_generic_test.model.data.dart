@@ -8,7 +8,8 @@ mixin _ApiResponse<T> {
   abstract final String message;
   abstract final T? data;
 
-  _ApiResponseCopyWith<T> get copyWith => _ApiResponseCopyWith<T>._(this);
+  _ApiResponseCopyWith<T> get copyWith =>
+      _ApiResponseCopyWith<T>._(this as ApiResponse<T>);
 
   @override
   bool operator ==(Object other) {
@@ -66,7 +67,7 @@ mixin _User {
   abstract final String email;
   abstract final int? age;
 
-  _UserCopyWith get copyWith => _UserCopyWith._(this);
+  _UserCopyWith get copyWith => _UserCopyWith._(this as User);
 
   @override
   bool operator ==(Object other) {
@@ -128,7 +129,8 @@ mixin _ListResponse<T> {
   abstract final int total;
   abstract final List<T>? items;
 
-  _ListResponseCopyWith<T> get copyWith => _ListResponseCopyWith<T>._(this);
+  _ListResponseCopyWith<T> get copyWith =>
+      _ListResponseCopyWith<T>._(this as ListResponse<T>);
 
   @override
   bool operator ==(Object other) {
@@ -178,34 +180,39 @@ mixin _ListResponse<T> {
 
 /// Helper class for chained copyWith operations
 class _ApiResponseCopyWith<T> {
-  final _ApiResponse<T> _instance;
+  final ApiResponse<T> _instance;
   const _ApiResponseCopyWith._(this._instance);
 
   /// Update success field
-  ApiResponse<T> success(bool? value) {
-    return ApiResponse<T>(
-      success: value ?? _instance.success,
+  _ApiResponseCopyWith<T> success(bool value) {
+    return _ApiResponseCopyWith<T>._(ApiResponse<T>(
+      success: value,
       message: _instance.message,
       data: _instance.data,
-    );
+    ));
   }
 
   /// Update message field
-  ApiResponse<T> message(String? value) {
-    return ApiResponse<T>(
+  _ApiResponseCopyWith<T> message(String value) {
+    return _ApiResponseCopyWith<T>._(ApiResponse<T>(
       success: _instance.success,
-      message: value ?? _instance.message,
+      message: value,
       data: _instance.data,
-    );
+    ));
   }
 
   /// Update data field
-  ApiResponse<T> data(T? value) {
-    return ApiResponse<T>(
+  _ApiResponseCopyWith<T> data(T? value) {
+    return _ApiResponseCopyWith<T>._(ApiResponse<T>(
       success: _instance.success,
       message: _instance.message,
       data: value,
-    );
+    ));
+  }
+
+  /// Build the final instance
+  ApiResponse<T> build() {
+    return _instance;
   }
 
   /// Nested copyWith for data field
@@ -229,13 +236,13 @@ class _ApiResponseCopyWith<T> {
 
 /// Nested copyWith helper class for data field
 class _ApiResponseNestedCopyWithData<T> {
-  final _ApiResponse<T> _instance;
+  final ApiResponse<T> _instance;
   const _ApiResponseNestedCopyWithData._(this._instance);
 
   /// Update data field using a copyWith function
   ApiResponse<T> call(T Function(T) updater) {
     final currentValue = _instance.data;
-    if (currentValue == null) return _instance as ApiResponse<T>;
+    if (currentValue == null) return _instance;
     final updatedValue = updater(currentValue);
     return ApiResponse<T>(
       success: _instance.success,
@@ -247,47 +254,52 @@ class _ApiResponseNestedCopyWithData<T> {
 
 /// Helper class for chained copyWith operations
 class _UserCopyWith {
-  final _User _instance;
+  final User _instance;
   const _UserCopyWith._(this._instance);
 
   /// Update id field
-  User id(int? value) {
-    return User(
-      id: value ?? _instance.id,
+  _UserCopyWith id(int value) {
+    return _UserCopyWith._(User(
+      id: value,
       name: _instance.name,
       email: _instance.email,
       age: _instance.age,
-    );
+    ));
   }
 
   /// Update name field
-  User name(String? value) {
-    return User(
+  _UserCopyWith name(String value) {
+    return _UserCopyWith._(User(
       id: _instance.id,
-      name: value ?? _instance.name,
+      name: value,
       email: _instance.email,
       age: _instance.age,
-    );
+    ));
   }
 
   /// Update email field
-  User email(String? value) {
-    return User(
+  _UserCopyWith email(String value) {
+    return _UserCopyWith._(User(
       id: _instance.id,
       name: _instance.name,
-      email: value ?? _instance.email,
+      email: value,
       age: _instance.age,
-    );
+    ));
   }
 
   /// Update age field
-  User age(int? value) {
-    return User(
+  _UserCopyWith age(int? value) {
+    return _UserCopyWith._(User(
       id: _instance.id,
       name: _instance.name,
       email: _instance.email,
       age: value,
-    );
+    ));
+  }
+
+  /// Build the final instance
+  User build() {
+    return _instance;
   }
 
   /// Traditional copyWith method
@@ -308,23 +320,28 @@ class _UserCopyWith {
 
 /// Helper class for chained copyWith operations
 class _ListResponseCopyWith<T> {
-  final _ListResponse<T> _instance;
+  final ListResponse<T> _instance;
   const _ListResponseCopyWith._(this._instance);
 
   /// Update total field
-  ListResponse<T> total(int? value) {
-    return ListResponse<T>(
-      total: value ?? _instance.total,
+  _ListResponseCopyWith<T> total(int value) {
+    return _ListResponseCopyWith<T>._(ListResponse<T>(
+      total: value,
       items: _instance.items,
-    );
+    ));
   }
 
   /// Update items field
-  ListResponse<T> items(List<T>? value) {
-    return ListResponse<T>(
+  _ListResponseCopyWith<T> items(List<T>? value) {
+    return _ListResponseCopyWith<T>._(ListResponse<T>(
       total: _instance.total,
       items: value,
-    );
+    ));
+  }
+
+  /// Build the final instance
+  ListResponse<T> build() {
+    return _instance;
   }
 
   /// Traditional copyWith method

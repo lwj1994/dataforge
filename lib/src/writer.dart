@@ -1,19 +1,26 @@
 import 'dart:io';
+import 'package:path/path.dart';
 
 import 'package:dataforge/src/util.dart';
 
 import 'model.dart';
+import 'import_resolver.dart';
 
 class Writer {
   final ParseResult result;
   final String? projectRoot;
   final bool debugMode;
-  final bool autoModify;
+  final bool autoModify = true;
   late final String _dataforgeAnnotationPrefix;
+  late final ImportResolver _importResolver;
 
-  Writer(this.result,
-      {this.projectRoot, this.debugMode = false, this.autoModify = false}) {
+  Writer(this.result, {this.projectRoot, this.debugMode = false}) {
     _dataforgeAnnotationPrefix = _getDataforgeAnnotationPrefix();
+    _importResolver = ImportResolver(
+      result: result,
+      projectRoot: projectRoot,
+      debugMode: debugMode,
+    );
   }
 
   /// Get the prefix for dataforge_annotation based on import statements
@@ -34,79 +41,10 @@ class Writer {
     return '${prefix}SafeCasteUtil';
   }
 
-  /// Check if a type is an enum by analyzing the source files
+  /// Check if a type is an enum by using ImportResolver
+  /// This method now prioritizes searching in imported files before falling back to project-wide search
   bool _isEnumType(String type) {
-    final enumCheckStartTime = DateTime.now();
-
-    // Remove nullable marker and generic parameters
-    final cleanType = _removeGenericParameters(type.replaceAll('?', ''));
-    if (debugMode) {
-      print(
-          '[PERF] $enumCheckStartTime: Starting enum type check for: $cleanType');
-    }
-
-    // Use project root if available, otherwise fall back to current directory
-    final searchDir =
-        projectRoot != null ? Directory(projectRoot!) : Directory.current;
-    if (!searchDir.existsSync()) {
-      if (debugMode) {
-        print(
-            '[PERF] ${DateTime.now()}: Search directory does not exist: ${searchDir.path}');
-      }
-      return false;
-    }
-
-    // Check all Dart files in the search directory for enum definitions
-    final scanStartTime = DateTime.now();
-    final dartFiles = searchDir
-        .listSync(recursive: true)
-        .whereType<File>()
-        .where((file) => file.path.endsWith('.dart'))
-        .toList();
-    final scanEndTime = DateTime.now();
-    final scanTime = scanEndTime.difference(scanStartTime).inMilliseconds;
-    if (debugMode) {
-      print(
-          '[PERF] $scanEndTime: Directory scan completed, found ${dartFiles.length} Dart files in ${scanTime}ms');
-    }
-
-    final searchStartTime = DateTime.now();
-    int filesChecked = 0;
-    for (final file in dartFiles) {
-      try {
-        final content = file.readAsStringSync();
-        filesChecked++;
-
-        // Look for enum definition
-        final enumPattern =
-            RegExp(r'enum\s+' + RegExp.escape(cleanType) + r'\s*\{');
-        if (enumPattern.hasMatch(content)) {
-          final searchEndTime = DateTime.now();
-          final searchTime =
-              searchEndTime.difference(searchStartTime).inMilliseconds;
-          final totalTime =
-              searchEndTime.difference(enumCheckStartTime).inMilliseconds;
-          if (debugMode) {
-            print(
-                '[PERF] $searchEndTime: Enum $cleanType found in ${file.path} after checking $filesChecked files (search:${searchTime}ms, total:${totalTime}ms)');
-          }
-          return true;
-        }
-      } catch (e) {
-        // Ignore file read errors
-        continue;
-      }
-    }
-
-    final searchEndTime = DateTime.now();
-    final searchTime = searchEndTime.difference(searchStartTime).inMilliseconds;
-    final totalTime =
-        searchEndTime.difference(enumCheckStartTime).inMilliseconds;
-    if (debugMode) {
-      print(
-          '[PERF] $searchEndTime: Enum $cleanType not found after checking $filesChecked files (search:${searchTime}ms, total:${totalTime}ms)');
-    }
-    return false;
+    return _importResolver.isEnumType(type);
   }
 
   /// Remove generic parameters from a type string, handling nested generics correctly
@@ -243,7 +181,18 @@ class Writer {
 
   /// Add with clause to class in lines, returns true if modified
   bool _addWithClauseToLines(List<String> lines, String className) {
+    // Find the class info to get generic parameters
+    final clazz = result.classes.firstWhere(
+      (c) => c.name == className,
+      orElse: () => throw StateError('Class $className not found'),
+    );
+
     final mixinName = '_$className';
+    // Generate generic parameters for the mixin
+    final genericParams = clazz.genericParameters.isNotEmpty
+        ? '<${clazz.genericParameters.map((p) => p.name).join(', ')}>'
+        : '';
+    final mixinWithGenerics = '$mixinName$genericParams';
 
     for (int i = 0; i < lines.length; i++) {
       final line = lines[i];
@@ -262,17 +211,37 @@ class Writer {
             final withClause =
                 line.substring(withIndex + 5, openBraceIndex).trim();
             final existingMixins =
-                withClause.split(',').map((m) => m.trim()).toSet();
+                withClause.split(',').map((m) => m.trim()).toList();
 
-            // Check if our mixin is already present
-            if (existingMixins.contains(mixinName)) {
-              return false; // Already has the correct with clause
+            // Filter out invalid mixin names (like single generic parameters or malformed names)
+            final validMixins = existingMixins
+                .where((m) =>
+                        m.isNotEmpty &&
+                            !RegExp(r'^[A-Z]>?$').hasMatch(
+                                m) && // Filter out single generic parameters like "U" or "U>"
+                            !m.endsWith('>') ||
+                        m.contains(
+                            '<') // Filter out malformed names ending with > but not containing <
+                    )
+                .toList();
+
+            // Check if our mixin is already present (with or without generics)
+            final hasBaseMixin =
+                validMixins.any((m) => m.startsWith(mixinName));
+            if (hasBaseMixin) {
+              // Update existing mixin to include generics if needed
+              for (int j = 0; j < validMixins.length; j++) {
+                if (validMixins[j].startsWith(mixinName)) {
+                  validMixins[j] = mixinWithGenerics;
+                  break;
+                }
+              }
+            } else {
+              // Add our mixin to the existing list
+              validMixins.add(mixinWithGenerics);
             }
 
-            // Add our mixin to the existing list
-            existingMixins.add(mixinName);
-            final newWithClause = existingMixins.join(', ');
-
+            final newWithClause = validMixins.join(', ');
             final beforeWith = line.substring(0, withIndex);
             final afterBrace = line.substring(openBraceIndex);
             lines[i] = '$beforeWith with $newWithClause $afterBrace';
@@ -285,7 +254,7 @@ class Writer {
           if (openBraceIndex != -1) {
             final beforeBrace = line.substring(0, openBraceIndex).trim();
             final afterBrace = line.substring(openBraceIndex);
-            lines[i] = '$beforeBrace with $mixinName $afterBrace';
+            lines[i] = '$beforeBrace with $mixinWithGenerics $afterBrace';
             return true;
           }
         }
@@ -1003,6 +972,11 @@ class Writer {
         ..createSync(recursive: true)
         ..writeAsStringSync(buffer.toString());
 
+      // Print generated file immediately after writing
+      final relativePath =
+          relative(result.outputPath, from: Directory.current.path);
+      print('Generated $relativePath');
+
       final fileWriteEndTime = DateTime.now();
       final fileWriteTime =
           fileWriteEndTime.difference(fileWriteStartTime).inMilliseconds;
@@ -1160,7 +1134,7 @@ class Writer {
 
     // Generate copyWith getter
     buffer.writeln(
-        '\n  $copyWithClassName get copyWith => $copyWithClassName._(this);');
+        '\n  $copyWithClassName get copyWith => $copyWithClassName._(this as ${clazz.name}$genericParams);');
   }
 
   /// Check if a field is a nested object that supports copyWith
@@ -1198,6 +1172,175 @@ class Writer {
     return primitiveTypes.contains(type);
   }
 
+  /// Recursively collect all flattened field paths for nested objects
+  /// Returns a list of FlattenedField objects containing field paths and types
+  List<FlattenedField> _collectFlattenedFields(ClassInfo clazz,
+      [String prefix = '']) {
+    final flattenedFields = <FlattenedField>[];
+
+    for (final field in clazz.fields) {
+      final fieldPath = prefix.isEmpty ? field.name : '${prefix}_${field.name}';
+
+      // Check if this field is a nested object that has its own ClassInfo
+      final nestedClass = _findClassInfoByType(field.type);
+      if (nestedClass != null) {
+        // Recursively collect fields from nested class
+        final nestedFields = _collectFlattenedFields(nestedClass, fieldPath);
+        flattenedFields.addAll(nestedFields);
+      } else {
+        // This is a primitive field, add it to the flattened list
+        flattenedFields.add(FlattenedField(
+          path: fieldPath,
+          fieldName: field.name,
+          type: field.type,
+          originalField: field,
+        ));
+      }
+    }
+
+    return flattenedFields;
+  }
+
+  /// Find ClassInfo by type name
+  /// First searches in current file, then in imported files
+  ClassInfo? _findClassInfoByType(String typeName) {
+    // Remove nullable marker and generic parameters
+    final cleanType = _removeGenericParameters(typeName.replaceAll('?', ''));
+
+    // Search through all classes in the current file first
+    for (final clazz in result.classes) {
+      if (clazz.name == cleanType) {
+        return clazz;
+      }
+    }
+
+    // If not found in current file, search in imported files
+    return _importResolver.findClassInfoInImports(cleanType);
+  }
+
+  /// Generate nested update path for flattened field access
+  String _generateNestedUpdatePath(List<String> pathParts) {
+    if (pathParts.isEmpty) return '';
+    return '["${pathParts.join('", "')}"]';
+  }
+
+  /// Generate nested copyWith chain for updating deep nested fields
+  String _generateNestedCopyWithChain(
+      ClassInfo clazz, List<String> fieldPath, String finalValue) {
+    if (fieldPath.isEmpty) {
+      return finalValue;
+    }
+
+    if (fieldPath.length == 1) {
+      // Direct field update
+      return finalValue;
+    }
+
+    // Build the nested copyWith chain from the inside out
+    String result = finalValue;
+
+    // Start from the innermost field and work outward
+    for (int i = fieldPath.length - 1; i > 0; i--) {
+      final currentField = fieldPath[i];
+      final parentPath = fieldPath.sublist(0, i);
+
+      // Build the access path with proper null safety
+      String accessPath = _buildAccessPath(clazz, parentPath);
+
+      // For nested access, we need to check if the last field in parentPath is nullable
+      // to determine if we need ?. or . before copyWith
+      bool needsNullableAccess = false;
+      if (parentPath.isNotEmpty) {
+        // Navigate to find the actual field type
+        ClassInfo? currentClass = clazz;
+        for (int k = 0; k < parentPath.length - 1; k++) {
+          final fieldName = parentPath[k];
+          final field = currentClass?.fields
+              .where((f) => f.name == fieldName)
+              .firstOrNull;
+          if (field != null) {
+            currentClass = _findClassInfoByType(field.type);
+          }
+        }
+
+        // Check if the last field in parentPath is nullable
+        if (currentClass != null && parentPath.isNotEmpty) {
+          final lastFieldName = parentPath.last;
+          final lastField = currentClass.fields
+              .where((f) => f.name == lastFieldName)
+              .firstOrNull;
+          needsNullableAccess = lastField?.type.endsWith('?') ?? false;
+        }
+      }
+
+      final copyWithOperator = needsNullableAccess ? '?.' : '.';
+
+      // Generate the copyWith chain
+      result =
+          '$accessPath${copyWithOperator}copyWith.$currentField($result).build()';
+    }
+
+    return result;
+  }
+
+  /// Build access path for a field path with proper null safety
+  String _buildAccessPath(ClassInfo clazz, List<String> fieldPath) {
+    if (fieldPath.isEmpty) {
+      return '_instance';
+    }
+
+    String accessPath = '_instance';
+
+    for (int j = 0; j < fieldPath.length; j++) {
+      final fieldName = fieldPath[j];
+
+      if (j == 0) {
+        // First field: use normal access
+        accessPath += '.$fieldName';
+      } else {
+        // Subsequent fields: use non-null assertion
+        accessPath += '!.$fieldName';
+      }
+    }
+
+    return accessPath;
+  }
+
+  /// Check if a field path represents a nullable field
+  bool _isFieldPathNullable(ClassInfo rootClass, List<String> fieldPath) {
+    if (fieldPath.isEmpty) return false;
+
+    // Start from the root class and traverse the path
+    ClassInfo? currentClass = rootClass;
+
+    for (int i = 0; i < fieldPath.length; i++) {
+      final fieldName = fieldPath[i];
+      final field =
+          currentClass?.fields.where((f) => f.name == fieldName).firstOrNull;
+
+      if (field == null) return false;
+
+      // Check if this field is nullable
+      final isNullable = field.type.endsWith('?');
+
+      // If this is the last field in the path, return its nullability
+      if (i == fieldPath.length - 1) {
+        return isNullable;
+      }
+
+      // If any field in the path is nullable, the entire path is nullable
+      if (isNullable) {
+        return true;
+      }
+
+      // Otherwise, find the next class in the chain
+      currentClass = _findClassInfoByType(field.type);
+      if (currentClass == null) return false;
+    }
+
+    return false;
+  }
+
   /// Build chained copyWith helper class (outside mixin)
   void _buildChainedCopyWithHelperClass(StringBuffer buffer, ClassInfo clazz,
       String genericParams, List<FieldInfo> validFields) {
@@ -1206,21 +1349,21 @@ class Writer {
     // Generate copyWith helper class
     buffer.writeln('\n/// Helper class for chained copyWith operations');
     buffer.writeln('class $copyWithClassName {');
-    buffer.writeln('  final _${clazz.name}$genericParams _instance;');
+    buffer.writeln('  final ${clazz.name}$genericParams _instance;');
     // Constructor name should not include generic parameters
     final constructorName = clazz.genericParameters.isNotEmpty
         ? '_${clazz.name}CopyWith._'
         : '$copyWithClassName._';
     buffer.writeln('  const $constructorName(this._instance);');
 
-    // Generate method for each field
+    // Generate method for each field that returns builder for chaining
     for (final field in validFields) {
       // For chained copyWith, use the original field type directly
       final paramType = field.type;
       buffer.writeln('\n  /// Update ${field.name} field');
+      buffer.writeln('  $copyWithClassName ${field.name}($paramType value) {');
       buffer.writeln(
-          '  ${clazz.name}$genericParams ${field.name}($paramType value) {');
-      buffer.writeln('    return ${clazz.name}$genericParams(');
+          '    return $copyWithClassName._(${clazz.name}$genericParams(');
 
       for (final f in validFields) {
         if (f.name == field.name) {
@@ -1231,9 +1374,15 @@ class Writer {
         }
       }
 
-      buffer.writeln('    );');
+      buffer.writeln('    ));');
       buffer.writeln('  }');
     }
+
+    // Generate build method to return the final instance
+    buffer.writeln('\n  /// Build the final instance');
+    buffer.writeln('  ${clazz.name}$genericParams build() {');
+    buffer.writeln('    return _instance as ${clazz.name}$genericParams;');
+    buffer.writeln('  }');
 
     // Generate nested copyWith getters for complex object fields
     for (final field in validFields) {
@@ -1247,6 +1396,38 @@ class Writer {
             '    return _${clazz.name}NestedCopyWith$capitalizedFieldName$genericParams._(_instance);');
         buffer.writeln('  }');
       }
+    }
+
+    // Generate flattened field methods for infinite nesting
+    final flattenedFields = _collectFlattenedFields(clazz);
+    for (final flattenedField in flattenedFields) {
+      // Skip direct fields (they are already handled above)
+      if (!flattenedField.path.contains('_')) continue;
+
+      final methodName = '\$${flattenedField.path}';
+      final paramType = flattenedField.type;
+
+      buffer.writeln('\n  /// Update ${flattenedField.path} field');
+      buffer.writeln('  $copyWithClassName $methodName($paramType value) {');
+
+      // Generate the nested field update logic using copyWith chain
+      final pathParts = flattenedField.path.split('_');
+      buffer.writeln(
+          '    return $copyWithClassName._(${clazz.name}$genericParams(');
+
+      for (final field in validFields) {
+        if (field.name == pathParts[0]) {
+          // Generate nested copyWith chain for this field
+          final nestedUpdateCode =
+              _generateNestedCopyWithChain(clazz, pathParts, 'value');
+          buffer.writeln('      ${field.name}: $nestedUpdateCode,');
+        } else {
+          buffer.writeln('      ${field.name}: _instance.${field.name},');
+        }
+      }
+
+      buffer.writeln('    ));');
+      buffer.writeln('  }');
     }
 
     // Generate call method for traditional copyWith syntax
@@ -1295,7 +1476,7 @@ class Writer {
     buffer.writeln(
         '\n/// Nested copyWith helper class for ${nestedField.name} field');
     buffer.writeln('class $nestedCopyWithClassName {');
-    buffer.writeln('  final _${parentClazz.name}$genericParams _instance;');
+    buffer.writeln('  final ${parentClazz.name}$genericParams _instance;');
     // Constructor name should not include generic parameters
     final nestedConstructorName = parentClazz.genericParameters.isNotEmpty
         ? '_${parentClazz.name}NestedCopyWith$capitalizedFieldName._'
