@@ -145,11 +145,6 @@ class _UserProfileCopyWith {
     return _instance;
   }
 
-  /// Nested copyWith for token field
-  _UserProfileNestedCopyWithToken get tokenBuilder {
-    return _UserProfileNestedCopyWithToken._(_instance);
-  }
-
   /// Update token_accessToken field
   _UserProfileCopyWith $token_accessToken(String value) {
     return _UserProfileCopyWith._(UserProfile(
@@ -200,23 +195,6 @@ class _UserProfileCopyWith {
   }
 }
 
-/// Nested copyWith helper class for token field
-class _UserProfileNestedCopyWithToken {
-  final UserProfile _instance;
-  const _UserProfileNestedCopyWithToken._(this._instance);
-
-  /// Update token field using a copyWith function
-  UserProfile call(TokenBean Function(TokenBean) updater) {
-    final currentValue = _instance.token;
-    final updatedValue = updater(currentValue);
-    return UserProfile(
-      id: _instance.id,
-      name: _instance.name,
-      token: updatedValue,
-    );
-  }
-}
-
 /// Helper class for chained copyWith operations
 class _SessionDataCopyWith {
   final SessionData _instance;
@@ -241,11 +219,6 @@ class _SessionDataCopyWith {
   /// Build the final instance
   SessionData build() {
     return _instance;
-  }
-
-  /// Nested copyWith for user field
-  _SessionDataNestedCopyWithUser get userBuilder {
-    return _SessionDataNestedCopyWithUser._(_instance);
   }
 
   /// Update user_id field
@@ -312,22 +285,6 @@ class _SessionDataCopyWith {
     return SessionData(
       sessionId: sessionId ?? _instance.sessionId,
       user: user ?? _instance.user,
-    );
-  }
-}
-
-/// Nested copyWith helper class for user field
-class _SessionDataNestedCopyWithUser {
-  final SessionData _instance;
-  const _SessionDataNestedCopyWithUser._(this._instance);
-
-  /// Update user field using a copyWith function
-  SessionData call(UserProfile Function(UserProfile) updater) {
-    final currentValue = _instance.user;
-    final updatedValue = updater(currentValue);
-    return SessionData(
-      sessionId: _instance.sessionId,
-      user: updatedValue,
     );
   }
 }

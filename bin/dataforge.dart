@@ -3,8 +3,9 @@ import 'package:args/args.dart';
 import 'package:dataforge/dataforge.dart';
 
 Future<void> main(List<String> args) async {
+  // Show loading indicator
+  print('🔨 Generating code');
   final parser = ArgParser();
-
   parser.addOption("path", defaultsTo: "");
   parser.addFlag("format", defaultsTo: false, help: "Format generated code");
   parser.addFlag("debug",
@@ -47,9 +48,6 @@ Future<void> main(List<String> args) async {
     print(
         '[DEBUG] ${DateTime.now()}: Current working directory: ${Directory.current.path}');
   }
-
-  // Show loading indicator
-  print('🔨 Generating code');
 
   if (path.isEmpty) {
     if (debugMode) {
@@ -103,8 +101,6 @@ Future<void> main(List<String> args) async {
       if (debugMode) {
         print('[DEBUG] ${DateTime.now()}: Code formatting completed');
       }
-    } else {
-      print('\n✅ Generated ${generatedFiles.length} files successfully!');
     }
   } else {
     print('\n✅ No files to generate.');
@@ -141,8 +137,6 @@ Future<void> _formatGeneratedCode(
     await Process.run('dart', formatArgs);
 
     stdout.write('.');
-
-    print('\n✅ Generated ${generatedFiles.length} files successfully!');
   } catch (e) {
     print('\n⚠ Warning: Failed to format generated code: $e');
   }

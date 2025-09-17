@@ -512,16 +512,6 @@ class _PersonCopyWith {
     return _instance;
   }
 
-  /// Nested copyWith for address field
-  _PersonNestedCopyWithAddress get addressBuilder {
-    return _PersonNestedCopyWithAddress._(_instance);
-  }
-
-  /// Nested copyWith for workAddress field
-  _PersonNestedCopyWithWorkAddress get workAddressBuilder {
-    return _PersonNestedCopyWithWorkAddress._(_instance);
-  }
-
   /// Update address_street field
   _PersonCopyWith $address_street(String value) {
     return _PersonCopyWith._(Person(
@@ -598,43 +588,6 @@ class _PersonCopyWith {
   }
 }
 
-/// Nested copyWith helper class for address field
-class _PersonNestedCopyWithAddress {
-  final Person _instance;
-  const _PersonNestedCopyWithAddress._(this._instance);
-
-  /// Update address field using a copyWith function
-  Person call(Address Function(Address) updater) {
-    final currentValue = _instance.address;
-    final updatedValue = updater(currentValue);
-    return Person(
-      name: _instance.name,
-      age: _instance.age,
-      address: updatedValue,
-      workAddress: _instance.workAddress,
-    );
-  }
-}
-
-/// Nested copyWith helper class for workAddress field
-class _PersonNestedCopyWithWorkAddress {
-  final Person _instance;
-  const _PersonNestedCopyWithWorkAddress._(this._instance);
-
-  /// Update workAddress field using a copyWith function
-  Person call(Address Function(Address) updater) {
-    final currentValue = _instance.workAddress;
-    if (currentValue == null) return _instance;
-    final updatedValue = updater(currentValue);
-    return Person(
-      name: _instance.name,
-      age: _instance.age,
-      address: _instance.address,
-      workAddress: updatedValue,
-    );
-  }
-}
-
 /// Helper class for chained copyWith operations
 class _CompanyCopyWith {
   final Company _instance;
@@ -670,11 +623,6 @@ class _CompanyCopyWith {
   /// Build the final instance
   Company build() {
     return _instance;
-  }
-
-  /// Nested copyWith for ceo field
-  _CompanyNestedCopyWithCeo get ceoBuilder {
-    return _CompanyNestedCopyWithCeo._(_instance);
   }
 
   /// Update ceo_name field
@@ -777,23 +725,6 @@ class _CompanyCopyWith {
   }
 }
 
-/// Nested copyWith helper class for ceo field
-class _CompanyNestedCopyWithCeo {
-  final Company _instance;
-  const _CompanyNestedCopyWithCeo._(this._instance);
-
-  /// Update ceo field using a copyWith function
-  Company call(Person Function(Person) updater) {
-    final currentValue = _instance.ceo;
-    final updatedValue = updater(currentValue);
-    return Company(
-      name: _instance.name,
-      ceo: updatedValue,
-      employees: _instance.employees,
-    );
-  }
-}
-
 /// Helper class for chained copyWith operations
 class _DepartmentCopyWith {
   final Department _instance;
@@ -842,21 +773,6 @@ class _DepartmentCopyWith {
   /// Build the final instance
   Department build() {
     return _instance;
-  }
-
-  /// Nested copyWith for manager field
-  _DepartmentNestedCopyWithManager get managerBuilder {
-    return _DepartmentNestedCopyWithManager._(_instance);
-  }
-
-  /// Nested copyWith for parentCompany field
-  _DepartmentNestedCopyWithParentCompany get parentCompanyBuilder {
-    return _DepartmentNestedCopyWithParentCompany._(_instance);
-  }
-
-  /// Nested copyWith for location field
-  _DepartmentNestedCopyWithLocation get locationBuilder {
-    return _DepartmentNestedCopyWithLocation._(_instance);
   }
 
   /// Update manager_name field
@@ -1140,61 +1056,6 @@ class _DepartmentCopyWith {
   }
 }
 
-/// Nested copyWith helper class for manager field
-class _DepartmentNestedCopyWithManager {
-  final Department _instance;
-  const _DepartmentNestedCopyWithManager._(this._instance);
-
-  /// Update manager field using a copyWith function
-  Department call(Person Function(Person) updater) {
-    final currentValue = _instance.manager;
-    final updatedValue = updater(currentValue);
-    return Department(
-      name: _instance.name,
-      manager: updatedValue,
-      parentCompany: _instance.parentCompany,
-      location: _instance.location,
-    );
-  }
-}
-
-/// Nested copyWith helper class for parentCompany field
-class _DepartmentNestedCopyWithParentCompany {
-  final Department _instance;
-  const _DepartmentNestedCopyWithParentCompany._(this._instance);
-
-  /// Update parentCompany field using a copyWith function
-  Department call(Company Function(Company) updater) {
-    final currentValue = _instance.parentCompany;
-    final updatedValue = updater(currentValue);
-    return Department(
-      name: _instance.name,
-      manager: _instance.manager,
-      parentCompany: updatedValue,
-      location: _instance.location,
-    );
-  }
-}
-
-/// Nested copyWith helper class for location field
-class _DepartmentNestedCopyWithLocation {
-  final Department _instance;
-  const _DepartmentNestedCopyWithLocation._(this._instance);
-
-  /// Update location field using a copyWith function
-  Department call(Address Function(Address) updater) {
-    final currentValue = _instance.location;
-    if (currentValue == null) return _instance;
-    final updatedValue = updater(currentValue);
-    return Department(
-      name: _instance.name,
-      manager: _instance.manager,
-      parentCompany: _instance.parentCompany,
-      location: updatedValue,
-    );
-  }
-}
-
 /// Helper class for chained copyWith operations
 class _OrganizationCopyWith {
   final Organization _instance;
@@ -1258,21 +1119,6 @@ class _OrganizationCopyWith {
   /// Build the final instance
   Organization build() {
     return _instance;
-  }
-
-  /// Nested copyWith for headquarters field
-  _OrganizationNestedCopyWithHeadquarters get headquartersBuilder {
-    return _OrganizationNestedCopyWithHeadquarters._(_instance);
-  }
-
-  /// Nested copyWith for founder field
-  _OrganizationNestedCopyWithFounder get founderBuilder {
-    return _OrganizationNestedCopyWithFounder._(_instance);
-  }
-
-  /// Nested copyWith for parentCompany field
-  _OrganizationNestedCopyWithParentCompany get parentCompanyBuilder {
-    return _OrganizationNestedCopyWithParentCompany._(_instance);
   }
 
   /// Update headquarters_street field
@@ -1579,64 +1425,6 @@ class _OrganizationCopyWith {
   }
 }
 
-/// Nested copyWith helper class for headquarters field
-class _OrganizationNestedCopyWithHeadquarters {
-  final Organization _instance;
-  const _OrganizationNestedCopyWithHeadquarters._(this._instance);
-
-  /// Update headquarters field using a copyWith function
-  Organization call(Address Function(Address) updater) {
-    final currentValue = _instance.headquarters;
-    final updatedValue = updater(currentValue);
-    return Organization(
-      name: _instance.name,
-      headquarters: updatedValue,
-      departments: _instance.departments,
-      founder: _instance.founder,
-      parentCompany: _instance.parentCompany,
-    );
-  }
-}
-
-/// Nested copyWith helper class for founder field
-class _OrganizationNestedCopyWithFounder {
-  final Organization _instance;
-  const _OrganizationNestedCopyWithFounder._(this._instance);
-
-  /// Update founder field using a copyWith function
-  Organization call(Person Function(Person) updater) {
-    final currentValue = _instance.founder;
-    final updatedValue = updater(currentValue);
-    return Organization(
-      name: _instance.name,
-      headquarters: _instance.headquarters,
-      departments: _instance.departments,
-      founder: updatedValue,
-      parentCompany: _instance.parentCompany,
-    );
-  }
-}
-
-/// Nested copyWith helper class for parentCompany field
-class _OrganizationNestedCopyWithParentCompany {
-  final Organization _instance;
-  const _OrganizationNestedCopyWithParentCompany._(this._instance);
-
-  /// Update parentCompany field using a copyWith function
-  Organization call(Company Function(Company) updater) {
-    final currentValue = _instance.parentCompany;
-    if (currentValue == null) return _instance;
-    final updatedValue = updater(currentValue);
-    return Organization(
-      name: _instance.name,
-      headquarters: _instance.headquarters,
-      departments: _instance.departments,
-      founder: _instance.founder,
-      parentCompany: updatedValue,
-    );
-  }
-}
-
 /// Helper class for chained copyWith operations
 class _CorporateGroupCopyWith {
   final CorporateGroup _instance;
@@ -1700,21 +1488,6 @@ class _CorporateGroupCopyWith {
   /// Build the final instance
   CorporateGroup build() {
     return _instance;
-  }
-
-  /// Nested copyWith for mainOrganization field
-  _CorporateGroupNestedCopyWithMainOrganization get mainOrganizationBuilder {
-    return _CorporateGroupNestedCopyWithMainOrganization._(_instance);
-  }
-
-  /// Nested copyWith for chairman field
-  _CorporateGroupNestedCopyWithChairman get chairmanBuilder {
-    return _CorporateGroupNestedCopyWithChairman._(_instance);
-  }
-
-  /// Nested copyWith for registeredAddress field
-  _CorporateGroupNestedCopyWithRegisteredAddress get registeredAddressBuilder {
-    return _CorporateGroupNestedCopyWithRegisteredAddress._(_instance);
   }
 
   /// Update mainOrganization_name field
@@ -2270,64 +2043,6 @@ class _CorporateGroupCopyWith {
       subsidiaries: subsidiaries ?? _instance.subsidiaries,
       chairman: chairman ?? _instance.chairman,
       registeredAddress: registeredAddress ?? _instance.registeredAddress,
-    );
-  }
-}
-
-/// Nested copyWith helper class for mainOrganization field
-class _CorporateGroupNestedCopyWithMainOrganization {
-  final CorporateGroup _instance;
-  const _CorporateGroupNestedCopyWithMainOrganization._(this._instance);
-
-  /// Update mainOrganization field using a copyWith function
-  CorporateGroup call(Organization Function(Organization) updater) {
-    final currentValue = _instance.mainOrganization;
-    final updatedValue = updater(currentValue);
-    return CorporateGroup(
-      name: _instance.name,
-      mainOrganization: updatedValue,
-      subsidiaries: _instance.subsidiaries,
-      chairman: _instance.chairman,
-      registeredAddress: _instance.registeredAddress,
-    );
-  }
-}
-
-/// Nested copyWith helper class for chairman field
-class _CorporateGroupNestedCopyWithChairman {
-  final CorporateGroup _instance;
-  const _CorporateGroupNestedCopyWithChairman._(this._instance);
-
-  /// Update chairman field using a copyWith function
-  CorporateGroup call(Person Function(Person) updater) {
-    final currentValue = _instance.chairman;
-    final updatedValue = updater(currentValue);
-    return CorporateGroup(
-      name: _instance.name,
-      mainOrganization: _instance.mainOrganization,
-      subsidiaries: _instance.subsidiaries,
-      chairman: updatedValue,
-      registeredAddress: _instance.registeredAddress,
-    );
-  }
-}
-
-/// Nested copyWith helper class for registeredAddress field
-class _CorporateGroupNestedCopyWithRegisteredAddress {
-  final CorporateGroup _instance;
-  const _CorporateGroupNestedCopyWithRegisteredAddress._(this._instance);
-
-  /// Update registeredAddress field using a copyWith function
-  CorporateGroup call(Address Function(Address) updater) {
-    final currentValue = _instance.registeredAddress;
-    if (currentValue == null) return _instance;
-    final updatedValue = updater(currentValue);
-    return CorporateGroup(
-      name: _instance.name,
-      mainOrganization: _instance.mainOrganization,
-      subsidiaries: _instance.subsidiaries,
-      chairman: _instance.chairman,
-      registeredAddress: updatedValue,
     );
   }
 }

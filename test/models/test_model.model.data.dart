@@ -122,11 +122,6 @@ class _TestModelCopyWith {
     return _instance;
   }
 
-  /// Nested copyWith for param field
-  _TestModelNestedCopyWithParam get paramBuilder {
-    return _TestModelNestedCopyWithParam._(_instance);
-  }
-
   /// Update param_value field
   _TestModelCopyWith $param_value(String value) {
     return _TestModelCopyWith._(TestModel(
@@ -143,23 +138,6 @@ class _TestModelCopyWith {
     return TestModel(
       name: name ?? _instance.name,
       param: param ?? _instance.param,
-    );
-  }
-}
-
-/// Nested copyWith helper class for param field
-class _TestModelNestedCopyWithParam {
-  final TestModel _instance;
-  const _TestModelNestedCopyWithParam._(this._instance);
-
-  /// Update param field using a copyWith function
-  TestModel call(Params Function(Params) updater) {
-    final currentValue = _instance.param;
-    if (currentValue == null) return _instance;
-    final updatedValue = updater(currentValue);
-    return TestModel(
-      name: _instance.name,
-      param: updatedValue,
     );
   }
 }

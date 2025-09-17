@@ -215,11 +215,6 @@ class _ApiResponseCopyWith<T> {
     return _instance;
   }
 
-  /// Nested copyWith for data field
-  _ApiResponseNestedCopyWithData<T> get dataBuilder {
-    return _ApiResponseNestedCopyWithData<T>._(_instance);
-  }
-
   /// Traditional copyWith method
   ApiResponse<T> call({
     bool? success,
@@ -230,24 +225,6 @@ class _ApiResponseCopyWith<T> {
       success: success ?? _instance.success,
       message: message ?? _instance.message,
       data: data ?? _instance.data,
-    );
-  }
-}
-
-/// Nested copyWith helper class for data field
-class _ApiResponseNestedCopyWithData<T> {
-  final ApiResponse<T> _instance;
-  const _ApiResponseNestedCopyWithData._(this._instance);
-
-  /// Update data field using a copyWith function
-  ApiResponse<T> call(T Function(T) updater) {
-    final currentValue = _instance.data;
-    if (currentValue == null) return _instance;
-    final updatedValue = updater(currentValue);
-    return ApiResponse<T>(
-      success: _instance.success,
-      message: _instance.message,
-      data: updatedValue,
     );
   }
 }

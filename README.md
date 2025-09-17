@@ -134,12 +134,62 @@ class User with _User {
 }
 ```
 
-## 🔗 Chained CopyWith
+## 🔗 Advanced CopyWith Features
 
-For complex nested objects, enable powerful chained updates:
+Dataforge provides multiple copyWith patterns to suit different coding styles and use cases:
+
+### 1. Traditional CopyWith (Default)
+
+```dart
+@Dataforge()
+class User with _User {
+  @override
+  final String name;
+  @override
+  final int age;
+  @override
+  final String? email;
+
+  const User({required this.name, required this.age, this.email});
+}
+
+// Usage
+final user = User(name: 'John', age: 25, email: 'john@example.com');
+final updated = user.copyWith(name: 'Jane', age: 30);
+```
+
+### 2. Chained CopyWith (Fluent API)
+
+Enable chained copyWith for a more fluent API experience:
 
 ```dart
 @Dataforge(chainedCopyWith: true)
+class User with _User {
+  @override
+  final String name;
+  @override
+  final int age;
+  @override
+  final String? email;
+
+  const User({required this.name, required this.age, this.email});
+}
+
+// Chained updates
+final updated1 = user.copyWith.name('Jane').build();
+final updated2 = user.copyWith.name('Jane').age(30).build();
+final updated3 = user.copyWith.email(null).build();
+
+// Traditional copyWith still available
+final updated4 = user.copyWith(name: 'Jane', age: 30);
+```
+
+### 3. Nested Object Updates
+
+For complex nested objects, use the traditional copyWith method:
+
+```dart
+@Dataforge()
 class Address with _Address {
   @override
   final String street;
@@ -151,113 +201,80 @@ class Address with _Address {
   const Address({required this.street, required this.city, required this.zipCode});
 }
 
-@Dataforge(chainedCopyWith: true)
-class Person with _Person {
+@Dataforge()
+class Profile with _Profile {
   @override
-  final String name;
-  @override
-  final int age;
+  final User user;
   @override
   final Address address;
   @override
-  final Address? workAddress;
+  final List<String> tags;
 
-  const Person({required this.name, required this.age, required this.address, this.workAddress});
+  const Profile({required this.user, required this.address, required this.tags});
 }
 
+// Nested updates using traditional copyWith
+final profile = Profile(
+  user: User(name: 'John', age: 25),
+  address: Address(street: '123 Main St', city: 'New York', zipCode: '10001'),
+  tags: ['developer'],
+);
+
+// Update nested user
+final updated1 = profile.copyWith(
+  user: profile.user.copyWith(name: 'Jane')
+);
+
+// Update nested address
+final updated2 = profile.copyWith(
+  address: profile.address.copyWith(
+    street: '999 Executive Blvd',
+    city: 'San Francisco'
+  )
+);
+
+// Multiple nested updates
+final updated3 = profile.copyWith(
+  user: profile.user.copyWith(name: 'Alice', age: 35),
+  address: profile.address.copyWith(city: 'Los Angeles'),
+  tags: ['senior-developer', 'team-lead']
+);
+```
+
+### 4. Chained CopyWith with Nested Objects
+
+When using chained copyWith, you can still update nested objects:
+
+```dart
 @Dataforge(chainedCopyWith: true)
-class Company with _Company {
-  @override
-  final String name;
-  @override
-  final Person ceo;
-  @override
-  final List<Person> employees;
-
-  const Company({required this.name, required this.ceo, required this.employees});
+class Profile with _Profile {
+  // ... same as above
 }
+
+// Chained updates with nested objects
+final updated1 = profile.copyWith
+  .user(profile.user.copyWith(name: 'Jane'))
+  .build();
+  
+final updated2 = profile.copyWith
+  .address(profile.address.copyWith(city: 'San Francisco'))
+  .build();
 ```
 
-### Usage Examples
+### 5. Mixed Usage Patterns
 
 ```dart
-final company = Company(
-  name: 'Tech Corp',
-  ceo: Person(
-    name: 'John Doe',
-    age: 30,
-    address: Address(street: '123 Main St', city: 'New York', zipCode: '10001'),
-  ),
-  employees: [],
+// Traditional copyWith for simple cases
+final simple = user.copyWith(name: 'Simple Update');
+
+// Chained for fluent API
+final fluent = user.copyWith.name('Fluent').age(25).build();
+
+// Nested object updates
+final nested = profile.copyWith(
+  user: User(name: 'New User', age: 40),  // Replace entire object
+  tags: ['new-tag']                       // Update list
 );
-
-// Simple chained copyWith
-final newCompany1 = company.copyWith.name('New Tech Corp');
-
-// Nested updates
-final newCompany2 = company.copyWith.ceoBuilder((ceo) => 
-  ceo.copyWith.name('Jane Smith')
-);
-
-// Multi-level nested updates
-final newCompany3 = company.copyWith.ceoBuilder((ceo) => 
-  ceo.copyWith.addressBuilder((addr) => 
-    addr.copyWith.street('999 Executive Blvd')
-  )
-);
-
-// Complex multi-field updates
-final newCompany4 = company.copyWith.ceoBuilder((ceo) => 
-  ceo.copyWith
-    .name('Alice Johnson')
-    .copyWith.age(35)
-    .copyWith.addressBuilder((addr) => 
-      addr.copyWith
-        .street('777 CEO Lane')
-        .copyWith.city('San Francisco')
-        .copyWith.zipCode('94105')
-    )
-);
-```
-
-### Builder Pattern Style (Alternative)
-
-For a more fluent API approach, you can use the `copyWithBuilder` getter that returns a builder object:
-
-```dart
-// Single field update
-final updatedCompany = company.copyWithBuilder
-  .name('New Tech Corp')
-  .build();
-
-// Multiple field updates
-final updatedCompany = company.copyWithBuilder
-  .name('New Tech Corp')
-  .ceo(ceo.copyWithBuilder.name('Jane Smith').build())
-  .build();
-
-// Complex nested updates with chaining
-final updatedCompany = company.copyWithBuilder
-  .ceo(
-    ceo.copyWithBuilder
-      .name('Bob Wilson')
-      .age(40)
-      .address(
-        address.copyWithBuilder
-          .street('456 Oak Ave')
-          .city('Los Angeles')
-          .build()
-      )
-      .build()
-  )
-  .build();
-
-// Clean multi-line chaining
-final updatedUser = user.copyWithBuilder
-  .name('Jane Doe')
-  .age(25)
-  .email('jane@example.com')
-  .build();
 ```
 
 ## 📋 Supported Types

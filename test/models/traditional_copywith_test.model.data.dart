@@ -69,3 +69,54 @@ mixin _User {
     );
   }
 }
+
+/// Helper class for chained copyWith operations
+class _UserCopyWith {
+  final User _instance;
+  const _UserCopyWith._(this._instance);
+
+  /// Update name field
+  _UserCopyWith name(String value) {
+    return _UserCopyWith._(User(
+      name: value,
+      age: _instance.age,
+      email: _instance.email,
+    ));
+  }
+
+  /// Update age field
+  _UserCopyWith age(int value) {
+    return _UserCopyWith._(User(
+      name: _instance.name,
+      age: value,
+      email: _instance.email,
+    ));
+  }
+
+  /// Update email field
+  _UserCopyWith email(String? value) {
+    return _UserCopyWith._(User(
+      name: _instance.name,
+      age: _instance.age,
+      email: value,
+    ));
+  }
+
+  /// Build the final instance
+  User build() {
+    return _instance;
+  }
+
+  /// Traditional copyWith method
+  User call({
+    String? name,
+    int? age,
+    String? email,
+  }) {
+    return User(
+      name: name ?? _instance.name,
+      age: age ?? _instance.age,
+      email: email ?? _instance.email,
+    );
+  }
+}

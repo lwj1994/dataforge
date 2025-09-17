@@ -98,11 +98,6 @@ class _EchoApiResponseCopyWith<T> {
     return _instance;
   }
 
-  /// Nested copyWith for data field
-  _EchoApiResponseNestedCopyWithData<T> get dataBuilder {
-    return _EchoApiResponseNestedCopyWithData<T>._(_instance);
-  }
-
   /// Traditional copyWith method
   EchoApiResponse<T> call({
     String? code,
@@ -113,24 +108,6 @@ class _EchoApiResponseCopyWith<T> {
       code: code ?? _instance.code,
       message: message ?? _instance.message,
       data: data ?? _instance.data,
-    );
-  }
-}
-
-/// Nested copyWith helper class for data field
-class _EchoApiResponseNestedCopyWithData<T> {
-  final EchoApiResponse<T> _instance;
-  const _EchoApiResponseNestedCopyWithData._(this._instance);
-
-  /// Update data field using a copyWith function
-  EchoApiResponse<T> call(T Function(T) updater) {
-    final currentValue = _instance.data;
-    if (currentValue == null) return _instance;
-    final updatedValue = updater(currentValue);
-    return EchoApiResponse<T>(
-      code: _instance.code,
-      message: _instance.message,
-      data: updatedValue,
     );
   }
 }

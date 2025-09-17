@@ -257,11 +257,6 @@ class _NestedDefaultValuesCopyWith {
     return _instance;
   }
 
-  /// Nested copyWith for nested field
-  _NestedDefaultValuesNestedCopyWithNested get nestedBuilder {
-    return _NestedDefaultValuesNestedCopyWithNested._(_instance);
-  }
-
   /// Update nested_intValue field
   _NestedDefaultValuesCopyWith $nested_intValue(int value) {
     return _NestedDefaultValuesCopyWith._(NestedDefaultValues(
@@ -317,23 +312,6 @@ class _NestedDefaultValuesCopyWith {
       name: name ?? _instance.name,
       nested: nested ?? _instance.nested,
       nullableValue: nullableValue ?? _instance.nullableValue,
-    );
-  }
-}
-
-/// Nested copyWith helper class for nested field
-class _NestedDefaultValuesNestedCopyWithNested {
-  final NestedDefaultValues _instance;
-  const _NestedDefaultValuesNestedCopyWithNested._(this._instance);
-
-  /// Update nested field using a copyWith function
-  NestedDefaultValues call(DefaultValues Function(DefaultValues) updater) {
-    final currentValue = _instance.nested;
-    final updatedValue = updater(currentValue);
-    return NestedDefaultValues(
-      name: _instance.name,
-      nested: updatedValue,
-      nullableValue: _instance.nullableValue,
     );
   }
 }

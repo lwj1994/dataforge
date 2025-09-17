@@ -138,12 +138,62 @@ class User with _User {
 }
 ```
 
-## 🔗 链式 CopyWith
+## 🔗 高级 CopyWith 功能
 
-对于复杂的嵌套对象，启用强大的链式更新：
+Dataforge 提供多种 copyWith 模式，适应不同的编码风格和使用场景：
+
+### 1. 传统 CopyWith（默认）
+
+```dart
+@Dataforge()
+class User with _User {
+  @override
+  final String name;
+  @override
+  final int age;
+  @override
+  final String? email;
+
+  const User({required this.name, required this.age, this.email});
+}
+
+// 使用方式
+final user = User(name: '张三', age: 25, email: 'zhangsan@example.com');
+final updated = user.copyWith(name: '李四', age: 30);
+```
+
+### 2. 链式 CopyWith（流畅 API）
+
+启用链式 copyWith 获得更流畅的 API 体验：
 
 ```dart
 @Dataforge(chainedCopyWith: true)
+class User with _User {
+  @override
+  final String name;
+  @override
+  final int age;
+  @override
+  final String? email;
+
+  const User({required this.name, required this.age, this.email});
+}
+
+// 链式更新
+final updated1 = user.copyWith.name('李四').build();
+final updated2 = user.copyWith.name('李四').age(30).build();
+final updated3 = user.copyWith.email(null).build();
+
+// 传统 copyWith 仍然可用
+final updated4 = user.copyWith(name: '李四', age: 30);
+```
+
+### 3. 嵌套对象更新
+
+对于复杂的嵌套对象，使用传统的 copyWith 方法进行更新：
+
+```dart
+@Dataforge()
 class Address with _Address {
   @override
   final String street;
@@ -155,72 +205,76 @@ class Address with _Address {
   const Address({required this.street, required this.city, required this.zipCode});
 }
 
-@Dataforge(chainedCopyWith: true)
-class Person with _Person {
+@Dataforge()
+class Profile with _Profile {
   @override
-  final String name;
-  @override
-  final int age;
+  final User user;
   @override
   final Address address;
   @override
-  final Address? workAddress;
+  final List<String> tags;
 
-  const Person({required this.name, required this.age, required this.address, this.workAddress});
+  const Profile({required this.user, required this.address, required this.tags});
 }
 
-@Dataforge(chainedCopyWith: true)
-class Company with _Company {
-  @override
-  final String name;
-  @override
-  final Person ceo;
-  @override
-  final List<Person> employees;
+// 使用传统 copyWith 方法进行嵌套更新
+final profile = Profile(
+  user: User(name: '张三', age: 25),
+  address: Address(street: '中山路123号', city: '北京', zipCode: '100001'),
+  tags: ['开发者'],
+);
 
-  const Company({required this.name, required this.ceo, required this.employees});
-}
+// 更新嵌套的用户
+final updated1 = profile.copyWith(
+  user: profile.user.copyWith(name: '李四'),
+);
+
+// 更新嵌套的地址
+final updated2 = profile.copyWith(
+  address: profile.address.copyWith(street: '长安街999号', city: '上海'),
+);
+
+// 多重嵌套更新
+final updated3 = profile.copyWith(
+  user: profile.user.copyWith(name: '王五', age: 35),
+  address: profile.address.copyWith(city: '深圳'),
+  tags: ['高级开发者', '团队负责人'],
+);
 ```
 
-### 使用示例
+### 4. 链式 CopyWith 与嵌套对象
+
+当使用链式 copyWith 时，仍然可以更新嵌套对象：
 
 ```dart
-final company = Company(
-  name: '科技公司',
-  ceo: Person(
-    name: '张三',
-    age: 30,
-    address: Address(street: '中山路123号', city: '北京', zipCode: '100001'),
-  ),
-  employees: [],
-);
+@Dataforge(chainedCopyWith: true)
+class Profile with _Profile {
+  // ... 与上面相同
+}
 
-// 简单链式 copyWith
-final newCompany1 = company.copyWith.name('新科技公司');
+// 链式更新嵌套对象
+final updated1 = profile.copyWith
+  .user(profile.user.copyWith(name: '李四'))
+  .build();
+  
+final updated2 = profile.copyWith
+  .address(profile.address.copyWith(city: '上海'))
+  .build();
+```
 
-// 嵌套更新
-final newCompany2 = company.copyWith.ceoBuilder((ceo) => 
-  ceo.copyWith.name('李四')
-);
+### 5. 混合使用模式
 
-// 多层嵌套更新
-final newCompany3 = company.copyWith.ceoBuilder((ceo) => 
-  ceo.copyWith.addressBuilder((addr) => 
-    addr.copyWith.street('长安街999号')
-  )
-);
+```dart
+// 简单情况使用传统 copyWith
+final simple = user.copyWith(name: '简单更新');
 
-// 复杂多字段更新
-final newCompany4 = company.copyWith.ceoBuilder((ceo) => 
-  ceo.copyWith
-    .name('王五')
-    .copyWith.age(35)
-    .copyWith.addressBuilder((addr) => 
-      addr.copyWith
-        .street('天安门大街777号')
-        .copyWith.city('上海')
-        .copyWith.zipCode('200001')
-    )
+// 流畅 API 使用链式
+final fluent = user.copyWith.name('流畅').age(25).build();
+
+// 嵌套对象更新
+final nested = profile.copyWith(
+  user: User(name: '新用户', age: 40),  // 替换整个对象
+  tags: ['新标签']                     // 更新列表
 );
 ```
 

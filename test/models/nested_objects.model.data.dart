@@ -581,16 +581,6 @@ class _CompanyCopyWith {
     return _instance;
   }
 
-  /// Nested copyWith for headquarters field
-  _CompanyNestedCopyWithHeadquarters get headquartersBuilder {
-    return _CompanyNestedCopyWithHeadquarters._(_instance);
-  }
-
-  /// Nested copyWith for primaryContact field
-  _CompanyNestedCopyWithPrimaryContact get primaryContactBuilder {
-    return _CompanyNestedCopyWithPrimaryContact._(_instance);
-  }
-
   /// Update headquarters_street field
   _CompanyCopyWith $headquarters_street(String value) {
     return _CompanyCopyWith._(Company(
@@ -705,44 +695,6 @@ class _CompanyCopyWith {
       branches: branches ?? _instance.branches,
       primaryContact: primaryContact ?? _instance.primaryContact,
       additionalContacts: additionalContacts ?? _instance.additionalContacts,
-    );
-  }
-}
-
-/// Nested copyWith helper class for headquarters field
-class _CompanyNestedCopyWithHeadquarters {
-  final Company _instance;
-  const _CompanyNestedCopyWithHeadquarters._(this._instance);
-
-  /// Update headquarters field using a copyWith function
-  Company call(Address Function(Address) updater) {
-    final currentValue = _instance.headquarters;
-    final updatedValue = updater(currentValue);
-    return Company(
-      name: _instance.name,
-      headquarters: updatedValue,
-      branches: _instance.branches,
-      primaryContact: _instance.primaryContact,
-      additionalContacts: _instance.additionalContacts,
-    );
-  }
-}
-
-/// Nested copyWith helper class for primaryContact field
-class _CompanyNestedCopyWithPrimaryContact {
-  final Company _instance;
-  const _CompanyNestedCopyWithPrimaryContact._(this._instance);
-
-  /// Update primaryContact field using a copyWith function
-  Company call(Contact Function(Contact) updater) {
-    final currentValue = _instance.primaryContact;
-    final updatedValue = updater(currentValue);
-    return Company(
-      name: _instance.name,
-      headquarters: _instance.headquarters,
-      branches: _instance.branches,
-      primaryContact: updatedValue,
-      additionalContacts: _instance.additionalContacts,
     );
   }
 }
@@ -915,31 +867,6 @@ class _NestedObjectsCopyWith {
   /// Build the final instance
   NestedObjects build() {
     return _instance;
-  }
-
-  /// Nested copyWith for homeAddress field
-  _NestedObjectsNestedCopyWithHomeAddress get homeAddressBuilder {
-    return _NestedObjectsNestedCopyWithHomeAddress._(_instance);
-  }
-
-  /// Nested copyWith for workAddress field
-  _NestedObjectsNestedCopyWithWorkAddress get workAddressBuilder {
-    return _NestedObjectsNestedCopyWithWorkAddress._(_instance);
-  }
-
-  /// Nested copyWith for primaryContact field
-  _NestedObjectsNestedCopyWithPrimaryContact get primaryContactBuilder {
-    return _NestedObjectsNestedCopyWithPrimaryContact._(_instance);
-  }
-
-  /// Nested copyWith for employer field
-  _NestedObjectsNestedCopyWithEmployer get employerBuilder {
-    return _NestedObjectsNestedCopyWithEmployer._(_instance);
-  }
-
-  /// Nested copyWith for customAddress field
-  _NestedObjectsNestedCopyWithCustomAddress get customAddressBuilder {
-    return _NestedObjectsNestedCopyWithCustomAddress._(_instance);
   }
 
   /// Update homeAddress_street field
@@ -1524,129 +1451,6 @@ class _NestedObjectsCopyWith {
       employer: employer ?? _instance.employer,
       customAddress: customAddress ?? _instance.customAddress,
       parsedContacts: parsedContacts ?? _instance.parsedContacts,
-    );
-  }
-}
-
-/// Nested copyWith helper class for homeAddress field
-class _NestedObjectsNestedCopyWithHomeAddress {
-  final NestedObjects _instance;
-  const _NestedObjectsNestedCopyWithHomeAddress._(this._instance);
-
-  /// Update homeAddress field using a copyWith function
-  NestedObjects call(Address Function(Address) updater) {
-    final currentValue = _instance.homeAddress;
-    final updatedValue = updater(currentValue);
-    return NestedObjects(
-      name: _instance.name,
-      homeAddress: updatedValue,
-      workAddress: _instance.workAddress,
-      previousAddresses: _instance.previousAddresses,
-      namedAddresses: _instance.namedAddresses,
-      primaryContact: _instance.primaryContact,
-      contacts: _instance.contacts,
-      employer: _instance.employer,
-      customAddress: _instance.customAddress,
-      parsedContacts: _instance.parsedContacts,
-    );
-  }
-}
-
-/// Nested copyWith helper class for workAddress field
-class _NestedObjectsNestedCopyWithWorkAddress {
-  final NestedObjects _instance;
-  const _NestedObjectsNestedCopyWithWorkAddress._(this._instance);
-
-  /// Update workAddress field using a copyWith function
-  NestedObjects call(Address Function(Address) updater) {
-    final currentValue = _instance.workAddress;
-    if (currentValue == null) return _instance;
-    final updatedValue = updater(currentValue);
-    return NestedObjects(
-      name: _instance.name,
-      homeAddress: _instance.homeAddress,
-      workAddress: updatedValue,
-      previousAddresses: _instance.previousAddresses,
-      namedAddresses: _instance.namedAddresses,
-      primaryContact: _instance.primaryContact,
-      contacts: _instance.contacts,
-      employer: _instance.employer,
-      customAddress: _instance.customAddress,
-      parsedContacts: _instance.parsedContacts,
-    );
-  }
-}
-
-/// Nested copyWith helper class for primaryContact field
-class _NestedObjectsNestedCopyWithPrimaryContact {
-  final NestedObjects _instance;
-  const _NestedObjectsNestedCopyWithPrimaryContact._(this._instance);
-
-  /// Update primaryContact field using a copyWith function
-  NestedObjects call(Contact Function(Contact) updater) {
-    final currentValue = _instance.primaryContact;
-    final updatedValue = updater(currentValue);
-    return NestedObjects(
-      name: _instance.name,
-      homeAddress: _instance.homeAddress,
-      workAddress: _instance.workAddress,
-      previousAddresses: _instance.previousAddresses,
-      namedAddresses: _instance.namedAddresses,
-      primaryContact: updatedValue,
-      contacts: _instance.contacts,
-      employer: _instance.employer,
-      customAddress: _instance.customAddress,
-      parsedContacts: _instance.parsedContacts,
-    );
-  }
-}
-
-/// Nested copyWith helper class for employer field
-class _NestedObjectsNestedCopyWithEmployer {
-  final NestedObjects _instance;
-  const _NestedObjectsNestedCopyWithEmployer._(this._instance);
-
-  /// Update employer field using a copyWith function
-  NestedObjects call(Company Function(Company) updater) {
-    final currentValue = _instance.employer;
-    if (currentValue == null) return _instance;
-    final updatedValue = updater(currentValue);
-    return NestedObjects(
-      name: _instance.name,
-      homeAddress: _instance.homeAddress,
-      workAddress: _instance.workAddress,
-      previousAddresses: _instance.previousAddresses,
-      namedAddresses: _instance.namedAddresses,
-      primaryContact: _instance.primaryContact,
-      contacts: _instance.contacts,
-      employer: updatedValue,
-      customAddress: _instance.customAddress,
-      parsedContacts: _instance.parsedContacts,
-    );
-  }
-}
-
-/// Nested copyWith helper class for customAddress field
-class _NestedObjectsNestedCopyWithCustomAddress {
-  final NestedObjects _instance;
-  const _NestedObjectsNestedCopyWithCustomAddress._(this._instance);
-
-  /// Update customAddress field using a copyWith function
-  NestedObjects call(Address Function(Address) updater) {
-    final currentValue = _instance.customAddress;
-    if (currentValue == null) return _instance;
-    final updatedValue = updater(currentValue);
-    return NestedObjects(
-      name: _instance.name,
-      homeAddress: _instance.homeAddress,
-      workAddress: _instance.workAddress,
-      previousAddresses: _instance.previousAddresses,
-      namedAddresses: _instance.namedAddresses,
-      primaryContact: _instance.primaryContact,
-      contacts: _instance.contacts,
-      employer: _instance.employer,
-      customAddress: updatedValue,
-      parsedContacts: _instance.parsedContacts,
     );
   }
 }

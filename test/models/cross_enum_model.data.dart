@@ -143,16 +143,6 @@ class _CrossEnumTestCopyWith {
     return _instance;
   }
 
-  /// Nested copyWith for status field
-  _CrossEnumTestNestedCopyWithStatus get statusBuilder {
-    return _CrossEnumTestNestedCopyWithStatus._(_instance);
-  }
-
-  /// Nested copyWith for priority field
-  _CrossEnumTestNestedCopyWithPriority get priorityBuilder {
-    return _CrossEnumTestNestedCopyWithPriority._(_instance);
-  }
-
   /// Traditional copyWith method
   CrossEnumTest call({
     LocalStatus? status,
@@ -165,42 +155,6 @@ class _CrossEnumTestCopyWith {
       priority: priority ?? _instance.priority,
       statusList: statusList ?? _instance.statusList,
       priorityMap: priorityMap ?? _instance.priorityMap,
-    );
-  }
-}
-
-/// Nested copyWith helper class for status field
-class _CrossEnumTestNestedCopyWithStatus {
-  final CrossEnumTest _instance;
-  const _CrossEnumTestNestedCopyWithStatus._(this._instance);
-
-  /// Update status field using a copyWith function
-  CrossEnumTest call(LocalStatus Function(LocalStatus) updater) {
-    final currentValue = _instance.status;
-    final updatedValue = updater(currentValue);
-    return CrossEnumTest(
-      status: updatedValue,
-      priority: _instance.priority,
-      statusList: _instance.statusList,
-      priorityMap: _instance.priorityMap,
-    );
-  }
-}
-
-/// Nested copyWith helper class for priority field
-class _CrossEnumTestNestedCopyWithPriority {
-  final CrossEnumTest _instance;
-  const _CrossEnumTestNestedCopyWithPriority._(this._instance);
-
-  /// Update priority field using a copyWith function
-  CrossEnumTest call(LocalPriority Function(LocalPriority) updater) {
-    final currentValue = _instance.priority;
-    final updatedValue = updater(currentValue);
-    return CrossEnumTest(
-      status: _instance.status,
-      priority: updatedValue,
-      statusList: _instance.statusList,
-      priorityMap: _instance.priorityMap,
     );
   }
 }

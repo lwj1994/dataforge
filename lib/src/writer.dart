@@ -1,5 +1,4 @@
 import 'dart:io';
-import 'package:path/path.dart';
 
 import 'package:dataforge/src/util.dart';
 
@@ -469,8 +468,10 @@ class Writer {
     final processEndTime = DateTime.now();
     final totalProcessTime =
         processEndTime.difference(processStartTime).inMilliseconds;
-    print(
-        '[PERF] $processEndTime: _processOriginalFilesAsync() completed in ${totalProcessTime}ms (batch:${batchTime}ms)');
+    if (debugMode) {
+      print(
+          '[PERF] $processEndTime: _processOriginalFilesAsync() completed in ${totalProcessTime}ms (batch:${batchTime}ms)');
+    }
   }
 
   /// Process original files synchronously (legacy)
@@ -972,10 +973,7 @@ class Writer {
         ..createSync(recursive: true)
         ..writeAsStringSync(buffer.toString());
 
-      // Print generated file immediately after writing
-      final relativePath =
-          relative(result.outputPath, from: Directory.current.path);
-      print('Generated $relativePath');
+      // File generation completed - timing info will be printed by caller
 
       final fileWriteEndTime = DateTime.now();
       final fileWriteTime =
@@ -1137,22 +1135,7 @@ class Writer {
         '\n  $copyWithClassName get copyWith => $copyWithClassName._(this as ${clazz.name}$genericParams);');
   }
 
-  /// Check if a field is a nested object that supports copyWith
-  bool _isNestedCopyWithField(FieldInfo field) {
-    // Check if the field type is a custom class (not primitive types)
-    final baseType =
-        field.type.replaceAll('?', '').replaceAll(RegExp(r'<.*>'), '');
-    return !_isPrimitiveType(baseType) &&
-        !baseType.startsWith('List') &&
-        !baseType.startsWith('Map');
-  }
-
-  /// Get the nested type for copyWith operations
-  String _getNestedCopyWithType(FieldInfo field) {
-    // For nested copyWith, we need to preserve the full type including generics
-    // Only remove the nullable marker
-    return field.type.replaceAll('?', '');
-  }
+  // Note: _isNestedCopyWithField and _getNestedCopyWithType methods removed in new version
 
   /// Check if a type is primitive
   bool _isPrimitiveType(String type) {
@@ -1384,19 +1367,7 @@ class Writer {
     buffer.writeln('    return _instance as ${clazz.name}$genericParams;');
     buffer.writeln('  }');
 
-    // Generate nested copyWith getters for complex object fields
-    for (final field in validFields) {
-      if (_isNestedCopyWithField(field)) {
-        final capitalizedFieldName =
-            field.name[0].toUpperCase() + field.name.substring(1);
-        buffer.writeln('\n  /// Nested copyWith for ${field.name} field');
-        buffer.writeln(
-            '  _${clazz.name}NestedCopyWith$capitalizedFieldName$genericParams get ${field.name}Builder {');
-        buffer.writeln(
-            '    return _${clazz.name}NestedCopyWith$capitalizedFieldName$genericParams._(_instance);');
-        buffer.writeln('  }');
-      }
-    }
+    // Note: Nested copyWith builders are no longer generated in the new version
 
     // Generate flattened field methods for infinite nesting
     final flattenedFields = _collectFlattenedFields(clazz);
@@ -1451,65 +1422,10 @@ class Writer {
     buffer.writeln('  }');
     buffer.writeln('}');
 
-    // Generate nested copyWith helper classes for complex object fields
-    for (final field in validFields) {
-      if (_isNestedCopyWithField(field)) {
-        _buildNestedCopyWithHelperClass(
-            buffer, clazz, field, genericParams, validFields);
-      }
-    }
+    // Note: Nested copyWith helper classes are no longer generated in the new version
   }
 
-  /// Build nested copyWith helper class for a specific field
-  void _buildNestedCopyWithHelperClass(
-      StringBuffer buffer,
-      ClassInfo parentClazz,
-      FieldInfo nestedField,
-      String genericParams,
-      List<FieldInfo> parentFields) {
-    final capitalizedFieldName =
-        nestedField.name[0].toUpperCase() + nestedField.name.substring(1);
-    final nestedType = _getNestedCopyWithType(nestedField);
-    final nestedCopyWithClassName =
-        '_${parentClazz.name}NestedCopyWith$capitalizedFieldName$genericParams';
-
-    buffer.writeln(
-        '\n/// Nested copyWith helper class for ${nestedField.name} field');
-    buffer.writeln('class $nestedCopyWithClassName {');
-    buffer.writeln('  final ${parentClazz.name}$genericParams _instance;');
-    // Constructor name should not include generic parameters
-    final nestedConstructorName = parentClazz.genericParameters.isNotEmpty
-        ? '_${parentClazz.name}NestedCopyWith$capitalizedFieldName._'
-        : '$nestedCopyWithClassName._';
-    buffer.writeln('  const $nestedConstructorName(this._instance);');
-
-    // Generate a method that takes a function to update the nested object
-    buffer.writeln(
-        '\n  /// Update ${nestedField.name} field using a copyWith function');
-    buffer.writeln(
-        '  ${parentClazz.name}$genericParams call($nestedType Function($nestedType) updater) {');
-    buffer.writeln('    final currentValue = _instance.${nestedField.name};');
-    if (nestedField.type.endsWith('?')) {
-      buffer.writeln(
-          '    if (currentValue == null) return _instance as ${parentClazz.name}$genericParams;');
-      buffer.writeln('    final updatedValue = updater(currentValue);');
-    } else {
-      buffer.writeln('    final updatedValue = updater(currentValue);');
-    }
-    buffer.writeln('    return ${parentClazz.name}$genericParams(');
-
-    for (final f in parentFields) {
-      if (f.name == nestedField.name) {
-        buffer.writeln('      ${f.name}: updatedValue,');
-      } else {
-        buffer.writeln('      ${f.name}: _instance.${f.name},');
-      }
-    }
-
-    buffer.writeln('    );');
-    buffer.writeln('  }');
-    buffer.writeln('}');
-  }
+  // Note: _buildNestedCopyWithHelperClass method removed in new version
 
   void _buildToJson(StringBuffer buffer, ClassInfo clazz) {
     buffer.writeln('\n  Map<String, dynamic> toJson() {');

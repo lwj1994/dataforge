@@ -140,7 +140,7 @@ class _JsonKeyFunctionsTestCopyWith {
 
   /// Build the final instance
   JsonKeyFunctionsTest build() {
-    return _instance;
+    return _instance as JsonKeyFunctionsTest;
   }
 
   /// Traditional copyWith method

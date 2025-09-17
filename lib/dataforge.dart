@@ -166,18 +166,30 @@ Future<List<String>> generate(String path, {bool debugMode = false}) async {
         print(
             '[DEBUG] ${DateTime.now()}: Starting writeCode() for single file: $absolutePath');
       }
-      final generatedFile = writer.writeCode();
+      final generatedFile = await writer.writeCodeAsync();
       final writeEndTime = DateTime.now();
+      final fileEndTime = DateTime.now();
 
-      if (debugMode) {
-        final writeTime =
-            writeEndTime.difference(writeStartTime).inMilliseconds;
-        print(
-            '[DEBUG] ${DateTime.now()}: writeCode() completed for single file: $absolutePath, generated: ${generatedFile.isNotEmpty ? generatedFile : 'empty'}, time: ${writeTime}ms');
-      }
+      // Always show file generation timing
+      final parseTime = parseEndTime.difference(parseStartTime).inMilliseconds;
+      final writeTime = writeEndTime.difference(writeStartTime).inMilliseconds;
+      final totalTime = fileEndTime.difference(parseStartTime).inMilliseconds;
 
       if (generatedFile.isNotEmpty) {
+        final relativePath =
+            p.relative(generatedFile, from: p.dirname(absolutePath));
+        print(
+            '✅ Generated $relativePath in ${totalTime}ms (parse: ${parseTime}ms, write: ${writeTime}ms)');
         generatedFiles.add(generatedFile);
+      } else {
+        final relativePath = p.basename(absolutePath);
+        print(
+            '❌ Failed to generate file for $relativePath in ${totalTime}ms (parse: ${parseTime}ms, write: ${writeTime}ms)');
+      }
+
+      if (debugMode) {
+        print(
+            '[DEBUG] ${DateTime.now()}: writeCode() completed for single file: $absolutePath, generated: ${generatedFile.isNotEmpty ? generatedFile : 'empty'}, time: ${writeTime}ms');
       }
     }
   }
@@ -387,9 +399,10 @@ Future<String> _processFile(
     final parseEndTime = DateTime.now();
 
     if (parseRes == null) {
+      final parseTime = parseEndTime.difference(parseStartTime).inMilliseconds;
+      print(
+          '❌ Parse failed for ${p.relative(filePath, from: projectRoot)} in ${parseTime}ms');
       if (debugMode) {
-        final parseTime =
-            parseEndTime.difference(parseStartTime).inMilliseconds;
         print(
             '[DEBUG] ${DateTime.now()}: Parse failed for ${p.basename(filePath)} in ${parseTime}ms');
       }
@@ -400,15 +413,27 @@ Future<String> _processFile(
     final writeStartTime = DateTime.now();
     final writer =
         Writer(parseRes, projectRoot: projectRoot, debugMode: debugMode);
-    final generatedFile = writer.writeCode();
+    final generatedFile = await writer.writeCodeAsync();
     final writeEndTime = DateTime.now();
 
     final fileEndTime = DateTime.now();
 
+    // Always show file generation timing
+    final parseTime = parseEndTime.difference(parseStartTime).inMilliseconds;
+    final writeTime = writeEndTime.difference(writeStartTime).inMilliseconds;
+    final totalTime = fileEndTime.difference(fileStartTime).inMilliseconds;
+
+    if (generatedFile.isNotEmpty) {
+      final relativePath = p.relative(generatedFile, from: projectRoot);
+      print(
+          '✅ Generated $relativePath in ${totalTime}ms (parse: ${parseTime}ms, write: ${writeTime}ms)');
+    } else {
+      final relativePath = p.relative(filePath, from: projectRoot);
+      print(
+          '❌ Failed to generate file for $relativePath in ${totalTime}ms (parse: ${parseTime}ms, write: ${writeTime}ms)');
+    }
+
     if (debugMode) {
-      final parseTime = parseEndTime.difference(parseStartTime).inMilliseconds;
-      final writeTime = writeEndTime.difference(writeStartTime).inMilliseconds;
-      final totalTime = fileEndTime.difference(fileStartTime).inMilliseconds;
       print(
           '[DEBUG] ${DateTime.now()}: File ${p.basename(filePath)} completed in ${totalTime}ms (parse:${parseTime}ms, write:${writeTime}ms)');
     }

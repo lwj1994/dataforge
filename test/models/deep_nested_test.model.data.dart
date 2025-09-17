@@ -323,11 +323,6 @@ class _TeamCopyWith {
     return _instance;
   }
 
-  /// Nested copyWith for leader field
-  _TeamNestedCopyWithLeader get leaderBuilder {
-    return _TeamNestedCopyWithLeader._(_instance);
-  }
-
   /// Update leader_name field
   _TeamCopyWith $leader_name(String value) {
     return _TeamCopyWith._(Team(
@@ -365,23 +360,6 @@ class _TeamCopyWith {
       name: name ?? _instance.name,
       leader: leader ?? _instance.leader,
       members: members ?? _instance.members,
-    );
-  }
-}
-
-/// Nested copyWith helper class for leader field
-class _TeamNestedCopyWithLeader {
-  final Team _instance;
-  const _TeamNestedCopyWithLeader._(this._instance);
-
-  /// Update leader field using a copyWith function
-  Team call(Employee Function(Employee) updater) {
-    final currentValue = _instance.leader;
-    final updatedValue = updater(currentValue);
-    return Team(
-      name: _instance.name,
-      leader: updatedValue,
-      members: _instance.members,
     );
   }
 }

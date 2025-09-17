@@ -185,16 +185,6 @@ class _CustomTypeReadValueTestCopyWith {
     return _instance;
   }
 
-  /// Nested copyWith for tradeInfo field
-  _CustomTypeReadValueTestNestedCopyWithTradeInfo get tradeInfoBuilder {
-    return _CustomTypeReadValueTestNestedCopyWithTradeInfo._(_instance);
-  }
-
-  /// Nested copyWith for userInfo field
-  _CustomTypeReadValueTestNestedCopyWithUserInfo get userInfoBuilder {
-    return _CustomTypeReadValueTestNestedCopyWithUserInfo._(_instance);
-  }
-
   /// Update tradeInfo_status field
   _CustomTypeReadValueTestCopyWith $tradeInfo_status(String value) {
     return _CustomTypeReadValueTestCopyWith._(CustomTypeReadValueTest(
@@ -235,39 +225,6 @@ class _CustomTypeReadValueTestCopyWith {
     return CustomTypeReadValueTest(
       tradeInfo: tradeInfo ?? _instance.tradeInfo,
       userInfo: userInfo ?? _instance.userInfo,
-    );
-  }
-}
-
-/// Nested copyWith helper class for tradeInfo field
-class _CustomTypeReadValueTestNestedCopyWithTradeInfo {
-  final CustomTypeReadValueTest _instance;
-  const _CustomTypeReadValueTestNestedCopyWithTradeInfo._(this._instance);
-
-  /// Update tradeInfo field using a copyWith function
-  CustomTypeReadValueTest call(TradeInfoBean Function(TradeInfoBean) updater) {
-    final currentValue = _instance.tradeInfo;
-    if (currentValue == null) return _instance;
-    final updatedValue = updater(currentValue);
-    return CustomTypeReadValueTest(
-      tradeInfo: updatedValue,
-      userInfo: _instance.userInfo,
-    );
-  }
-}
-
-/// Nested copyWith helper class for userInfo field
-class _CustomTypeReadValueTestNestedCopyWithUserInfo {
-  final CustomTypeReadValueTest _instance;
-  const _CustomTypeReadValueTestNestedCopyWithUserInfo._(this._instance);
-
-  /// Update userInfo field using a copyWith function
-  CustomTypeReadValueTest call(UserInfo Function(UserInfo) updater) {
-    final currentValue = _instance.userInfo;
-    final updatedValue = updater(currentValue);
-    return CustomTypeReadValueTest(
-      tradeInfo: _instance.tradeInfo,
-      userInfo: updatedValue,
     );
   }
 }

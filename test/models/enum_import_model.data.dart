@@ -143,16 +143,6 @@ class _EnumImportTestCopyWith {
     return _instance;
   }
 
-  /// Nested copyWith for status field
-  _EnumImportTestNestedCopyWithStatus get statusBuilder {
-    return _EnumImportTestNestedCopyWithStatus._(_instance);
-  }
-
-  /// Nested copyWith for priority field
-  _EnumImportTestNestedCopyWithPriority get priorityBuilder {
-    return _EnumImportTestNestedCopyWithPriority._(_instance);
-  }
-
   /// Traditional copyWith method
   EnumImportTest call({
     LocalStatus? status,
@@ -165,42 +155,6 @@ class _EnumImportTestCopyWith {
       priority: priority ?? _instance.priority,
       statusList: statusList ?? _instance.statusList,
       priorityMap: priorityMap ?? _instance.priorityMap,
-    );
-  }
-}
-
-/// Nested copyWith helper class for status field
-class _EnumImportTestNestedCopyWithStatus {
-  final EnumImportTest _instance;
-  const _EnumImportTestNestedCopyWithStatus._(this._instance);
-
-  /// Update status field using a copyWith function
-  EnumImportTest call(LocalStatus Function(LocalStatus) updater) {
-    final currentValue = _instance.status;
-    final updatedValue = updater(currentValue);
-    return EnumImportTest(
-      status: updatedValue,
-      priority: _instance.priority,
-      statusList: _instance.statusList,
-      priorityMap: _instance.priorityMap,
-    );
-  }
-}
-
-/// Nested copyWith helper class for priority field
-class _EnumImportTestNestedCopyWithPriority {
-  final EnumImportTest _instance;
-  const _EnumImportTestNestedCopyWithPriority._(this._instance);
-
-  /// Update priority field using a copyWith function
-  EnumImportTest call(LocalPriority Function(LocalPriority) updater) {
-    final currentValue = _instance.priority;
-    final updatedValue = updater(currentValue);
-    return EnumImportTest(
-      status: _instance.status,
-      priority: updatedValue,
-      statusList: _instance.statusList,
-      priorityMap: _instance.priorityMap,
     );
   }
 }
