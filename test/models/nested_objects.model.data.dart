@@ -565,16 +565,6 @@ class _CompanyCopyWith {
     );
   }
 
-  /// Nested copyWith for headquarters field
-  _CompanyNestedCopyWithHeadquarters get headquartersBuilder {
-    return _CompanyNestedCopyWithHeadquarters._(_instance);
-  }
-
-  /// Nested copyWith for primaryContact field
-  _CompanyNestedCopyWithPrimaryContact get primaryContactBuilder {
-    return _CompanyNestedCopyWithPrimaryContact._(_instance);
-  }
-
   /// Traditional copyWith method
   Company call({
     String? name,
@@ -794,31 +784,6 @@ class _NestedObjectsCopyWith {
       customAddress: _instance.customAddress,
       parsedContacts: value,
     );
-  }
-
-  /// Nested copyWith for homeAddress field
-  _NestedObjectsNestedCopyWithHomeAddress get homeAddressBuilder {
-    return _NestedObjectsNestedCopyWithHomeAddress._(_instance);
-  }
-
-  /// Nested copyWith for workAddress field
-  _NestedObjectsNestedCopyWithWorkAddress get workAddressBuilder {
-    return _NestedObjectsNestedCopyWithWorkAddress._(_instance);
-  }
-
-  /// Nested copyWith for primaryContact field
-  _NestedObjectsNestedCopyWithPrimaryContact get primaryContactBuilder {
-    return _NestedObjectsNestedCopyWithPrimaryContact._(_instance);
-  }
-
-  /// Nested copyWith for employer field
-  _NestedObjectsNestedCopyWithEmployer get employerBuilder {
-    return _NestedObjectsNestedCopyWithEmployer._(_instance);
-  }
-
-  /// Nested copyWith for customAddress field
-  _NestedObjectsNestedCopyWithCustomAddress get customAddressBuilder {
-    return _NestedObjectsNestedCopyWithCustomAddress._(_instance);
   }
 
   /// Traditional copyWith method

@@ -5,7 +5,8 @@ import 'utils.dart';
 part 'api_base_response.data.dart';
 
 @Dataforge()
-class EchoApiResponse<T> with _EchoApiResponse {
+class EchoApiResponse<T>
+    with _EchoApiResponse<T>, _EchoApiResponse<T>, _EchoApiResponse<T> {
   // int or string ??
   @override
   @JsonKey(name: 'code')

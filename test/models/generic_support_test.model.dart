@@ -5,7 +5,8 @@ part 'generic_support_test.model.data.dart';
 
 /// Test class for single generic type parameter support
 @Dataforge()
-class GenericContainer<T> with _GenericContainer<T> {
+class GenericContainer<T>
+    with _GenericContainer<T>, _GenericContainer<T>, _GenericContainer<T> {
   @override
   final T data;
   @override
@@ -26,7 +27,8 @@ class GenericContainer<T> with _GenericContainer<T> {
 
 /// Test class for multiple generic type parameters
 @Dataforge()
-class GenericPair<T, U> with _GenericPair<T, U> {
+class GenericPair<T, U>
+    with _GenericPair<T, U>, _GenericPair<T, U>, _GenericPair<T, U> {
   @override
   final T first;
   @override
@@ -47,7 +49,8 @@ class GenericPair<T, U> with _GenericPair<T, U> {
 
 /// Test class for nested generic types
 @Dataforge()
-class GenericWrapper<T> with _GenericWrapper<T> {
+class GenericWrapper<T>
+    with _GenericWrapper<T>, _GenericWrapper<T>, _GenericWrapper<T> {
   @override
   final List<T> items;
   @override
@@ -68,7 +71,8 @@ class GenericWrapper<T> with _GenericWrapper<T> {
 
 /// Test class for bounded generic types
 @Dataforge()
-class GenericBounded<T> with _GenericBounded<T> {
+class GenericBounded<T>
+    with _GenericBounded<T>, _GenericBounded<T>, _GenericBounded<T> {
   @override
   final T value;
   @override
@@ -93,7 +97,11 @@ enum TestStatus {
 
 /// Test class combining generics with other features
 @Dataforge()
-class GenericWithFeatures<T> with _GenericWithFeatures<T> {
+class GenericWithFeatures<T>
+    with
+        _GenericWithFeatures<T>,
+        _GenericWithFeatures<T>,
+        _GenericWithFeatures<T> {
   @override
   final T data;
 

@@ -179,16 +179,6 @@ class _CustomTypeReadValueTestCopyWith {
     );
   }
 
-  /// Nested copyWith for tradeInfo field
-  _CustomTypeReadValueTestNestedCopyWithTradeInfo get tradeInfoBuilder {
-    return _CustomTypeReadValueTestNestedCopyWithTradeInfo._(_instance);
-  }
-
-  /// Nested copyWith for userInfo field
-  _CustomTypeReadValueTestNestedCopyWithUserInfo get userInfoBuilder {
-    return _CustomTypeReadValueTestNestedCopyWithUserInfo._(_instance);
-  }
-
   /// Traditional copyWith method
   CustomTypeReadValueTest call({
     TradeInfoBean? tradeInfo,

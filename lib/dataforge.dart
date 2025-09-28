@@ -148,37 +148,29 @@ Future<List<String>> generate(String path, {bool debugMode = false}) async {
     final parseRes = parser.parseDartFile();
     final parseEndTime = DateTime.now();
 
-    if (debugMode) {
-      final parseTime = parseEndTime.difference(parseStartTime).inMilliseconds;
-      print(
-          '[DEBUG] ${DateTime.now()}: parseDartFile() completed for single file: $absolutePath, result: ${parseRes != null ? 'success' : 'null'}, time: ${parseTime}ms');
+    final parseTime = parseEndTime.difference(parseStartTime).inMilliseconds;
+    if (parseRes == null) {
+      return generatedFiles;
     }
 
-    if (parseRes != null) {
-      if (debugMode) {
-        print(
-            '[DEBUG] ${DateTime.now()}: Creating writer for single file: $absolutePath');
-      }
-      final writeStartTime = DateTime.now();
-      final writer = Writer(parseRes,
-          projectRoot: p.dirname(absolutePath), debugMode: debugMode);
-      if (debugMode) {
-        print(
-            '[DEBUG] ${DateTime.now()}: Starting writeCode() for single file: $absolutePath');
-      }
-      final generatedFile = writer.writeCode();
-      final writeEndTime = DateTime.now();
+    if (debugMode) {
+      print(
+          '[DEBUG] ${DateTime.now()}: parseDartFile() completed for single file: $absolutePath, result: success, time: ${parseTime}ms');
+    }
 
-      if (debugMode) {
-        final writeTime =
-            writeEndTime.difference(writeStartTime).inMilliseconds;
-        print(
-            '[DEBUG] ${DateTime.now()}: writeCode() completed for single file: $absolutePath, generated: ${generatedFile.isNotEmpty ? generatedFile : 'empty'}, time: ${writeTime}ms');
-      }
+    final writeStartTime = DateTime.now();
+    final writer = Writer(parseRes,
+        projectRoot: p.dirname(absolutePath), debugMode: debugMode);
+    final generatedFile = writer.writeCode();
+    final writeEndTime = DateTime.now();
 
-      if (generatedFile.isNotEmpty) {
-        generatedFiles.add(generatedFile);
-      }
+    final writeTime = writeEndTime.difference(writeStartTime).inMilliseconds;
+    final totalTime = writeTime + parseTime;
+    print(
+        '✅ Generated ${p.relative(generatedFile, from: p.dirname(absolutePath))} in ${totalTime}ms (parse: ${parseTime}ms, write: ${writeTime}ms)');
+
+    if (generatedFile.isNotEmpty) {
+      generatedFiles.add(generatedFile);
     }
   }
   final endTime = DateTime.now();
@@ -352,17 +344,21 @@ Future<List<String>> _processFilesInParallel(
     // Process files in current batch concurrently
     final batchFutures =
         batch.map((filePath) => _processFile(filePath, projectRoot, debugMode));
-    final batchResults = await Future.wait(batchFutures);
 
-    results.addAll(batchResults);
+    int batchSuccessCount = 0;
+    await for (final result in Stream.fromFutures(batchFutures)) {
+      if (result.isNotEmpty) {
+        results.add(result);
+        batchSuccessCount++;
+      }
+    }
 
     final batchEndTime = DateTime.now();
     final batchTime = batchEndTime.difference(batchStartTime).inMilliseconds;
 
     if (debugMode) {
-      final successCount = batchResults.where((r) => r.isNotEmpty).length;
       print(
-          '[DEBUG] ${DateTime.now()}: Batch ${batchIndex + 1} completed in ${batchTime}ms ($successCount/${batch.length} successful)');
+          '[DEBUG] ${DateTime.now()}: Batch ${batchIndex + 1} completed in ${batchTime}ms ($batchSuccessCount/${batch.length} successful)');
     }
   }
 
@@ -386,13 +382,8 @@ Future<String> _processFile(
     final parseRes = parser.parseDartFile();
     final parseEndTime = DateTime.now();
 
+    final parseTime = parseEndTime.difference(parseStartTime).inMilliseconds;
     if (parseRes == null) {
-      if (debugMode) {
-        final parseTime =
-            parseEndTime.difference(parseStartTime).inMilliseconds;
-        print(
-            '[DEBUG] ${DateTime.now()}: Parse failed for ${p.basename(filePath)} in ${parseTime}ms');
-      }
       return '';
     }
 
@@ -405,19 +396,16 @@ Future<String> _processFile(
 
     final fileEndTime = DateTime.now();
 
-    if (debugMode) {
-      final parseTime = parseEndTime.difference(parseStartTime).inMilliseconds;
-      final writeTime = writeEndTime.difference(writeStartTime).inMilliseconds;
-      final totalTime = fileEndTime.difference(fileStartTime).inMilliseconds;
-      print(
-          '[DEBUG] ${DateTime.now()}: File ${p.basename(filePath)} completed in ${totalTime}ms (parse:${parseTime}ms, write:${writeTime}ms)');
-    }
+    final writeTime = writeEndTime.difference(writeStartTime).inMilliseconds;
+    final totalTime = fileEndTime.difference(fileStartTime).inMilliseconds;
+    print(
+        '✅ Generated ${p.relative(generatedFile, from: projectRoot)} in ${totalTime}ms (parse: ${parseTime}ms, write: ${writeTime}ms)');
 
     return generatedFile;
-  } catch (e) {
+  } catch (e, s) {
+    print('❌ Error processing ${p.relative(filePath, from: projectRoot)}: $e');
     if (debugMode) {
-      print(
-          '[DEBUG] ${DateTime.now()}: Error processing ${p.basename(filePath)}: $e');
+      print(s);
     }
     return '';
   }

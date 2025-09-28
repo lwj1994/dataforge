@@ -298,16 +298,6 @@ class _ProfileCopyWith {
     );
   }
 
-  /// Nested copyWith for user field
-  _ProfileNestedCopyWithUser get userBuilder {
-    return _ProfileNestedCopyWithUser._(_instance);
-  }
-
-  /// Nested copyWith for address field
-  _ProfileNestedCopyWithAddress get addressBuilder {
-    return _ProfileNestedCopyWithAddress._(_instance);
-  }
-
   /// Traditional copyWith method
   Profile call({
     User? user,

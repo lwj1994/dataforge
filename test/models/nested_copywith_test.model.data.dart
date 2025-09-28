@@ -276,16 +276,6 @@ class _PersonCopyWith {
     );
   }
 
-  /// Nested copyWith for address field
-  _PersonNestedCopyWithAddress get addressBuilder {
-    return _PersonNestedCopyWithAddress._(_instance);
-  }
-
-  /// Nested copyWith for workAddress field
-  _PersonNestedCopyWithWorkAddress get workAddressBuilder {
-    return _PersonNestedCopyWithWorkAddress._(_instance);
-  }
-
   /// Traditional copyWith method
   Person call({
     String? name,
@@ -369,11 +359,6 @@ class _CompanyCopyWith {
       ceo: _instance.ceo,
       employees: value ?? _instance.employees,
     );
-  }
-
-  /// Nested copyWith for ceo field
-  _CompanyNestedCopyWithCeo get ceoBuilder {
-    return _CompanyNestedCopyWithCeo._(_instance);
   }
 
   /// Traditional copyWith method

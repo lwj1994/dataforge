@@ -117,11 +117,6 @@ class _TestModelCopyWith {
     );
   }
 
-  /// Nested copyWith for param field
-  _TestModelNestedCopyWithParam get paramBuilder {
-    return _TestModelNestedCopyWithParam._(_instance);
-  }
-
   /// Traditional copyWith method
   TestModel call({
     String? name,

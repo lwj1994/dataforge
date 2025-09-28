@@ -256,36 +256,6 @@ class _EnumTypesCopyWith {
     );
   }
 
-  /// Nested copyWith for status field
-  _EnumTypesNestedCopyWithStatus get statusBuilder {
-    return _EnumTypesNestedCopyWithStatus._(_instance);
-  }
-
-  /// Nested copyWith for optionalRole field
-  _EnumTypesNestedCopyWithOptionalRole get optionalRoleBuilder {
-    return _EnumTypesNestedCopyWithOptionalRole._(_instance);
-  }
-
-  /// Nested copyWith for userType field
-  _EnumTypesNestedCopyWithUserType get userTypeBuilder {
-    return _EnumTypesNestedCopyWithUserType._(_instance);
-  }
-
-  /// Nested copyWith for priority field
-  _EnumTypesNestedCopyWithPriority get priorityBuilder {
-    return _EnumTypesNestedCopyWithPriority._(_instance);
-  }
-
-  /// Nested copyWith for parsedStatus field
-  _EnumTypesNestedCopyWithParsedStatus get parsedStatusBuilder {
-    return _EnumTypesNestedCopyWithParsedStatus._(_instance);
-  }
-
-  /// Nested copyWith for roleFromInt field
-  _EnumTypesNestedCopyWithRoleFromInt get roleFromIntBuilder {
-    return _EnumTypesNestedCopyWithRoleFromInt._(_instance);
-  }
-
   /// Traditional copyWith method
   EnumTypes call({
     Status? status,

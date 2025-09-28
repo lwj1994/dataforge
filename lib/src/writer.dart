@@ -241,17 +241,43 @@ class Writer {
 
   /// Add with clause to class in lines, returns true if modified
   bool _addWithClauseToLines(List<String> lines, String className) {
-    final mixinName = '_$className';
-
     for (int i = 0; i < lines.length; i++) {
       final line = lines[i];
 
       // Find class declaration line
       if (line.contains('class $className') && !line.contains('mixin')) {
+        String genericPart = '';
+        final genericStartIndex = line.indexOf('<');
+
+        // Check for presence of generics and that it's part of the class name
+        final classDefRegex =
+            RegExp('^\\s*(abstract\\s+)?class\\s+$className\\s*<');
+        if (genericStartIndex != -1 && classDefRegex.hasMatch(line)) {
+          int depth = 0;
+          int genericEndIndex = -1;
+          for (int j = genericStartIndex; j < line.length; j++) {
+            if (line[j] == '<') {
+              depth++;
+            } else if (line[j] == '>') {
+              depth--;
+              if (depth == 0) {
+                genericEndIndex = j;
+                break;
+              }
+            }
+          }
+          if (genericEndIndex != -1) {
+            genericPart =
+                line.substring(genericStartIndex, genericEndIndex + 1);
+          }
+        }
+
+        final mixinName = '_$className$genericPart';
         final trimmedLine = line.trim();
 
         // Check if already has the correct with clause
-        if (trimmedLine.contains('with $mixinName')) {
+        final mixinPattern = RegExp('\\b${RegExp.escape(mixinName)}\\b');
+        if (mixinPattern.hasMatch(trimmedLine)) {
           return false; // Already has the correct with clause
         }
 
@@ -1075,20 +1101,6 @@ class Writer {
 
       buffer.writeln('    );');
       buffer.writeln('  }');
-    }
-
-    // Generate nested copyWith getters for complex object fields
-    for (final field in validFields) {
-      if (_isNestedCopyWithField(field)) {
-        final capitalizedFieldName =
-            field.name[0].toUpperCase() + field.name.substring(1);
-        buffer.writeln('\n  /// Nested copyWith for ${field.name} field');
-        buffer.writeln(
-            '  _${clazz.name}NestedCopyWith$capitalizedFieldName$genericParams get ${field.name}Builder {');
-        buffer.writeln(
-            '    return _${clazz.name}NestedCopyWith$capitalizedFieldName$genericParams._(_instance);');
-        buffer.writeln('  }');
-      }
     }
 
     // Generate call method for traditional copyWith syntax

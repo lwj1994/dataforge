@@ -246,11 +246,6 @@ class _NestedDefaultValuesCopyWith {
     );
   }
 
-  /// Nested copyWith for nested field
-  _NestedDefaultValuesNestedCopyWithNested get nestedBuilder {
-    return _NestedDefaultValuesNestedCopyWithNested._(_instance);
-  }
-
   /// Traditional copyWith method
   NestedDefaultValues call({
     String? name,

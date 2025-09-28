@@ -208,11 +208,6 @@ class _ApiResponseCopyWith<T> {
     );
   }
 
-  /// Nested copyWith for data field
-  _ApiResponseNestedCopyWithData<T> get dataBuilder {
-    return _ApiResponseNestedCopyWithData<T>._(_instance);
-  }
-
   /// Traditional copyWith method
   ApiResponse<T> call({
     bool? success,

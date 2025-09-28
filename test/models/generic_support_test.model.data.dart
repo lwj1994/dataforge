@@ -329,11 +329,6 @@ class _GenericContainerCopyWith<T> {
     );
   }
 
-  /// Nested copyWith for data field
-  _GenericContainerNestedCopyWithData<T> get dataBuilder {
-    return _GenericContainerNestedCopyWithData<T>._(_instance);
-  }
-
   /// Traditional copyWith method
   GenericContainer<T> call({
     T? data,
@@ -395,16 +390,6 @@ class _GenericPairCopyWith<T, U> {
       second: _instance.second,
       label: value ?? _instance.label,
     );
-  }
-
-  /// Nested copyWith for first field
-  _GenericPairNestedCopyWithFirst<T, U> get firstBuilder {
-    return _GenericPairNestedCopyWithFirst<T, U>._(_instance);
-  }
-
-  /// Nested copyWith for second field
-  _GenericPairNestedCopyWithSecond<T, U> get secondBuilder {
-    return _GenericPairNestedCopyWithSecond<T, U>._(_instance);
   }
 
   /// Traditional copyWith method
@@ -487,11 +472,6 @@ class _GenericWrapperCopyWith<T> {
     );
   }
 
-  /// Nested copyWith for optionalItem field
-  _GenericWrapperNestedCopyWithOptionalItem<T> get optionalItemBuilder {
-    return _GenericWrapperNestedCopyWithOptionalItem<T>._(_instance);
-  }
-
   /// Traditional copyWith method
   GenericWrapper<T> call({
     List<T>? items,
@@ -543,11 +523,6 @@ class _GenericBoundedCopyWith<T> {
       value: _instance.value,
       values: value ?? _instance.values,
     );
-  }
-
-  /// Nested copyWith for value field
-  _GenericBoundedNestedCopyWithValue<T> get valueBuilder {
-    return _GenericBoundedNestedCopyWithValue<T>._(_instance);
   }
 
   /// Traditional copyWith method
@@ -636,16 +611,6 @@ class _GenericWithFeaturesCopyWith<T> {
       status: _instance.status,
       createdAt: value ?? _instance.createdAt,
     );
-  }
-
-  /// Nested copyWith for data field
-  _GenericWithFeaturesNestedCopyWithData<T> get dataBuilder {
-    return _GenericWithFeaturesNestedCopyWithData<T>._(_instance);
-  }
-
-  /// Nested copyWith for status field
-  _GenericWithFeaturesNestedCopyWithStatus<T> get statusBuilder {
-    return _GenericWithFeaturesNestedCopyWithStatus<T>._(_instance);
   }
 
   /// Traditional copyWith method

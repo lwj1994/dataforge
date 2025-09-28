@@ -313,11 +313,6 @@ class _TeamCopyWith {
     );
   }
 
-  /// Nested copyWith for leader field
-  _TeamNestedCopyWithLeader get leaderBuilder {
-    return _TeamNestedCopyWithLeader._(_instance);
-  }
-
   /// Traditional copyWith method
   Team call({
     String? name,

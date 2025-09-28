@@ -93,11 +93,6 @@ class _EchoApiResponseCopyWith<T> {
     );
   }
 
-  /// Nested copyWith for data field
-  _EchoApiResponseNestedCopyWithData<T> get dataBuilder {
-    return _EchoApiResponseNestedCopyWithData<T>._(_instance);
-  }
-
   /// Traditional copyWith method
   EchoApiResponse<T> call({
     String? code,
