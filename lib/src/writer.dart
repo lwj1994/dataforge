@@ -1103,6 +1103,54 @@ class Writer {
       buffer.writeln('  }');
     }
 
+    // Generate multi-level copyWith getters for nested objects
+    for (final field in validFields) {}
+
+    // Generate special $NestedType_fieldName getters for direct field access
+    for (final field in validFields) {
+      if (_isNestedCopyWithField(field)) {
+        final nestedType = _getNestedCopyWithType(field);
+        final nestedClazz = result.classes.firstWhere(
+          (clazz) => clazz.name == nestedType.replaceAll('?', ''),
+          orElse: () => ClassInfo(name: '', mixinName: '', fields: []),
+        );
+
+        if (nestedClazz.name.isNotEmpty) {
+          for (final nestedField in nestedClazz.fields) {
+            final getterName = '\$${field.name}_${nestedField.name}';
+            final paramType = _generateCopyWithParameterType(nestedField);
+
+            buffer.writeln(
+                '\n  /// Direct field access getter for ${field.name}.${nestedField.name}');
+            buffer.writeln(
+                '  ${clazz.name}$genericParams Function($paramType) get $getterName {');
+            buffer.writeln('    return ($paramType value) {');
+
+            // Handle nullable nested fields
+            if (field.type.endsWith('?')) {
+              buffer.writeln(
+                  '      final currentValue = _instance.${field.name};');
+              buffer.writeln('      if (currentValue == null) {');
+              buffer.writeln(
+                  '        // Cannot create new instance when nested object is null');
+              buffer.writeln(
+                  '        throw StateError(\'Cannot update field ${nestedField.name} when ${field.name} is null. Set ${field.name} first.\');');
+              buffer.writeln('      } else {');
+              buffer.writeln(
+                  '        return ${field.name}(currentValue.copyWith(${nestedField.name}: value));');
+              buffer.writeln('      }');
+            } else {
+              buffer.writeln(
+                  '      return ${field.name}(_instance.${field.name}.copyWith(${nestedField.name}: value));');
+            }
+
+            buffer.writeln('    };');
+            buffer.writeln('  }');
+          }
+        }
+      }
+    }
+
     // Generate call method for traditional copyWith syntax
     buffer.writeln('\n  /// Traditional copyWith method');
     buffer.writeln('  ${clazz.name}$genericParams call({');

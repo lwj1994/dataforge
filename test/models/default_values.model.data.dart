@@ -246,6 +246,41 @@ class _NestedDefaultValuesCopyWith {
     );
   }
 
+  /// Direct field access getter for nested.intValue
+  NestedDefaultValues Function(int?) get $nested_intValue {
+    return (int? value) {
+      return nested(_instance.nested.copyWith(intValue: value));
+    };
+  }
+
+  /// Direct field access getter for nested.stringValue
+  NestedDefaultValues Function(String?) get $nested_stringValue {
+    return (String? value) {
+      return nested(_instance.nested.copyWith(stringValue: value));
+    };
+  }
+
+  /// Direct field access getter for nested.boolValue
+  NestedDefaultValues Function(bool?) get $nested_boolValue {
+    return (bool? value) {
+      return nested(_instance.nested.copyWith(boolValue: value));
+    };
+  }
+
+  /// Direct field access getter for nested.doubleValue
+  NestedDefaultValues Function(double?) get $nested_doubleValue {
+    return (double? value) {
+      return nested(_instance.nested.copyWith(doubleValue: value));
+    };
+  }
+
+  /// Direct field access getter for nested.listValue
+  NestedDefaultValues Function(List<String>?) get $nested_listValue {
+    return (List<String>? value) {
+      return nested(_instance.nested.copyWith(listValue: value));
+    };
+  }
+
   /// Traditional copyWith method
   NestedDefaultValues call({
     String? name,

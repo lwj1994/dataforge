@@ -6,7 +6,17 @@ part 'jsonkey_generic_test.model.data.dart';
 /// Test class to demonstrate JsonKey fromJson/toJson with generics
 /// Similar to json_serializable implementation
 @Dataforge()
-class ApiResponse<T> with _ApiResponse<T>, _ApiResponse<T> {
+class ApiResponse<T>
+    with
+        _ApiResponse<T>,
+        _ApiResponse<T>,
+        _ApiResponse<T>,
+        _ApiResponse<T>,
+        _ApiResponse<T>,
+        _ApiResponse<T>,
+        _ApiResponse<T>,
+        _ApiResponse<T>,
+        _ApiResponse<T> {
   @override
   final bool success;
   @override
@@ -100,7 +110,17 @@ class User with _User {
 
 /// Another test class for list generics
 @Dataforge()
-class ListResponse<T> with _ListResponse<T>, _ListResponse<T> {
+class ListResponse<T>
+    with
+        _ListResponse<T>,
+        _ListResponse<T>,
+        _ListResponse<T>,
+        _ListResponse<T>,
+        _ListResponse<T>,
+        _ListResponse<T>,
+        _ListResponse<T>,
+        _ListResponse<T>,
+        _ListResponse<T> {
   @override
   final int total;
 

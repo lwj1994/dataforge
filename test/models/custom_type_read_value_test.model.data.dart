@@ -179,6 +179,48 @@ class _CustomTypeReadValueTestCopyWith {
     );
   }
 
+  /// Direct field access getter for tradeInfo.status
+  CustomTypeReadValueTest Function(String?) get $tradeInfo_status {
+    return (String? value) {
+      final currentValue = _instance.tradeInfo;
+      if (currentValue == null) {
+        // Cannot create new instance when nested object is null
+        throw StateError(
+            'Cannot update field status when tradeInfo is null. Set tradeInfo first.');
+      } else {
+        return tradeInfo(currentValue.copyWith(status: value));
+      }
+    };
+  }
+
+  /// Direct field access getter for tradeInfo.price
+  CustomTypeReadValueTest Function(double?) get $tradeInfo_price {
+    return (double? value) {
+      final currentValue = _instance.tradeInfo;
+      if (currentValue == null) {
+        // Cannot create new instance when nested object is null
+        throw StateError(
+            'Cannot update field price when tradeInfo is null. Set tradeInfo first.');
+      } else {
+        return tradeInfo(currentValue.copyWith(price: value));
+      }
+    };
+  }
+
+  /// Direct field access getter for userInfo.name
+  CustomTypeReadValueTest Function(String?) get $userInfo_name {
+    return (String? value) {
+      return userInfo(_instance.userInfo.copyWith(name: value));
+    };
+  }
+
+  /// Direct field access getter for userInfo.age
+  CustomTypeReadValueTest Function(int?) get $userInfo_age {
+    return (int? value) {
+      return userInfo(_instance.userInfo.copyWith(age: value));
+    };
+  }
+
   /// Traditional copyWith method
   CustomTypeReadValueTest call({
     TradeInfoBean? tradeInfo,

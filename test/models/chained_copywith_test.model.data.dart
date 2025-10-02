@@ -298,6 +298,48 @@ class _ProfileCopyWith {
     );
   }
 
+  /// Direct field access getter for user.name
+  Profile Function(String?) get $user_name {
+    return (String? value) {
+      return user(_instance.user.copyWith(name: value));
+    };
+  }
+
+  /// Direct field access getter for user.age
+  Profile Function(int?) get $user_age {
+    return (int? value) {
+      return user(_instance.user.copyWith(age: value));
+    };
+  }
+
+  /// Direct field access getter for user.email
+  Profile Function(String?) get $user_email {
+    return (String? value) {
+      return user(_instance.user.copyWith(email: value));
+    };
+  }
+
+  /// Direct field access getter for address.street
+  Profile Function(String?) get $address_street {
+    return (String? value) {
+      return address(_instance.address.copyWith(street: value));
+    };
+  }
+
+  /// Direct field access getter for address.city
+  Profile Function(String?) get $address_city {
+    return (String? value) {
+      return address(_instance.address.copyWith(city: value));
+    };
+  }
+
+  /// Direct field access getter for address.zipCode
+  Profile Function(String?) get $address_zipCode {
+    return (String? value) {
+      return address(_instance.address.copyWith(zipCode: value));
+    };
+  }
+
   /// Traditional copyWith method
   Profile call({
     User? user,

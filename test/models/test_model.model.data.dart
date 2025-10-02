@@ -117,6 +117,20 @@ class _TestModelCopyWith {
     );
   }
 
+  /// Direct field access getter for param.value
+  TestModel Function(String?) get $param_value {
+    return (String? value) {
+      final currentValue = _instance.param;
+      if (currentValue == null) {
+        // Cannot create new instance when nested object is null
+        throw StateError(
+            'Cannot update field value when param is null. Set param first.');
+      } else {
+        return param(currentValue.copyWith(value: value));
+      }
+    };
+  }
+
   /// Traditional copyWith method
   TestModel call({
     String? name,

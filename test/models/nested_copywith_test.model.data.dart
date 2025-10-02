@@ -276,6 +276,69 @@ class _PersonCopyWith {
     );
   }
 
+  /// Direct field access getter for address.street
+  Person Function(String?) get $address_street {
+    return (String? value) {
+      return address(_instance.address.copyWith(street: value));
+    };
+  }
+
+  /// Direct field access getter for address.city
+  Person Function(String?) get $address_city {
+    return (String? value) {
+      return address(_instance.address.copyWith(city: value));
+    };
+  }
+
+  /// Direct field access getter for address.zipCode
+  Person Function(String?) get $address_zipCode {
+    return (String? value) {
+      return address(_instance.address.copyWith(zipCode: value));
+    };
+  }
+
+  /// Direct field access getter for workAddress.street
+  Person Function(String?) get $workAddress_street {
+    return (String? value) {
+      final currentValue = _instance.workAddress;
+      if (currentValue == null) {
+        // Cannot create new instance when nested object is null
+        throw StateError(
+            'Cannot update field street when workAddress is null. Set workAddress first.');
+      } else {
+        return workAddress(currentValue.copyWith(street: value));
+      }
+    };
+  }
+
+  /// Direct field access getter for workAddress.city
+  Person Function(String?) get $workAddress_city {
+    return (String? value) {
+      final currentValue = _instance.workAddress;
+      if (currentValue == null) {
+        // Cannot create new instance when nested object is null
+        throw StateError(
+            'Cannot update field city when workAddress is null. Set workAddress first.');
+      } else {
+        return workAddress(currentValue.copyWith(city: value));
+      }
+    };
+  }
+
+  /// Direct field access getter for workAddress.zipCode
+  Person Function(String?) get $workAddress_zipCode {
+    return (String? value) {
+      final currentValue = _instance.workAddress;
+      if (currentValue == null) {
+        // Cannot create new instance when nested object is null
+        throw StateError(
+            'Cannot update field zipCode when workAddress is null. Set workAddress first.');
+      } else {
+        return workAddress(currentValue.copyWith(zipCode: value));
+      }
+    };
+  }
+
   /// Traditional copyWith method
   Person call({
     String? name,
@@ -359,6 +422,34 @@ class _CompanyCopyWith {
       ceo: _instance.ceo,
       employees: value ?? _instance.employees,
     );
+  }
+
+  /// Direct field access getter for ceo.name
+  Company Function(String?) get $ceo_name {
+    return (String? value) {
+      return ceo(_instance.ceo.copyWith(name: value));
+    };
+  }
+
+  /// Direct field access getter for ceo.age
+  Company Function(int?) get $ceo_age {
+    return (int? value) {
+      return ceo(_instance.ceo.copyWith(age: value));
+    };
+  }
+
+  /// Direct field access getter for ceo.address
+  Company Function(Address?) get $ceo_address {
+    return (Address? value) {
+      return ceo(_instance.ceo.copyWith(address: value));
+    };
+  }
+
+  /// Direct field access getter for ceo.workAddress
+  Company Function(Address?) get $ceo_workAddress {
+    return (Address? value) {
+      return ceo(_instance.ceo.copyWith(workAddress: value));
+    };
   }
 
   /// Traditional copyWith method

@@ -313,6 +313,27 @@ class _TeamCopyWith {
     );
   }
 
+  /// Direct field access getter for leader.name
+  Team Function(String?) get $leader_name {
+    return (String? value) {
+      return leader(_instance.leader.copyWith(name: value));
+    };
+  }
+
+  /// Direct field access getter for leader.id
+  Team Function(int?) get $leader_id {
+    return (int? value) {
+      return leader(_instance.leader.copyWith(id: value));
+    };
+  }
+
+  /// Direct field access getter for leader.position
+  Team Function(String?) get $leader_position {
+    return (String? value) {
+      return leader(_instance.leader.copyWith(position: value));
+    };
+  }
+
   /// Traditional copyWith method
   Team call({
     String? name,
