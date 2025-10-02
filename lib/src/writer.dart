@@ -9,6 +9,7 @@ class Writer {
   final String? projectRoot;
   final bool debugMode;
   late final String _dataforgeAnnotationPrefix;
+  final Set<String> _enumTypeCache = {};
 
   Writer(this.result, {this.projectRoot, this.debugMode = false}) {
     _dataforgeAnnotationPrefix = _getDataforgeAnnotationPrefix();
@@ -38,9 +39,8 @@ class Writer {
 
     // Remove nullable marker and generic parameters
     final cleanType = _removeGenericParameters(type.replaceAll('?', ''));
-    if (debugMode) {
-      print(
-          '[PERF] $enumCheckStartTime: Starting enum type check for: $cleanType');
+    if (_enumTypeCache.contains(cleanType)) {
+      return true;
     }
 
     // Use project root if available, otherwise fall back to current directory
@@ -88,6 +88,7 @@ class Writer {
             print(
                 '[PERF] $searchEndTime: Enum $cleanType found in ${file.path} after checking $filesChecked files (search:${searchTime}ms, total:${totalTime}ms)');
           }
+          _enumTypeCache.add(cleanType);
           return true;
         }
       } catch (e) {

@@ -11,3 +11,5 @@ test/gen/
 # IDE files
 .idea/
 *.iml
+
+vs_plugin/node_modules
