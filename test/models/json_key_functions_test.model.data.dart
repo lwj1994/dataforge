@@ -10,8 +10,7 @@ mixin _JsonKeyFunctionsTest {
   abstract final String? optionalValue;
   abstract final String regularField;
 
-  _JsonKeyFunctionsTestCopyWith get copyWith =>
-      _JsonKeyFunctionsTestCopyWith._(this);
+  _JsonKeyFunctionsTestCopyWith get copyWith => _JsonKeyFunctionsTestCopyWith._(this);
 
   @override
   bool operator ==(Object other) {
@@ -46,11 +45,11 @@ mixin _JsonKeyFunctionsTest {
       regularField,
     ]);
   }
-
   @override
   String toString() {
     return 'JsonKeyFunctionsTest(name: $name, items: $items, count: $count, optionalValue: $optionalValue, regularField: $regularField)';
   }
+
 
   Map<String, dynamic> toJson() {
     final map = <String, dynamic>{};
@@ -58,8 +57,7 @@ mixin _JsonKeyFunctionsTest {
     map['custom_list'] = customListToJson(items);
     map['custom_count'] = customIntToJson(count);
     if (optionalValue != null) {
-      map['optional_value'] =
-          optionalValue != null ? customStringToJson(optionalValue!) : null;
+      map['optional_value'] = optionalValue != null ? customStringToJson(optionalValue!) : null;
     }
     map['regularField'] = regularField;
     return map;
@@ -70,13 +68,12 @@ mixin _JsonKeyFunctionsTest {
       name: customStringFromJson(map['custom_name'] ?? {}),
       items: customListFromJson(map['custom_list'] ?? {}),
       count: customIntFromJson(map['custom_count'] ?? {}),
-      optionalValue: map['optional_value'] != null
-          ? customStringFromJson(map['optional_value'])
-          : null,
+      optionalValue: map['optional_value'] != null ? customStringFromJson(map['optional_value']) : null,
       regularField: SafeCasteUtil.safeCast<String>(map['regularField']) ?? "",
     );
   }
 }
+
 
 /// Helper class for chained copyWith operations
 class _JsonKeyFunctionsTestCopyWith {
@@ -155,3 +152,4 @@ class _JsonKeyFunctionsTestCopyWith {
     );
   }
 }
+

@@ -8,8 +8,7 @@ mixin _DateTimeNullableAutoMatchTest {
   abstract final DateTime updatedAt;
   abstract final String name;
 
-  _DateTimeNullableAutoMatchTestCopyWith get copyWith =>
-      _DateTimeNullableAutoMatchTestCopyWith._(this);
+  _DateTimeNullableAutoMatchTestCopyWith get copyWith => _DateTimeNullableAutoMatchTestCopyWith._(this);
 
   @override
   bool operator ==(Object other) {
@@ -36,18 +35,16 @@ mixin _DateTimeNullableAutoMatchTest {
       name,
     ]);
   }
-
   @override
   String toString() {
     return 'DateTimeNullableAutoMatchTest(createdAt: $createdAt, updatedAt: $updatedAt, name: $name)';
   }
 
+
   Map<String, dynamic> toJson() {
     final map = <String, dynamic>{};
     if (createdAt != null) {
-      map['createdAt'] = createdAt != null
-          ? const DefaultDateTimeConverter().toJson(createdAt!)
-          : null;
+      map['createdAt'] = createdAt != null ? const DefaultDateTimeConverter().toJson(createdAt!) : null;
     }
     map['updatedAt'] = const DefaultDateTimeConverter().toJson(updatedAt);
     map['name'] = name;
@@ -56,17 +53,13 @@ mixin _DateTimeNullableAutoMatchTest {
 
   static DateTimeNullableAutoMatchTest fromJson(Map<String, dynamic> map) {
     return DateTimeNullableAutoMatchTest(
-      createdAt: map['createdAt'] != null
-          ? const DefaultDateTimeConverter().fromJson(map['createdAt'])
-          : null,
-      updatedAt: map['updatedAt'] != null
-          ? const DefaultDateTimeConverter().fromJson(map['updatedAt'])
-              as DateTime
-          : throw ArgumentError('Required field updatedAt is missing'),
+      createdAt: map['createdAt'] != null ? const DefaultDateTimeConverter().fromJson(map['createdAt']) : null,
+      updatedAt: map['updatedAt'] != null ? const DefaultDateTimeConverter().fromJson(map['updatedAt']) as DateTime : throw ArgumentError('Required field updatedAt is missing'),
       name: SafeCasteUtil.safeCast<String>(map['name']) ?? "",
     );
   }
 }
+
 
 /// Helper class for chained copyWith operations
 class _DateTimeNullableAutoMatchTestCopyWith {
@@ -113,3 +106,4 @@ class _DateTimeNullableAutoMatchTestCopyWith {
     );
   }
 }
+

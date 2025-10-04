@@ -7,8 +7,7 @@ mixin _CustomTypeReadValueTest {
   abstract final TradeInfoBean? tradeInfo;
   abstract final UserInfo userInfo;
 
-  _CustomTypeReadValueTestCopyWith get copyWith =>
-      _CustomTypeReadValueTestCopyWith._(this);
+  _CustomTypeReadValueTestCopyWith get copyWith => _CustomTypeReadValueTestCopyWith._(this);
 
   @override
   bool operator ==(Object other) {
@@ -31,11 +30,11 @@ mixin _CustomTypeReadValueTest {
       userInfo,
     ]);
   }
-
   @override
   String toString() {
     return 'CustomTypeReadValueTest(tradeInfo: $tradeInfo, userInfo: $userInfo)';
   }
+
 
   Map<String, dynamic> toJson() {
     final map = <String, dynamic>{};
@@ -47,17 +46,11 @@ mixin _CustomTypeReadValueTest {
   }
 
   static CustomTypeReadValueTest fromJson(Map<String, dynamic> map) {
-    final tradeInfoReadValue =
-        CustomTypeReadValueTest._readTradeInfo(map, 'tradeInfo');
-    final userInfoReadValue =
-        CustomTypeReadValueTest._readUserInfo(map, 'userInfo');
+    final tradeInfoReadValue = CustomTypeReadValueTest._readTradeInfo(map, 'tradeInfo');
+    final userInfoReadValue = CustomTypeReadValueTest._readUserInfo(map, 'userInfo');
     return CustomTypeReadValueTest(
-      tradeInfo: tradeInfoReadValue != null
-          ? TradeInfoBean.fromJson(
-              Map<String, dynamic>.from(tradeInfoReadValue as Map))
-          : null,
-      userInfo: UserInfo.fromJson(
-          Map<String, dynamic>.from((userInfoReadValue ?? {}) as Map)),
+      tradeInfo: tradeInfoReadValue != null ? TradeInfoBean.fromJson(Map<String, dynamic>.from(tradeInfoReadValue as Map)) : null,
+      userInfo: UserInfo.fromJson(Map<String, dynamic>.from((userInfoReadValue ?? {}) as Map)),
     );
   }
 }
@@ -89,11 +82,11 @@ mixin _TradeInfoBean {
       price,
     ]);
   }
-
   @override
   String toString() {
     return 'TradeInfoBean(status: $status, price: $price)';
   }
+
 
   Map<String, dynamic> toJson() {
     final map = <String, dynamic>{};
@@ -137,11 +130,11 @@ mixin _UserInfo {
       age,
     ]);
   }
-
   @override
   String toString() {
     return 'UserInfo(name: $name, age: $age)';
   }
+
 
   Map<String, dynamic> toJson() {
     final map = <String, dynamic>{};
@@ -157,6 +150,7 @@ mixin _UserInfo {
     );
   }
 }
+
 
 /// Helper class for chained copyWith operations
 class _CustomTypeReadValueTestCopyWith {
@@ -185,8 +179,7 @@ class _CustomTypeReadValueTestCopyWith {
       final currentValue = _instance.tradeInfo;
       if (currentValue == null) {
         // Cannot create new instance when nested object is null
-        throw StateError(
-            'Cannot update field status when tradeInfo is null. Set tradeInfo first.');
+        throw StateError('Cannot update field status when tradeInfo is null. Set tradeInfo first.');
       } else {
         return tradeInfo(currentValue.copyWith(status: value));
       }
@@ -199,8 +192,7 @@ class _CustomTypeReadValueTestCopyWith {
       final currentValue = _instance.tradeInfo;
       if (currentValue == null) {
         // Cannot create new instance when nested object is null
-        throw StateError(
-            'Cannot update field price when tradeInfo is null. Set tradeInfo first.');
+        throw StateError('Cannot update field price when tradeInfo is null. Set tradeInfo first.');
       } else {
         return tradeInfo(currentValue.copyWith(price: value));
       }
@@ -266,6 +258,7 @@ class _CustomTypeReadValueTestNestedCopyWithUserInfo {
   }
 }
 
+
 /// Helper class for chained copyWith operations
 class _TradeInfoBeanCopyWith {
   final _TradeInfoBean _instance;
@@ -299,6 +292,7 @@ class _TradeInfoBeanCopyWith {
   }
 }
 
+
 /// Helper class for chained copyWith operations
 class _UserInfoCopyWith {
   final _UserInfo _instance;
@@ -331,3 +325,4 @@ class _UserInfoCopyWith {
     );
   }
 }
+

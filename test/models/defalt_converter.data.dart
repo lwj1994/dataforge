@@ -30,35 +30,29 @@ mixin _Test {
       createdAtNull,
     ]);
   }
-
   @override
   String toString() {
     return 'Test(createdAt: $createdAt, createdAtNull: $createdAtNull)';
   }
 
+
   Map<String, dynamic> toJson() {
     final map = <String, dynamic>{};
     map['createdAt'] = const DefaultDateTimeConverter().toJson(createdAt);
     if (createdAtNull != null) {
-      map['createdAtNull'] = createdAtNull != null
-          ? const DefaultDateTimeConverter().toJson(createdAtNull!)
-          : null;
+      map['createdAtNull'] = createdAtNull != null ? const DefaultDateTimeConverter().toJson(createdAtNull!) : null;
     }
     return map;
   }
 
   static Test fromJson(Map<String, dynamic> map) {
     return Test(
-      createdAt: map['createdAt'] != null
-          ? const DefaultDateTimeConverter().fromJson(map['createdAt'])
-              as DateTime
-          : throw ArgumentError('Required field createdAt is missing'),
-      createdAtNull: map['createdAtNull'] != null
-          ? const DefaultDateTimeConverter().fromJson(map['createdAtNull'])
-          : null,
+      createdAt: map['createdAt'] != null ? const DefaultDateTimeConverter().fromJson(map['createdAt']) as DateTime : throw ArgumentError('Required field createdAt is missing'),
+      createdAtNull: map['createdAtNull'] != null ? const DefaultDateTimeConverter().fromJson(map['createdAtNull']) : null,
     );
   }
 }
+
 
 /// Helper class for chained copyWith operations
 class _TestCopyWith {
@@ -92,3 +86,4 @@ class _TestCopyWith {
     );
   }
 }
+

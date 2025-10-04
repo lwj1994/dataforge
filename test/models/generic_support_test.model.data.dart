@@ -8,8 +8,7 @@ mixin _GenericContainer<T> {
   abstract final String name;
   abstract final int? count;
 
-  _GenericContainerCopyWith<T> get copyWith =>
-      _GenericContainerCopyWith<T>._(this);
+  _GenericContainerCopyWith<T> get copyWith => _GenericContainerCopyWith<T>._(this);
 
   @override
   bool operator ==(Object other) {
@@ -36,11 +35,11 @@ mixin _GenericContainer<T> {
       count,
     ]);
   }
-
   @override
   String toString() {
     return 'GenericContainer(data: $data, name: $name, count: $count)';
   }
+
 
   Map<String, dynamic> toJson() {
     final map = <String, dynamic>{};
@@ -93,11 +92,11 @@ mixin _GenericPair<T, U> {
       label,
     ]);
   }
-
   @override
   String toString() {
     return 'GenericPair(first: $first, second: $second, label: $label)';
   }
+
 
   Map<String, dynamic> toJson() {
     final map = <String, dynamic>{};
@@ -148,11 +147,11 @@ mixin _GenericWrapper<T> {
       optionalItem,
     ]);
   }
-
   @override
   String toString() {
     return 'GenericWrapper(items: $items, namedItems: $namedItems, optionalItem: $optionalItem)';
   }
+
 
   Map<String, dynamic> toJson() {
     final map = <String, dynamic>{};
@@ -167,8 +166,7 @@ mixin _GenericWrapper<T> {
   static GenericWrapper<T> fromJson<T>(Map<String, dynamic> map) {
     return GenericWrapper<T>(
       items: (map['items'] as List<dynamic>?)?.cast<T>() ?? [],
-      namedItems: ((map['namedItems'] as Map<dynamic, dynamic>?) ?? {})
-          .map((key, value) => MapEntry(key as String, value as T)),
+      namedItems: ((map['namedItems'] as Map<dynamic, dynamic>?) ?? {}).map((key, value) => MapEntry(key as String, value as T)),
       optionalItem: map['optionalItem'] as T?,
     );
   }
@@ -201,11 +199,11 @@ mixin _GenericBounded<T> {
       DeepCollectionEquality().hash(values),
     ]);
   }
-
   @override
   String toString() {
     return 'GenericBounded(value: $value, values: $values)';
   }
+
 
   Map<String, dynamic> toJson() {
     final map = <String, dynamic>{};
@@ -229,8 +227,7 @@ mixin _GenericWithFeatures<T> {
   abstract final TestStatus status;
   abstract final DateTime createdAt;
 
-  _GenericWithFeaturesCopyWith<T> get copyWith =>
-      _GenericWithFeaturesCopyWith<T>._(this);
+  _GenericWithFeaturesCopyWith<T> get copyWith => _GenericWithFeaturesCopyWith<T>._(this);
 
   @override
   bool operator ==(Object other) {
@@ -265,18 +262,17 @@ mixin _GenericWithFeatures<T> {
       createdAt,
     ]);
   }
-
   @override
   String toString() {
     return 'GenericWithFeatures(data: $data, customField: $customField, ignoredField: $ignoredField, status: $status, createdAt: $createdAt)';
   }
 
+
   Map<String, dynamic> toJson() {
     final map = <String, dynamic>{};
     map['data'] = data;
     map['custom_name'] = customField;
-    map['status'] = const DefaultEnumConverter<TestStatus>(TestStatus.values)
-        .toJson(status);
+    map['status'] = const DefaultEnumConverter<TestStatus>(TestStatus.values).toJson(status);
     map['createdAt'] = const DefaultDateTimeConverter().toJson(createdAt);
     return map;
   }
@@ -285,17 +281,12 @@ mixin _GenericWithFeatures<T> {
     return GenericWithFeatures<T>(
       data: map['data'] as T,
       customField: SafeCasteUtil.safeCast<String>(map['custom_name']) ?? "",
-      status: map['status'] != null
-          ? const DefaultEnumConverter<TestStatus>(TestStatus.values)
-              .fromJson(map['status']) as TestStatus
-          : throw ArgumentError('Required field status is missing'),
-      createdAt: map['createdAt'] != null
-          ? const DefaultDateTimeConverter().fromJson(map['createdAt'])
-              as DateTime
-          : throw ArgumentError('Required field createdAt is missing'),
+      status: map['status'] != null ? const DefaultEnumConverter<TestStatus>(TestStatus.values).fromJson(map['status']) as TestStatus : throw ArgumentError('Required field status is missing'),
+      createdAt: map['createdAt'] != null ? const DefaultDateTimeConverter().fromJson(map['createdAt']) as DateTime : throw ArgumentError('Required field createdAt is missing'),
     );
   }
 }
+
 
 /// Helper class for chained copyWith operations
 class _GenericContainerCopyWith<T> {
@@ -359,6 +350,7 @@ class _GenericContainerNestedCopyWithData<T> {
     );
   }
 }
+
 
 /// Helper class for chained copyWith operations
 class _GenericPairCopyWith<T, U> {
@@ -440,6 +432,7 @@ class _GenericPairNestedCopyWithSecond<T, U> {
   }
 }
 
+
 /// Helper class for chained copyWith operations
 class _GenericWrapperCopyWith<T> {
   final _GenericWrapper<T> _instance;
@@ -504,6 +497,7 @@ class _GenericWrapperNestedCopyWithOptionalItem<T> {
   }
 }
 
+
 /// Helper class for chained copyWith operations
 class _GenericBoundedCopyWith<T> {
   final _GenericBounded<T> _instance;
@@ -552,6 +546,7 @@ class _GenericBoundedNestedCopyWithValue<T> {
     );
   }
 }
+
 
 /// Helper class for chained copyWith operations
 class _GenericWithFeaturesCopyWith<T> {
@@ -668,3 +663,4 @@ class _GenericWithFeaturesNestedCopyWithStatus<T> {
     );
   }
 }
+

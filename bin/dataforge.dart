@@ -48,7 +48,7 @@ Future<void> main(List<String> args) async {
   }
 
   // Show loading indicator
-  stdout.write('🔨 Generating code');
+  print('🔨 Generating code');
 
   if (path.isEmpty) {
     if (debugMode) {

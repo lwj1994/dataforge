@@ -35,18 +35,18 @@ mixin _ApiResponse<T> {
       data,
     ]);
   }
-
   @override
   String toString() {
     return 'ApiResponse(success: $success, message: $message, data: $data)';
   }
+
 
   Map<String, dynamic> toJson() {
     final map = <String, dynamic>{};
     map['success'] = success;
     map['message'] = message;
     if (data != null) {
-      map['data'] = data != null ? ApiResponse._dataToJson(data as T) : null;
+      map['data'] = data != null ? ApiResponse._dataToJson(data!) : null;
     }
     return map;
   }
@@ -97,11 +97,11 @@ mixin _User {
       age,
     ]);
   }
-
   @override
   String toString() {
     return 'User(id: $id, name: $name, email: $email, age: $age)';
   }
+
 
   Map<String, dynamic> toJson() {
     final map = <String, dynamic>{};
@@ -151,11 +151,11 @@ mixin _ListResponse<T> {
       DeepCollectionEquality().hash(items),
     ]);
   }
-
   @override
   String toString() {
     return 'ListResponse(total: $total, items: $items)';
   }
+
 
   Map<String, dynamic> toJson() {
     final map = <String, dynamic>{};
@@ -169,12 +169,11 @@ mixin _ListResponse<T> {
   static ListResponse<T> fromJson<T>(Map<String, dynamic> map) {
     return ListResponse<T>(
       total: SafeCasteUtil.safeCast<int>(map['total']) ?? 0,
-      items: map['items'] != null
-          ? ListResponse._itemsFromJson(map['items'])
-          : null,
+      items: map['items'] != null ? ListResponse._itemsFromJson(map['items']) : null,
     );
   }
 }
+
 
 /// Helper class for chained copyWith operations
 class _ApiResponseCopyWith<T> {
@@ -240,6 +239,7 @@ class _ApiResponseNestedCopyWithData<T> {
   }
 }
 
+
 /// Helper class for chained copyWith operations
 class _UserCopyWith {
   final _User _instance;
@@ -301,6 +301,7 @@ class _UserCopyWith {
   }
 }
 
+
 /// Helper class for chained copyWith operations
 class _ListResponseCopyWith<T> {
   final _ListResponse<T> _instance;
@@ -333,3 +334,4 @@ class _ListResponseCopyWith<T> {
     );
   }
 }
+

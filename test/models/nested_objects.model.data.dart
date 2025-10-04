@@ -50,11 +50,11 @@ mixin _Address {
       isPrimary,
     ]);
   }
-
   @override
   String toString() {
     return 'Address(street: $street, city: $city, state: $state, zipCode: $zipCode, country: $country, isPrimary: $isPrimary)';
   }
+
 
   Map<String, dynamic> toJson() {
     final map = <String, dynamic>{};
@@ -113,11 +113,11 @@ mixin _Contact {
       contactType,
     ]);
   }
-
   @override
   String toString() {
     return 'Contact(email: $email, phone: $phone, contactType: $contactType)';
   }
+
 
   Map<String, dynamic> toJson() {
     final map = <String, dynamic>{};
@@ -144,6 +144,7 @@ mixin _Company {
   abstract final List<Address>? branches;
   abstract final Contact primaryContact;
   abstract final List<Contact>? additionalContacts;
+  abstract final Address? subAddress;
 
   _CompanyCopyWith get copyWith => _CompanyCopyWith._(this);
 
@@ -164,8 +165,10 @@ mixin _Company {
     if (primaryContact != other.primaryContact) {
       return false;
     }
-    if (!DeepCollectionEquality()
-        .equals(additionalContacts, other.additionalContacts)) {
+    if (!DeepCollectionEquality().equals(additionalContacts, other.additionalContacts)) {
+      return false;
+    }
+    if (subAddress != other.subAddress) {
       return false;
     }
     return true;
@@ -179,13 +182,14 @@ mixin _Company {
       DeepCollectionEquality().hash(branches),
       primaryContact,
       DeepCollectionEquality().hash(additionalContacts),
+      subAddress,
     ]);
   }
-
   @override
   String toString() {
-    return 'Company(name: $name, headquarters: $headquarters, branches: $branches, primaryContact: $primaryContact, additionalContacts: $additionalContacts)';
+    return 'Company(name: $name, headquarters: $headquarters, branches: $branches, primaryContact: $primaryContact, additionalContacts: $additionalContacts, subAddress: $subAddress)';
   }
+
 
   Map<String, dynamic> toJson() {
     final map = <String, dynamic>{};
@@ -198,24 +202,20 @@ mixin _Company {
     if (additionalContacts != null) {
       map['additionalContacts'] = additionalContacts;
     }
+    if (subAddress != null) {
+      map['subAddress'] = subAddress;
+    }
     return map;
   }
 
   static Company fromJson(Map<String, dynamic> map) {
     return Company(
       name: SafeCasteUtil.safeCast<String>(map['name']) ?? "",
-      headquarters:
-          Address.fromJson((map['headquarters'] ?? {}) as Map<String, dynamic>),
-      branches: (map['branches'] as List<dynamic>?)
-          ?.map((e) => Address.fromJson(e as Map<String, dynamic>))
-          .toList()
-          .cast<Address>(),
-      primaryContact: Contact.fromJson(
-          (map['primaryContact'] ?? {}) as Map<String, dynamic>),
-      additionalContacts: (map['additionalContacts'] as List<dynamic>?)
-          ?.map((e) => Contact.fromJson(e as Map<String, dynamic>))
-          .toList()
-          .cast<Contact>(),
+      headquarters: Address.fromJson((map['headquarters'] ?? {}) as Map<String, dynamic>),
+      branches: (map['branches'] as List<dynamic>?)?.map((e) => Address.fromJson(e as Map<String, dynamic>)).toList()?.cast<Address>(),
+      primaryContact: Contact.fromJson((map['primaryContact'] ?? {}) as Map<String, dynamic>),
+      additionalContacts: (map['additionalContacts'] as List<dynamic>?)?.map((e) => Contact.fromJson(e as Map<String, dynamic>)).toList()?.cast<Contact>(),
+      subAddress: map['subAddress'] != null ? Address.fromJson(map['subAddress'] as Map<String, dynamic>) : null,
     );
   }
 }
@@ -248,12 +248,10 @@ mixin _NestedObjects {
     if (workAddress != other.workAddress) {
       return false;
     }
-    if (!DeepCollectionEquality()
-        .equals(previousAddresses, other.previousAddresses)) {
+    if (!DeepCollectionEquality().equals(previousAddresses, other.previousAddresses)) {
       return false;
     }
-    if (!DeepCollectionEquality()
-        .equals(namedAddresses, other.namedAddresses)) {
+    if (!DeepCollectionEquality().equals(namedAddresses, other.namedAddresses)) {
       return false;
     }
     if (primaryContact != other.primaryContact) {
@@ -268,8 +266,7 @@ mixin _NestedObjects {
     if (customAddress != other.customAddress) {
       return false;
     }
-    if (!DeepCollectionEquality()
-        .equals(parsedContacts, other.parsedContacts)) {
+    if (!DeepCollectionEquality().equals(parsedContacts, other.parsedContacts)) {
       return false;
     }
     return true;
@@ -290,11 +287,11 @@ mixin _NestedObjects {
       DeepCollectionEquality().hash(parsedContacts),
     ]);
   }
-
   @override
   String toString() {
     return 'NestedObjects(name: $name, homeAddress: $homeAddress, workAddress: $workAddress, previousAddresses: $previousAddresses, namedAddresses: $namedAddresses, primaryContact: $primaryContact, contacts: $contacts, employer: $employer, customAddress: $customAddress, parsedContacts: $parsedContacts)';
   }
+
 
   Map<String, dynamic> toJson() {
     final map = <String, dynamic>{};
@@ -324,43 +321,22 @@ mixin _NestedObjects {
   }
 
   static NestedObjects fromJson(Map<String, dynamic> map) {
-    final parsedContactsReadValue =
-        NestedObjects._readValue(map, 'parsedContacts');
+    final parsedContactsReadValue = NestedObjects._readValue(map, 'parsedContacts');
     return NestedObjects(
       name: SafeCasteUtil.safeCast<String>(map['name']) ?? "",
-      homeAddress:
-          Address.fromJson((map['homeAddress'] ?? {}) as Map<String, dynamic>),
-      workAddress: map['workAddress'] != null
-          ? Address.fromJson(map['workAddress'] as Map<String, dynamic>)
-          : null,
-      previousAddresses: (map['previousAddresses'] as List<dynamic>?)
-              ?.map((e) => Address.fromJson(e as Map<String, dynamic>))
-              .toList()
-              .cast<Address>() ??
-          [],
-      namedAddresses: (map['namedAddresses'] as Map<String, dynamic>?)?.map(
-          (key, value) =>
-              MapEntry(key, Address.fromJson(value as Map<String, dynamic>))),
-      primaryContact: Contact.fromJson(
-          (map['primaryContact'] ?? {}) as Map<String, dynamic>),
-      contacts: (map['contacts'] as List<dynamic>?)
-          ?.map((e) => Contact.fromJson(e as Map<String, dynamic>))
-          .toList()
-          .cast<Contact>(),
-      employer: map['employer'] != null
-          ? Company.fromJson(map['employer'] as Map<String, dynamic>)
-          : null,
-      customAddress: map['customAddress'] != null
-          ? Address.fromJson(map['customAddress'] as Map<String, dynamic>)
-          : null,
-      parsedContacts: parsedContactsReadValue != null
-          ? (parsedContactsReadValue as List?)
-              ?.map((e) => Contact.fromJson(e as Map<String, dynamic>))
-              .toList()
-          : null,
+      homeAddress: Address.fromJson((map['homeAddress'] ?? {}) as Map<String, dynamic>),
+      workAddress: map['workAddress'] != null ? Address.fromJson(map['workAddress'] as Map<String, dynamic>) : null,
+      previousAddresses: (map['previousAddresses'] as List<dynamic>?)?.map((e) => Address.fromJson(e as Map<String, dynamic>)).toList()?.cast<Address>() ?? [],
+      namedAddresses: (map['namedAddresses'] as Map<String, dynamic>?)?.map((key, value) => MapEntry(key, Address.fromJson(value as Map<String, dynamic>))),
+      primaryContact: Contact.fromJson((map['primaryContact'] ?? {}) as Map<String, dynamic>),
+      contacts: (map['contacts'] as List<dynamic>?)?.map((e) => Contact.fromJson(e as Map<String, dynamic>)).toList()?.cast<Contact>(),
+      employer: map['employer'] != null ? Company.fromJson(map['employer'] as Map<String, dynamic>) : null,
+      customAddress: map['customAddress'] != null ? Address.fromJson(map['customAddress'] as Map<String, dynamic>) : null,
+      parsedContacts: parsedContactsReadValue != null ? (parsedContactsReadValue as List?)?.map((e) => Contact.fromJson(e as Map<String, dynamic>)).toList() : null,
     );
   }
 }
+
 
 /// Helper class for chained copyWith operations
 class _AddressCopyWith {
@@ -459,6 +435,7 @@ class _AddressCopyWith {
   }
 }
 
+
 /// Helper class for chained copyWith operations
 class _ContactCopyWith {
   final _Contact _instance;
@@ -505,6 +482,7 @@ class _ContactCopyWith {
   }
 }
 
+
 /// Helper class for chained copyWith operations
 class _CompanyCopyWith {
   final _Company _instance;
@@ -518,6 +496,7 @@ class _CompanyCopyWith {
       branches: _instance.branches,
       primaryContact: _instance.primaryContact,
       additionalContacts: _instance.additionalContacts,
+      subAddress: _instance.subAddress,
     );
   }
 
@@ -529,6 +508,7 @@ class _CompanyCopyWith {
       branches: _instance.branches,
       primaryContact: _instance.primaryContact,
       additionalContacts: _instance.additionalContacts,
+      subAddress: _instance.subAddress,
     );
   }
 
@@ -540,6 +520,7 @@ class _CompanyCopyWith {
       branches: value,
       primaryContact: _instance.primaryContact,
       additionalContacts: _instance.additionalContacts,
+      subAddress: _instance.subAddress,
     );
   }
 
@@ -551,6 +532,7 @@ class _CompanyCopyWith {
       branches: _instance.branches,
       primaryContact: value ?? _instance.primaryContact,
       additionalContacts: _instance.additionalContacts,
+      subAddress: _instance.subAddress,
     );
   }
 
@@ -562,6 +544,19 @@ class _CompanyCopyWith {
       branches: _instance.branches,
       primaryContact: _instance.primaryContact,
       additionalContacts: value,
+      subAddress: _instance.subAddress,
+    );
+  }
+
+  /// Update subAddress field
+  Company subAddress(Address? value) {
+    return Company(
+      name: _instance.name,
+      headquarters: _instance.headquarters,
+      branches: _instance.branches,
+      primaryContact: _instance.primaryContact,
+      additionalContacts: _instance.additionalContacts,
+      subAddress: value,
     );
   }
 
@@ -624,8 +619,79 @@ class _CompanyCopyWith {
   /// Direct field access getter for primaryContact.contactType
   Company Function(String?) get primaryContact$ContactType {
     return (String? value) {
-      return primaryContact(
-          _instance.primaryContact.copyWith(contactType: value));
+      return primaryContact(_instance.primaryContact.copyWith(contactType: value));
+    };
+  }
+
+  /// Direct field access getter for subAddress.street
+  Company Function(String?) get subAddress$Street {
+    return (String? value) {
+      final currentValue = _instance.subAddress;
+      if (currentValue == null) {
+        throw StateError('Cannot update field street when subAddress is null. Set subAddress first.');
+      } else {
+        return subAddress(currentValue.copyWith(street: value));
+      }
+    };
+  }
+
+  /// Direct field access getter for subAddress.city
+  Company Function(String?) get subAddress$City {
+    return (String? value) {
+      final currentValue = _instance.subAddress;
+      if (currentValue == null) {
+        throw StateError('Cannot update field city when subAddress is null. Set subAddress first.');
+      } else {
+        return subAddress(currentValue.copyWith(city: value));
+      }
+    };
+  }
+
+  /// Direct field access getter for subAddress.state
+  Company Function(String?) get subAddress$State {
+    return (String? value) {
+      final currentValue = _instance.subAddress;
+      if (currentValue == null) {
+        throw StateError('Cannot update field state when subAddress is null. Set subAddress first.');
+      } else {
+        return subAddress(currentValue.copyWith(state: value));
+      }
+    };
+  }
+
+  /// Direct field access getter for subAddress.zipCode
+  Company Function(String?) get subAddress$ZipCode {
+    return (String? value) {
+      final currentValue = _instance.subAddress;
+      if (currentValue == null) {
+        throw StateError('Cannot update field zipCode when subAddress is null. Set subAddress first.');
+      } else {
+        return subAddress(currentValue.copyWith(zipCode: value));
+      }
+    };
+  }
+
+  /// Direct field access getter for subAddress.country
+  Company Function(String?) get subAddress$Country {
+    return (String? value) {
+      final currentValue = _instance.subAddress;
+      if (currentValue == null) {
+        throw StateError('Cannot update field country when subAddress is null. Set subAddress first.');
+      } else {
+        return subAddress(currentValue.copyWith(country: value));
+      }
+    };
+  }
+
+  /// Direct field access getter for subAddress.isPrimary
+  Company Function(bool?) get subAddress$IsPrimary {
+    return (bool? value) {
+      final currentValue = _instance.subAddress;
+      if (currentValue == null) {
+        throw StateError('Cannot update field isPrimary when subAddress is null. Set subAddress first.');
+      } else {
+        return subAddress(currentValue.copyWith(isPrimary: value));
+      }
     };
   }
 
@@ -636,6 +702,7 @@ class _CompanyCopyWith {
     List<Address>? branches,
     Contact? primaryContact,
     List<Contact>? additionalContacts,
+    Address? subAddress,
   }) {
     return Company(
       name: name ?? _instance.name,
@@ -643,47 +710,11 @@ class _CompanyCopyWith {
       branches: branches ?? _instance.branches,
       primaryContact: primaryContact ?? _instance.primaryContact,
       additionalContacts: additionalContacts ?? _instance.additionalContacts,
+      subAddress: subAddress ?? _instance.subAddress,
     );
   }
 }
 
-/// Nested copyWith helper class for headquarters field
-class _CompanyNestedCopyWithHeadquarters {
-  final _Company _instance;
-  const _CompanyNestedCopyWithHeadquarters._(this._instance);
-
-  /// Update headquarters field using a copyWith function
-  Company call(Address Function(Address) updater) {
-    final currentValue = _instance.headquarters;
-    final updatedValue = updater(currentValue);
-    return Company(
-      name: _instance.name,
-      headquarters: updatedValue,
-      branches: _instance.branches,
-      primaryContact: _instance.primaryContact,
-      additionalContacts: _instance.additionalContacts,
-    );
-  }
-}
-
-/// Nested copyWith helper class for primaryContact field
-class _CompanyNestedCopyWithPrimaryContact {
-  final _Company _instance;
-  const _CompanyNestedCopyWithPrimaryContact._(this._instance);
-
-  /// Update primaryContact field using a copyWith function
-  Company call(Contact Function(Contact) updater) {
-    final currentValue = _instance.primaryContact;
-    final updatedValue = updater(currentValue);
-    return Company(
-      name: _instance.name,
-      headquarters: _instance.headquarters,
-      branches: _instance.branches,
-      primaryContact: updatedValue,
-      additionalContacts: _instance.additionalContacts,
-    );
-  }
-}
 
 /// Helper class for chained copyWith operations
 class _NestedObjectsCopyWith {
@@ -897,9 +928,7 @@ class _NestedObjectsCopyWith {
     return (String? value) {
       final currentValue = _instance.workAddress;
       if (currentValue == null) {
-        // Cannot create new instance when nested object is null
-        throw StateError(
-            'Cannot update field street when workAddress is null. Set workAddress first.');
+        throw StateError('Cannot update field street when workAddress is null. Set workAddress first.');
       } else {
         return workAddress(currentValue.copyWith(street: value));
       }
@@ -911,9 +940,7 @@ class _NestedObjectsCopyWith {
     return (String? value) {
       final currentValue = _instance.workAddress;
       if (currentValue == null) {
-        // Cannot create new instance when nested object is null
-        throw StateError(
-            'Cannot update field city when workAddress is null. Set workAddress first.');
+        throw StateError('Cannot update field city when workAddress is null. Set workAddress first.');
       } else {
         return workAddress(currentValue.copyWith(city: value));
       }
@@ -925,9 +952,7 @@ class _NestedObjectsCopyWith {
     return (String? value) {
       final currentValue = _instance.workAddress;
       if (currentValue == null) {
-        // Cannot create new instance when nested object is null
-        throw StateError(
-            'Cannot update field state when workAddress is null. Set workAddress first.');
+        throw StateError('Cannot update field state when workAddress is null. Set workAddress first.');
       } else {
         return workAddress(currentValue.copyWith(state: value));
       }
@@ -939,9 +964,7 @@ class _NestedObjectsCopyWith {
     return (String? value) {
       final currentValue = _instance.workAddress;
       if (currentValue == null) {
-        // Cannot create new instance when nested object is null
-        throw StateError(
-            'Cannot update field zipCode when workAddress is null. Set workAddress first.');
+        throw StateError('Cannot update field zipCode when workAddress is null. Set workAddress first.');
       } else {
         return workAddress(currentValue.copyWith(zipCode: value));
       }
@@ -953,9 +976,7 @@ class _NestedObjectsCopyWith {
     return (String? value) {
       final currentValue = _instance.workAddress;
       if (currentValue == null) {
-        // Cannot create new instance when nested object is null
-        throw StateError(
-            'Cannot update field country when workAddress is null. Set workAddress first.');
+        throw StateError('Cannot update field country when workAddress is null. Set workAddress first.');
       } else {
         return workAddress(currentValue.copyWith(country: value));
       }
@@ -967,9 +988,7 @@ class _NestedObjectsCopyWith {
     return (bool? value) {
       final currentValue = _instance.workAddress;
       if (currentValue == null) {
-        // Cannot create new instance when nested object is null
-        throw StateError(
-            'Cannot update field isPrimary when workAddress is null. Set workAddress first.');
+        throw StateError('Cannot update field isPrimary when workAddress is null. Set workAddress first.');
       } else {
         return workAddress(currentValue.copyWith(isPrimary: value));
       }
@@ -993,8 +1012,7 @@ class _NestedObjectsCopyWith {
   /// Direct field access getter for primaryContact.contactType
   NestedObjects Function(String?) get primaryContact$ContactType {
     return (String? value) {
-      return primaryContact(
-          _instance.primaryContact.copyWith(contactType: value));
+      return primaryContact(_instance.primaryContact.copyWith(contactType: value));
     };
   }
 
@@ -1003,9 +1021,7 @@ class _NestedObjectsCopyWith {
     return (String? value) {
       final currentValue = _instance.employer;
       if (currentValue == null) {
-        // Cannot create new instance when nested object is null
-        throw StateError(
-            'Cannot update field name when employer is null. Set employer first.');
+        throw StateError('Cannot update field name when employer is null. Set employer first.');
       } else {
         return employer(currentValue.copyWith(name: value));
       }
@@ -1017,9 +1033,7 @@ class _NestedObjectsCopyWith {
     return (Address? value) {
       final currentValue = _instance.employer;
       if (currentValue == null) {
-        // Cannot create new instance when nested object is null
-        throw StateError(
-            'Cannot update field headquarters when employer is null. Set employer first.');
+        throw StateError('Cannot update field headquarters when employer is null. Set employer first.');
       } else {
         return employer(currentValue.copyWith(headquarters: value));
       }
@@ -1031,9 +1045,7 @@ class _NestedObjectsCopyWith {
     return (List<Address>? value) {
       final currentValue = _instance.employer;
       if (currentValue == null) {
-        // Cannot create new instance when nested object is null
-        throw StateError(
-            'Cannot update field branches when employer is null. Set employer first.');
+        throw StateError('Cannot update field branches when employer is null. Set employer first.');
       } else {
         return employer(currentValue.copyWith(branches: value));
       }
@@ -1045,9 +1057,7 @@ class _NestedObjectsCopyWith {
     return (Contact? value) {
       final currentValue = _instance.employer;
       if (currentValue == null) {
-        // Cannot create new instance when nested object is null
-        throw StateError(
-            'Cannot update field primaryContact when employer is null. Set employer first.');
+        throw StateError('Cannot update field primaryContact when employer is null. Set employer first.');
       } else {
         return employer(currentValue.copyWith(primaryContact: value));
       }
@@ -1059,11 +1069,231 @@ class _NestedObjectsCopyWith {
     return (List<Contact>? value) {
       final currentValue = _instance.employer;
       if (currentValue == null) {
-        // Cannot create new instance when nested object is null
-        throw StateError(
-            'Cannot update field additionalContacts when employer is null. Set employer first.');
+        throw StateError('Cannot update field additionalContacts when employer is null. Set employer first.');
       } else {
         return employer(currentValue.copyWith(additionalContacts: value));
+      }
+    };
+  }
+
+  /// Direct field access getter for employer.subAddress
+  NestedObjects Function(Address?) get employer$SubAddress {
+    return (Address? value) {
+      final currentValue = _instance.employer;
+      if (currentValue == null) {
+        throw StateError('Cannot update field subAddress when employer is null. Set employer first.');
+      } else {
+        return employer(currentValue.copyWith(subAddress: value));
+      }
+    };
+  }
+
+  /// Direct field access getter for employer.headquarters.street
+  NestedObjects Function(String?) get employer$Headquarters$Street {
+    return (String? value) {
+      final currentValue = _instance.employer;
+      if (currentValue == null) {
+        throw StateError('Cannot update field street when employer is null. Set employer first.');
+      } else {
+        return employer(currentValue.copyWith(
+          headquarters: currentValue.headquarters.copyWith(street: value),
+        ));
+      }
+    };
+  }
+
+  /// Direct field access getter for employer.headquarters.city
+  NestedObjects Function(String?) get employer$Headquarters$City {
+    return (String? value) {
+      final currentValue = _instance.employer;
+      if (currentValue == null) {
+        throw StateError('Cannot update field city when employer is null. Set employer first.');
+      } else {
+        return employer(currentValue.copyWith(
+          headquarters: currentValue.headquarters.copyWith(city: value),
+        ));
+      }
+    };
+  }
+
+  /// Direct field access getter for employer.headquarters.state
+  NestedObjects Function(String?) get employer$Headquarters$State {
+    return (String? value) {
+      final currentValue = _instance.employer;
+      if (currentValue == null) {
+        throw StateError('Cannot update field state when employer is null. Set employer first.');
+      } else {
+        return employer(currentValue.copyWith(
+          headquarters: currentValue.headquarters.copyWith(state: value),
+        ));
+      }
+    };
+  }
+
+  /// Direct field access getter for employer.headquarters.zipCode
+  NestedObjects Function(String?) get employer$Headquarters$ZipCode {
+    return (String? value) {
+      final currentValue = _instance.employer;
+      if (currentValue == null) {
+        throw StateError('Cannot update field zipCode when employer is null. Set employer first.');
+      } else {
+        return employer(currentValue.copyWith(
+          headquarters: currentValue.headquarters.copyWith(zipCode: value),
+        ));
+      }
+    };
+  }
+
+  /// Direct field access getter for employer.headquarters.country
+  NestedObjects Function(String?) get employer$Headquarters$Country {
+    return (String? value) {
+      final currentValue = _instance.employer;
+      if (currentValue == null) {
+        throw StateError('Cannot update field country when employer is null. Set employer first.');
+      } else {
+        return employer(currentValue.copyWith(
+          headquarters: currentValue.headquarters.copyWith(country: value),
+        ));
+      }
+    };
+  }
+
+  /// Direct field access getter for employer.headquarters.isPrimary
+  NestedObjects Function(bool?) get employer$Headquarters$IsPrimary {
+    return (bool? value) {
+      final currentValue = _instance.employer;
+      if (currentValue == null) {
+        throw StateError('Cannot update field isPrimary when employer is null. Set employer first.');
+      } else {
+        return employer(currentValue.copyWith(
+          headquarters: currentValue.headquarters.copyWith(isPrimary: value),
+        ));
+      }
+    };
+  }
+
+  /// Direct field access getter for employer.primaryContact.email
+  NestedObjects Function(String?) get employer$PrimaryContact$Email {
+    return (String? value) {
+      final currentValue = _instance.employer;
+      if (currentValue == null) {
+        throw StateError('Cannot update field email when employer is null. Set employer first.');
+      } else {
+        return employer(currentValue.copyWith(
+          primaryContact: currentValue.primaryContact.copyWith(email: value),
+        ));
+      }
+    };
+  }
+
+  /// Direct field access getter for employer.primaryContact.phone
+  NestedObjects Function(String?) get employer$PrimaryContact$Phone {
+    return (String? value) {
+      final currentValue = _instance.employer;
+      if (currentValue == null) {
+        throw StateError('Cannot update field phone when employer is null. Set employer first.');
+      } else {
+        return employer(currentValue.copyWith(
+          primaryContact: currentValue.primaryContact.copyWith(phone: value),
+        ));
+      }
+    };
+  }
+
+  /// Direct field access getter for employer.primaryContact.contactType
+  NestedObjects Function(String?) get employer$PrimaryContact$ContactType {
+    return (String? value) {
+      final currentValue = _instance.employer;
+      if (currentValue == null) {
+        throw StateError('Cannot update field contactType when employer is null. Set employer first.');
+      } else {
+        return employer(currentValue.copyWith(
+          primaryContact: currentValue.primaryContact.copyWith(contactType: value),
+        ));
+      }
+    };
+  }
+
+  /// Direct field access getter for employer.subAddress.street
+  NestedObjects Function(String?) get employer$SubAddress$Street {
+    return (String? value) {
+      final currentValue = _instance.employer;
+      if (currentValue == null) {
+        throw StateError('Cannot update field street when employer is null. Set employer first.');
+      } else {
+        return employer(currentValue.copyWith(
+          subAddress: currentValue.subAddress?.copyWith(street: value),
+        ));
+      }
+    };
+  }
+
+  /// Direct field access getter for employer.subAddress.city
+  NestedObjects Function(String?) get employer$SubAddress$City {
+    return (String? value) {
+      final currentValue = _instance.employer;
+      if (currentValue == null) {
+        throw StateError('Cannot update field city when employer is null. Set employer first.');
+      } else {
+        return employer(currentValue.copyWith(
+          subAddress: currentValue.subAddress?.copyWith(city: value),
+        ));
+      }
+    };
+  }
+
+  /// Direct field access getter for employer.subAddress.state
+  NestedObjects Function(String?) get employer$SubAddress$State {
+    return (String? value) {
+      final currentValue = _instance.employer;
+      if (currentValue == null) {
+        throw StateError('Cannot update field state when employer is null. Set employer first.');
+      } else {
+        return employer(currentValue.copyWith(
+          subAddress: currentValue.subAddress?.copyWith(state: value),
+        ));
+      }
+    };
+  }
+
+  /// Direct field access getter for employer.subAddress.zipCode
+  NestedObjects Function(String?) get employer$SubAddress$ZipCode {
+    return (String? value) {
+      final currentValue = _instance.employer;
+      if (currentValue == null) {
+        throw StateError('Cannot update field zipCode when employer is null. Set employer first.');
+      } else {
+        return employer(currentValue.copyWith(
+          subAddress: currentValue.subAddress?.copyWith(zipCode: value),
+        ));
+      }
+    };
+  }
+
+  /// Direct field access getter for employer.subAddress.country
+  NestedObjects Function(String?) get employer$SubAddress$Country {
+    return (String? value) {
+      final currentValue = _instance.employer;
+      if (currentValue == null) {
+        throw StateError('Cannot update field country when employer is null. Set employer first.');
+      } else {
+        return employer(currentValue.copyWith(
+          subAddress: currentValue.subAddress?.copyWith(country: value),
+        ));
+      }
+    };
+  }
+
+  /// Direct field access getter for employer.subAddress.isPrimary
+  NestedObjects Function(bool?) get employer$SubAddress$IsPrimary {
+    return (bool? value) {
+      final currentValue = _instance.employer;
+      if (currentValue == null) {
+        throw StateError('Cannot update field isPrimary when employer is null. Set employer first.');
+      } else {
+        return employer(currentValue.copyWith(
+          subAddress: currentValue.subAddress?.copyWith(isPrimary: value),
+        ));
       }
     };
   }
@@ -1073,9 +1303,7 @@ class _NestedObjectsCopyWith {
     return (String? value) {
       final currentValue = _instance.customAddress;
       if (currentValue == null) {
-        // Cannot create new instance when nested object is null
-        throw StateError(
-            'Cannot update field street when customAddress is null. Set customAddress first.');
+        throw StateError('Cannot update field street when customAddress is null. Set customAddress first.');
       } else {
         return customAddress(currentValue.copyWith(street: value));
       }
@@ -1087,9 +1315,7 @@ class _NestedObjectsCopyWith {
     return (String? value) {
       final currentValue = _instance.customAddress;
       if (currentValue == null) {
-        // Cannot create new instance when nested object is null
-        throw StateError(
-            'Cannot update field city when customAddress is null. Set customAddress first.');
+        throw StateError('Cannot update field city when customAddress is null. Set customAddress first.');
       } else {
         return customAddress(currentValue.copyWith(city: value));
       }
@@ -1101,9 +1327,7 @@ class _NestedObjectsCopyWith {
     return (String? value) {
       final currentValue = _instance.customAddress;
       if (currentValue == null) {
-        // Cannot create new instance when nested object is null
-        throw StateError(
-            'Cannot update field state when customAddress is null. Set customAddress first.');
+        throw StateError('Cannot update field state when customAddress is null. Set customAddress first.');
       } else {
         return customAddress(currentValue.copyWith(state: value));
       }
@@ -1115,9 +1339,7 @@ class _NestedObjectsCopyWith {
     return (String? value) {
       final currentValue = _instance.customAddress;
       if (currentValue == null) {
-        // Cannot create new instance when nested object is null
-        throw StateError(
-            'Cannot update field zipCode when customAddress is null. Set customAddress first.');
+        throw StateError('Cannot update field zipCode when customAddress is null. Set customAddress first.');
       } else {
         return customAddress(currentValue.copyWith(zipCode: value));
       }
@@ -1129,9 +1351,7 @@ class _NestedObjectsCopyWith {
     return (String? value) {
       final currentValue = _instance.customAddress;
       if (currentValue == null) {
-        // Cannot create new instance when nested object is null
-        throw StateError(
-            'Cannot update field country when customAddress is null. Set customAddress first.');
+        throw StateError('Cannot update field country when customAddress is null. Set customAddress first.');
       } else {
         return customAddress(currentValue.copyWith(country: value));
       }
@@ -1143,9 +1363,7 @@ class _NestedObjectsCopyWith {
     return (bool? value) {
       final currentValue = _instance.customAddress;
       if (currentValue == null) {
-        // Cannot create new instance when nested object is null
-        throw StateError(
-            'Cannot update field isPrimary when customAddress is null. Set customAddress first.');
+        throw StateError('Cannot update field isPrimary when customAddress is null. Set customAddress first.');
       } else {
         return customAddress(currentValue.copyWith(isPrimary: value));
       }
@@ -1180,125 +1398,3 @@ class _NestedObjectsCopyWith {
   }
 }
 
-/// Nested copyWith helper class for homeAddress field
-class _NestedObjectsNestedCopyWithHomeAddress {
-  final _NestedObjects _instance;
-  const _NestedObjectsNestedCopyWithHomeAddress._(this._instance);
-
-  /// Update homeAddress field using a copyWith function
-  NestedObjects call(Address Function(Address) updater) {
-    final currentValue = _instance.homeAddress;
-    final updatedValue = updater(currentValue);
-    return NestedObjects(
-      name: _instance.name,
-      homeAddress: updatedValue,
-      workAddress: _instance.workAddress,
-      previousAddresses: _instance.previousAddresses,
-      namedAddresses: _instance.namedAddresses,
-      primaryContact: _instance.primaryContact,
-      contacts: _instance.contacts,
-      employer: _instance.employer,
-      customAddress: _instance.customAddress,
-      parsedContacts: _instance.parsedContacts,
-    );
-  }
-}
-
-/// Nested copyWith helper class for workAddress field
-class _NestedObjectsNestedCopyWithWorkAddress {
-  final _NestedObjects _instance;
-  const _NestedObjectsNestedCopyWithWorkAddress._(this._instance);
-
-  /// Update workAddress field using a copyWith function
-  NestedObjects call(Address Function(Address) updater) {
-    final currentValue = _instance.workAddress;
-    if (currentValue == null) return _instance as NestedObjects;
-    final updatedValue = updater(currentValue);
-    return NestedObjects(
-      name: _instance.name,
-      homeAddress: _instance.homeAddress,
-      workAddress: updatedValue,
-      previousAddresses: _instance.previousAddresses,
-      namedAddresses: _instance.namedAddresses,
-      primaryContact: _instance.primaryContact,
-      contacts: _instance.contacts,
-      employer: _instance.employer,
-      customAddress: _instance.customAddress,
-      parsedContacts: _instance.parsedContacts,
-    );
-  }
-}
-
-/// Nested copyWith helper class for primaryContact field
-class _NestedObjectsNestedCopyWithPrimaryContact {
-  final _NestedObjects _instance;
-  const _NestedObjectsNestedCopyWithPrimaryContact._(this._instance);
-
-  /// Update primaryContact field using a copyWith function
-  NestedObjects call(Contact Function(Contact) updater) {
-    final currentValue = _instance.primaryContact;
-    final updatedValue = updater(currentValue);
-    return NestedObjects(
-      name: _instance.name,
-      homeAddress: _instance.homeAddress,
-      workAddress: _instance.workAddress,
-      previousAddresses: _instance.previousAddresses,
-      namedAddresses: _instance.namedAddresses,
-      primaryContact: updatedValue,
-      contacts: _instance.contacts,
-      employer: _instance.employer,
-      customAddress: _instance.customAddress,
-      parsedContacts: _instance.parsedContacts,
-    );
-  }
-}
-
-/// Nested copyWith helper class for employer field
-class _NestedObjectsNestedCopyWithEmployer {
-  final _NestedObjects _instance;
-  const _NestedObjectsNestedCopyWithEmployer._(this._instance);
-
-  /// Update employer field using a copyWith function
-  NestedObjects call(Company Function(Company) updater) {
-    final currentValue = _instance.employer;
-    if (currentValue == null) return _instance as NestedObjects;
-    final updatedValue = updater(currentValue);
-    return NestedObjects(
-      name: _instance.name,
-      homeAddress: _instance.homeAddress,
-      workAddress: _instance.workAddress,
-      previousAddresses: _instance.previousAddresses,
-      namedAddresses: _instance.namedAddresses,
-      primaryContact: _instance.primaryContact,
-      contacts: _instance.contacts,
-      employer: updatedValue,
-      customAddress: _instance.customAddress,
-      parsedContacts: _instance.parsedContacts,
-    );
-  }
-}
-
-/// Nested copyWith helper class for customAddress field
-class _NestedObjectsNestedCopyWithCustomAddress {
-  final _NestedObjects _instance;
-  const _NestedObjectsNestedCopyWithCustomAddress._(this._instance);
-
-  /// Update customAddress field using a copyWith function
-  NestedObjects call(Address Function(Address) updater) {
-    final currentValue = _instance.customAddress;
-    if (currentValue == null) return _instance as NestedObjects;
-    final updatedValue = updater(currentValue);
-    return NestedObjects(
-      name: _instance.name,
-      homeAddress: _instance.homeAddress,
-      workAddress: _instance.workAddress,
-      previousAddresses: _instance.previousAddresses,
-      namedAddresses: _instance.namedAddresses,
-      primaryContact: _instance.primaryContact,
-      contacts: _instance.contacts,
-      employer: _instance.employer,
-      customAddress: updatedValue,
-      parsedContacts: _instance.parsedContacts,
-    );
-  }
-}

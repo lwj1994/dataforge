@@ -30,11 +30,11 @@ mixin _TestModel {
       param,
     ]);
   }
-
   @override
   String toString() {
     return 'TestModel(name: $name, param: $param)';
   }
+
 
   Map<String, dynamic> toJson() {
     final map = <String, dynamic>{};
@@ -48,9 +48,7 @@ mixin _TestModel {
   static TestModel fromJson(Map<String, dynamic> map) {
     return TestModel(
       name: SafeCasteUtil.safeCast<String>(map['name']) ?? "",
-      param: map['param'] != null
-          ? Params.fromJson(map['param'] as Map<String, dynamic>)
-          : null,
+      param: map['param'] != null ? Params.fromJson(map['param'] as Map<String, dynamic>) : null,
     );
   }
 }
@@ -77,11 +75,11 @@ mixin _Params {
       value,
     ]);
   }
-
   @override
   String toString() {
     return 'Params(value: $value)';
   }
+
 
   Map<String, dynamic> toJson() {
     final map = <String, dynamic>{};
@@ -95,6 +93,7 @@ mixin _Params {
     );
   }
 }
+
 
 /// Helper class for chained copyWith operations
 class _TestModelCopyWith {
@@ -123,8 +122,7 @@ class _TestModelCopyWith {
       final currentValue = _instance.param;
       if (currentValue == null) {
         // Cannot create new instance when nested object is null
-        throw StateError(
-            'Cannot update field value when param is null. Set param first.');
+        throw StateError('Cannot update field value when param is null. Set param first.');
       } else {
         return param(currentValue.copyWith(value: value));
       }
@@ -160,6 +158,7 @@ class _TestModelNestedCopyWithParam {
   }
 }
 
+
 /// Helper class for chained copyWith operations
 class _ParamsCopyWith {
   final _Params _instance;
@@ -181,3 +180,4 @@ class _ParamsCopyWith {
     );
   }
 }
+

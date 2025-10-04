@@ -17,8 +17,7 @@ mixin _ImageListModel {
     if (id != other.id) {
       return false;
     }
-    if (!DeepCollectionEquality()
-        .equals(watermarkImages, other.watermarkImages)) {
+    if (!DeepCollectionEquality().equals(watermarkImages, other.watermarkImages)) {
       return false;
     }
     return true;
@@ -31,11 +30,11 @@ mixin _ImageListModel {
       DeepCollectionEquality().hash(watermarkImages),
     ]);
   }
-
   @override
   String toString() {
     return 'ImageListModel(id: $id, watermarkImages: $watermarkImages)';
   }
+
 
   Map<String, dynamic> toJson() {
     final map = <String, dynamic>{};
@@ -45,13 +44,10 @@ mixin _ImageListModel {
   }
 
   static ImageListModel fromJson(Map<String, dynamic> map) {
-    final watermarkImagesReadValue =
-        ImageListModel._readValue(map, 'watermarkImages');
+    final watermarkImagesReadValue = ImageListModel._readValue(map, 'watermarkImages');
     return ImageListModel(
       id: SafeCasteUtil.safeCast<String>(map['id']) ?? "",
-      watermarkImages: ((watermarkImagesReadValue as List?) ?? [])
-          .map((e) => ImageBean.fromJson(e as Map<String, dynamic>))
-          .toList(),
+      watermarkImages: ((watermarkImagesReadValue as List?) ?? []).map((e) => ImageBean.fromJson(e as Map<String, dynamic>)).toList(),
     );
   }
 }
@@ -88,11 +84,11 @@ mixin _ImageBean {
       height,
     ]);
   }
-
   @override
   String toString() {
     return 'ImageBean(url: $url, width: $width, height: $height)';
   }
+
 
   Map<String, dynamic> toJson() {
     final map = <String, dynamic>{};
@@ -110,6 +106,7 @@ mixin _ImageBean {
     );
   }
 }
+
 
 /// Helper class for chained copyWith operations
 class _ImageListModelCopyWith {
@@ -143,6 +140,7 @@ class _ImageListModelCopyWith {
     );
   }
 }
+
 
 /// Helper class for chained copyWith operations
 class _ImageBeanCopyWith {
@@ -189,3 +187,4 @@ class _ImageBeanCopyWith {
     );
   }
 }
+

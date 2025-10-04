@@ -10,8 +10,7 @@ mixin _AlternateNamesTest {
   abstract final bool isActive;
   abstract final List<String> tags;
 
-  _AlternateNamesTestCopyWith get copyWith =>
-      _AlternateNamesTestCopyWith._(this);
+  _AlternateNamesTestCopyWith get copyWith => _AlternateNamesTestCopyWith._(this);
 
   @override
   bool operator ==(Object other) {
@@ -46,11 +45,11 @@ mixin _AlternateNamesTest {
       DeepCollectionEquality().hash(tags),
     ]);
   }
-
   @override
   String toString() {
     return 'AlternateNamesTest(name: $name, age: $age, email: $email, isActive: $isActive, tags: $tags)';
   }
+
 
   Map<String, dynamic> toJson() {
     final map = <String, dynamic>{};
@@ -65,26 +64,14 @@ mixin _AlternateNamesTest {
   static AlternateNamesTest fromJson(Map<String, dynamic> map) {
     return AlternateNamesTest(
       name: SafeCasteUtil.safeCast<String>(map['name']) ?? "",
-      age: SafeCasteUtil.safeCast<int>(
-              map['user_age'] ?? map['age'] ?? map['years']) ??
-          0,
-      email: SafeCasteUtil.safeCast<String>(map['email'] ??
-              map['email_address'] ??
-              map['mail'] ??
-              map['e_mail']) ??
-          "",
-      isActive: SafeCasteUtil.safeCast<bool>(
-              map['is_active'] ?? map['active'] ?? map['enabled']) ??
-          false,
-      tags: ((map['tags'] as List<dynamic>?) ??
-                  (map['tags_list'] as List<dynamic>?) ??
-                  (map['labels'] as List<dynamic>?))
-              ?.map((e) => e.toString())
-              .toList() ??
-          const [],
+      age: SafeCasteUtil.safeCast<int>(map['user_age'] ?? map['age'] ?? map['years']) ?? 0,
+      email: SafeCasteUtil.safeCast<String>(map['email'] ?? map['email_address'] ?? map['mail'] ?? map['e_mail']) ?? "",
+      isActive: SafeCasteUtil.safeCast<bool>(map['is_active'] ?? map['active'] ?? map['enabled']) ?? false,
+      tags: ((map['tags'] as List<dynamic>?) ?? (map['tags_list'] as List<dynamic>?) ?? (map['labels'] as List<dynamic>?))?.map((e) => e.toString()).toList() ?? const [],
     );
   }
 }
+
 
 /// Helper class for chained copyWith operations
 class _AlternateNamesTestCopyWith {
@@ -163,3 +150,4 @@ class _AlternateNamesTestCopyWith {
     );
   }
 }
+

@@ -1,6 +1,7 @@
 // Test file to verify backward compatibility between DataClass and Dataforge annotations
 
 import 'package:dataforge_annotation/dataforge_annotation.dart';
+import 'package:collection/collection.dart';
 
 part 'backward_compatibility_test.model.data.dart';
 

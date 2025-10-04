@@ -40,54 +40,39 @@ mixin _DateTimeModel {
       isoDate,
     ]);
   }
-
   @override
   String toString() {
     return 'DateTimeModel(timestamp: $timestamp, millisTimestamp: $millisTimestamp, secondsTimestamp: $secondsTimestamp, isoDate: $isoDate)';
   }
 
+
   Map<String, dynamic> toJson() {
     final map = <String, dynamic>{};
     if (timestamp != null) {
-      map['timestamp'] = timestamp != null
-          ? const DefaultDateTimeConverter().toJson(timestamp!)
-          : null;
+      map['timestamp'] = timestamp != null ? const DefaultDateTimeConverter().toJson(timestamp!) : null;
     }
     if (millisTimestamp != null) {
-      map['millisTimestamp'] = millisTimestamp != null
-          ? const DefaultDateTimeConverter().toJson(millisTimestamp!)
-          : null;
+      map['millisTimestamp'] = millisTimestamp != null ? const DefaultDateTimeConverter().toJson(millisTimestamp!) : null;
     }
     if (secondsTimestamp != null) {
-      map['secondsTimestamp'] = secondsTimestamp != null
-          ? const DefaultDateTimeConverter().toJson(secondsTimestamp!)
-          : null;
+      map['secondsTimestamp'] = secondsTimestamp != null ? const DefaultDateTimeConverter().toJson(secondsTimestamp!) : null;
     }
     if (isoDate != null) {
-      map['isoDate'] = isoDate != null
-          ? const DefaultDateTimeConverter().toJson(isoDate!)
-          : null;
+      map['isoDate'] = isoDate != null ? const DefaultDateTimeConverter().toJson(isoDate!) : null;
     }
     return map;
   }
 
   static DateTimeModel fromJson(Map<String, dynamic> map) {
     return DateTimeModel(
-      timestamp: map['timestamp'] != null
-          ? const DefaultDateTimeConverter().fromJson(map['timestamp'])
-          : null,
-      millisTimestamp: map['millisTimestamp'] != null
-          ? const DefaultDateTimeConverter().fromJson(map['millisTimestamp'])
-          : null,
-      secondsTimestamp: map['secondsTimestamp'] != null
-          ? const DefaultDateTimeConverter().fromJson(map['secondsTimestamp'])
-          : null,
-      isoDate: map['isoDate'] != null
-          ? const DefaultDateTimeConverter().fromJson(map['isoDate'])
-          : null,
+      timestamp: map['timestamp'] != null ? const DefaultDateTimeConverter().fromJson(map['timestamp']) : null,
+      millisTimestamp: map['millisTimestamp'] != null ? const DefaultDateTimeConverter().fromJson(map['millisTimestamp']) : null,
+      secondsTimestamp: map['secondsTimestamp'] != null ? const DefaultDateTimeConverter().fromJson(map['secondsTimestamp']) : null,
+      isoDate: map['isoDate'] != null ? const DefaultDateTimeConverter().fromJson(map['isoDate']) : null,
     );
   }
 }
+
 
 /// Helper class for chained copyWith operations
 class _DateTimeModelCopyWith {
@@ -149,3 +134,4 @@ class _DateTimeModelCopyWith {
     );
   }
 }
+

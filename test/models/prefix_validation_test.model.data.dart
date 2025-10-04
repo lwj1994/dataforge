@@ -12,8 +12,7 @@ mixin _PrefixValidationTest {
   abstract final String customField;
   abstract final String ignoredField;
 
-  _PrefixValidationTestCopyWith get copyWith =>
-      _PrefixValidationTestCopyWith._(this);
+  _PrefixValidationTestCopyWith get copyWith => _PrefixValidationTestCopyWith._(this);
 
   @override
   bool operator ==(Object other) {
@@ -56,11 +55,11 @@ mixin _PrefixValidationTest {
       ignoredField,
     ]);
   }
-
   @override
   String toString() {
     return 'PrefixValidationTest(name: $name, age: $age, isActive: $isActive, score: $score, description: $description, customField: $customField, ignoredField: $ignoredField)';
   }
+
 
   Map<String, dynamic> toJson() {
     final map = <String, dynamic>{};
@@ -77,23 +76,16 @@ mixin _PrefixValidationTest {
 
   static PrefixValidationTest fromJson(Map<String, dynamic> map) {
     return PrefixValidationTest(
-      name: dataforge_annotation.SafeCasteUtil.safeCast<String>(map['name']) ??
-          "",
+      name: dataforge_annotation.SafeCasteUtil.safeCast<String>(map['name']) ?? "",
       age: dataforge_annotation.SafeCasteUtil.safeCast<int>(map['age']) ?? 0,
-      isActive:
-          dataforge_annotation.SafeCasteUtil.safeCast<bool>(map['isActive']) ??
-              false,
-      score:
-          dataforge_annotation.SafeCasteUtil.safeCast<double>(map['score']) ??
-              0.0,
-      description: dataforge_annotation.SafeCasteUtil.safeCast<String>(
-          map['description']),
-      customField: dataforge_annotation.SafeCasteUtil.safeCast<String>(
-              map['custom_field']) ??
-          "",
+      isActive: dataforge_annotation.SafeCasteUtil.safeCast<bool>(map['isActive']) ?? false,
+      score: dataforge_annotation.SafeCasteUtil.safeCast<double>(map['score']) ?? 0.0,
+      description: dataforge_annotation.SafeCasteUtil.safeCast<String>(map['description']),
+      customField: dataforge_annotation.SafeCasteUtil.safeCast<String>(map['custom_field']) ?? "",
     );
   }
 }
+
 
 /// Helper class for chained copyWith operations
 class _PrefixValidationTestCopyWith {
@@ -212,3 +204,4 @@ class _PrefixValidationTestCopyWith {
     );
   }
 }
+

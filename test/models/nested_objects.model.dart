@@ -67,10 +67,13 @@ class Company with _Company {
   @override
   final List<Contact>? additionalContacts;
 
+  final Address? subAddress;
+
   const Company({
     required this.name,
     required this.headquarters,
     this.branches,
+    this.subAddress,
     required this.primaryContact,
     this.additionalContacts,
   });
