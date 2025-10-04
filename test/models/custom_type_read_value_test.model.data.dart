@@ -180,7 +180,7 @@ class _CustomTypeReadValueTestCopyWith {
   }
 
   /// Direct field access getter for tradeInfo.status
-  CustomTypeReadValueTest Function(String?) get $tradeInfo_status {
+  CustomTypeReadValueTest Function(String?) get tradeInfo$Status {
     return (String? value) {
       final currentValue = _instance.tradeInfo;
       if (currentValue == null) {
@@ -194,7 +194,7 @@ class _CustomTypeReadValueTestCopyWith {
   }
 
   /// Direct field access getter for tradeInfo.price
-  CustomTypeReadValueTest Function(double?) get $tradeInfo_price {
+  CustomTypeReadValueTest Function(double?) get tradeInfo$Price {
     return (double? value) {
       final currentValue = _instance.tradeInfo;
       if (currentValue == null) {
@@ -208,14 +208,14 @@ class _CustomTypeReadValueTestCopyWith {
   }
 
   /// Direct field access getter for userInfo.name
-  CustomTypeReadValueTest Function(String?) get $userInfo_name {
+  CustomTypeReadValueTest Function(String?) get userInfo$Name {
     return (String? value) {
       return userInfo(_instance.userInfo.copyWith(name: value));
     };
   }
 
   /// Direct field access getter for userInfo.age
-  CustomTypeReadValueTest Function(int?) get $userInfo_age {
+  CustomTypeReadValueTest Function(int?) get userInfo$Age {
     return (int? value) {
       return userInfo(_instance.userInfo.copyWith(age: value));
     };

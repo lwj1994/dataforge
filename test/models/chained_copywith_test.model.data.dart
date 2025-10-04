@@ -299,42 +299,42 @@ class _ProfileCopyWith {
   }
 
   /// Direct field access getter for user.name
-  Profile Function(String?) get $user_name {
+  Profile Function(String?) get user$Name {
     return (String? value) {
       return user(_instance.user.copyWith(name: value));
     };
   }
 
   /// Direct field access getter for user.age
-  Profile Function(int?) get $user_age {
+  Profile Function(int?) get user$Age {
     return (int? value) {
       return user(_instance.user.copyWith(age: value));
     };
   }
 
   /// Direct field access getter for user.email
-  Profile Function(String?) get $user_email {
+  Profile Function(String?) get user$Email {
     return (String? value) {
       return user(_instance.user.copyWith(email: value));
     };
   }
 
   /// Direct field access getter for address.street
-  Profile Function(String?) get $address_street {
+  Profile Function(String?) get address$Street {
     return (String? value) {
       return address(_instance.address.copyWith(street: value));
     };
   }
 
   /// Direct field access getter for address.city
-  Profile Function(String?) get $address_city {
+  Profile Function(String?) get address$City {
     return (String? value) {
       return address(_instance.address.copyWith(city: value));
     };
   }
 
   /// Direct field access getter for address.zipCode
-  Profile Function(String?) get $address_zipCode {
+  Profile Function(String?) get address$ZipCode {
     return (String? value) {
       return address(_instance.address.copyWith(zipCode: value));
     };

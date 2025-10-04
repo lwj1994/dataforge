@@ -306,21 +306,21 @@ class _UserCopyWith {
   }
 
   /// Direct field access getter for address.street
-  User Function(String?) get $address_street {
+  User Function(String?) get address$Street {
     return (String? value) {
       return address(_instance.address.copyWith(street: value));
     };
   }
 
   /// Direct field access getter for address.city
-  User Function(String?) get $address_city {
+  User Function(String?) get address$City {
     return (String? value) {
       return address(_instance.address.copyWith(city: value));
     };
   }
 
   /// Direct field access getter for address.zipCode
-  User Function(String?) get $address_zipCode {
+  User Function(String?) get address$ZipCode {
     return (String? value) {
       return address(_instance.address.copyWith(zipCode: value));
     };
@@ -390,21 +390,21 @@ class _CompanyCopyWith {
   }
 
   /// Direct field access getter for owner.name
-  Company Function(String?) get $owner_name {
+  Company Function(String?) get owner$Name {
     return (String? value) {
       return owner(_instance.owner.copyWith(name: value));
     };
   }
 
   /// Direct field access getter for owner.age
-  Company Function(int?) get $owner_age {
+  Company Function(int?) get owner$Age {
     return (int? value) {
       return owner(_instance.owner.copyWith(age: value));
     };
   }
 
   /// Direct field access getter for owner.address
-  Company Function(Address?) get $owner_address {
+  Company Function(Address?) get owner$Address {
     return (Address? value) {
       return owner(_instance.owner.copyWith(address: value));
     };
@@ -474,21 +474,21 @@ class _ProfileCopyWith {
   }
 
   /// Direct field access getter for user.name
-  Profile Function(String?) get $user_name {
+  Profile Function(String?) get user$Name {
     return (String? value) {
       return user(_instance.user.copyWith(name: value));
     };
   }
 
   /// Direct field access getter for user.age
-  Profile Function(int?) get $user_age {
+  Profile Function(int?) get user$Age {
     return (int? value) {
       return user(_instance.user.copyWith(age: value));
     };
   }
 
   /// Direct field access getter for user.address
-  Profile Function(Address?) get $user_address {
+  Profile Function(Address?) get user$Address {
     return (Address? value) {
       return user(_instance.user.copyWith(address: value));
     };

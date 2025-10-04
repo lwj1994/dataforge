@@ -277,28 +277,28 @@ class _PersonCopyWith {
   }
 
   /// Direct field access getter for address.street
-  Person Function(String?) get $address_street {
+  Person Function(String?) get address$Street {
     return (String? value) {
       return address(_instance.address.copyWith(street: value));
     };
   }
 
   /// Direct field access getter for address.city
-  Person Function(String?) get $address_city {
+  Person Function(String?) get address$City {
     return (String? value) {
       return address(_instance.address.copyWith(city: value));
     };
   }
 
   /// Direct field access getter for address.zipCode
-  Person Function(String?) get $address_zipCode {
+  Person Function(String?) get address$ZipCode {
     return (String? value) {
       return address(_instance.address.copyWith(zipCode: value));
     };
   }
 
   /// Direct field access getter for workAddress.street
-  Person Function(String?) get $workAddress_street {
+  Person Function(String?) get workAddress$Street {
     return (String? value) {
       final currentValue = _instance.workAddress;
       if (currentValue == null) {
@@ -312,7 +312,7 @@ class _PersonCopyWith {
   }
 
   /// Direct field access getter for workAddress.city
-  Person Function(String?) get $workAddress_city {
+  Person Function(String?) get workAddress$City {
     return (String? value) {
       final currentValue = _instance.workAddress;
       if (currentValue == null) {
@@ -326,7 +326,7 @@ class _PersonCopyWith {
   }
 
   /// Direct field access getter for workAddress.zipCode
-  Person Function(String?) get $workAddress_zipCode {
+  Person Function(String?) get workAddress$ZipCode {
     return (String? value) {
       final currentValue = _instance.workAddress;
       if (currentValue == null) {
@@ -425,28 +425,28 @@ class _CompanyCopyWith {
   }
 
   /// Direct field access getter for ceo.name
-  Company Function(String?) get $ceo_name {
+  Company Function(String?) get ceo$Name {
     return (String? value) {
       return ceo(_instance.ceo.copyWith(name: value));
     };
   }
 
   /// Direct field access getter for ceo.age
-  Company Function(int?) get $ceo_age {
+  Company Function(int?) get ceo$Age {
     return (int? value) {
       return ceo(_instance.ceo.copyWith(age: value));
     };
   }
 
   /// Direct field access getter for ceo.address
-  Company Function(Address?) get $ceo_address {
+  Company Function(Address?) get ceo$Address {
     return (Address? value) {
       return ceo(_instance.ceo.copyWith(address: value));
     };
   }
 
   /// Direct field access getter for ceo.workAddress
-  Company Function(Address?) get $ceo_workAddress {
+  Company Function(Address?) get ceo$WorkAddress {
     return (Address? value) {
       return ceo(_instance.ceo.copyWith(workAddress: value));
     };

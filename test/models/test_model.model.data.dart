@@ -118,7 +118,7 @@ class _TestModelCopyWith {
   }
 
   /// Direct field access getter for param.value
-  TestModel Function(String?) get $param_value {
+  TestModel Function(String?) get param$Value {
     return (String? value) {
       final currentValue = _instance.param;
       if (currentValue == null) {

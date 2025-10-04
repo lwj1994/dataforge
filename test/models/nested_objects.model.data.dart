@@ -566,63 +566,63 @@ class _CompanyCopyWith {
   }
 
   /// Direct field access getter for headquarters.street
-  Company Function(String?) get $headquarters_street {
+  Company Function(String?) get headquarters$Street {
     return (String? value) {
       return headquarters(_instance.headquarters.copyWith(street: value));
     };
   }
 
   /// Direct field access getter for headquarters.city
-  Company Function(String?) get $headquarters_city {
+  Company Function(String?) get headquarters$City {
     return (String? value) {
       return headquarters(_instance.headquarters.copyWith(city: value));
     };
   }
 
   /// Direct field access getter for headquarters.state
-  Company Function(String?) get $headquarters_state {
+  Company Function(String?) get headquarters$State {
     return (String? value) {
       return headquarters(_instance.headquarters.copyWith(state: value));
     };
   }
 
   /// Direct field access getter for headquarters.zipCode
-  Company Function(String?) get $headquarters_zipCode {
+  Company Function(String?) get headquarters$ZipCode {
     return (String? value) {
       return headquarters(_instance.headquarters.copyWith(zipCode: value));
     };
   }
 
   /// Direct field access getter for headquarters.country
-  Company Function(String?) get $headquarters_country {
+  Company Function(String?) get headquarters$Country {
     return (String? value) {
       return headquarters(_instance.headquarters.copyWith(country: value));
     };
   }
 
   /// Direct field access getter for headquarters.isPrimary
-  Company Function(bool?) get $headquarters_isPrimary {
+  Company Function(bool?) get headquarters$IsPrimary {
     return (bool? value) {
       return headquarters(_instance.headquarters.copyWith(isPrimary: value));
     };
   }
 
   /// Direct field access getter for primaryContact.email
-  Company Function(String?) get $primaryContact_email {
+  Company Function(String?) get primaryContact$Email {
     return (String? value) {
       return primaryContact(_instance.primaryContact.copyWith(email: value));
     };
   }
 
   /// Direct field access getter for primaryContact.phone
-  Company Function(String?) get $primaryContact_phone {
+  Company Function(String?) get primaryContact$Phone {
     return (String? value) {
       return primaryContact(_instance.primaryContact.copyWith(phone: value));
     };
   }
 
   /// Direct field access getter for primaryContact.contactType
-  Company Function(String?) get $primaryContact_contactType {
+  Company Function(String?) get primaryContact$ContactType {
     return (String? value) {
       return primaryContact(
           _instance.primaryContact.copyWith(contactType: value));
@@ -851,49 +851,49 @@ class _NestedObjectsCopyWith {
   }
 
   /// Direct field access getter for homeAddress.street
-  NestedObjects Function(String?) get $homeAddress_street {
+  NestedObjects Function(String?) get homeAddress$Street {
     return (String? value) {
       return homeAddress(_instance.homeAddress.copyWith(street: value));
     };
   }
 
   /// Direct field access getter for homeAddress.city
-  NestedObjects Function(String?) get $homeAddress_city {
+  NestedObjects Function(String?) get homeAddress$City {
     return (String? value) {
       return homeAddress(_instance.homeAddress.copyWith(city: value));
     };
   }
 
   /// Direct field access getter for homeAddress.state
-  NestedObjects Function(String?) get $homeAddress_state {
+  NestedObjects Function(String?) get homeAddress$State {
     return (String? value) {
       return homeAddress(_instance.homeAddress.copyWith(state: value));
     };
   }
 
   /// Direct field access getter for homeAddress.zipCode
-  NestedObjects Function(String?) get $homeAddress_zipCode {
+  NestedObjects Function(String?) get homeAddress$ZipCode {
     return (String? value) {
       return homeAddress(_instance.homeAddress.copyWith(zipCode: value));
     };
   }
 
   /// Direct field access getter for homeAddress.country
-  NestedObjects Function(String?) get $homeAddress_country {
+  NestedObjects Function(String?) get homeAddress$Country {
     return (String? value) {
       return homeAddress(_instance.homeAddress.copyWith(country: value));
     };
   }
 
   /// Direct field access getter for homeAddress.isPrimary
-  NestedObjects Function(bool?) get $homeAddress_isPrimary {
+  NestedObjects Function(bool?) get homeAddress$IsPrimary {
     return (bool? value) {
       return homeAddress(_instance.homeAddress.copyWith(isPrimary: value));
     };
   }
 
   /// Direct field access getter for workAddress.street
-  NestedObjects Function(String?) get $workAddress_street {
+  NestedObjects Function(String?) get workAddress$Street {
     return (String? value) {
       final currentValue = _instance.workAddress;
       if (currentValue == null) {
@@ -907,7 +907,7 @@ class _NestedObjectsCopyWith {
   }
 
   /// Direct field access getter for workAddress.city
-  NestedObjects Function(String?) get $workAddress_city {
+  NestedObjects Function(String?) get workAddress$City {
     return (String? value) {
       final currentValue = _instance.workAddress;
       if (currentValue == null) {
@@ -921,7 +921,7 @@ class _NestedObjectsCopyWith {
   }
 
   /// Direct field access getter for workAddress.state
-  NestedObjects Function(String?) get $workAddress_state {
+  NestedObjects Function(String?) get workAddress$State {
     return (String? value) {
       final currentValue = _instance.workAddress;
       if (currentValue == null) {
@@ -935,7 +935,7 @@ class _NestedObjectsCopyWith {
   }
 
   /// Direct field access getter for workAddress.zipCode
-  NestedObjects Function(String?) get $workAddress_zipCode {
+  NestedObjects Function(String?) get workAddress$ZipCode {
     return (String? value) {
       final currentValue = _instance.workAddress;
       if (currentValue == null) {
@@ -949,7 +949,7 @@ class _NestedObjectsCopyWith {
   }
 
   /// Direct field access getter for workAddress.country
-  NestedObjects Function(String?) get $workAddress_country {
+  NestedObjects Function(String?) get workAddress$Country {
     return (String? value) {
       final currentValue = _instance.workAddress;
       if (currentValue == null) {
@@ -963,7 +963,7 @@ class _NestedObjectsCopyWith {
   }
 
   /// Direct field access getter for workAddress.isPrimary
-  NestedObjects Function(bool?) get $workAddress_isPrimary {
+  NestedObjects Function(bool?) get workAddress$IsPrimary {
     return (bool? value) {
       final currentValue = _instance.workAddress;
       if (currentValue == null) {
@@ -977,21 +977,21 @@ class _NestedObjectsCopyWith {
   }
 
   /// Direct field access getter for primaryContact.email
-  NestedObjects Function(String?) get $primaryContact_email {
+  NestedObjects Function(String?) get primaryContact$Email {
     return (String? value) {
       return primaryContact(_instance.primaryContact.copyWith(email: value));
     };
   }
 
   /// Direct field access getter for primaryContact.phone
-  NestedObjects Function(String?) get $primaryContact_phone {
+  NestedObjects Function(String?) get primaryContact$Phone {
     return (String? value) {
       return primaryContact(_instance.primaryContact.copyWith(phone: value));
     };
   }
 
   /// Direct field access getter for primaryContact.contactType
-  NestedObjects Function(String?) get $primaryContact_contactType {
+  NestedObjects Function(String?) get primaryContact$ContactType {
     return (String? value) {
       return primaryContact(
           _instance.primaryContact.copyWith(contactType: value));
@@ -999,7 +999,7 @@ class _NestedObjectsCopyWith {
   }
 
   /// Direct field access getter for employer.name
-  NestedObjects Function(String?) get $employer_name {
+  NestedObjects Function(String?) get employer$Name {
     return (String? value) {
       final currentValue = _instance.employer;
       if (currentValue == null) {
@@ -1013,7 +1013,7 @@ class _NestedObjectsCopyWith {
   }
 
   /// Direct field access getter for employer.headquarters
-  NestedObjects Function(Address?) get $employer_headquarters {
+  NestedObjects Function(Address?) get employer$Headquarters {
     return (Address? value) {
       final currentValue = _instance.employer;
       if (currentValue == null) {
@@ -1027,7 +1027,7 @@ class _NestedObjectsCopyWith {
   }
 
   /// Direct field access getter for employer.branches
-  NestedObjects Function(List<Address>?) get $employer_branches {
+  NestedObjects Function(List<Address>?) get employer$Branches {
     return (List<Address>? value) {
       final currentValue = _instance.employer;
       if (currentValue == null) {
@@ -1041,7 +1041,7 @@ class _NestedObjectsCopyWith {
   }
 
   /// Direct field access getter for employer.primaryContact
-  NestedObjects Function(Contact?) get $employer_primaryContact {
+  NestedObjects Function(Contact?) get employer$PrimaryContact {
     return (Contact? value) {
       final currentValue = _instance.employer;
       if (currentValue == null) {
@@ -1055,7 +1055,7 @@ class _NestedObjectsCopyWith {
   }
 
   /// Direct field access getter for employer.additionalContacts
-  NestedObjects Function(List<Contact>?) get $employer_additionalContacts {
+  NestedObjects Function(List<Contact>?) get employer$AdditionalContacts {
     return (List<Contact>? value) {
       final currentValue = _instance.employer;
       if (currentValue == null) {
@@ -1069,7 +1069,7 @@ class _NestedObjectsCopyWith {
   }
 
   /// Direct field access getter for customAddress.street
-  NestedObjects Function(String?) get $customAddress_street {
+  NestedObjects Function(String?) get customAddress$Street {
     return (String? value) {
       final currentValue = _instance.customAddress;
       if (currentValue == null) {
@@ -1083,7 +1083,7 @@ class _NestedObjectsCopyWith {
   }
 
   /// Direct field access getter for customAddress.city
-  NestedObjects Function(String?) get $customAddress_city {
+  NestedObjects Function(String?) get customAddress$City {
     return (String? value) {
       final currentValue = _instance.customAddress;
       if (currentValue == null) {
@@ -1097,7 +1097,7 @@ class _NestedObjectsCopyWith {
   }
 
   /// Direct field access getter for customAddress.state
-  NestedObjects Function(String?) get $customAddress_state {
+  NestedObjects Function(String?) get customAddress$State {
     return (String? value) {
       final currentValue = _instance.customAddress;
       if (currentValue == null) {
@@ -1111,7 +1111,7 @@ class _NestedObjectsCopyWith {
   }
 
   /// Direct field access getter for customAddress.zipCode
-  NestedObjects Function(String?) get $customAddress_zipCode {
+  NestedObjects Function(String?) get customAddress$ZipCode {
     return (String? value) {
       final currentValue = _instance.customAddress;
       if (currentValue == null) {
@@ -1125,7 +1125,7 @@ class _NestedObjectsCopyWith {
   }
 
   /// Direct field access getter for customAddress.country
-  NestedObjects Function(String?) get $customAddress_country {
+  NestedObjects Function(String?) get customAddress$Country {
     return (String? value) {
       final currentValue = _instance.customAddress;
       if (currentValue == null) {
@@ -1139,7 +1139,7 @@ class _NestedObjectsCopyWith {
   }
 
   /// Direct field access getter for customAddress.isPrimary
-  NestedObjects Function(bool?) get $customAddress_isPrimary {
+  NestedObjects Function(bool?) get customAddress$IsPrimary {
     return (bool? value) {
       final currentValue = _instance.customAddress;
       if (currentValue == null) {

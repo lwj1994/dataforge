@@ -1118,7 +1118,8 @@ class Writer {
 
         if (nestedClazz.name.isNotEmpty) {
           for (final nestedField in nestedClazz.fields) {
-            final getterName = '\$${field.name}_${nestedField.name}';
+            final getterName =
+                '${field.name}\$${nestedField.name[0].toUpperCase()}${nestedField.name.substring(1)}';
             final paramType = _generateCopyWithParameterType(nestedField);
 
             buffer.writeln(
