@@ -45,11 +45,11 @@ mixin _User {
       email,
     ]);
   }
+
   @override
   String toString() {
     return 'User(name: $name, age: $age, email: $email)';
   }
-
 
   Map<String, dynamic> toJson() {
     final map = <String, dynamic>{};
@@ -69,4 +69,3 @@ mixin _User {
     );
   }
 }
-

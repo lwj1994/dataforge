@@ -30,11 +30,11 @@ mixin _TestUser {
       age,
     ]);
   }
+
   @override
   String toString() {
     return 'TestUser(name: $name, age: $age)';
   }
-
 
   Map<String, dynamic> toJson() {
     final map = <String, dynamic>{};
@@ -78,11 +78,11 @@ mixin _TestAdmin {
       role,
     ]);
   }
+
   @override
   String toString() {
     return 'TestAdmin(username: $username, role: $role)';
   }
-
 
   Map<String, dynamic> toJson() {
     final map = <String, dynamic>{};
@@ -98,7 +98,6 @@ mixin _TestAdmin {
     );
   }
 }
-
 
 /// Helper class for chained copyWith operations
 class _TestUserCopyWith {
@@ -133,7 +132,6 @@ class _TestUserCopyWith {
   }
 }
 
-
 /// Helper class for chained copyWith operations
 class _TestAdminCopyWith {
   final _TestAdmin _instance;
@@ -166,4 +164,3 @@ class _TestAdminCopyWith {
     );
   }
 }
-

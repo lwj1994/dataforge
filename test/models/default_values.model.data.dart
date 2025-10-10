@@ -45,11 +45,11 @@ mixin _DefaultValues {
       DeepCollectionEquality().hash(listValue),
     ]);
   }
+
   @override
   String toString() {
     return 'DefaultValues(intValue: $intValue, stringValue: $stringValue, boolValue: $boolValue, doubleValue: $doubleValue, listValue: $listValue)';
   }
-
 
   Map<String, dynamic> toJson() {
     final map = <String, dynamic>{};
@@ -64,10 +64,14 @@ mixin _DefaultValues {
   static DefaultValues fromJson(Map<String, dynamic> map) {
     return DefaultValues(
       intValue: SafeCasteUtil.safeCast<int>(map['intValue']) ?? 42,
-      stringValue: SafeCasteUtil.safeCast<String>(map['stringValue']) ?? 'default',
+      stringValue:
+          SafeCasteUtil.safeCast<String>(map['stringValue']) ?? 'default',
       boolValue: SafeCasteUtil.safeCast<bool>(map['boolValue']) ?? true,
       doubleValue: SafeCasteUtil.safeCast<double>(map['doubleValue']) ?? 3.14,
-      listValue: (map['listValue'] as List<dynamic>?)?.map((e) => e.toString()).toList() ?? const ['default'],
+      listValue: (map['listValue'] as List<dynamic>?)
+              ?.map((e) => e.toString())
+              .toList() ??
+          const ['default'],
     );
   }
 }
@@ -77,7 +81,8 @@ mixin _NestedDefaultValues {
   abstract final DefaultValues nested;
   abstract final int? nullableValue;
 
-  _NestedDefaultValuesCopyWith get copyWith => _NestedDefaultValuesCopyWith._(this);
+  _NestedDefaultValuesCopyWith get copyWith =>
+      _NestedDefaultValuesCopyWith._(this);
 
   @override
   bool operator ==(Object other) {
@@ -104,11 +109,11 @@ mixin _NestedDefaultValues {
       nullableValue,
     ]);
   }
+
   @override
   String toString() {
     return 'NestedDefaultValues(name: $name, nested: $nested, nullableValue: $nullableValue)';
   }
-
 
   Map<String, dynamic> toJson() {
     final map = <String, dynamic>{};
@@ -123,12 +128,13 @@ mixin _NestedDefaultValues {
   static NestedDefaultValues fromJson(Map<String, dynamic> map) {
     return NestedDefaultValues(
       name: SafeCasteUtil.safeCast<String>(map['name']) ?? 'nested_default',
-      nested: map['nested'] != null ? DefaultValues.fromJson(map['nested'] as Map<String, dynamic>) : const DefaultValues(),
+      nested: map['nested'] != null
+          ? DefaultValues.fromJson(map['nested'] as Map<String, dynamic>)
+          : const DefaultValues(),
       nullableValue: SafeCasteUtil.safeCast<int>(map['nullableValue']),
     );
   }
 }
-
 
 /// Helper class for chained copyWith operations
 class _DefaultValuesCopyWith {
@@ -207,7 +213,6 @@ class _DefaultValuesCopyWith {
     );
   }
 }
-
 
 /// Helper class for chained copyWith operations
 class _NestedDefaultValuesCopyWith {
@@ -306,4 +311,3 @@ class _NestedDefaultValuesNestedCopyWithNested {
     );
   }
 }
-

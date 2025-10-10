@@ -67,6 +67,7 @@ class Company with _Company {
   @override
   final List<Contact>? additionalContacts;
 
+  @override
   final Address? subAddress;
 
   const Company({

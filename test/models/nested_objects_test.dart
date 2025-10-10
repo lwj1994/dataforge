@@ -111,8 +111,8 @@ void main() {
 
       // Verify that other nested fields in employer are preserved
       expect(updated.employer!.name, equals('Test Company'));
-      expect(
-          updated.employer!.primaryContact.email, equals('contact@company.com'));
+      expect(updated.employer!.primaryContact.email,
+          equals('contact@company.com'));
 
       // Verify that other fields in headquarters are preserved
       expect(updated.employer!.headquarters.city, equals('HQ City'));
@@ -127,13 +127,13 @@ void main() {
           .copyWith
           .employer$PrimaryContact$Email('new@email.com');
 
-      expect(updated.employer!.headquarters!.street, equals('New Street'));
-      expect(updated.employer!.headquarters!.city, equals('New City'));
-      expect(updated.employer!.primaryContact!.email, equals('new@email.com'));
+      expect(updated.employer!.headquarters.street, equals('New Street'));
+      expect(updated.employer!.headquarters.city, equals('New City'));
+      expect(updated.employer!.primaryContact.email, equals('new@email.com'));
 
       // Verify other fields are preserved
-      expect(updated.employer!.headquarters!.state, equals('HQ State'));
-      expect(updated.employer!.primaryContact!.phone, equals('123-456-7890'));
+      expect(updated.employer!.headquarters.state, equals('HQ State'));
+      expect(updated.employer!.primaryContact.phone, equals('123-456-7890'));
     });
   });
 }

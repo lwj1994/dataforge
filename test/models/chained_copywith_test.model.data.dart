@@ -35,11 +35,11 @@ mixin _User {
       email,
     ]);
   }
+
   @override
   String toString() {
     return 'User(name: $name, age: $age, email: $email)';
   }
-
 
   Map<String, dynamic> toJson() {
     final map = <String, dynamic>{};
@@ -92,11 +92,11 @@ mixin _Address {
       zipCode,
     ]);
   }
+
   @override
   String toString() {
     return 'Address(street: $street, city: $city, zipCode: $zipCode)';
   }
-
 
   Map<String, dynamic> toJson() {
     final map = <String, dynamic>{};
@@ -149,11 +149,11 @@ mixin _Profile {
       DeepCollectionEquality().hash(tags),
     ]);
   }
+
   @override
   String toString() {
     return 'Profile(user: $user, address: $address, tags: $tags)';
   }
-
 
   Map<String, dynamic> toJson() {
     final map = <String, dynamic>{};
@@ -167,11 +167,12 @@ mixin _Profile {
     return Profile(
       user: User.fromJson((map['user'] ?? {}) as Map<String, dynamic>),
       address: Address.fromJson((map['address'] ?? {}) as Map<String, dynamic>),
-      tags: ((map['tags'] as List<dynamic>?) ?? []).map((e) => e.toString()).toList(),
+      tags: ((map['tags'] as List<dynamic>?) ?? [])
+          .map((e) => e.toString())
+          .toList(),
     );
   }
 }
-
 
 /// Helper class for chained copyWith operations
 class _UserCopyWith {
@@ -219,7 +220,6 @@ class _UserCopyWith {
   }
 }
 
-
 /// Helper class for chained copyWith operations
 class _AddressCopyWith {
   final _Address _instance;
@@ -265,7 +265,6 @@ class _AddressCopyWith {
     );
   }
 }
-
 
 /// Helper class for chained copyWith operations
 class _ProfileCopyWith {
@@ -388,4 +387,3 @@ class _ProfileNestedCopyWithAddress {
     );
   }
 }
-

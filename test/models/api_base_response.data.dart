@@ -8,7 +8,8 @@ mixin _EchoApiResponse<T> {
   abstract final String message;
   abstract final T? data;
 
-  _EchoApiResponseCopyWith<T> get copyWith => _EchoApiResponseCopyWith<T>._(this);
+  _EchoApiResponseCopyWith<T> get copyWith =>
+      _EchoApiResponseCopyWith<T>._(this);
 
   @override
   bool operator ==(Object other) {
@@ -35,11 +36,11 @@ mixin _EchoApiResponse<T> {
       data,
     ]);
   }
+
   @override
   String toString() {
     return 'EchoApiResponse(code: $code, message: $message, data: $data)';
   }
-
 
   Map<String, dynamic> toJson() {
     final map = <String, dynamic>{};
@@ -59,7 +60,6 @@ mixin _EchoApiResponse<T> {
     );
   }
 }
-
 
 /// Helper class for chained copyWith operations
 class _EchoApiResponseCopyWith<T> {
@@ -124,4 +124,3 @@ class _EchoApiResponseNestedCopyWithData<T> {
     );
   }
 }
-

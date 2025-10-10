@@ -1,5 +1,4 @@
 import 'package:dataforge_annotation/dataforge_annotation.dart';
-import 'package:collection/collection.dart';
 
 part 'custom_type_read_value_test.model.data.dart';
 

@@ -35,11 +35,11 @@ mixin _UserDataforge {
       email,
     ]);
   }
+
   @override
   String toString() {
     return 'UserDataforge(name: $name, age: $age, email: $email)';
   }
-
 
   Map<String, dynamic> toJson() {
     final map = <String, dynamic>{};
@@ -92,11 +92,11 @@ mixin _UserDataClass {
       email,
     ]);
   }
+
   @override
   String toString() {
     return 'UserDataClass(name: $name, age: $age, email: $email)';
   }
-
 
   Map<String, dynamic> toJson() {
     final map = <String, dynamic>{};
@@ -121,7 +121,8 @@ mixin _UserDataClassConstant {
   abstract final String name;
   abstract final int age;
 
-  _UserDataClassConstantCopyWith get copyWith => _UserDataClassConstantCopyWith._(this);
+  _UserDataClassConstantCopyWith get copyWith =>
+      _UserDataClassConstantCopyWith._(this);
 
   @override
   bool operator ==(Object other) {
@@ -144,11 +145,11 @@ mixin _UserDataClassConstant {
       age,
     ]);
   }
+
   @override
   String toString() {
     return 'UserDataClassConstant(name: $name, age: $age)';
   }
-
 
   Map<String, dynamic> toJson() {
     final map = <String, dynamic>{};
@@ -169,7 +170,8 @@ mixin _UserDataforgeConstant {
   abstract final String name;
   abstract final int age;
 
-  _UserDataforgeConstantCopyWith get copyWith => _UserDataforgeConstantCopyWith._(this);
+  _UserDataforgeConstantCopyWith get copyWith =>
+      _UserDataforgeConstantCopyWith._(this);
 
   @override
   bool operator ==(Object other) {
@@ -192,11 +194,11 @@ mixin _UserDataforgeConstant {
       age,
     ]);
   }
+
   @override
   String toString() {
     return 'UserDataforgeConstant(name: $name, age: $age)';
   }
-
 
   Map<String, dynamic> toJson() {
     final map = <String, dynamic>{};
@@ -212,7 +214,6 @@ mixin _UserDataforgeConstant {
     );
   }
 }
-
 
 /// Helper class for chained copyWith operations
 class _UserDataforgeCopyWith {
@@ -260,7 +261,6 @@ class _UserDataforgeCopyWith {
   }
 }
 
-
 /// Helper class for chained copyWith operations
 class _UserDataClassCopyWith {
   final _UserDataClass _instance;
@@ -307,7 +307,6 @@ class _UserDataClassCopyWith {
   }
 }
 
-
 /// Helper class for chained copyWith operations
 class _UserDataClassConstantCopyWith {
   final _UserDataClassConstant _instance;
@@ -341,7 +340,6 @@ class _UserDataClassConstantCopyWith {
   }
 }
 
-
 /// Helper class for chained copyWith operations
 class _UserDataforgeConstantCopyWith {
   final _UserDataforgeConstant _instance;
@@ -374,4 +372,3 @@ class _UserDataforgeConstantCopyWith {
     );
   }
 }
-

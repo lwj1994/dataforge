@@ -35,11 +35,11 @@ mixin _Address {
       zipCode,
     ]);
   }
+
   @override
   String toString() {
     return 'Address(street: $street, city: $city, zipCode: $zipCode)';
   }
-
 
   Map<String, dynamic> toJson() {
     final map = <String, dynamic>{};
@@ -90,11 +90,11 @@ mixin _User {
       address,
     ]);
   }
+
   @override
   String toString() {
     return 'User(name: $name, age: $age, address: $address)';
   }
-
 
   Map<String, dynamic> toJson() {
     final map = <String, dynamic>{};
@@ -145,11 +145,11 @@ mixin _Company {
       DeepCollectionEquality().hash(employees),
     ]);
   }
+
   @override
   String toString() {
     return 'Company(name: $name, owner: $owner, employees: $employees)';
   }
-
 
   Map<String, dynamic> toJson() {
     final map = <String, dynamic>{};
@@ -163,7 +163,11 @@ mixin _Company {
     return Company(
       name: SafeCasteUtil.safeCast<String>(map['name']) ?? "",
       owner: User.fromJson((map['owner'] ?? {}) as Map<String, dynamic>),
-      employees: (map['employees'] as List<dynamic>?)?.map((e) => User.fromJson(e as Map<String, dynamic>)).toList()?.cast<User>() ?? [],
+      employees: (map['employees'] as List<dynamic>?)
+              ?.map((e) => User.fromJson(e as Map<String, dynamic>))
+              .toList()
+              .cast<User>() ??
+          [],
     );
   }
 }
@@ -200,11 +204,11 @@ mixin _Profile {
       DeepCollectionEquality().hash(metadata),
     ]);
   }
+
   @override
   String toString() {
     return 'Profile(id: $id, user: $user, metadata: $metadata)';
   }
-
 
   Map<String, dynamic> toJson() {
     final map = <String, dynamic>{};
@@ -222,7 +226,6 @@ mixin _Profile {
     );
   }
 }
-
 
 /// Helper class for chained copyWith operations
 class _AddressCopyWith {
@@ -269,7 +272,6 @@ class _AddressCopyWith {
     );
   }
 }
-
 
 /// Helper class for chained copyWith operations
 class _UserCopyWith {
@@ -355,7 +357,6 @@ class _UserNestedCopyWithAddress {
   }
 }
 
-
 /// Helper class for chained copyWith operations
 class _CompanyCopyWith {
   final _Company _instance;
@@ -440,7 +441,6 @@ class _CompanyNestedCopyWithOwner {
   }
 }
 
-
 /// Helper class for chained copyWith operations
 class _ProfileCopyWith {
   final _Profile _instance;
@@ -524,4 +524,3 @@ class _ProfileNestedCopyWithUser {
     );
   }
 }
-

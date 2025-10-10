@@ -1,6 +1,5 @@
 import 'package:dataforge_annotation/dataforge_annotation.dart';
 import 'package:test/test.dart';
-import 'package:collection/collection.dart';
 
 part 'datetime_nullable_auto_match_test.data.dart';
 

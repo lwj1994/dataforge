@@ -35,11 +35,11 @@ mixin _AutoFromJsonTest {
       isActive,
     ]);
   }
+
   @override
   String toString() {
     return 'AutoFromJsonTest(name: $name, age: $age, isActive: $isActive)';
   }
-
 
   Map<String, dynamic> toJson() {
     final map = <String, dynamic>{};
@@ -57,7 +57,6 @@ mixin _AutoFromJsonTest {
     );
   }
 }
-
 
 /// Helper class for chained copyWith operations
 class _AutoFromJsonTestCopyWith {
@@ -104,4 +103,3 @@ class _AutoFromJsonTestCopyWith {
     );
   }
 }
-

@@ -45,11 +45,11 @@ mixin _IgnoreTest {
       isActive,
     ]);
   }
+
   @override
   String toString() {
     return 'IgnoreTest(name: $name, password: $password, age: $age, secretToken: $secretToken, isActive: $isActive)';
   }
-
 
   Map<String, dynamic> toJson() {
     final map = <String, dynamic>{};
@@ -67,7 +67,6 @@ mixin _IgnoreTest {
     );
   }
 }
-
 
 /// Helper class for chained copyWith operations
 class _IgnoreTestCopyWith {
@@ -146,4 +145,3 @@ class _IgnoreTestCopyWith {
     );
   }
 }
-

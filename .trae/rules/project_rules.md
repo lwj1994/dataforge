@@ -5,3 +5,4 @@
 * 你可以直接删除 *.data.dart 文件
 * 不要使用 @DataClass ，他已经过时了
 * 测试model 放在 test/models ，测试用例按模块放在 test/modules
+* git commit 信息使用中文

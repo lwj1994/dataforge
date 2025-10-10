@@ -60,11 +60,11 @@ mixin _CustomReadValue {
       DeepCollectionEquality().hash(tags),
     ]);
   }
+
   @override
   String toString() {
     return 'CustomReadValue(id: $id, name: $name, title: $title, count: $count, enabled: $enabled, createdDate: $createdDate, config: $config, tags: $tags)';
   }
-
 
   Map<String, dynamic> toJson() {
     final map = <String, dynamic>{};
@@ -74,7 +74,9 @@ mixin _CustomReadValue {
     map['count'] = count;
     map['enabled'] = enabled;
     if (createdDate != null) {
-      map['createdDate'] = createdDate != null ? const DefaultDateTimeConverter().toJson(createdDate!) : null;
+      map['createdDate'] = createdDate != null
+          ? const DefaultDateTimeConverter().toJson(createdDate!)
+          : null;
     }
     if (config != null) {
       map['config'] = config;
@@ -98,13 +100,18 @@ mixin _CustomReadValue {
       title: SafeCasteUtil.safeCast<String>(titleReadValue) ?? '',
       count: SafeCasteUtil.safeCast<int>(countReadValue) ?? 0,
       enabled: SafeCasteUtil.safeCast<bool>(enabledReadValue) ?? false,
-      createdDate: createdDateReadValue != null ? DateTime.tryParse(createdDateReadValue.toString()) : null,
-      config: configReadValue != null ? (configReadValue as Map?)?.cast<String, dynamic>() : null,
-      tags: tagsReadValue != null ? (tagsReadValue as List?)?.cast<String>() : null,
+      createdDate: createdDateReadValue != null
+          ? DateTime.tryParse(createdDateReadValue.toString())
+          : null,
+      config: configReadValue != null
+          ? (configReadValue as Map?)?.cast<String, dynamic>()
+          : null,
+      tags: tagsReadValue != null
+          ? (tagsReadValue as List?)?.cast<String>()
+          : null,
     );
   }
 }
-
 
 /// Helper class for chained copyWith operations
 class _CustomReadValueCopyWith {
@@ -246,4 +253,3 @@ class _CustomReadValueCopyWith {
     );
   }
 }
-

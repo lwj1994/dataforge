@@ -12,7 +12,8 @@ mixin _NoPrefixValidationTest {
   abstract final String customField;
   abstract final String ignoredField;
 
-  _NoPrefixValidationTestCopyWith get copyWith => _NoPrefixValidationTestCopyWith._(this);
+  _NoPrefixValidationTestCopyWith get copyWith =>
+      _NoPrefixValidationTestCopyWith._(this);
 
   @override
   bool operator ==(Object other) {
@@ -55,11 +56,11 @@ mixin _NoPrefixValidationTest {
       ignoredField,
     ]);
   }
+
   @override
   String toString() {
     return 'NoPrefixValidationTest(name: $name, age: $age, isActive: $isActive, score: $score, description: $description, customField: $customField, ignoredField: $ignoredField)';
   }
-
 
   Map<String, dynamic> toJson() {
     final map = <String, dynamic>{};
@@ -85,7 +86,6 @@ mixin _NoPrefixValidationTest {
     );
   }
 }
-
 
 /// Helper class for chained copyWith operations
 class _NoPrefixValidationTestCopyWith {
@@ -204,4 +204,3 @@ class _NoPrefixValidationTestCopyWith {
     );
   }
 }
-

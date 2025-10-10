@@ -35,11 +35,11 @@ mixin _Employee {
       position,
     ]);
   }
+
   @override
   String toString() {
     return 'Employee(name: $name, id: $id, position: $position)';
   }
-
 
   Map<String, dynamic> toJson() {
     final map = <String, dynamic>{};
@@ -90,11 +90,11 @@ mixin _Team {
       DeepCollectionEquality().hash(members),
     ]);
   }
+
   @override
   String toString() {
     return 'Team(name: $name, leader: $leader, members: $members)';
   }
-
 
   Map<String, dynamic> toJson() {
     final map = <String, dynamic>{};
@@ -108,7 +108,11 @@ mixin _Team {
     return Team(
       name: SafeCasteUtil.safeCast<String>(map['name']) ?? "",
       leader: Employee.fromJson((map['leader'] ?? {}) as Map<String, dynamic>),
-      members: (map['members'] as List<dynamic>?)?.map((e) => Employee.fromJson(e as Map<String, dynamic>)).toList()?.cast<Employee>() ?? [],
+      members: (map['members'] as List<dynamic>?)
+              ?.map((e) => Employee.fromJson(e as Map<String, dynamic>))
+              .toList()
+              .cast<Employee>() ??
+          [],
     );
   }
 }
@@ -145,11 +149,11 @@ mixin _Department {
       DeepCollectionEquality().hash(teams),
     ]);
   }
+
   @override
   String toString() {
     return 'Department(name: $name, code: $code, teams: $teams)';
   }
-
 
   Map<String, dynamic> toJson() {
     final map = <String, dynamic>{};
@@ -163,7 +167,11 @@ mixin _Department {
     return Department(
       name: SafeCasteUtil.safeCast<String>(map['name']) ?? "",
       code: SafeCasteUtil.safeCast<String>(map['code']) ?? "",
-      teams: (map['teams'] as List<dynamic>?)?.map((e) => Team.fromJson(e as Map<String, dynamic>)).toList()?.cast<Team>() ?? [],
+      teams: (map['teams'] as List<dynamic>?)
+              ?.map((e) => Team.fromJson(e as Map<String, dynamic>))
+              .toList()
+              .cast<Team>() ??
+          [],
     );
   }
 }
@@ -200,11 +208,11 @@ mixin _Company {
       DeepCollectionEquality().hash(departments),
     ]);
   }
+
   @override
   String toString() {
     return 'Company(name: $name, address: $address, departments: $departments)';
   }
-
 
   Map<String, dynamic> toJson() {
     final map = <String, dynamic>{};
@@ -218,11 +226,14 @@ mixin _Company {
     return Company(
       name: SafeCasteUtil.safeCast<String>(map['name']) ?? "",
       address: SafeCasteUtil.safeCast<String>(map['address']) ?? "",
-      departments: (map['departments'] as List<dynamic>?)?.map((e) => Department.fromJson(e as Map<String, dynamic>)).toList()?.cast<Department>() ?? [],
+      departments: (map['departments'] as List<dynamic>?)
+              ?.map((e) => Department.fromJson(e as Map<String, dynamic>))
+              .toList()
+              .cast<Department>() ??
+          [],
     );
   }
 }
-
 
 /// Helper class for chained copyWith operations
 class _EmployeeCopyWith {
@@ -269,7 +280,6 @@ class _EmployeeCopyWith {
     );
   }
 }
-
 
 /// Helper class for chained copyWith operations
 class _TeamCopyWith {
@@ -355,7 +365,6 @@ class _TeamNestedCopyWithLeader {
   }
 }
 
-
 /// Helper class for chained copyWith operations
 class _DepartmentCopyWith {
   final _Department _instance;
@@ -402,7 +411,6 @@ class _DepartmentCopyWith {
   }
 }
 
-
 /// Helper class for chained copyWith operations
 class _CompanyCopyWith {
   final _Company _instance;
@@ -448,4 +456,3 @@ class _CompanyCopyWith {
     );
   }
 }
-
