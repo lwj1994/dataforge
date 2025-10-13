@@ -246,7 +246,9 @@ class Writer {
       final line = lines[i];
 
       // Find class declaration line
-      if (line.contains('class $className') && !line.contains('mixin')) {
+      final classPattern =
+          RegExp(r'\bclass\s+' + RegExp.escape(className) + r'\b');
+      if (classPattern.hasMatch(line) && !line.contains('mixin')) {
         String genericPart = '';
         final genericStartIndex = line.indexOf('<');
 
@@ -332,7 +334,9 @@ class Writer {
       final line = lines[i].trim();
 
       // Check if we've entered the target class
-      if (line.contains('class $className') && !line.contains('mixin')) {
+      final classPattern =
+          RegExp(r'\bclass\s+' + RegExp.escape(className) + r'\b');
+      if (!inClass && classPattern.hasMatch(line) && !line.contains('mixin')) {
         inClass = true;
       }
 
