@@ -13,3 +13,6 @@ test/gen/
 *.iml
 
 vs_plugin/node_modules
+
+idea_plugin/build
+idea_plugin/.gradle
