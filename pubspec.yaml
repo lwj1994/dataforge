@@ -1,6 +1,6 @@
 name: dataforge
 description: A Dart code generator that forges data classes with JSON serialization support from annotated classes.
-version: 0.2.1
+version: 0.3.0
 homepage: https://github.com/your_username/dataforge
 repository: https://github.com/your_username/dataforge
 issue_tracker: https://github.com/your_username/dataforge/issues
@@ -18,8 +18,7 @@ dependencies:
   collection: ^1.17.0
   path: ^1.7.0
   args: ^2.7.0
-  dataforge_annotation:
-    path: ./annotation
+  dataforge_annotation: ^0.3.0
 
 dev_dependencies:
   lints: ^5.0.0

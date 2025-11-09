@@ -1,3 +1,7 @@
+## 0.3.0
+- fix some bugs 
+- support idea/vs plugin
+
 ## 0.2.0
 - Chained copyWith support
 - Support for fromJson and toJson hooks
