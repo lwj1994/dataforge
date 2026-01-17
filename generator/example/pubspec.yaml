@@ -1,0 +1,20 @@
+name: dataforge_generator_example
+description: Example usage of dataforge_generator
+version: 0.3.0
+publish_to: none
+
+environment:
+  sdk: ^3.0.0
+
+dependencies:
+  dataforge_annotation: ^0.3.0
+
+dev_dependencies:
+  build_runner: ^2.4.0
+  dataforge_generator:
+    path: ../
+  lints: ^5.0.0
+
+dependency_overrides:
+  dataforge_annotation:
+    path: ../../annotation
