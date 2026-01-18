@@ -501,7 +501,8 @@ mixin _AlternateNamesTest {
       tags:
           ((json['tags'] ?? json['tags_list'] ?? json['labels'])
                   as List<dynamic>?)
-              ?.cast<String>(),
+              ?.cast<String>() ??
+          [],
     );
   }
 }
@@ -990,4 +991,65 @@ class MyDateTimeConverter extends JsonTypeConverter<DateTime, String> {
   DateTime? fromJson(Object? json) => null;
   @override
   String? toJson(DateTime? object) => null;
+}
+
+@ShouldGenerate(r'''
+mixin _ListObjectExample {
+  abstract final List<BasicUser> users;
+  _ListObjectExampleCopyWith<ListObjectExample> get copyWith =>
+      _ListObjectExampleCopyWith<ListObjectExample>._(this);
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+    if (other is! ListObjectExample) return false;
+
+    return other.users == users;
+  }
+
+  @override
+  int get hashCode => Object.hashAll([users]);
+
+  @override
+  String toString() => 'ListObjectExample(users: $users)';
+
+  Map<String, dynamic> toJson() {
+    return {'users': users};
+  }
+
+  static ListObjectExample fromJson(Map<String, dynamic> json) {
+    return ListObjectExample(
+      users:
+          (json['users'] as List<dynamic>?)
+              ?.map((e) => BasicUser.fromJson(e as Map<String, dynamic>))
+              .toList() ??
+          [],
+    );
+  }
+}
+
+class _ListObjectExampleCopyWith<R> {
+  final _ListObjectExample _instance;
+  final R Function(ListObjectExample)? _then;
+  _ListObjectExampleCopyWith._(this._instance, [this._then]);
+
+  R call({Object? users = dataforgeUndefined}) {
+    final res = ListObjectExample(
+      users: users == dataforgeUndefined
+          ? _instance.users
+          : users as List<BasicUser>,
+    );
+    return _then != null ? _then!(res) : res as R;
+  }
+
+  R users(List<BasicUser> value) {
+    final res = ListObjectExample(users: value);
+    return _then != null ? _then!(res) : res as R;
+  }
+}
+''')
+@Dataforge()
+class ListObjectExample {
+  final List<BasicUser> users;
+  ListObjectExample({this.users = const []});
 }

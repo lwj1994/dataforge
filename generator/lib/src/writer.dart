@@ -472,10 +472,38 @@ class GeneratorWriter {
           conversion += defaultValue;
         }
       } else if (cleanType.startsWith('List<')) {
-        conversion =
-            "($valueExpression as List<dynamic>?)?.cast<${cleanType.substring(5, cleanType.length - 1)}>()";
-        if (!isNullable && field.defaultValue.isNotEmpty) {
-          conversion += ' ?? ${field.defaultValue}';
+        final innerType = cleanType.substring(5, cleanType.length - 1);
+        final innerTypeClean = innerType.replaceAll('?', '');
+        final isPrimitive = [
+              'int',
+              'double',
+              'num',
+              'String',
+              'bool',
+              'dynamic',
+              'Object',
+              'DateTime'
+            ].contains(innerTypeClean) ||
+            innerTypeClean.startsWith('Map<') ||
+            innerTypeClean.startsWith('List<');
+
+        if (isPrimitive) {
+          conversion =
+              "($valueExpression as List<dynamic>?)?.cast<$innerType>()";
+        } else {
+          if (innerType.endsWith('?')) {
+            conversion =
+                "($valueExpression as List<dynamic>?)?.map((e) => e == null ? null : $innerTypeClean.fromJson(e as Map<String, dynamic>)).toList()";
+          } else {
+            conversion =
+                "($valueExpression as List<dynamic>?)?.map((e) => $innerTypeClean.fromJson(e as Map<String, dynamic>)).toList()";
+          }
+        }
+
+        if (!isNullable) {
+          conversion += field.defaultValue.isNotEmpty
+              ? ' ?? ${field.defaultValue}'
+              : ' ?? []';
         }
       } else if (cleanType.startsWith('Map<')) {
         conversion = "$valueExpression as Map<String, dynamic>?";
