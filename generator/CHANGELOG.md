@@ -1,3 +1,10 @@
+## 0.5.0-dev.5
+- Add `isRequired` field parsing for constructor parameters.
+- Use `readRequiredValue` for required non-nullable basic types in `fromJson`.
+- Use `readRequiredObject` for required non-nullable Dataforge objects in `fromJson`.
+- Use `readObject` for optional Dataforge objects with default values.
+- Improve code generation for cleaner output.
+
 ## 0.5.0-dev.3
 - Remove `required_inputs` from `build.yaml`.
 
