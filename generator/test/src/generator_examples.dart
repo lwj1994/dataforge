@@ -858,7 +858,7 @@ mixin _NestedDefaultValues {
   static NestedDefaultValues fromJson(Map<String, dynamic> json) {
     return NestedDefaultValues(
       name: SafeCasteUtil.readValue<String>(json, 'name') ?? '',
-      nested: json['nested'],
+      nested: DefaultValues.fromJson(json['nested'] as Map<String, dynamic>),
     );
   }
 }
@@ -942,7 +942,7 @@ mixin _ChainedExample {
   static ChainedExample fromJson(Map<String, dynamic> json) {
     return ChainedExample(
       id: SafeCasteUtil.readValue<String>(json, 'id') ?? '',
-      user: json['user'],
+      user: BasicUser.fromJson(json['user'] as Map<String, dynamic>),
     );
   }
 }

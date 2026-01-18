@@ -425,7 +425,15 @@ class GeneratorWriter {
 
       String conversion;
       if (customConverter != null && customConverter.isNotEmpty) {
-        conversion = "const $customConverter().fromJson($valueExpression)";
+        if (jsonKeyInfo != null && jsonKeyInfo.readValue.isNotEmpty) {
+          // If readValue is used, check if the value is already the target type
+          // If so, return it directly. Otherwise, use the converter.
+          conversion =
+              "((dynamic v) => v is $cleanType ? v : const $customConverter().fromJson(v))($valueExpression)";
+        } else {
+          conversion = "const $customConverter().fromJson($valueExpression)";
+        }
+
         if (!isNullable) {
           conversion += ' as $cleanType';
         }
@@ -518,6 +526,33 @@ class GeneratorWriter {
         conversion = "$valueExpression as Map<String, dynamic>?";
         if (!isNullable && field.defaultValue.isNotEmpty) {
           conversion += ' ?? ${field.defaultValue}';
+        }
+      } else if (field.isDataforge) {
+        String baseExpression;
+        if (jsonKeyInfo != null && jsonKeyInfo.readValue.isNotEmpty) {
+          final valParam = 'v';
+          final castExpression = (isNullable || field.defaultValue.isNotEmpty)
+              ? 'as $cleanType?'
+              : 'as $cleanType';
+
+          // User Rule: if readValue returns TargetType, return it.
+          // If Map, call fromJson.
+          // Else safely cast/return.
+          baseExpression =
+              "((dynamic $valParam) { if ($valParam is $cleanType) return $valParam; if ($valParam is Map<String, dynamic>) return $cleanType.fromJson($valParam); return $valParam $castExpression; })($valueExpression)";
+        } else {
+          if (isNullable || field.defaultValue.isNotEmpty) {
+            baseExpression =
+                "$valueExpression == null ? null : $cleanType.fromJson($valueExpression as Map<String, dynamic>)";
+          } else {
+            baseExpression =
+                "$cleanType.fromJson($valueExpression as Map<String, dynamic>)";
+          }
+        }
+
+        conversion = baseExpression;
+        if (!isNullable && field.defaultValue.isNotEmpty) {
+          conversion = "($baseExpression) ?? ${field.defaultValue}";
         }
       } else {
         conversion = "$valueExpression";
