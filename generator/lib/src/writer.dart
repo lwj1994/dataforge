@@ -438,17 +438,24 @@ class GeneratorWriter {
           conversion += ' as $cleanType';
         }
       } else if (['int', 'double', 'String', 'bool'].contains(cleanType)) {
+        bool usedRequired = false;
         if (jsonKeyInfo == null ||
             (jsonKeyInfo.readValue.isEmpty &&
                 jsonKeyInfo.alternateNames.isEmpty)) {
-          conversion =
-              "${_getPrefix(clazz)}SafeCasteUtil.readValue<$cleanType>(json, '$jsonKey')";
+          if (field.isRequired && !isNullable && field.defaultValue.isEmpty) {
+            conversion =
+                "${_getPrefix(clazz)}SafeCasteUtil.readRequiredValue<$cleanType>(json, '$jsonKey')";
+            usedRequired = true;
+          } else {
+            conversion =
+                "${_getPrefix(clazz)}SafeCasteUtil.readValue<$cleanType>(json, '$jsonKey')";
+          }
         } else {
           conversion =
               "${_getPrefix(clazz)}SafeCasteUtil.safeCast<$cleanType>($valueExpression)";
         }
 
-        if (!isNullable) {
+        if (!isNullable && !usedRequired) {
           final defaultValue = field.defaultValue.isNotEmpty
               ? field.defaultValue
               : ({
@@ -529,30 +536,41 @@ class GeneratorWriter {
         }
       } else if (field.isDataforge) {
         String baseExpression;
+        bool usedRequired = false;
+
         if (jsonKeyInfo != null && jsonKeyInfo.readValue.isNotEmpty) {
           final valParam = 'v';
           final castExpression = (isNullable || field.defaultValue.isNotEmpty)
               ? 'as $cleanType?'
               : 'as $cleanType';
 
-          // User Rule: if readValue returns TargetType, return it.
-          // If Map, call fromJson.
-          // Else safely cast/return.
           baseExpression =
               "((dynamic $valParam) { if ($valParam is $cleanType) return $valParam; if ($valParam is Map<String, dynamic>) return $cleanType.fromJson($valParam); return $valParam $castExpression; })($valueExpression)";
         } else {
-          if (isNullable || field.defaultValue.isNotEmpty) {
-            baseExpression =
-                "$valueExpression == null ? null : $cleanType.fromJson($valueExpression as Map<String, dynamic>)";
+          if (jsonKeyInfo == null ||
+              (jsonKeyInfo.readValue.isEmpty &&
+                  jsonKeyInfo.alternateNames.isEmpty)) {
+            if (field.isRequired && !isNullable && field.defaultValue.isEmpty) {
+              baseExpression =
+                  "${_getPrefix(clazz)}SafeCasteUtil.readRequiredObject(json, '$jsonKey', $cleanType.fromJson)";
+              usedRequired = true;
+            } else {
+              baseExpression =
+                  "${_getPrefix(clazz)}SafeCasteUtil.readObject(json, '$jsonKey', $cleanType.fromJson)";
+            }
           } else {
             baseExpression =
-                "$cleanType.fromJson($valueExpression as Map<String, dynamic>)";
+                "${_getPrefix(clazz)}SafeCasteUtil.parseObject($valueExpression, $cleanType.fromJson)";
           }
         }
 
         conversion = baseExpression;
-        if (!isNullable && field.defaultValue.isNotEmpty) {
-          conversion = "($baseExpression) ?? ${field.defaultValue}";
+        if (!isNullable && !usedRequired) {
+          if (field.defaultValue.isNotEmpty) {
+            conversion = "($baseExpression) ?? ${field.defaultValue}";
+          } else {
+            conversion = "($baseExpression)!";
+          }
         }
       } else {
         conversion = "$valueExpression";

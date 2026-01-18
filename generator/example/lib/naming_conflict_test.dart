@@ -11,6 +11,10 @@ class TestUser with _TestUser {
   final int age;
 
   TestUser({required this.name, required this.age});
+
+  static TestUser fromJson(Map<String, dynamic> json) {
+    return _TestUser.fromJson(json);
+  }
 }
 
 @Dataforge(deepCopyWith: true)
@@ -24,6 +28,10 @@ class TestProfile with _TestProfile {
   final String userName;
 
   TestProfile({required this.user, required this.userName});
+
+  static TestProfile fromJson(Map<String, dynamic> json) {
+    return _TestProfile.fromJson(json);
+  }
 }
 
 void main() {

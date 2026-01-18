@@ -207,6 +207,7 @@ class FieldInfo {
   final bool isEnum;
   final bool isDataforge;
   final bool isDateTime;
+  final bool isRequired;
 
   const FieldInfo({
     required this.name,
@@ -219,6 +220,7 @@ class FieldInfo {
     this.isEnum = false,
     this.isDataforge = false,
     this.isDateTime = false,
+    this.isRequired = false,
   });
 
   FieldInfo copyWith({
@@ -231,6 +233,7 @@ class FieldInfo {
     String? defaultValue,
     bool? isEnum,
     bool? isDataforge,
+    bool? isRequired,
   }) {
     return FieldInfo(
       name: name ?? this.name,
@@ -242,6 +245,7 @@ class FieldInfo {
       defaultValue: defaultValue ?? this.defaultValue,
       isEnum: isEnum ?? this.isEnum,
       isDataforge: isDataforge ?? this.isDataforge,
+      isRequired: isRequired ?? this.isRequired,
     );
   }
 
@@ -256,6 +260,7 @@ class FieldInfo {
       'defaultValue': defaultValue,
       'isEnum': isEnum,
       'isDataforge': isDataforge,
+      'isRequired': isRequired,
     };
   }
 
@@ -272,12 +277,13 @@ class FieldInfo {
       defaultValue: map['defaultValue'] as String? ?? '',
       isEnum: map['isEnum'] as bool? ?? false,
       isDataforge: map['isDataforge'] as bool? ?? false,
+      isRequired: map['isRequired'] as bool? ?? false,
     );
   }
 
   @override
   String toString() {
-    return 'FieldInfo(name: $name, type: $type, isFinal: $isFinal, isFunction: $isFunction, jsonKey: $jsonKey, isRecord: $isRecord, defaultValue: $defaultValue, isEnum: $isEnum, isDataforge: $isDataforge)';
+    return 'FieldInfo(name: $name, type: $type, isFinal: $isFinal, isFunction: $isFunction, jsonKey: $jsonKey, isRecord: $isRecord, defaultValue: $defaultValue, isEnum: $isEnum, isDataforge: $isDataforge, isRequired: $isRequired)';
   }
 
   @override
@@ -292,7 +298,8 @@ class FieldInfo {
         other.isRecord == isRecord &&
         other.defaultValue == defaultValue &&
         other.isEnum == isEnum &&
-        other.isDataforge == isDataforge;
+        other.isDataforge == isDataforge &&
+        other.isRequired == isRequired;
   }
 
   @override
@@ -305,6 +312,8 @@ class FieldInfo {
         isRecord,
         defaultValue,
         isEnum,
+        isDataforge,
+        isRequired, // Add isRequired to hash calculation properly (might exceed default hashAll limit?)
       ]);
 }
 

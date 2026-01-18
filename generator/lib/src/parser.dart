@@ -136,20 +136,63 @@ class GeneratorParser {
 
   /// Parse fields from class
   List<FieldInfo> _parseFields(ClassElement element) {
-    // Collect parameter defaults from constructors
+    // Collect parameter defaults and required status from constructors
     final parameterDefaults = <String, String>{};
-    /*
+    final parameterRequired = <String, bool>{};
     for (final constructor in element.constructors) {
       if (!constructor.isFactory) {
         try {
-          // Use dynamic cast to bypass potential interface changes or missing legacy mixins
-          final params = (constructor as dynamic).parameters; 
+          // Try multiple ways to access parameters for compatibility
+          List<dynamic> params = [];
+          try {
+            params = (constructor as dynamic).parameters;
+          } catch (_) {
+            try {
+              // Try formalParameters (sometimes used in newer APIs)
+              params = (constructor as dynamic).formalParameters;
+            } catch (_) {}
+          }
+
           for (final parameter in params) {
-            if (parameter.hasDefaultValue == true) { 
-               final val = parameter.defaultValueCode;
-               if (val != null && parameter.name.isNotEmpty) { 
-                  parameterDefaults[parameter.name ?? ''] = val;
-               }
+            // Need to cast to dynamic to access properties if strict type fails
+            final p = parameter as dynamic;
+            try {
+              if (p.hasDefaultValue == true) {
+                final val = p.defaultValueCode;
+                if (val != null && (p.name as String).isNotEmpty) {
+                  parameterDefaults[p.name as String] = val as String;
+                }
+              }
+              if (p.isRequiredNamed == true || p.isRequiredPositional == true) {
+                if ((p.name as String).isNotEmpty) {
+                  parameterRequired[p.name as String] = true;
+                }
+              }
+            } catch (_) {}
+          }
+
+          // Fallback: If no defaults were found via API, try parsing from toString()
+          // This is a heuristic and might not cover all cases, but can help for common patterns.
+          if (parameterDefaults.isEmpty && parameterRequired.isEmpty) {
+            final signature = constructor.toString();
+            // Matches: Type fieldName = defaultValue
+            final defaultRegex =
+                RegExp(r'(?:[\w\<\>\?]+\s+)?(\w+)\s*=\s*([^,\)]+)');
+            for (final match in defaultRegex.allMatches(signature)) {
+              final name = match.group(1);
+              final value = match.group(2)?.trim();
+              if (name != null && value != null) {
+                parameterDefaults[name] = value;
+              }
+            }
+            // Matches: required Type fieldName
+            final requiredRegex =
+                RegExp(r'required\s+(?:[\w\<\>\?]+\s+)?(\w+)');
+            for (final match in requiredRegex.allMatches(signature)) {
+              final name = match.group(1);
+              if (name != null) {
+                parameterRequired[name] = true;
+              }
             }
           }
         } catch (e) {
@@ -157,7 +200,6 @@ class GeneratorParser {
         }
       }
     }
-    */
 
     final fields = <FieldInfo>[];
 
@@ -188,6 +230,7 @@ class GeneratorParser {
 
       final fieldName = field.name ?? '';
       final defaultValue = parameterDefaults[fieldName] ?? '';
+      final isRequired = parameterRequired[fieldName] ?? false;
 
       JsonKeyInfo? jsonKeyInfo;
       for (final metadata in _getAnnotations(field)) {
@@ -211,6 +254,7 @@ class GeneratorParser {
         isDateTime: isDateTime,
         jsonKey: jsonKeyInfo,
         defaultValue: defaultValue,
+        isRequired: isRequired,
       ));
     }
 
@@ -232,7 +276,12 @@ class GeneratorParser {
       alternateNames: alternateNames,
       readValue: reader.peek('readValue')?.revive().accessor ?? '',
       ignore: reader.peek('ignore')?.boolValue ?? false,
-      converter: '', // Converter parsing not implemented yet
+      converter: reader
+              .peek('converter')
+              ?.objectValue
+              .type
+              ?.getDisplayString(withNullability: false) ??
+          '',
       includeIfNull: reader.peek('includeIfNull')?.boolValue,
     );
   }

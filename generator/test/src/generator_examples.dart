@@ -2,6 +2,23 @@ import 'package:dataforge_annotation/dataforge_annotation.dart';
 import 'package:dataforge_annotation/dataforge_annotation.dart' as df;
 import 'package:source_gen_test/annotations.dart';
 
+class GenericConverter<T> extends JsonTypeConverter<T, Object?> {
+  const GenericConverter();
+
+  @override
+  T fromJson(Object? json) {
+    if (json is T) {
+      return json;
+    }
+    return json as T;
+  }
+
+  @override
+  Object? toJson(T? object) {
+    return object;
+  }
+}
+
 @ShouldGenerate(r'''
 mixin _BasicUser {
   abstract final String name;
@@ -29,8 +46,8 @@ mixin _BasicUser {
 
   static BasicUser fromJson(Map<String, dynamic> json) {
     return BasicUser(
-      name: SafeCasteUtil.readValue<String>(json, 'name') ?? '',
-      age: SafeCasteUtil.readValue<int>(json, 'age') ?? 0,
+      name: SafeCasteUtil.readRequiredValue<String>(json, 'name'),
+      age: SafeCasteUtil.readRequiredValue<int>(json, 'age'),
     );
   }
 }
@@ -149,8 +166,8 @@ mixin _Product {
 
   static Product fromJson(Map<String, dynamic> json) {
     return Product(
-      id: SafeCasteUtil.readValue<String>(json, 'product_id') ?? '',
-      name: SafeCasteUtil.readValue<String>(json, 'name') ?? '',
+      id: SafeCasteUtil.readRequiredValue<String>(json, 'product_id'),
+      name: SafeCasteUtil.readRequiredValue<String>(json, 'name'),
     );
   }
 }
@@ -367,9 +384,10 @@ mixin _DefaultValues {
 
   static DefaultValues fromJson(Map<String, dynamic> json) {
     return DefaultValues(
-      intValue: SafeCasteUtil.readValue<int>(json, 'intValue') ?? 0,
-      stringValue: SafeCasteUtil.readValue<String>(json, 'stringValue') ?? '',
-      boolValue: SafeCasteUtil.readValue<bool>(json, 'boolValue') ?? false,
+      intValue: SafeCasteUtil.readValue<int>(json, 'intValue') ?? 42,
+      stringValue:
+          SafeCasteUtil.readValue<String>(json, 'stringValue') ?? 'default',
+      boolValue: SafeCasteUtil.readValue<bool>(json, 'boolValue') ?? true,
     );
   }
 }
@@ -480,7 +498,7 @@ mixin _AlternateNamesTest {
 
   static AlternateNamesTest fromJson(Map<String, dynamic> json) {
     return AlternateNamesTest(
-      name: SafeCasteUtil.readValue<String>(json, 'name') ?? '',
+      name: SafeCasteUtil.readRequiredValue<String>(json, 'name'),
       age:
           SafeCasteUtil.safeCast<int>(
             (json['user_age'] ?? json['age'] ?? json['years']),
@@ -503,7 +521,7 @@ mixin _AlternateNamesTest {
           ((json['tags'] ?? json['tags_list'] ?? json['labels'])
                   as List<dynamic>?)
               ?.cast<String>() ??
-          [],
+          const [],
     );
   }
 }
@@ -654,8 +672,8 @@ mixin _CustomReadValue {
 
   static CustomReadValue fromJson(Map<String, dynamic> json) {
     return CustomReadValue(
-      id: SafeCasteUtil.readValue<String>(json, 'id') ?? '',
-      name: SafeCasteUtil.readValue<String>(json, 'name') ?? '',
+      id: SafeCasteUtil.readRequiredValue<String>(json, 'id'),
+      name: SafeCasteUtil.readRequiredValue<String>(json, 'name'),
       title:
           SafeCasteUtil.safeCast<String>(
             CustomReadValue._readValue(json, 'title'),
@@ -798,11 +816,13 @@ mixin _GenericContainer<T> {
   String toString() => 'GenericContainer(data: $data)';
 
   Map<String, dynamic> toJson() {
-    return {'data': data};
+    return {'data': const GenericConverter<dynamic>().toJson(data)};
   }
 
   static GenericContainer<T> fromJson<T>(Map<String, dynamic> json) {
-    return GenericContainer(data: json['data']);
+    return GenericContainer(
+      data: const GenericConverter<dynamic>().fromJson(json['data']) as T,
+    );
   }
 }
 
@@ -826,6 +846,7 @@ class _GenericContainerCopyWith<T, R> {
 ''')
 @Dataforge()
 class GenericContainer<T> {
+  @JsonKey(converter: GenericConverter())
   final T data;
   GenericContainer({required this.data});
 }
@@ -857,8 +878,10 @@ mixin _NestedDefaultValues {
 
   static NestedDefaultValues fromJson(Map<String, dynamic> json) {
     return NestedDefaultValues(
-      name: SafeCasteUtil.readValue<String>(json, 'name') ?? '',
-      nested: DefaultValues.fromJson(json['nested'] as Map<String, dynamic>),
+      name: SafeCasteUtil.readValue<String>(json, 'name') ?? 'nested_default',
+      nested:
+          (SafeCasteUtil.readObject(json, 'nested', DefaultValues.fromJson)) ??
+          const DefaultValues(),
     );
   }
 }
@@ -941,8 +964,8 @@ mixin _ChainedExample {
 
   static ChainedExample fromJson(Map<String, dynamic> json) {
     return ChainedExample(
-      id: SafeCasteUtil.readValue<String>(json, 'id') ?? '',
-      user: BasicUser.fromJson(json['user'] as Map<String, dynamic>),
+      id: SafeCasteUtil.readRequiredValue<String>(json, 'id'),
+      user: SafeCasteUtil.readRequiredObject(json, 'user', BasicUser.fromJson),
     );
   }
 }
@@ -1024,7 +1047,7 @@ mixin _ListObjectExample {
           (json['users'] as List<dynamic>?)
               ?.map((e) => BasicUser.fromJson(e as Map<String, dynamic>))
               .toList() ??
-          [],
+          const [],
     );
   }
 }
@@ -1081,7 +1104,7 @@ mixin _PrefixedExample {
 
   static PrefixedExample fromJson(Map<String, dynamic> json) {
     return PrefixedExample(
-      name: df.SafeCasteUtil.readValue<String>(json, 'name') ?? '',
+      name: df.SafeCasteUtil.readRequiredValue<String>(json, 'name'),
     );
   }
 }
