@@ -1,0 +1,249 @@
+00:00 [32m+0[0m: [1m[90mloading test/should_generate_test.dart[0m[0m                                                                                                                                                       00:01 [32m+0[0m: [1m[90mloading test/should_generate_test.dart[0m[0m                                                                                                                                                         0s _ResolveSourceBuilder<LibraryElement> on 5 inputs; $package$
+00:02 [32m+0[0m: [1m[90mloading test/should_generate_test.dart[0m[0m                                                                                                                                                         1s _ResolveSourceBuilder<LibraryElement> on 5 inputs: 5 no-op
+  Built with build_runner/jit in 1s; wrote 0 outputs.
+00:02 [32m+0[0m: Product[0m                                                                                                                                                                                      00:02 [32m+0[0m[31m -1[0m: Product [1m[31m[E][0m[0m                                                                                                                                                                               
+  Expected: 'mixin _Product {\n'
+              '  abstract final String id;\n'
+              '  abstract final String secret;\n'
+              '  abstract final String name;\n'
+              '  _ProductCopyWith<Product> get copyWith => _ProductCopyWith<Product>._(this);\n'
+              '\n'
+              '  @override\n'
+              '  bool operator ==(Object other) {\n'
+              '    if (identical(this, other)) return true;\n'
+              '    if (other is! Product) return false;\n'
+              '\n'
+              '    return other.id == id && other.secret == secret && other.name == name;\n'
+              '  }\n'
+              '\n'
+              '  @override\n'
+              '  int get hashCode => Object.hashAll([id, secret, name]);\n'
+              '\n'
+              '  @override\n'
+              '  String toString() => \'Product(id: $id, secret: $secret, name: $name)\';\n'
+              '\n'
+              '  Map<String, dynamic> toJson() {\n'
+              '    return {\'product_id\': id, \'name\': name};\n'
+              '  }\n'
+              '\n'
+              '  static Product fromJson(Map<String, dynamic> json) {\n'
+              '    return Product(\n'
+              '      id: SafeCasteUtil.readValue<String>(json, \'product_id\') ?? \'\',\n'
+              '      name: SafeCasteUtil.readValue<String>(json, \'name\') ?? \'\',\n'
+              '    );\n'
+              '  }\n'
+              '}\n'
+              '\n'
+              'class _ProductCopyWith<R> {\n'
+              '  final _Product _instance;\n'
+              '  final R Function(Product)? _then;\n'
+              '  _ProductCopyWith._(this._instance, [this._then]);\n'
+              '\n'
+              '  R call({\n'
+              '    Object? id = dataforgeUndefined,\n'
+              '    Object? secret = dataforgeUndefined,\n'
+              '    Object? name = dataforgeUndefined,\n'
+              '  }) {\n'
+              '    final res = Product(\n'
+              '      id: id == dataforgeUndefined ? _instance.id : id as String,\n'
+              '      secret: secret == dataforgeUndefined\n'
+              '          ? _instance.secret\n'
+              '          : secret as String,\n'
+              '      name: name == dataforgeUndefined ? _instance.name : name as String,\n'
+              '    );\n'
+              '    return _then != null ? _then!(res) : res as R;\n'
+              '  }\n'
+              '\n'
+              '  R id(String value) {\n'
+              '    final res = Product(\n'
+              '      id: value,\n'
+              '      secret: _instance.secret,\n'
+              '      name: _instance.name,\n'
+              '    );\n'
+              '    return _then != null ? _then!(res) : res as R;\n'
+              '  }\n'
+              '\n'
+              '  R secret(String value) {\n'
+              '    final res = Product(id: _instance.id, secret: value, name: _instance.name);\n'
+              '    return _then != null ? _then!(res) : res as R;\n'
+              '  }\n'
+              '\n'
+              '  R name(String value) {\n'
+              '    final res = Product(\n'
+              '      id: _instance.id,\n'
+              '      secret: _instance.secret,\n'
+              '      name: value,\n'
+              '    );\n'
+              '    return _then != null ? _then!(res) : res as R;\n'
+              '  }\n'
+              '}\n'
+              ''
+    Actual: 'mixin _Product {\n'
+              '  abstract final String id;\n'
+              '  abstract final String secret;\n'
+              '  abstract final String name;\n'
+              '  _ProductCopyWith<Product> get copyWith => _ProductCopyWith<Product>._(this);\n'
+              '\n'
+              '  @override\n'
+              '  bool operator ==(Object other) {\n'
+              '    if (identical(this, other)) return true;\n'
+              '    if (other is! Product) return false;\n'
+              '\n'
+              '    return other.id == id && other.secret == secret && other.name == name;\n'
+              '  }\n'
+              '\n'
+              '  @override\n'
+              '  int get hashCode => Object.hashAll([id, secret, name]);\n'
+              '\n'
+              '  @override\n'
+              '  String toString() => \'Product(id: $id, secret: $secret, name: $name)\';\n'
+              '\n'
+              '  Map<String, dynamic> toJson() {\n'
+              '    return {\'product_id\': id, \'name\': name};\n'
+              '  }\n'
+              '\n'
+              '  static Product fromJson(Map<String, dynamic> json) {\n'
+              '    return Product(\n'
+              '      id: df.SafeCasteUtil.readValue<String>(json, \'product_id\') ?? \'\',\n'
+              '      name: df.SafeCasteUtil.readValue<String>(json, \'name\') ?? \'\',\n'
+              '    );\n'
+              '  }\n'
+              '}\n'
+              '\n'
+              'class _ProductCopyWith<R> {\n'
+              '  final _Product _instance;\n'
+              '  final R Function(Product)? _then;\n'
+              '  _ProductCopyWith._(this._instance, [this._then]);\n'
+              '\n'
+              '  R call({\n'
+              '    Object? id = df.dataforgeUndefined,\n'
+              '    Object? secret = df.dataforgeUndefined,\n'
+              '    Object? name = df.dataforgeUndefined,\n'
+              '  }) {\n'
+              '    final res = Product(\n'
+              '      id: id == df.dataforgeUndefined ? _instance.id : id as String,\n'
+              '      secret: secret == df.dataforgeUndefined\n'
+              '          ? _instance.secret\n'
+              '          : secret as String,\n'
+              '      name: name == df.dataforgeUndefined ? _instance.name : name as String,\n'
+              '    );\n'
+              '    return _then != null ? _then!(res) : res as R;\n'
+              '  }\n'
+              '\n'
+              '  R id(String value) {\n'
+              '    final res = Product(\n'
+              '      id: value,\n'
+              '      secret: _instance.secret,\n'
+              '      name: _instance.name,\n'
+              '    );\n'
+              '    return _then != null ? _then!(res) : res as R;\n'
+              '  }\n'
+              '\n'
+              '  R secret(String value) {\n'
+              '    final res = Product(id: _instance.id, secret: value, name: _instance.name);\n'
+              '    return _then != null ? _then!(res) : res as R;\n'
+              '  }\n'
+              '\n'
+              '  R name(String value) {\n'
+              '    final res = Product(\n'
+              '      id: _instance.id,\n'
+              '      secret: _instance.secret,\n'
+              '      name: value,\n'
+              '    );\n'
+              '    return _then != null ? _then!(res) : res as R;\n'
+              '  }\n'
+              '}\n'
+              ''
+     Which: is different.
+            Expected: ...       id: SafeCasteU ...
+              Actual: ...       id: df.SafeCas ...
+                                    ^
+             Differ at offset 753
+  
+  package:matcher                                                expect
+  package:source_gen_test/src/test_annotated_classes.dart 258:7  AnnotatedTest._shouldGenerateTest
+  
+ACTUAL CONTENT:
+r'''
+mixin _Product {
+  abstract final String id;
+  abstract final String secret;
+  abstract final String name;
+  _ProductCopyWith<Product> get copyWith => _ProductCopyWith<Product>._(this);
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+    if (other is! Product) return false;
+
+    return other.id == id && other.secret == secret && other.name == name;
+  }
+
+  @override
+  int get hashCode => Object.hashAll([id, secret, name]);
+
+  @override
+  String toString() => 'Product(id: $id, secret: $secret, name: $name)';
+
+  Map<String, dynamic> toJson() {
+    return {'product_id': id, 'name': name};
+  }
+
+  static Product fromJson(Map<String, dynamic> json) {
+    return Product(
+      id: df.SafeCasteUtil.readValue<String>(json, 'product_id') ?? '',
+      name: df.SafeCasteUtil.readValue<String>(json, 'name') ?? '',
+    );
+  }
+}
+
+class _ProductCopyWith<R> {
+  final _Product _instance;
+  final R Function(Product)? _then;
+  _ProductCopyWith._(this._instance, [this._then]);
+
+  R call({
+    Object? id = df.dataforgeUndefined,
+    Object? secret = df.dataforgeUndefined,
+    Object? name = df.dataforgeUndefined,
+  }) {
+    final res = Product(
+      id: id == df.dataforgeUndefined ? _instance.id : id as String,
+      secret: secret == df.dataforgeUndefined
+          ? _instance.secret
+          : secret as String,
+      name: name == df.dataforgeUndefined ? _instance.name : name as String,
+    );
+    return _then != null ? _then!(res) : res as R;
+  }
+
+  R id(String value) {
+    final res = Product(
+      id: value,
+      secret: _instance.secret,
+      name: _instance.name,
+    );
+    return _then != null ? _then!(res) : res as R;
+  }
+
+  R secret(String value) {
+    final res = Product(id: _instance.id, secret: value, name: _instance.name);
+    return _then != null ? _then!(res) : res as R;
+  }
+
+  R name(String value) {
+    final res = Product(
+      id: _instance.id,
+      secret: _instance.secret,
+      name: value,
+    );
+    return _then != null ? _then!(res) : res as R;
+  }
+}
+'''
+
+[1m[36mTo run this test again:[0m /Users/luwenjie/.puro/envs/stable/flutter/bin/cache/dart-sdk/bin/dart test test/should_generate_test.dart -p vm --plain-name 'Product'
+00:02 [32m+0[0m[31m -1[0m: (tearDownAll)[0m                                                                                                                                                                             00:02 [32m+0[0m[31m -1[0m: [31mSome tests failed.[0m                                                                                                                                                                        
+
+Consider enabling the flag chain-stack-traces to receive more detailed exceptions.
+For example, 'dart test --chain-stack-traces'.

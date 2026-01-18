@@ -89,6 +89,7 @@ class ClassInfo {
   final bool includeToJson;
   final bool chainedCopyWith;
   final List<GenericParameter> genericParameters;
+  final String? dataforgePrefix;
 
   const ClassInfo({
     required this.name,
@@ -98,6 +99,7 @@ class ClassInfo {
     this.includeToJson = true,
     this.genericParameters = const [],
     this.chainedCopyWith = true,
+    this.dataforgePrefix,
   });
 
   ClassInfo copyWith({
@@ -108,6 +110,7 @@ class ClassInfo {
     bool? includeToJson,
     List<GenericParameter>? genericParameters,
     bool? chainedCopyWith,
+    String? dataforgePrefix,
   }) {
     return ClassInfo(
       name: name ?? this.name,
@@ -117,6 +120,7 @@ class ClassInfo {
       includeToJson: includeToJson ?? this.includeToJson,
       genericParameters: genericParameters ?? this.genericParameters,
       chainedCopyWith: chainedCopyWith ?? this.chainedCopyWith,
+      dataforgePrefix: dataforgePrefix ?? this.dataforgePrefix,
     );
   }
 
@@ -131,6 +135,7 @@ class ClassInfo {
           .map((x) => {'name': x.name, 'bound': x.bound})
           .toList(),
       'chainedCopyWith': chainedCopyWith,
+      'dataforgePrefix': dataforgePrefix,
     };
   }
 

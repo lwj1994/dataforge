@@ -1,4 +1,5 @@
 import 'package:dataforge_annotation/dataforge_annotation.dart';
+import 'package:dataforge_annotation/dataforge_annotation.dart' as df;
 import 'package:source_gen_test/annotations.dart';
 
 @ShouldGenerate(r'''
@@ -1052,4 +1053,59 @@ class _ListObjectExampleCopyWith<R> {
 class ListObjectExample {
   final List<BasicUser> users;
   ListObjectExample({this.users = const []});
+}
+
+@ShouldGenerate(r'''
+mixin _PrefixedExample {
+  abstract final String name;
+  _PrefixedExampleCopyWith<PrefixedExample> get copyWith =>
+      _PrefixedExampleCopyWith<PrefixedExample>._(this);
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+    if (other is! PrefixedExample) return false;
+
+    return other.name == name;
+  }
+
+  @override
+  int get hashCode => Object.hashAll([name]);
+
+  @override
+  String toString() => 'PrefixedExample(name: $name)';
+
+  Map<String, dynamic> toJson() {
+    return {'name': name};
+  }
+
+  static PrefixedExample fromJson(Map<String, dynamic> json) {
+    return PrefixedExample(
+      name: df.SafeCasteUtil.readValue<String>(json, 'name') ?? '',
+    );
+  }
+}
+
+class _PrefixedExampleCopyWith<R> {
+  final _PrefixedExample _instance;
+  final R Function(PrefixedExample)? _then;
+  _PrefixedExampleCopyWith._(this._instance, [this._then]);
+
+  R call({Object? name = df.dataforgeUndefined}) {
+    final res = PrefixedExample(
+      name: name == df.dataforgeUndefined ? _instance.name : name as String,
+    );
+    return _then != null ? _then!(res) : res as R;
+  }
+
+  R name(String value) {
+    final res = PrefixedExample(name: value);
+    return _then != null ? _then!(res) : res as R;
+  }
+}
+''')
+@df.Dataforge()
+class PrefixedExample {
+  final String name;
+  PrefixedExample({required this.name});
 }

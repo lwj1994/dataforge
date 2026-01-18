@@ -22,10 +22,10 @@ class GeneratorParser {
       // Use LibraryReader to safely access classes in the library
       final reader = LibraryReader(classElement.library);
       for (final element in reader.classes) {
-        final dataforgeAnnotation = _findDataforgeAnnotation(element);
-        if (dataforgeAnnotation != null) {
-          final classInfo =
-              _parseClassInfo(element, ConstantReader(dataforgeAnnotation));
+        final annotationResult = _findDataforgeAnnotation(element);
+        if (annotationResult != null) {
+          final classInfo = _parseClassInfo(element,
+              ConstantReader(annotationResult.object), annotationResult.prefix);
           classes.add(classInfo);
         }
       }
@@ -67,17 +67,31 @@ class GeneratorParser {
   }
 
   // Find @Dataforge annotation on a class
-  DartObject? _findDataforgeAnnotation(ClassElement element) {
+  _AnnotationResult? _findDataforgeAnnotation(ClassElement element) {
     for (final metadata in _getAnnotations(element)) {
       final obj = (metadata as dynamic).computeConstantValue();
       if (obj?.type?.element?.name == 'Dataforge') {
-        return obj;
+        String? prefix;
+        // Try to extract prefix from source
+        try {
+          if (metadata is ElementAnnotation) {
+            final source = metadata.toSource();
+            final match = RegExp(r'@(\w+)\.Dataforge').firstMatch(source);
+            if (match != null) {
+              prefix = match.group(1);
+            }
+          }
+        } catch (e) {
+          // Ignore source extraction errors
+        }
+        return _AnnotationResult(obj!, prefix: prefix);
       }
     }
     return null;
   }
 
-  ClassInfo _parseClassInfo(ClassElement element, ConstantReader annotation) {
+  ClassInfo _parseClassInfo(
+      ClassElement element, ConstantReader annotation, String? prefix) {
     final name = annotation.peek('name')?.stringValue ?? '';
     final includeFromJson = annotation.peek('includeFromJson')?.boolValue ??
         annotation.peek('fromMap')?.boolValue ??
@@ -102,6 +116,7 @@ class GeneratorParser {
       includeToJson: includeToJson,
       chainedCopyWith: chainedCopyWith,
       genericParameters: genericParameters,
+      dataforgePrefix: prefix,
     );
   }
 
@@ -222,4 +237,10 @@ class GeneratorParser {
       includeIfNull: reader.peek('includeIfNull')?.boolValue,
     );
   }
+}
+
+class _AnnotationResult {
+  final DartObject object;
+  final String? prefix;
+  _AnnotationResult(this.object, {this.prefix});
 }

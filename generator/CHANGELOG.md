@@ -1,3 +1,8 @@
+## 0.5.0-dev.2
+- Support detecting Dataforge prefix alias.
+- Support List<Object> nested fromJson.
+- Fix dataforgeUndefined prefix.
+
 ## 0.5.0-dev.1
 - Development release.
 

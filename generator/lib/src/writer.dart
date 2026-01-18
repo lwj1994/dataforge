@@ -16,6 +16,9 @@ class GeneratorWriter {
 
   GeneratorWriter(this.result);
 
+  String _getPrefix(ClassInfo clazz) =>
+      clazz.dataforgePrefix != null ? '${clazz.dataforgePrefix}.' : '';
+
   /// Generate the complete code output
   String generate() {
     final buffer = StringBuffer();
@@ -140,14 +143,15 @@ class GeneratorWriter {
     buffer.writeln('  R call({');
     // Use Object? with sentinel default for all parameters
     for (final field in validFields) {
-      buffer.writeln('    Object? ${field.name} = dataforgeUndefined,');
+      buffer.writeln(
+          '    Object? ${field.name} = ${_getPrefix(clazz)}dataforgeUndefined,');
     }
     buffer.writeln('  }) {');
     buffer.writeln('    final res = ${clazz.name}$genericParams(');
     for (final field in validFields) {
       // Use sentinel check to distinguish null from omitted
       buffer.writeln(
-          '      ${field.name}: ${field.name} == dataforgeUndefined ? _instance.${field.name} : ${field.name} as ${field.type},');
+          '      ${field.name}: ${field.name} == ${_getPrefix(clazz)}dataforgeUndefined ? _instance.${field.name} : ${field.name} as ${field.type},');
     }
     buffer.writeln('    );');
     buffer.writeln('    return _then != null ? _then!(res) : res as R;');
@@ -369,10 +373,11 @@ class GeneratorWriter {
       if (customConverter != null && customConverter.isNotEmpty) {
         valueAccess = 'const $customConverter().toJson(${field.name})';
       } else if (field.isDateTime) {
-        valueAccess = 'const DefaultDateTimeConverter().toJson(${field.name})';
+        valueAccess =
+            'const ${_getPrefix(clazz)}DefaultDateTimeConverter().toJson(${field.name})';
       } else if (field.isEnum) {
         valueAccess =
-            'DefaultEnumConverter($cleanType.values).toJson(${field.name})';
+            '${_getPrefix(clazz)}DefaultEnumConverter($cleanType.values).toJson(${field.name})';
       } else {
         valueAccess = field.name;
       }
@@ -428,9 +433,11 @@ class GeneratorWriter {
         if (jsonKeyInfo == null ||
             (jsonKeyInfo.readValue.isEmpty &&
                 jsonKeyInfo.alternateNames.isEmpty)) {
-          conversion = "SafeCasteUtil.readValue<$cleanType>(json, '$jsonKey')";
+          conversion =
+              "${_getPrefix(clazz)}SafeCasteUtil.readValue<$cleanType>(json, '$jsonKey')";
         } else {
-          conversion = "SafeCasteUtil.safeCast<$cleanType>($valueExpression)";
+          conversion =
+              "${_getPrefix(clazz)}SafeCasteUtil.safeCast<$cleanType>($valueExpression)";
         }
 
         if (!isNullable) {
@@ -447,7 +454,7 @@ class GeneratorWriter {
         }
       } else if (field.isDateTime) {
         conversion =
-            "const DefaultDateTimeConverter().fromJson($valueExpression)";
+            "const ${_getPrefix(clazz)}DefaultDateTimeConverter().fromJson($valueExpression)";
         if (!isNullable) {
           final defaultValue = field.defaultValue.isNotEmpty
               ? ' ?? ${field.defaultValue}'
@@ -459,12 +466,14 @@ class GeneratorWriter {
         if (jsonKeyInfo == null ||
             (jsonKeyInfo.readValue.isEmpty &&
                 jsonKeyInfo.alternateNames.isEmpty)) {
-          stringValueExpr = "SafeCasteUtil.readValue<String>(json, '$jsonKey')";
+          stringValueExpr =
+              "${_getPrefix(clazz)}SafeCasteUtil.readValue<String>(json, '$jsonKey')";
         } else {
-          stringValueExpr = "SafeCasteUtil.safeCast<String>($valueExpression)";
+          stringValueExpr =
+              "${_getPrefix(clazz)}SafeCasteUtil.safeCast<String>($valueExpression)";
         }
         conversion =
-            "DefaultEnumConverter($cleanType.values).fromJson($stringValueExpr)";
+            "${_getPrefix(clazz)}DefaultEnumConverter($cleanType.values).fromJson($stringValueExpr)";
         if (!isNullable) {
           final defaultValue = field.defaultValue.isNotEmpty
               ? ' ?? ${field.defaultValue}'
