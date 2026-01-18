@@ -6,7 +6,7 @@ description: Workflow for publishing dataforge packages (annotation, generator) 
 # Publish Process
 
 1. 发布前保证 所有  test passed
-2. 保留 dependency_overrides: 
+2. 不要删除 dependency_overrides: 
 1. 先更新版本号。只改动 version: xxx 。其他的依赖版本不要改
 2. 始终保持   `dataforge_annotation:`  版本为空,
 2. 编写 changelog
