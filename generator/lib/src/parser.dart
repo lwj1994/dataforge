@@ -99,8 +99,7 @@ class GeneratorParser {
     final includeToJson = annotation.peek('includeToJson')?.boolValue ??
         annotation.peek('fromMap')?.boolValue ??
         true;
-    final chainedCopyWith =
-        annotation.peek('chainedCopyWith')?.boolValue ?? true;
+    final deepCopyWith = annotation.peek('deepCopyWith')?.boolValue ?? true;
 
     final className = element.name ?? '';
     final mixinName = name.isEmpty ? '_$className' : '_$name';
@@ -114,7 +113,7 @@ class GeneratorParser {
       fields: fields,
       includeFromJson: includeFromJson,
       includeToJson: includeToJson,
-      chainedCopyWith: chainedCopyWith,
+      deepCopyWith: deepCopyWith,
       genericParameters: genericParameters,
       dataforgePrefix: prefix,
     );

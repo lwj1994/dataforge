@@ -49,10 +49,9 @@ class ParseResult {
   final String partOf;
   final List<ClassInfo> classes;
   final List<ImportInfo> imports;
-  final String? primaryClassName;
 
-  ParseResult(this.outputPath, this.partOf, this.classes, this.imports,
-      {this.primaryClassName});
+  ParseResult(this.outputPath, this.partOf, this.classes,
+      [this.imports = const []]);
 
   @override
   String toString() {
@@ -87,9 +86,8 @@ class ClassInfo {
   final List<FieldInfo> fields;
   final bool includeFromJson;
   final bool includeToJson;
-  final bool deepCopyWith;
+  final bool chainedCopyWith;
   final List<GenericParameter> genericParameters;
-  final String? dataforgePrefix;
 
   const ClassInfo({
     required this.name,
@@ -98,8 +96,7 @@ class ClassInfo {
     this.includeFromJson = true,
     this.includeToJson = true,
     this.genericParameters = const [],
-    this.deepCopyWith = true,
-    this.dataforgePrefix,
+    this.chainedCopyWith = true,
   });
 
   ClassInfo copyWith({
@@ -109,8 +106,7 @@ class ClassInfo {
     bool? includeFromJson,
     bool? includeToJson,
     List<GenericParameter>? genericParameters,
-    bool? deepCopyWith,
-    String? dataforgePrefix,
+    bool? chainedCopyWith,
   }) {
     return ClassInfo(
       name: name ?? this.name,
@@ -119,8 +115,7 @@ class ClassInfo {
       includeFromJson: includeFromJson ?? this.includeFromJson,
       includeToJson: includeToJson ?? this.includeToJson,
       genericParameters: genericParameters ?? this.genericParameters,
-      deepCopyWith: deepCopyWith ?? this.deepCopyWith,
-      dataforgePrefix: dataforgePrefix ?? this.dataforgePrefix,
+      chainedCopyWith: chainedCopyWith ?? this.chainedCopyWith,
     );
   }
 
@@ -134,8 +129,7 @@ class ClassInfo {
       'genericParameters': genericParameters
           .map((x) => {'name': x.name, 'bound': x.bound})
           .toList(),
-      'deepCopyWith': deepCopyWith,
-      'dataforgePrefix': dataforgePrefix,
+      'chainedCopyWith': chainedCopyWith,
     };
   }
 
@@ -161,13 +155,13 @@ class ClassInfo {
                   : GenericParameter(e.toString()))
               .toList() ??
           [],
-      deepCopyWith: map['deepCopyWith'] as bool? ?? false,
+      chainedCopyWith: map['chainedCopyWith'] as bool? ?? false,
     );
   }
 
   @override
   String toString() {
-    return 'ClassInfo(name: $name, mixinName: $mixinName, fields: $fields, includeFromJson: $includeFromJson, includeToJson: $includeToJson, genericParameters: $genericParameters, deepCopyWith: $deepCopyWith)';
+    return 'ClassInfo(name: $name, mixinName: $mixinName, fields: $fields, includeFromJson: $includeFromJson, includeToJson: $includeToJson, genericParameters: $genericParameters, chainedCopyWith: $chainedCopyWith)';
   }
 
   @override
@@ -181,7 +175,7 @@ class ClassInfo {
         other.includeToJson == includeToJson &&
         const DeepCollectionEquality()
             .equals(other.genericParameters, genericParameters) &&
-        other.deepCopyWith == deepCopyWith;
+        other.chainedCopyWith == chainedCopyWith;
   }
 
   @override
@@ -192,7 +186,7 @@ class ClassInfo {
         includeFromJson,
         includeToJson,
         const DeepCollectionEquality().hash(genericParameters),
-        deepCopyWith,
+        chainedCopyWith,
       ]);
 }
 
@@ -204,9 +198,6 @@ class FieldInfo {
   final JsonKeyInfo? jsonKey;
   final bool isRecord;
   final String defaultValue;
-  final bool isEnum;
-  final bool isDataforge;
-  final bool isDateTime;
 
   const FieldInfo({
     required this.name,
@@ -216,9 +207,6 @@ class FieldInfo {
     this.jsonKey,
     required this.isRecord,
     required this.defaultValue,
-    this.isEnum = false,
-    this.isDataforge = false,
-    this.isDateTime = false,
   });
 
   FieldInfo copyWith({
@@ -229,8 +217,6 @@ class FieldInfo {
     JsonKeyInfo? jsonKey,
     bool? isRecord,
     String? defaultValue,
-    bool? isEnum,
-    bool? isDataforge,
   }) {
     return FieldInfo(
       name: name ?? this.name,
@@ -240,8 +226,6 @@ class FieldInfo {
       jsonKey: jsonKey ?? this.jsonKey,
       isRecord: isRecord ?? this.isRecord,
       defaultValue: defaultValue ?? this.defaultValue,
-      isEnum: isEnum ?? this.isEnum,
-      isDataforge: isDataforge ?? this.isDataforge,
     );
   }
 
@@ -254,8 +238,6 @@ class FieldInfo {
       'jsonKey': jsonKey?.toMap(),
       'isRecord': isRecord,
       'defaultValue': defaultValue,
-      'isEnum': isEnum,
-      'isDataforge': isDataforge,
     };
   }
 
@@ -270,14 +252,12 @@ class FieldInfo {
           : null,
       isRecord: map['isRecord'] as bool? ?? false,
       defaultValue: map['defaultValue'] as String? ?? '',
-      isEnum: map['isEnum'] as bool? ?? false,
-      isDataforge: map['isDataforge'] as bool? ?? false,
     );
   }
 
   @override
   String toString() {
-    return 'FieldInfo(name: $name, type: $type, isFinal: $isFinal, isFunction: $isFunction, jsonKey: $jsonKey, isRecord: $isRecord, defaultValue: $defaultValue, isEnum: $isEnum, isDataforge: $isDataforge)';
+    return 'FieldInfo(name: $name, type: $type, isFinal: $isFinal, isFunction: $isFunction, jsonKey: $jsonKey, isRecord: $isRecord, defaultValue: $defaultValue)';
   }
 
   @override
@@ -290,9 +270,7 @@ class FieldInfo {
         other.isFunction == isFunction &&
         other.jsonKey == jsonKey &&
         other.isRecord == isRecord &&
-        other.defaultValue == defaultValue &&
-        other.isEnum == isEnum &&
-        other.isDataforge == isDataforge;
+        other.defaultValue == defaultValue;
   }
 
   @override
@@ -304,7 +282,6 @@ class FieldInfo {
         jsonKey,
         isRecord,
         defaultValue,
-        isEnum,
       ]);
 }
 
@@ -315,6 +292,8 @@ class JsonKeyInfo {
   final bool ignore;
   final String converter;
   final bool? includeIfNull;
+  final String fromJson;
+  final String toJson;
 
   const JsonKeyInfo({
     required this.name,
@@ -323,6 +302,8 @@ class JsonKeyInfo {
     required this.ignore,
     this.converter = '',
     this.includeIfNull,
+    this.fromJson = '',
+    this.toJson = '',
   });
 
   JsonKeyInfo copyWith({
@@ -332,6 +313,8 @@ class JsonKeyInfo {
     bool? ignore,
     String? converter,
     bool? includeIfNull,
+    String? fromJson,
+    String? toJson,
   }) {
     return JsonKeyInfo(
       name: name ?? this.name,
@@ -340,6 +323,8 @@ class JsonKeyInfo {
       ignore: ignore ?? this.ignore,
       converter: converter ?? this.converter,
       includeIfNull: includeIfNull ?? this.includeIfNull,
+      fromJson: fromJson ?? this.fromJson,
+      toJson: toJson ?? this.toJson,
     );
   }
 
@@ -351,6 +336,8 @@ class JsonKeyInfo {
       'ignore': ignore,
       'converter': converter,
       'includeIfNull': includeIfNull,
+      'fromJson': fromJson,
+      'toJson': toJson,
     };
   }
 
@@ -365,12 +352,14 @@ class JsonKeyInfo {
       ignore: map['ignore'] as bool? ?? false,
       converter: map['converter'] as String? ?? '',
       includeIfNull: map['includeIfNull'] as bool?,
+      fromJson: map['fromJson'] as String? ?? '',
+      toJson: map['toJson'] as String? ?? '',
     );
   }
 
   @override
   String toString() {
-    return 'JsonKeyInfo(name: $name, alternateNames: $alternateNames, readValue: $readValue, ignore: $ignore, converter: $converter, includeIfNull: $includeIfNull)';
+    return 'JsonKeyInfo(name: $name, alternateNames: $alternateNames, readValue: $readValue, ignore: $ignore, converter: $converter, includeIfNull: $includeIfNull, fromJson: $fromJson, toJson: $toJson)';
   }
 
   @override
@@ -383,7 +372,9 @@ class JsonKeyInfo {
         other.readValue == readValue &&
         other.ignore == ignore &&
         other.converter == converter &&
-        other.includeIfNull == includeIfNull;
+        other.includeIfNull == includeIfNull &&
+        other.fromJson == fromJson &&
+        other.toJson == toJson;
   }
 
   @override
@@ -394,5 +385,7 @@ class JsonKeyInfo {
         ignore,
         converter,
         includeIfNull,
+        fromJson,
+        toJson,
       ]);
 }

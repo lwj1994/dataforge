@@ -1,0 +1,38 @@
+{
+  "name": "dataforge-runner",
+  "displayName": "DataForge Runner",
+  "description": "Right-click on a file to run the dataforge command.",
+  "version": "0.0.1",
+  "publisher": "local",
+  "engines": {
+    "vscode": "^1.80.0"
+  },
+  "activationEvents": [
+    "onCommand:dataforge.runOnFile"
+  ],
+  "main": "./extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "dataforge.runOnFile",
+        "title": "Run DataForge"
+      }
+    ],
+    "menus": {
+      "explorer/context": [
+        {
+          "when": "resourceExtname == .dart",
+          "command": "dataforge.runOnFile",
+          "group": "navigation"
+        }
+      ]
+    }
+  },
+  "scripts": {
+    "install-dependencies": "npm install"
+  },
+  "devDependencies": {
+    "@types/vscode": "^1.80.0",
+    "@vscode/test-electron": "^2.3.9"
+  }
+}

@@ -82,7 +82,7 @@ class GeneratorWriter {
       buffer.writeln();
 
       // Generate chained copyWith helper class if needed
-      if (clazz.chainedCopyWith) {
+      if (clazz.deepCopyWith) {
         _buildChainedCopyWithHelperClass(
             buffer, clazz, genericParams, validFields);
       }
@@ -94,7 +94,7 @@ class GeneratorWriter {
   /// Build copyWith method
   void _buildCopyWith(StringBuffer buffer, ClassInfo clazz,
       String genericParams, List<FieldInfo> validFields) {
-    if (clazz.chainedCopyWith) {
+    if (clazz.deepCopyWith) {
       // Chained copyWith style
       final genericArgs = genericParams.isEmpty
           ? '<${clazz.name}>'
@@ -176,7 +176,7 @@ class GeneratorWriter {
     }
 
     // Generate chained copyWith accessors (Flat Accessor Pattern)
-    if (clazz.chainedCopyWith) {
+    if (clazz.deepCopyWith) {
       _generateNestedFieldAccessors(
           buffer, clazz, genericParams, validFields, [], clazz);
     }
@@ -482,7 +482,7 @@ class GeneratorWriter {
         }
       } else if (cleanType.startsWith('List<')) {
         final innerType = cleanType.substring(5, cleanType.length - 1);
-        final innerTypeClean = innerType.replaceAll('?', '');
+        final innerTypeClean = innerType.replaceAll('?', '').trim();
         final isPrimitive = [
               'int',
               'double',
