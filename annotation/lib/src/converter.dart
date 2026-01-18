@@ -4,8 +4,10 @@
 ///
 /// Type converters are used to handle custom serialization/deserialization logic
 /// for specific field types that require special handling.
-abstract class TypeConverter<T, S> {
-  const TypeConverter();
+///
+///
+abstract class JsonTypeConverter<T, S> {
+  const JsonTypeConverter();
 
   /// Converts a JSON value [json] of type [S] to a Dart object of type [T].
   /// This method is called during deserialization (fromJson).
@@ -29,7 +31,7 @@ abstract class TypeConverter<T, S> {
 /// - If input is a number (13-digit milliseconds timestamp), uses DateTime.fromMillisecondsSinceEpoch
 /// - If input is a number with less than 13 digits, pads it to 13 digits
 /// - Otherwise tries to parse using DateTime.parse as fallback
-class DefaultDateTimeConverter extends TypeConverter<DateTime, String> {
+class DefaultDateTimeConverter extends JsonTypeConverter<DateTime, String> {
   const DefaultDateTimeConverter();
 
   @override
@@ -92,7 +94,8 @@ class DefaultDateTimeConverter extends TypeConverter<DateTime, String> {
 
 /// Built-in converter for Enum objects.
 /// Converts Enum to/from string using the enum name.
-class DefaultEnumConverter<T extends Enum> extends TypeConverter<T, String> {
+class DefaultEnumConverter<T extends Enum>
+    extends JsonTypeConverter<T, String> {
   final List<T> values;
 
   const DefaultEnumConverter(this.values);

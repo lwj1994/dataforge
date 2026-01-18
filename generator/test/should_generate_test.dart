@@ -1,5 +1,5 @@
 import 'dart:async';
-import 'package:dataforge_generator/src/dataforge_generator.dart';
+import 'package:dataforge/src/dataforge.dart';
 import 'package:path/path.dart' as p;
 import 'package:source_gen_test/source_gen_test.dart';
 

@@ -11,7 +11,7 @@ generator/
 ├── lib/
 │   ├── builder.dart                      # Builder 入口点
 │   └── src/
-│       ├── dataforge_generator.dart      # 主生成器类
+│       ├── dataforge.dart      # 主生成器类
 │       ├── parser.dart                   # Element 解析器
 │       ├── writer.dart                   # 代码生成器
 │       └── model.dart                    # 数据模型(从主包复制)
@@ -44,7 +44,7 @@ generator/
 
 ## 核心组件
 
-### 1. DataforgeGenerator (`dataforge_generator.dart`)
+### 1. DataforgeGenerator (`dataforge.dart`)
 - 继承自 `GeneratorForAnnotation<Dataforge>`
 - 扫描所有带 `@Dataforge` 注解的类
 - 协调 Parser 和 Writer
@@ -73,7 +73,7 @@ dependencies:
 
 dev_dependencies:
   build_runner: ^2.4.0
-  dataforge_generator: ^0.3.0
+  dataforge: ^0.3.0
 ```
 
 ### 代码示例

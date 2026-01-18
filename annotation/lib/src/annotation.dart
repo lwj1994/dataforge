@@ -10,14 +10,14 @@ class Dataforge {
   final bool? includeToJson;
 
   /// Enable chained copyWith syntax like object.copyWith.field(value)
-  final bool chainedCopyWith;
+  final bool deepCopyWith;
 
   const Dataforge({
     this.name = "",
     @Deprecated('Use includeFromJson and includeToJson instead') this.fromMap,
     this.includeFromJson,
     this.includeToJson,
-    this.chainedCopyWith = true,
+    this.deepCopyWith = true,
   });
 }
 
@@ -35,16 +35,8 @@ class JsonKey {
   final List<String> alternateNames;
   final bool ignore;
   final Object? Function(Map<dynamic, dynamic> map, String key)? readValue;
-  final TypeConverter? converter;
+  final JsonTypeConverter? converter;
   final bool? includeIfNull;
-
-  /// Custom function for deserializing field value from JSON
-  /// Similar to json_serializable's fromJson parameter
-  final Function? fromJson;
-
-  /// Custom function for serializing field value to JSON
-  /// Similar to json_serializable's toJson parameter
-  final Function? toJson;
 
   const JsonKey({
     this.name = "",
@@ -53,7 +45,13 @@ class JsonKey {
     this.ignore = false,
     this.converter,
     this.includeIfNull,
-    this.fromJson,
-    this.toJson,
   });
 }
+
+/// Sentinel value used by copyWith to distinguish between null and absent parameters.
+///
+/// When a parameter is not provided to copyWith, it defaults to this sentinel value,
+/// allowing the method to differentiate between:
+/// - Parameter not provided (use current value)
+/// - Parameter explicitly set to null (update to null)
+const Object dataforgeUndefined = Object();

@@ -1,8 +1,13 @@
+targets:
+  $default:
+    builders:
+      dataforge:dataforge:
+        enabled: true
+
 builders:
   dataforge:
-    import: "package:dataforge_generator/builder.dart"
+    import: "package:dataforge/builder.dart"
     builder_factories: ["dataforgeBuilder"]
     build_extensions: {".dart": [".data.dart"]}
     auto_apply: dependents
     build_to: source
-

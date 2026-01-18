@@ -64,9 +64,9 @@ void main() {
   );
   print('\nOriginal complex user: $complexUser');
 
-  // Test Flat Accessor CopyWith: updates sub-fields using flat methods
+  // Test Flat Accessor CopyWith: updates sub-fields using flat methods with $ separator
   final updatedComplexUser =
-      complexUser.copyWith.userName('Jane').copyWith.addressCity('Chicago');
+      complexUser.copyWith.user$name('Jane').copyWith.address$city('Chicago');
   print('Updated complex user (true chain): $updatedComplexUser');
 
   // Verify changes

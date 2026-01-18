@@ -220,8 +220,6 @@ class GeneratorParser {
       ignore: reader.peek('ignore')?.boolValue ?? false,
       converter: '', // Converter parsing not implemented yet
       includeIfNull: reader.peek('includeIfNull')?.boolValue,
-      fromJson: reader.peek('fromJson')?.revive().accessor ?? '',
-      toJson: reader.peek('toJson')?.revive().accessor ?? '',
     );
   }
 }

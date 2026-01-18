@@ -7,7 +7,7 @@ part 'example.data.dart';
 /// - If input is a number (13-digit milliseconds timestamp), uses DateTime.fromMillisecondsSinceEpoch
 /// - If input is a number with less than 13 digits, pads it to 13 digits
 /// - Otherwise tries to parse using DateTime.parse as fallback
-class MyDateTimeConverter extends TypeConverter<DateTime, String> {
+class MyDateTimeConverter extends JsonTypeConverter<DateTime, String> {
   const MyDateTimeConverter();
 
   @override
@@ -70,8 +70,10 @@ class MyDateTimeConverter extends TypeConverter<DateTime, String> {
 
 @Dataforge()
 class DateTimeExample with _DateTimeExample {
+  @override
   final DateTime? dateTime;
 
+  @override
   @JsonKey(converter: MyDateTimeConverter())
   final DateTime? dateTime2;
 
@@ -84,11 +86,14 @@ class DateTimeExample with _DateTimeExample {
       _DateTimeExample.fromJson(json);
 }
 
-/// Example user class using dataforge_generator
+/// Example user class using dataforge
 @Dataforge()
 class User with _User {
+  @override
   final String name;
+  @override
   final int age;
+  @override
   final String? email;
 
   User({
@@ -100,17 +105,38 @@ class User with _User {
   factory User.fromJson(Map<String, dynamic> json) => _User.fromJson(json);
 }
 
-/// Example with JsonKey annotations
+/// Example with nullable nested fields
+@Dataforge(deepCopyWith: true)
+class NullableComplexUser with _NullableComplexUser {
+  NullableComplexUser({
+    required this.user,
+    this.address,
+    required this.nickname,
+  });
+
+  @override
+  final User? user; // Nullable nested
+  @override
+  final Address? address; // Nullable nested
+  @override
+  final String nickname;
+}
+
+/// Product class example
 @Dataforge()
 class Product with _Product {
+  @override
   final String id;
 
+  @override
   @JsonKey(name: 'product_name')
   final String productName;
 
+  @override
   @JsonKey(name: 'unit_price')
   final double unitPrice;
 
+  @override
   @JsonKey(ignore: true)
   final DateTime? createdAt;
 
@@ -128,8 +154,11 @@ class Product with _Product {
 /// Example with generic parameters
 @Dataforge()
 class Result<T> with _Result<T> {
+  @override
   final T? data;
+  @override
   final String? error;
+  @override
   final bool success;
 
   Result({
@@ -142,10 +171,13 @@ class Result<T> with _Result<T> {
 }
 
 /// Example with chained copyWith
-@Dataforge(chainedCopyWith: true)
+@Dataforge(deepCopyWith: true)
 class Address with _Address {
+  @override
   final String street;
+  @override
   final String city;
+  @override
   final String country;
 
   Address({
@@ -159,10 +191,13 @@ class Address with _Address {
 }
 
 /// Example demonstrating Nested (Chained) CopyWith
-@Dataforge(chainedCopyWith: true)
+@Dataforge(deepCopyWith: true)
 class ComplexUser with _ComplexUser {
+  @override
   final User user;
+  @override
   final Address address;
+  @override
   final String nickname;
 
   ComplexUser({

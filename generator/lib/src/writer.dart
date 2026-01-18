@@ -138,13 +138,16 @@ class GeneratorWriter {
 
     buffer.writeln();
     buffer.writeln('  R call({');
+    // Use Object? with sentinel default for all parameters
     for (final field in validFields) {
-      _writeParameter(buffer, field);
+      buffer.writeln('    Object? ${field.name} = dataforgeUndefined,');
     }
     buffer.writeln('  }) {');
     buffer.writeln('    final res = ${clazz.name}$genericParams(');
     for (final field in validFields) {
-      _writeAssignment(buffer, field, '_instance');
+      // Use sentinel check to distinguish null from omitted
+      buffer.writeln(
+          '      ${field.name}: ${field.name} == dataforgeUndefined ? _instance.${field.name} : ${field.name} as ${field.type},');
     }
     buffer.writeln('    );');
     buffer.writeln('    return _then != null ? _then!(res) : res as R;');
@@ -154,7 +157,16 @@ class GeneratorWriter {
     // Generate single-field update methods
     for (final field in validFields) {
       buffer.writeln('  R ${field.name}(${field.type} value) {');
-      buffer.writeln('    return call(${field.name}: value);');
+      buffer.writeln('    final res = ${clazz.name}$genericParams(');
+      for (final f in validFields) {
+        if (f.name == field.name) {
+          buffer.writeln('      ${f.name}: value,');
+        } else {
+          buffer.writeln('      ${f.name}: _instance.${f.name},');
+        }
+      }
+      buffer.writeln('    );');
+      buffer.writeln('    return _then != null ? _then!(res) : res as R;');
       buffer.writeln('  }');
       buffer.writeln();
     }
@@ -208,11 +220,11 @@ class GeneratorWriter {
     return result.classes.firstWhereOrNull((c) => c.name == name);
   }
 
-  // Helper to build a combined field accessor name (e.g., userAddressStreet)
+  // Helper to build a combined field accessor name (e.g., user$address$street)
+  // Uses $ separator to avoid conflicts with existing property names
   String _buildFieldAccessorName(List<String> path) {
     if (path.isEmpty) return '';
-    return path.first +
-        path.skip(1).map((s) => s[0].toUpperCase() + s.substring(1)).join();
+    return path.join('\$');
   }
 
   // Helper to generate the nested copyWith chain for the call method
@@ -249,12 +261,11 @@ class GeneratorWriter {
     final isLast = index == path.length - 1;
 
     final access = '$currentAccess.$fieldName';
-    final throwExpr =
-        "throw StateError('Cannot update field $targetField when $fieldName is null')";
+    final safeAccess = field.type.endsWith('?') ? '$access!' : access;
 
     String nextValue;
     if (isLast) {
-      nextValue = '$access.copyWith($targetField: value)';
+      nextValue = '$safeAccess.copyWith($targetField: value)';
     } else {
       final nextClassName = field.type.replaceAll('?', '');
       final nextClass = _findClassByName(nextClassName);
@@ -266,11 +277,11 @@ class GeneratorWriter {
             path, targetField, access, nextClass, index + 1);
       }
       final nextFieldName = path[index + 1];
-      nextValue = '$access.copyWith($nextFieldName: $nextValue)';
+      nextValue = '$safeAccess.copyWith($nextFieldName: $nextValue)';
     }
 
     if (field.type.endsWith('?')) {
-      return '($access == null ? $throwExpr : $nextValue)';
+      return '($access == null ? $access : $nextValue)';
     } else {
       return nextValue;
     }
@@ -355,9 +366,7 @@ class GeneratorWriter {
       final jsonKeyInfo = field.jsonKey;
       final customConverter = jsonKeyInfo?.converter;
 
-      if (jsonKeyInfo != null && jsonKeyInfo.toJson.isNotEmpty) {
-        valueAccess = '${jsonKeyInfo.toJson}(${field.name})';
-      } else if (customConverter != null && customConverter.isNotEmpty) {
+      if (customConverter != null && customConverter.isNotEmpty) {
         valueAccess = 'const $customConverter().toJson(${field.name})';
       } else if (field.isDateTime) {
         valueAccess = 'const DefaultDateTimeConverter().toJson(${field.name})';
@@ -410,18 +419,20 @@ class GeneratorWriter {
       final customConverter = jsonKeyInfo?.converter;
 
       String conversion;
-      if (jsonKeyInfo != null && jsonKeyInfo.fromJson.isNotEmpty) {
-        conversion = "${jsonKeyInfo.fromJson}($valueExpression)";
-        if (!isNullable) {
-          conversion += ' as $cleanType';
-        }
-      } else if (customConverter != null && customConverter.isNotEmpty) {
+      if (customConverter != null && customConverter.isNotEmpty) {
         conversion = "const $customConverter().fromJson($valueExpression)";
         if (!isNullable) {
           conversion += ' as $cleanType';
         }
       } else if (['int', 'double', 'String', 'bool'].contains(cleanType)) {
-        conversion = "SafeCasteUtil.safeCast<$cleanType>($valueExpression)";
+        if (jsonKeyInfo == null ||
+            (jsonKeyInfo.readValue.isEmpty &&
+                jsonKeyInfo.alternateNames.isEmpty)) {
+          conversion = "SafeCasteUtil.readValue<$cleanType>(json, '$jsonKey')";
+        } else {
+          conversion = "SafeCasteUtil.safeCast<$cleanType>($valueExpression)";
+        }
+
         if (!isNullable) {
           final defaultValue = field.defaultValue.isNotEmpty
               ? field.defaultValue
@@ -444,8 +455,16 @@ class GeneratorWriter {
           conversion += defaultValue;
         }
       } else if (field.isEnum) {
+        String stringValueExpr;
+        if (jsonKeyInfo == null ||
+            (jsonKeyInfo.readValue.isEmpty &&
+                jsonKeyInfo.alternateNames.isEmpty)) {
+          stringValueExpr = "SafeCasteUtil.readValue<String>(json, '$jsonKey')";
+        } else {
+          stringValueExpr = "SafeCasteUtil.safeCast<String>($valueExpression)";
+        }
         conversion =
-            "DefaultEnumConverter($cleanType.values).fromJson(SafeCasteUtil.safeCast<String>($valueExpression))";
+            "DefaultEnumConverter($cleanType.values).fromJson($stringValueExpr)";
         if (!isNullable) {
           final defaultValue = field.defaultValue.isNotEmpty
               ? ' ?? ${field.defaultValue}'

@@ -1,6 +1,6 @@
-name: dataforge_generator
+name: dataforge
 description: Code generator for dataforge package using build_runner for data classes with JSON serialization.
-version: 0.3.0
+version: 0.5.0-dev.0
 homepage: https://github.com/your_username/dataforge
 repository: https://github.com/your_username/dataforge
 issue_tracker: https://github.com/your_username/dataforge/issues
@@ -12,9 +12,8 @@ environment:
 dependencies:
   build_config: ^1.1.0
   collection: ^1.17.0
-  dataforge_annotation: ^0.3.0
+  dataforge_annotation:
   path: ^1.7.0
-  test: ^1.26.3
   analyzer: ^8.1.1
   source_gen: ^4.0.0
   build: ^4.0.0
@@ -24,7 +23,7 @@ dev_dependencies:
   build_test: ^3.5.5
   lints: ^5.0.0
   source_gen_test: ^1.1.0
-
+  test: ^1.26.3
 dependency_overrides:
   dataforge_annotation:
     path: ../annotation
