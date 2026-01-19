@@ -198,6 +198,10 @@ class FieldInfo {
   final JsonKeyInfo? jsonKey;
   final bool isRecord;
   final String defaultValue;
+  final bool isEnum;
+  final bool isDataforge;
+  final bool isDateTime;
+  final bool isRequired;
 
   const FieldInfo({
     required this.name,
@@ -207,6 +211,10 @@ class FieldInfo {
     this.jsonKey,
     required this.isRecord,
     required this.defaultValue,
+    this.isEnum = false,
+    this.isDataforge = false,
+    this.isDateTime = false,
+    this.isRequired = false,
   });
 
   FieldInfo copyWith({
@@ -217,6 +225,10 @@ class FieldInfo {
     JsonKeyInfo? jsonKey,
     bool? isRecord,
     String? defaultValue,
+    bool? isEnum,
+    bool? isDataforge,
+    bool? isDateTime,
+    bool? isRequired,
   }) {
     return FieldInfo(
       name: name ?? this.name,
@@ -226,6 +238,10 @@ class FieldInfo {
       jsonKey: jsonKey ?? this.jsonKey,
       isRecord: isRecord ?? this.isRecord,
       defaultValue: defaultValue ?? this.defaultValue,
+      isEnum: isEnum ?? this.isEnum,
+      isDataforge: isDataforge ?? this.isDataforge,
+      isDateTime: isDateTime ?? this.isDateTime,
+      isRequired: isRequired ?? this.isRequired,
     );
   }
 
@@ -238,6 +254,10 @@ class FieldInfo {
       'jsonKey': jsonKey?.toMap(),
       'isRecord': isRecord,
       'defaultValue': defaultValue,
+      'isEnum': isEnum,
+      'isDataforge': isDataforge,
+      'isDateTime': isDateTime,
+      'isRequired': isRequired,
     };
   }
 
@@ -252,12 +272,16 @@ class FieldInfo {
           : null,
       isRecord: map['isRecord'] as bool? ?? false,
       defaultValue: map['defaultValue'] as String? ?? '',
+      isEnum: map['isEnum'] as bool? ?? false,
+      isDataforge: map['isDataforge'] as bool? ?? false,
+      isDateTime: map['isDateTime'] as bool? ?? false,
+      isRequired: map['isRequired'] as bool? ?? false,
     );
   }
 
   @override
   String toString() {
-    return 'FieldInfo(name: $name, type: $type, isFinal: $isFinal, isFunction: $isFunction, jsonKey: $jsonKey, isRecord: $isRecord, defaultValue: $defaultValue)';
+    return 'FieldInfo(name: $name, type: $type, isFinal: $isFinal, isFunction: $isFunction, jsonKey: $jsonKey, isRecord: $isRecord, defaultValue: $defaultValue, isEnum: $isEnum, isDataforge: $isDataforge, isDateTime: $isDateTime, isRequired: $isRequired)';
   }
 
   @override
@@ -270,7 +294,11 @@ class FieldInfo {
         other.isFunction == isFunction &&
         other.jsonKey == jsonKey &&
         other.isRecord == isRecord &&
-        other.defaultValue == defaultValue;
+        other.defaultValue == defaultValue &&
+        other.isEnum == isEnum &&
+        other.isDataforge == isDataforge &&
+        other.isDateTime == isDateTime &&
+        other.isRequired == isRequired;
   }
 
   @override
@@ -282,6 +310,10 @@ class FieldInfo {
         jsonKey,
         isRecord,
         defaultValue,
+        isEnum,
+        isDataforge,
+        isDateTime,
+        isRequired,
       ]);
 }
 

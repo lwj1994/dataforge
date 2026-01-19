@@ -1,5 +1,5 @@
-import 'package:collection/collection.dart';
 import 'package:dataforge_annotation/dataforge_annotation.dart';
+import 'package:collection/collection.dart';
 
 part 'datetime_types.model.data.dart';
 

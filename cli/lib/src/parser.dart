@@ -210,7 +210,8 @@ class Parser {
 
         // Method names are now fixed as 'fromJson' and 'toJson'
 
-        // Parse default values of constructor parameters
+        // Parse default values and required status of constructor parameters
+        final requiredParams = <String>{};
         for (final member
             in declaration.members.whereType<ConstructorDeclaration>()) {
           if (member.factoryKeyword == null) {
@@ -222,6 +223,15 @@ class Parser {
                 final defaultValue = parameter.defaultValue?.toSource();
                 if (paramName != null && defaultValue != null) {
                   defaultValueMap[paramName] = defaultValue;
+                }
+              }
+              // Check for required parameters
+              if (parameter is DefaultFormalParameter) {
+                if (parameter.requiredKeyword != null) {
+                  final paramName = parameter.name?.lexeme;
+                  if (paramName != null) {
+                    requiredParams.add(paramName);
+                  }
                 }
               }
             }
@@ -359,6 +369,10 @@ class Parser {
                   continue;
                 }
 
+                // Check if field type is DateTime
+                final cleanType = type.replaceAll('?', '');
+                final isDateTime = cleanType == 'DateTime';
+
                 fields.add(
                   FieldInfo(
                     name: name,
@@ -368,6 +382,8 @@ class Parser {
                     jsonKey: jsonKeyInfo,
                     isRecord: isRecord,
                     defaultValue: defaultValueMap[name] ?? "",
+                    isDateTime: isDateTime,
+                    isRequired: requiredParams.contains(name),
                   ),
                 );
               }

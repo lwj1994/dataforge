@@ -1,7 +1,5 @@
 import 'dart:io';
 
-import 'package:dataforge/src/util.dart';
-
 import 'model.dart';
 
 class Writer {
@@ -130,22 +128,6 @@ class Writer {
     }
 
     return buffer.toString();
-  }
-
-  /// Auto-match converter based on field type
-  /// Returns the appropriate converter name for common types
-  String? _getAutoMatchedConverter(String type) {
-    final cleanType = type.replaceAll('?', '');
-    switch (cleanType) {
-      case 'DateTime':
-        return 'DefaultDateTimeConverter';
-      default:
-        // Check if it's an enum type
-        if (_isEnumType(cleanType)) {
-          return 'DefaultEnumConverter';
-        }
-        return null;
-    }
   }
 
   /// Check if collection import exists in lines
@@ -916,87 +898,77 @@ class Writer {
   }
 
   void _buildEquality(StringBuffer buffer, ClassInfo clazz) {
+    final validFields = clazz.fields
+        .where((f) =>
+            f.name.isNotEmpty &&
+            f.type.isNotEmpty &&
+            f.type != 'dynamic' &&
+            !f.isFunction)
+        .toList();
+
     buffer.writeln('\n  @override');
     buffer.writeln('  bool operator ==(Object other) {');
     buffer.writeln('    if (identical(this, other)) return true;');
     buffer.writeln('    if (other is! ${clazz.name}) return false;');
+    buffer.writeln();
 
-    final validFields = clazz.fields
-        .where((f) =>
-            f.name.isNotEmpty && f.type.isNotEmpty && f.type != 'dynamic')
-        .toList();
-    if (validFields.isNotEmpty) {
-      buffer.writeln();
-      for (final field in validFields) {
-        final name = field.name;
-        final type = field.type;
-
-        if (field.isRecord || field.isFunction) {
-          buffer.writeln('    if ($name != other.$name) {');
-          buffer.writeln('      return false;');
-          buffer.writeln('    }');
-        } else if (type.isCollection()) {
-          buffer.writeln(
-            '    if (!DeepCollectionEquality().equals($name, other.$name)) {',
-          );
-          buffer.writeln('      return false;');
-          buffer.writeln('    }');
-        } else {
-          buffer.writeln('    if ($name != other.$name) {');
-          buffer.writeln('      return false;');
-          buffer.writeln('    }');
+    if (validFields.isEmpty) {
+      buffer.writeln('    return true;');
+    } else {
+      buffer.write('    return ');
+      for (int i = 0; i < validFields.length; i++) {
+        final field = validFields[i];
+        final isLast = i == validFields.length - 1;
+        buffer.write('other.${field.name} == ${field.name}');
+        if (!isLast) {
+          buffer.write(' && ');
         }
       }
+      buffer.writeln(';');
     }
-
-    buffer.writeln('    return true;');
     buffer.writeln('  }');
   }
 
   void _buildHashCode(StringBuffer buffer, ClassInfo clazz) {
-    buffer.writeln('\n  @override');
-    buffer.writeln('  int get hashCode {');
-
     final validFields = clazz.fields
         .where((f) =>
-            f.name.isNotEmpty && f.type.isNotEmpty && f.type != 'dynamic')
+            f.name.isNotEmpty &&
+            f.type.isNotEmpty &&
+            f.type != 'dynamic' &&
+            !f.isFunction)
         .toList();
-    if (validFields.isEmpty) {
-      buffer.writeln('    return runtimeType.hashCode;');
-    } else {
-      buffer.writeln('    return Object.hashAll([');
-      for (final field in validFields) {
-        final name = field.name;
-        final type = field.type;
 
-        if (type.isCollection()) {
-          buffer.writeln('      DeepCollectionEquality().hash($name),');
-        } else {
-          buffer.writeln('      $name,');
-        }
-      }
-      buffer.writeln('    ]);');
+    buffer.writeln('\n  @override');
+    buffer.writeln('  int get hashCode => Object.hashAll([');
+    for (final field in validFields) {
+      buffer.writeln('        ${field.name},');
     }
-
-    buffer.writeln('  }');
+    buffer.writeln('      ]);');
   }
 
   void _buildCopyWith(StringBuffer buffer, ClassInfo clazz) {
-    // Generate generic parameter string
+    // Generate generic parameter string with bounds for mixin declaration
     final genericParams = clazz.genericParameters.isNotEmpty
-        ? '<${clazz.genericParameters.map((p) => p.name).join(', ')}>'
+        ? '<${clazz.genericParameters.map((p) => p.toString()).join(', ')}>'
         : '';
 
     final validFields = clazz.fields
         .where((f) =>
-            f.name.isNotEmpty && f.type.isNotEmpty && f.type != 'dynamic')
+            f.name.isNotEmpty &&
+            f.type.isNotEmpty &&
+            f.type != 'dynamic' &&
+            !f.isFunction)
         .toList();
 
     if (clazz.deepCopyWith) {
-      // Generate chained copyWith getter and helper class
-      _buildChainedCopyWith(buffer, clazz, genericParams, validFields);
+      // Chained copyWith style
+      final genericArgs = genericParams.isEmpty
+          ? '<${clazz.name}>'
+          : genericParams.replaceFirst('>', ', ${clazz.name}$genericParams>');
+      buffer.writeln(
+          '\n  _${clazz.name}CopyWith$genericArgs get copyWith => _${clazz.name}CopyWith$genericArgs._(this);');
     } else {
-      // Generate traditional copyWith method
+      // Traditional copyWith style
       _buildTraditionalCopyWith(buffer, clazz, genericParams, validFields);
     }
   }
@@ -1007,12 +979,12 @@ class Writer {
     buffer.writeln('\n  ${clazz.name}$genericParams copyWith({');
 
     for (final field in validFields) {
-      final paramType = _generateCopyWithParameterType(field);
-      buffer.writeln('    $paramType ${field.name},');
+      final type = field.type.endsWith('?') ? field.type : '${field.type}?';
+      buffer.writeln('    $type ${field.name},');
     }
 
     buffer.writeln('  }) {');
-    buffer.writeln('    return ${clazz.name}$genericParams(');
+    buffer.writeln('    return ${clazz.name}(');
 
     for (final field in validFields) {
       buffer
@@ -1023,311 +995,125 @@ class Writer {
     buffer.writeln('  }');
   }
 
-  /// Build chained copyWith getter and helper class
-  void _buildChainedCopyWith(StringBuffer buffer, ClassInfo clazz,
-      String genericParams, List<FieldInfo> validFields) {
-    final copyWithClassName = '_${clazz.name}CopyWith$genericParams';
-
-    // Generate copyWith getter
-    buffer.writeln(
-        '\n  $copyWithClassName get copyWith => $copyWithClassName._(this);');
-  }
-
-  /// Check if a field is a nested object that supports copyWith
-  bool _isNestedCopyWithField(FieldInfo field) {
-    // Check if the field type is a custom class (not primitive types)
-    final baseType =
-        field.type.replaceAll('?', '').replaceAll(RegExp(r'<.*>'), '');
-    return !_isPrimitiveType(baseType) &&
-        !baseType.startsWith('List') &&
-        !baseType.startsWith('Map');
-  }
-
-  /// Get the nested type for copyWith operations
-  String _getNestedCopyWithType(FieldInfo field) {
-    // For nested copyWith, we need to preserve the full type including generics
-    // Only remove the nullable marker
-    return field.type.replaceAll('?', '');
-  }
-
-  /// Check if a type is primitive
-  bool _isPrimitiveType(String type) {
-    const primitiveTypes = {
-      'String',
-      'int',
-      'double',
-      'bool',
-      'num',
-      'Object',
-      'dynamic',
-      'DateTime',
-      'Duration',
-      'Uri',
-      'BigInt'
-    };
-    return primitiveTypes.contains(type);
-  }
-
   /// Build chained copyWith helper class (outside mixin)
   void _buildChainedCopyWithHelperClass(StringBuffer buffer, ClassInfo clazz,
       String genericParams, List<FieldInfo> validFields) {
-    final copyWithClassName = '_${clazz.name}CopyWith$genericParams';
+    final copyWithClassName = '_${clazz.name}CopyWith';
+    final returnType = 'R';
+    final genericParamsWithR = genericParams.isEmpty
+        ? '<$returnType>'
+        : genericParams.replaceFirst('>', ', $returnType>');
 
-    // Generate copyWith helper class
-    buffer.writeln('\n/// Helper class for chained copyWith operations');
-    buffer.writeln('class $copyWithClassName {');
+    buffer.writeln('class $copyWithClassName$genericParamsWithR {');
     buffer.writeln('  final _${clazz.name}$genericParams _instance;');
-    // Constructor name should not include generic parameters
-    final constructorName = clazz.genericParameters.isNotEmpty
-        ? '_${clazz.name}CopyWith._'
-        : '$copyWithClassName._';
-    buffer.writeln('  const $constructorName(this._instance);');
+    buffer.writeln(
+        '  final $returnType Function(${clazz.name}$genericParams)? _then;');
+    buffer.writeln('  $copyWithClassName._(this._instance, [this._then]);');
 
-    // Generate method for each field
+    buffer.writeln();
+    buffer.writeln('  R call({');
+    // Use Object? with sentinel default for all parameters
     for (final field in validFields) {
-      final paramType = _generateCopyWithParameterType(field);
-      buffer.writeln('\n  /// Update ${field.name} field');
       buffer.writeln(
-          '  ${clazz.name}$genericParams ${field.name}($paramType value) {');
-      buffer.writeln('    return ${clazz.name}$genericParams(');
+          '    Object? ${field.name} = ${_dataforgeAnnotationPrefix}dataforgeUndefined,');
+    }
+    buffer.writeln('  }) {');
+    buffer.writeln('    final res = ${clazz.name}$genericParams(');
+    for (final field in validFields) {
+      // Use sentinel check to distinguish null from omitted
+      buffer.writeln(
+          '      ${field.name}: ${field.name} == ${_dataforgeAnnotationPrefix}dataforgeUndefined ? _instance.${field.name} : ${field.name} as ${field.type},');
+    }
+    buffer.writeln('    );');
+    buffer.writeln('    return _then != null ? _then!(res) : res as R;');
+    buffer.writeln('  }');
+    buffer.writeln();
 
+    // Generate single-field update methods
+    for (final field in validFields) {
+      buffer.writeln('  R ${field.name}(${field.type} value) {');
+      buffer.writeln('    final res = ${clazz.name}$genericParams(');
       for (final f in validFields) {
         if (f.name == field.name) {
-          // For nullable fields, use value directly to allow setting null
-          if (field.type.endsWith('?')) {
-            buffer.writeln('      ${f.name}: value,');
-          } else {
-            buffer.writeln('      ${f.name}: value ?? _instance.${f.name},');
-          }
+          buffer.writeln('      ${f.name}: value,');
         } else {
           buffer.writeln('      ${f.name}: _instance.${f.name},');
         }
       }
-
       buffer.writeln('    );');
+      buffer.writeln('    return _then != null ? _then!(res) : res as R;');
       buffer.writeln('  }');
+      buffer.writeln();
     }
 
-    // Generate multi-level copyWith getters for nested objects
-    for (final field in validFields) {}
-
-    // Generate special $NestedType_fieldName getters for direct field access
-    _generateNestedFieldAccessors(
-        buffer, clazz, genericParams, validFields, []);
-
-    // Generate call method for traditional copyWith syntax
-    buffer.writeln('\n  /// Traditional copyWith method');
-    buffer.writeln('  ${clazz.name}$genericParams call({');
-
-    for (final field in validFields) {
-      final paramType = _generateCopyWithParameterType(field);
-      buffer.writeln('    $paramType ${field.name},');
+    // Generate chained copyWith accessors (Flat Accessor Pattern)
+    if (clazz.deepCopyWith) {
+      _generateNestedFieldAccessors(
+          buffer, clazz, genericParams, validFields, [], clazz);
     }
 
-    buffer.writeln('  }) {');
-    buffer.writeln('    return ${clazz.name}$genericParams(');
-
-    for (final field in validFields) {
-      buffer.writeln(
-          '      ${field.name}: ${field.name} ?? _instance.${field.name},');
-    }
-
-    buffer.writeln('    );');
-    buffer.writeln('  }');
-    buffer.writeln('}');
-
-    // Generate nested copyWith helper classes for complex object fields
-    // NOTE: Commented out as these classes are no longer used.
-    // Direct field accessors (e.g., customAddress$Street) are used instead.
-    /*
-    for (final field in validFields) {
-      if (_isNestedCopyWithField(field)) {
-        _buildNestedCopyWithHelperClass(
-            buffer, clazz, field, genericParams, validFields);
-      }
-    }
-    */
-  }
-
-  /// Build nested copyWith helper class for a specific field
-  void _buildNestedCopyWithHelperClass(
-      StringBuffer buffer,
-      ClassInfo parentClazz,
-      FieldInfo nestedField,
-      String genericParams,
-      List<FieldInfo> parentFields) {
-    final capitalizedFieldName =
-        nestedField.name[0].toUpperCase() + nestedField.name.substring(1);
-    final nestedType = _getNestedCopyWithType(nestedField);
-    final nestedCopyWithClassName =
-        '_${parentClazz.name}NestedCopyWith$capitalizedFieldName$genericParams';
-
-    buffer.writeln(
-        '\n/// Nested copyWith helper class for ${nestedField.name} field');
-    buffer.writeln('class $nestedCopyWithClassName {');
-    buffer.writeln('  final _${parentClazz.name}$genericParams _instance;');
-    // Constructor name should not include generic parameters
-    final nestedConstructorName = parentClazz.genericParameters.isNotEmpty
-        ? '_${parentClazz.name}NestedCopyWith$capitalizedFieldName._'
-        : '$nestedCopyWithClassName._';
-    buffer.writeln('  const $nestedConstructorName(this._instance);');
-
-    // Generate a method that takes a function to update the nested object
-    buffer.writeln(
-        '\n  /// Update ${nestedField.name} field using a copyWith function');
-    buffer.writeln(
-        '  ${parentClazz.name}$genericParams call($nestedType Function($nestedType) updater) {');
-    buffer.writeln('    final currentValue = _instance.${nestedField.name};');
-    if (nestedField.type.endsWith('?')) {
-      buffer.writeln(
-          '    if (currentValue == null) return _instance as ${parentClazz.name}$genericParams;');
-      buffer.writeln('    final updatedValue = updater(currentValue);');
-    } else {
-      buffer.writeln('    final updatedValue = updater(currentValue);');
-    }
-    buffer.writeln('    return ${parentClazz.name}$genericParams(');
-
-    for (final f in parentFields) {
-      if (f.name == nestedField.name) {
-        buffer.writeln('      ${f.name}: updatedValue,');
-      } else {
-        buffer.writeln('      ${f.name}: _instance.${f.name},');
-      }
-    }
-
-    buffer.writeln('    );');
-    buffer.writeln('  }');
     buffer.writeln('}');
   }
 
   void _buildToJson(StringBuffer buffer, ClassInfo clazz) {
     buffer.writeln('\n  Map<String, dynamic> toJson() {');
-    buffer.writeln('    final map = <String, dynamic>{};');
+    buffer.writeln('    return {');
 
     for (final field in clazz.fields) {
       if (field.jsonKey?.ignore == true ||
           field.name.isEmpty ||
           field.type.isEmpty ||
-          field.type == 'dynamic') {
+          field.type == 'dynamic' ||
+          field.isFunction) {
         continue;
       }
 
-      String key = field.name;
-      if (field.jsonKey?.name.isNotEmpty == true) {
-        key = field.jsonKey!.name;
-      }
+      final jsonKey = field.jsonKey?.name.isNotEmpty == true
+          ? field.jsonKey!.name
+          : field.name;
 
-      // Check for custom toJson function first
-      String valueExpression = field.name;
-      if (field.jsonKey?.toJson.isNotEmpty == true) {
-        final toJsonFunc = field.jsonKey!.toJson;
-        final isNullable = field.type.endsWith('?');
+      final cleanType = field.type.replaceAll('?', '');
+      final isNullable = field.type.endsWith('?');
+      String valueAccess;
+      final jsonKeyInfo = field.jsonKey;
+      final customToJson = jsonKeyInfo?.toJson;
+      final customConverter = jsonKeyInfo?.converter;
+
+      // Priority 1: Custom toJson function (highest priority)
+      if (customToJson != null && customToJson.isNotEmpty) {
         // Check if toJsonFunc needs class prefix (for static methods starting with _)
         final fullToJsonFunc =
-            toJsonFunc.startsWith('_') && !toJsonFunc.contains('.')
-                ? '${clazz.name}.$toJsonFunc'
-                : toJsonFunc;
+            customToJson.startsWith('_') && !customToJson.contains('.')
+                ? '${clazz.name}.$customToJson'
+                : customToJson;
         if (isNullable) {
-          valueExpression =
-              "${field.name} != null ? $fullToJsonFunc(${field.name}!) : null";
+          valueAccess =
+              '${field.name} != null ? $fullToJsonFunc(${field.name}!) : null';
         } else {
-          valueExpression = "$fullToJsonFunc(${field.name})";
-        }
-      } else {
-        // Check for explicit TypeConverter, then auto-match
-        String? converterName = field.jsonKey?.converter.isNotEmpty == true
-            ? field.jsonKey!.converter
-            : null;
-
-        // If no explicit converter, try to auto-match based on type
-        if (converterName == null || converterName.isEmpty) {
-          converterName = _getAutoMatchedConverter(field.type);
-        }
-
-        // If there is a TypeConverter (explicit or auto-matched), use converter's toJson method
-        if (converterName != null && converterName.isNotEmpty) {
-          // Check if converterName already contains parentheses, if so use directly, otherwise add parentheses
-          String converterInstance;
-          if (converterName.contains('(')) {
-            converterInstance = 'const $converterName';
-          } else {
-            // For DefaultEnumConverter, add values parameter
-            if (converterName == 'DefaultEnumConverter') {
-              final cleanType = field.type.replaceAll('?', '');
-              converterInstance =
-                  'const $_dataforgeAnnotationPrefix$converterName<$cleanType>($cleanType.values)';
-            } else {
-              converterInstance =
-                  'const $_dataforgeAnnotationPrefix$converterName()';
-            }
-          }
-          final isNullable = field.type.endsWith('?');
-          if (isNullable) {
-            valueExpression =
-                "${field.name} != null ? $converterInstance.toJson(${field.name}!) : null";
-          } else {
-            valueExpression = "$converterInstance.toJson(${field.name})";
-          }
-        } else {
-          // Handle complex types that contain enums
-          final cleanType = field.type.replaceAll('?', '');
-          final isNullable = field.type.endsWith('?');
-
-          if (cleanType.startsWith('List<')) {
-            // Extract item type from List<ItemType>
-            final listMatch = RegExp(r'List<(.+)>').firstMatch(cleanType);
-            if (listMatch != null) {
-              final itemType = listMatch.group(1)?.trim() ?? 'dynamic';
-              final cleanItemType = itemType.replaceAll('?', '');
-
-              if (_isEnumType(cleanItemType)) {
-                if (isNullable) {
-                  valueExpression =
-                      "${field.name}?.map((e) => const ${_dataforgeAnnotationPrefix}DefaultEnumConverter<$cleanItemType>($cleanItemType.values).toJson(e)).toList()";
-                } else {
-                  valueExpression =
-                      "${field.name}.map((e) => const ${_dataforgeAnnotationPrefix}DefaultEnumConverter<$cleanItemType>($cleanItemType.values).toJson(e)).toList()";
-                }
-              }
-            }
-          } else if (cleanType.startsWith('Map<')) {
-            // Extract key and value types from Map<KeyType, ValueType>
-            final mapMatch =
-                RegExp(r'Map<([^,]+),\s*(.+)>').firstMatch(cleanType);
-            if (mapMatch != null) {
-              final valueType = mapMatch.group(2)?.trim() ?? 'dynamic';
-              final cleanValueType = valueType.replaceAll('?', '');
-
-              if (_isEnumType(cleanValueType)) {
-                if (isNullable) {
-                  valueExpression =
-                      "${field.name}?.map((key, value) => MapEntry(key, const ${_dataforgeAnnotationPrefix}DefaultEnumConverter<$cleanValueType>($cleanValueType.values).toJson(value)))";
-                } else {
-                  valueExpression =
-                      "${field.name}.map((key, value) => MapEntry(key, const ${_dataforgeAnnotationPrefix}DefaultEnumConverter<$cleanValueType>($cleanValueType.values).toJson(value)))";
-                }
-              }
-            }
-          }
+          valueAccess = '$fullToJsonFunc(${field.name})';
         }
       }
-
-      // Handle includeIfNull parameter
-      final includeIfNull = field.jsonKey?.includeIfNull ?? false;
-      final isNullable = field.type.endsWith('?');
-
-      if (isNullable && !includeIfNull) {
-        // If field is nullable and includeIfNull is false, only add when non-null
-        buffer.writeln("    if (${field.name} != null) {");
-        buffer.writeln("      map['$key'] = $valueExpression;");
-        buffer.writeln("    }");
-      } else {
-        // Otherwise always add field
-        buffer.writeln("    map['$key'] = $valueExpression;");
+      // Priority 2: Custom converter
+      else if (customConverter != null && customConverter.isNotEmpty) {
+        valueAccess = 'const $customConverter().toJson(${field.name})';
       }
+      // Priority 3: Auto-matched converters (DateTime, Enum)
+      else if (field.isDateTime) {
+        valueAccess =
+            'const ${_dataforgeAnnotationPrefix}DefaultDateTimeConverter().toJson(${field.name})';
+      } else if (field.isEnum || _isEnumType(cleanType)) {
+        valueAccess =
+            '${_dataforgeAnnotationPrefix}DefaultEnumConverter($cleanType.values).toJson(${field.name})';
+      }
+      // Priority 4: Default (direct access)
+      else {
+        valueAccess = field.name;
+      }
+
+      buffer.writeln("      '$jsonKey': $valueAccess,");
     }
 
-    buffer.writeln('    return map;');
+    buffer.writeln('    };');
     buffer.writeln('  }');
   }
 
@@ -1407,807 +1193,234 @@ class Writer {
       if (field.jsonKey?.ignore == true ||
           field.name.isEmpty ||
           field.type.isEmpty ||
-          field.type == 'dynamic') {
+          field.type == 'dynamic' ||
+          field.isFunction) {
         continue;
       }
 
-      final jsonKeys = <String>[];
-      if (field.jsonKey?.name.isNotEmpty == true) {
-        jsonKeys.add(field.jsonKey!.name);
-      } else {
-        jsonKeys.add(field.name);
-      }
+      final jsonKey = field.jsonKey?.name.isNotEmpty == true
+          ? field.jsonKey!.name
+          : field.name;
 
-      if (field.jsonKey?.alternateNames.isNotEmpty == true) {
-        jsonKeys.addAll(field.jsonKey!.alternateNames);
-      }
+      final jsonKeyInfo = field.jsonKey;
 
-      String defaultValue = "";
-      // Use constructor parameter's defaultValue
-      if (field.defaultValue.isNotEmpty) {
-        defaultValue = " ?? ${field.defaultValue}";
-      }
-
-      // Build value extraction expression
       String valueExpression;
-      if (jsonKeys.length == 1) {
-        valueExpression = "map['${jsonKeys[0]}']";
+      if (jsonKeyInfo != null && jsonKeyInfo.readValue.isNotEmpty) {
+        final readValue = jsonKeyInfo.readValue;
+        final readValueCall =
+            readValue.startsWith('_') && !readValue.contains('.')
+                ? '${clazz.name}.$readValue(map, \'$jsonKey\')'
+                : '$readValue(map, \'$jsonKey\')';
+        valueExpression = readValueCall;
+      } else if (jsonKeyInfo != null && jsonKeyInfo.alternateNames.isNotEmpty) {
+        final allKeys = [jsonKey, ...jsonKeyInfo.alternateNames];
+        valueExpression = "(${allKeys.map((k) => "map['$k']").join(' ?? ')})";
       } else {
-        valueExpression =
-            '(${jsonKeys.map((key) => "map['$key']").join(' ?? ')})';
+        valueExpression = "map['$jsonKey']";
       }
 
-      // Check for custom fromJson function first
-      String getValueExpression;
-      if (field.jsonKey?.fromJson.isNotEmpty == true) {
-        final fromJsonFunc = field.jsonKey!.fromJson;
-        final isNullable = field.type.endsWith('?');
+      final cleanType = field.type.replaceAll('?', '');
+      final isNullable = field.type.endsWith('?');
+      final customFromJson = jsonKeyInfo?.fromJson;
+      final customConverter = jsonKeyInfo?.converter;
+
+      String conversion;
+      // Priority 1: Custom fromJson function (highest priority)
+      if (customFromJson != null && customFromJson.isNotEmpty) {
         // Check if fromJsonFunc needs class prefix (for static methods starting with _)
         final fullFromJsonFunc =
-            fromJsonFunc.startsWith('_') && !fromJsonFunc.contains('.')
-                ? '${clazz.name}.$fromJsonFunc'
-                : fromJsonFunc;
+            customFromJson.startsWith('_') && !customFromJson.contains('.')
+                ? '${clazz.name}.$customFromJson'
+                : customFromJson;
         if (isNullable) {
-          getValueExpression =
-              "$valueExpression != null ? $fullFromJsonFunc($valueExpression) : null$defaultValue";
+          conversion =
+              '$valueExpression != null ? $fullFromJsonFunc($valueExpression) : null';
         } else {
-          if (defaultValue.isNotEmpty) {
-            getValueExpression =
-                "$valueExpression != null ? $fullFromJsonFunc($valueExpression) : ${defaultValue.substring(4)}";
+          conversion = '$fullFromJsonFunc($valueExpression)';
+        }
+      }
+      // Priority 2: Custom converter
+      else if (customConverter != null && customConverter.isNotEmpty) {
+        if (jsonKeyInfo != null && jsonKeyInfo.readValue.isNotEmpty) {
+          // If readValue is used, check if the value is already the target type
+          // If so, return it directly. Otherwise, use the converter.
+          conversion =
+              "((dynamic v) => v is $cleanType ? v : const $customConverter().fromJson(v))($valueExpression)";
+        } else {
+          conversion = "const $customConverter().fromJson($valueExpression)";
+        }
+
+        if (!isNullable) {
+          conversion += ' as $cleanType';
+        }
+      } else if (['int', 'double', 'String', 'bool'].contains(cleanType)) {
+        bool usedRequired = false;
+        if (jsonKeyInfo == null ||
+            (jsonKeyInfo.readValue.isEmpty &&
+                jsonKeyInfo.alternateNames.isEmpty)) {
+          if (field.isRequired && !isNullable && field.defaultValue.isEmpty) {
+            conversion =
+                "${_getSafeCasteUtil()}.readRequiredValue<$cleanType>(map, '$jsonKey')";
+            usedRequired = true;
           } else {
-            getValueExpression = "$fullFromJsonFunc($valueExpression ?? {})";
+            conversion =
+                "${_getSafeCasteUtil()}.readValue<$cleanType>(map, '$jsonKey')";
+          }
+        } else {
+          conversion =
+              "${_getSafeCasteUtil()}.safeCast<$cleanType>($valueExpression)";
+        }
+
+        if (!isNullable && !usedRequired) {
+          final defaultValue = field.defaultValue.isNotEmpty
+              ? field.defaultValue
+              : ({
+                    'int': '0',
+                    'double': '0.0',
+                    'String': "''",
+                    'bool': 'false',
+                  }[cleanType] ??
+                  'null');
+          conversion += ' ?? $defaultValue';
+        }
+      } else if (field.isDateTime) {
+        conversion =
+            "const ${_dataforgeAnnotationPrefix}DefaultDateTimeConverter().fromJson($valueExpression)";
+        if (!isNullable) {
+          final defaultValue = field.defaultValue.isNotEmpty
+              ? ' ?? ${field.defaultValue}'
+              : ' ?? DateTime.fromMillisecondsSinceEpoch(0)';
+          conversion += defaultValue;
+        }
+      } else if (field.isEnum || _isEnumType(cleanType)) {
+        String stringValueExpr;
+        if (jsonKeyInfo == null ||
+            (jsonKeyInfo.readValue.isEmpty &&
+                jsonKeyInfo.alternateNames.isEmpty)) {
+          stringValueExpr =
+              "${_getSafeCasteUtil()}.readValue<String>(map, '$jsonKey')";
+        } else {
+          stringValueExpr =
+              "${_getSafeCasteUtil()}.safeCast<String>($valueExpression)";
+        }
+        conversion =
+            "${_dataforgeAnnotationPrefix}DefaultEnumConverter($cleanType.values).fromJson($stringValueExpr)";
+        if (!isNullable) {
+          final defaultValue = field.defaultValue.isNotEmpty
+              ? ' ?? ${field.defaultValue}'
+              : ' ?? $cleanType.values.first';
+          conversion += defaultValue;
+        }
+      } else if (cleanType.startsWith('List<')) {
+        final innerType = cleanType.substring(5, cleanType.length - 1);
+        final innerTypeClean = innerType.replaceAll('?', '').trim();
+        final isPrimitive = [
+              'int',
+              'double',
+              'num',
+              'String',
+              'bool',
+              'dynamic',
+              'Object',
+              'DateTime'
+            ].contains(innerTypeClean) ||
+            innerTypeClean.startsWith('Map<') ||
+            innerTypeClean.startsWith('List<');
+
+        if (isPrimitive) {
+          conversion =
+              "($valueExpression as List<dynamic>?)?.cast<$innerType>()";
+        } else {
+          if (innerType.endsWith('?')) {
+            conversion =
+                "($valueExpression as List<dynamic>?)?.map((e) => e == null ? null : $innerTypeClean.fromJson(e as Map<String, dynamic>)).toList()";
+          } else {
+            conversion =
+                "($valueExpression as List<dynamic>?)?.map((e) => $innerTypeClean.fromJson(e as Map<String, dynamic>)).toList()";
           }
         }
-      } else if (field.jsonKey?.readValue.isNotEmpty == true) {
-        // Use the cached readValue result to avoid duplicate calls
-        final cachedVarName = '${field.name}ReadValue';
-        valueExpression = cachedVarName;
 
-        // For fields with readValue, apply safe type conversion for basic types
-        // But for generic classes, need special handling for type parameters
-        if (clazz.genericParameters.isNotEmpty &&
-            RegExp(r'^[A-Z]\??$').hasMatch(field.type)) {
-          // Convert generic type parameters to dynamic
-          if (field.type.endsWith('?')) {
-            getValueExpression = "$valueExpression as dynamic$defaultValue";
-          } else {
-            getValueExpression =
-                "($valueExpression ?? ${_getDefaultValueForType('dynamic')}) as dynamic$defaultValue";
-          }
+        if (!isNullable) {
+          conversion += field.defaultValue.isNotEmpty
+              ? ' ?? ${field.defaultValue}'
+              : ' ?? []';
+        }
+      } else if (cleanType.startsWith('Map<')) {
+        conversion = "$valueExpression as Map<String, dynamic>?";
+        if (!isNullable && field.defaultValue.isNotEmpty) {
+          conversion += ' ?? ${field.defaultValue}';
+        }
+      } else if (field.isDataforge || _hasFromJsonMethod(cleanType)) {
+        String baseExpression;
+        bool usedRequired = false;
+
+        if (jsonKeyInfo != null && jsonKeyInfo.readValue.isNotEmpty) {
+          final valParam = 'v';
+          final castExpression = (isNullable || field.defaultValue.isNotEmpty)
+              ? 'as $cleanType?'
+              : 'as $cleanType';
+
+          baseExpression =
+              "((dynamic $valParam) { if ($valParam is $cleanType) return $valParam; if ($valParam is Map<String, dynamic>) return $cleanType.fromJson($valParam); return $valParam $castExpression; })($valueExpression)";
         } else {
-          // For fields with readValue, use safe type conversion for basic types
-          // The readValue method returns Object?, so we need to safely convert it
+          if (jsonKeyInfo == null ||
+              (jsonKeyInfo.readValue.isEmpty &&
+                  jsonKeyInfo.alternateNames.isEmpty)) {
+            if (field.isRequired && !isNullable && field.defaultValue.isEmpty) {
+              baseExpression =
+                  "${_getSafeCasteUtil()}.readRequiredObject(map, '$jsonKey', $cleanType.fromJson)";
+              usedRequired = true;
+            } else {
+              baseExpression =
+                  "${_getSafeCasteUtil()}.readObject(map, '$jsonKey', $cleanType.fromJson)";
+            }
+          } else {
+            baseExpression =
+                "${_getSafeCasteUtil()}.parseObject($valueExpression, $cleanType.fromJson)";
+          }
+        }
 
-          getValueExpression = _generateSafeReadValueExpression(
-              field, valueExpression, defaultValue);
+        conversion = baseExpression;
+        if (!isNullable && !usedRequired) {
+          if (field.defaultValue.isNotEmpty) {
+            conversion = "($baseExpression) ?? ${field.defaultValue}";
+          } else {
+            conversion = "($baseExpression)!";
+          }
         }
       } else {
-        getValueExpression = _generateFromMapExpression(
-            field, valueExpression, defaultValue, clazz);
+        conversion = "$valueExpression";
+        if (!isNullable && field.defaultValue.isNotEmpty) {
+          conversion += ' ?? ${field.defaultValue}';
+        }
       }
 
-      buffer.writeln("      ${field.name}: $getValueExpression,");
+      buffer.writeln("      ${field.name}: $conversion,");
     }
   }
 
-  String _generateFromMapExpression(
-      FieldInfo field, String valueExpression, String defaultValue,
-      [ClassInfo? clazz]) {
-    final type = field.type.replaceAll('?', '');
-    final isNullable = field.type.endsWith('?');
-
-    // Check for explicit TypeConverter first
-    String? converterName = field.jsonKey?.converter.isNotEmpty == true
-        ? field.jsonKey!.converter
-        : null;
-
-    // If no explicit converter, try to auto-match based on type
-    if (converterName == null || converterName.isEmpty) {
-      converterName = _getAutoMatchedConverter(field.type);
-    }
-
-    // If there is a TypeConverter (explicit or auto-matched), use converter's fromJson method
-    if (converterName != null && converterName.isNotEmpty) {
-      // Check if converterName already contains parentheses, if so use directly, otherwise add parentheses
-      String converterInstance;
-      if (converterName.contains('(')) {
-        converterInstance = 'const $converterName';
-      } else {
-        // For DefaultEnumConverter and EnumIndexConverter, add generic type parameter and values
-        if (converterName == 'DefaultEnumConverter') {
-          converterInstance =
-              'const $_dataforgeAnnotationPrefix$converterName<$type>($type.values)';
-        } else {
-          converterInstance =
-              'const $_dataforgeAnnotationPrefix$converterName()';
-        }
-      }
-
-      // If readValue is used, need to perform type conversion on return value
-      final hasReadValue = field.jsonKey?.readValue.isNotEmpty == true;
-      final convertedValueExpression =
-          hasReadValue ? "($valueExpression as dynamic)" : valueExpression;
-
-      // For all converters, add type cast to ensure type safety when field is not nullable
-      if (isNullable) {
-        return "$convertedValueExpression != null ? $converterInstance.fromJson($convertedValueExpression) : null$defaultValue";
-      } else {
-        if (defaultValue.isNotEmpty) {
-          // If there is defaultValue, use defaultValue directly when field is missing, otherwise use converter to convert actual value
-          return "$convertedValueExpression != null ? $converterInstance.fromJson($convertedValueExpression) as $type : ${defaultValue.substring(4)}";
-        } else {
-          // For required fields, if there is no defaultValue, need to throw exception or provide reasonable handling
-          return "$convertedValueExpression != null ? $converterInstance.fromJson($convertedValueExpression) as $type : throw ArgumentError('Required field ${field.name} is missing')";
-        }
-      }
-    }
-
-    try {
-      switch (type) {
-        case 'DateTime':
-          if (isNullable) {
-            return "$valueExpression != null ? DateTime.tryParse($valueExpression.toString())$defaultValue : null";
-          } else {
-            return "DateTime.parse(($valueExpression ?? '').toString())$defaultValue";
-          }
-        case 'Uri':
-          if (isNullable) {
-            return "$valueExpression != null ? Uri.tryParse($valueExpression.toString())$defaultValue : null";
-          } else {
-            return "Uri.parse(($valueExpression ?? '').toString())$defaultValue";
-          }
-        case 'Duration':
-          if (isNullable) {
-            return "$valueExpression != null ? Duration(milliseconds: $valueExpression as int? ?? 0)$defaultValue : null";
-          } else {
-            return "Duration(milliseconds: ($valueExpression as int? ?? 0))$defaultValue";
-          }
-        case 'String':
-          if (isNullable) {
-            return "${_getSafeCasteUtil()}.safeCast<String>($valueExpression)$defaultValue";
-          } else {
-            if (defaultValue.isNotEmpty) {
-              return "${_getSafeCasteUtil()}.safeCast<String>($valueExpression)$defaultValue";
-            } else {
-              return "${_getSafeCasteUtil()}.safeCast<String>($valueExpression) ?? \"\"";
-            }
-          }
-        case 'bool':
-          if (isNullable) {
-            return "${_getSafeCasteUtil()}.safeCast<bool>($valueExpression)$defaultValue";
-          } else {
-            if (defaultValue.isNotEmpty) {
-              return "${_getSafeCasteUtil()}.safeCast<bool>($valueExpression)$defaultValue";
-            } else {
-              return "${_getSafeCasteUtil()}.safeCast<bool>($valueExpression) ?? false";
-            }
-          }
-        case 'int':
-          if (isNullable) {
-            return "${_getSafeCasteUtil()}.safeCast<int>($valueExpression)$defaultValue";
-          } else {
-            if (defaultValue.isNotEmpty) {
-              return "${_getSafeCasteUtil()}.safeCast<int>($valueExpression)$defaultValue";
-            } else {
-              return "${_getSafeCasteUtil()}.safeCast<int>($valueExpression) ?? 0";
-            }
-          }
-        case 'double':
-          if (isNullable) {
-            return "${_getSafeCasteUtil()}.safeCast<double>($valueExpression)$defaultValue";
-          } else {
-            if (defaultValue.isNotEmpty) {
-              return "${_getSafeCasteUtil()}.safeCast<double>($valueExpression)$defaultValue";
-            } else {
-              return "${_getSafeCasteUtil()}.safeCast<double>($valueExpression) ?? 0.0";
-            }
-          }
-        case 'num':
-          if (isNullable) {
-            return "$valueExpression != null ? num.tryParse($valueExpression.toString())$defaultValue : null";
-          } else {
-            if (defaultValue.isNotEmpty) {
-              return "num.tryParse(($valueExpression)?.toString() ?? '')$defaultValue";
-            } else {
-              return "num.tryParse(($valueExpression)?.toString() ?? '') ?? 0";
-            }
-          }
-        default:
-          return _generateDefaultFromMapExpression(
-              field, valueExpression, defaultValue, clazz);
-      }
-    } catch (e) {
-      // Re-throw ArgumentError for readValue type restrictions
-      if (e is ArgumentError) {
-        rethrow;
-      }
-      print(
-          'Warning: Error generating fromMap expression for ${field.name}: $e');
-      return "$valueExpression$defaultValue";
-    }
-  }
-
-  String _generateDefaultFromMapExpression(
-      FieldInfo field, String valueExpression, String defaultValue,
-      [ClassInfo? clazz]) {
-    final type = field.type;
-    final isNullable = type.endsWith('?');
-    final cleanType = type.replaceAll('?', '');
-
-    // Check if this is a generic parameter
-    if (clazz != null &&
-        clazz.genericParameters.any((p) => p.name == cleanType)) {
-      // For generic parameters, cast directly without fromJson
-      if (isNullable) {
-        return "$valueExpression as $cleanType?$defaultValue";
-      } else {
-        return "$valueExpression as $cleanType$defaultValue";
-      }
-    }
-
-    try {
-      if (type.isList()) {
-        final genericMatch = RegExp(r'List<(.+)>').firstMatch(type);
-        if (genericMatch != null) {
-          String itemType = genericMatch.group(1)!.replaceAll('?', '');
-
-          if (itemType == 'Map<String, dynamic>' ||
-              itemType.isMap() ||
-              itemType.startsWith('Map<')) {
-            if (isNullable) {
-              return "($valueExpression as List<dynamic>?)?.cast<$itemType>()$defaultValue";
-            } else {
-              if (defaultValue.isNotEmpty) {
-                return "($valueExpression as List<dynamic>?)?.cast<$itemType>()$defaultValue";
-              } else {
-                return "($valueExpression as List<dynamic>?)?.cast<$itemType>() ?? []";
-              }
-            }
-          } else if (itemType == "String") {
-            // Handle alternateNames properly for List<String>
-            if (field.jsonKey?.alternateNames.isNotEmpty == true) {
-              final jsonKeys = <String>[];
-              if (field.jsonKey!.name.isNotEmpty) {
-                jsonKeys.add(field.jsonKey!.name);
-              } else {
-                jsonKeys.add(field.name);
-              }
-              jsonKeys.addAll(field.jsonKey!.alternateNames);
-              final expressions = jsonKeys
-                  .map((key) => "(map['$key'] as List<dynamic>?)")
-                  .join(' ?? ');
-              if (isNullable) {
-                return "($expressions)?.map((e) => e.toString()).toList()$defaultValue";
-              } else {
-                if (defaultValue.isNotEmpty) {
-                  return "($expressions)?.map((e) => e.toString()).toList()$defaultValue";
-                } else {
-                  return "(($expressions) ?? []).map((e) => e.toString()).toList()";
-                }
-              }
-            } else {
-              if (isNullable) {
-                return "($valueExpression as List<dynamic>?)?.map((e) => e.toString()).toList()$defaultValue";
-              } else {
-                if (defaultValue.isNotEmpty) {
-                  return "($valueExpression as List<dynamic>?)?.map((e) => e.toString()).toList()$defaultValue";
-                } else {
-                  return "(($valueExpression as List<dynamic>?) ?? []).map((e) => e.toString()).toList()";
-                }
-              }
-            }
-          } else if (itemType == 'int') {
-            if (isNullable) {
-              return "($valueExpression as List<dynamic>?)?.map((e) => int.tryParse(e.toString()) ?? 0).toList()$defaultValue";
-            } else {
-              if (defaultValue.isNotEmpty) {
-                return "($valueExpression as List<dynamic>?)?.map((e) => int.tryParse(e.toString()) ?? 0).toList()$defaultValue";
-              } else {
-                return "(($valueExpression as List<dynamic>?) ?? []).map((e) => int.tryParse(e.toString()) ?? 0).toList()";
-              }
-            }
-          } else if (itemType == 'double') {
-            if (isNullable) {
-              return "($valueExpression as List<dynamic>?)?.map((e) => double.tryParse(e.toString()) ?? 0.0).toList()$defaultValue";
-            } else {
-              if (defaultValue.isNotEmpty) {
-                return "($valueExpression as List<dynamic>?)?.map((e) => double.tryParse(e.toString()) ?? 0.0).toList()$defaultValue";
-              } else {
-                return "(($valueExpression as List<dynamic>?) ?? []).map((e) => double.tryParse(e.toString()) ?? 0.0).toList()";
-              }
-            }
-          } else if (itemType == 'bool') {
-            if (isNullable) {
-              return "($valueExpression as List<dynamic>?)?.map((e) => e as bool? ?? false).toList()$defaultValue";
-            } else {
-              if (defaultValue.isNotEmpty) {
-                return "($valueExpression as List<dynamic>?)?.map((e) => e as bool? ?? false).toList()$defaultValue";
-              } else {
-                return "(($valueExpression as List<dynamic>?) ?? []).map((e) => e as bool? ?? false).toList()";
-              }
-            }
-          } else if (['DateTime', 'Uri', 'Duration'].contains(itemType)) {
-            // Built-in types, convert directly
-            if (isNullable) {
-              return "($valueExpression as List<dynamic>?)?.cast<$itemType>()$defaultValue";
-            } else {
-              if (defaultValue.isNotEmpty) {
-                return "($valueExpression as List<dynamic>?)?.cast<$itemType>()$defaultValue";
-              } else {
-                return "($valueExpression as List<dynamic>?)?.cast<$itemType>() ?? []";
-              }
-            }
-          } else {
-            // Custom types - use static method
-            final cleanItemType =
-                _removeGenericParameters(itemType); // Remove generic parameters
-
-            // Check if itemType contains generic parameters
-            final castType =
-                RegExp(r'\b[A-Z]\b').hasMatch(itemType) ? 'dynamic' : itemType;
-
-            // Check if it's a single generic type parameter (like T, U, etc.)
-            if (RegExp(r'^[A-Z]$').hasMatch(cleanItemType)) {
-              // For single generic type parameters, cast to the generic type
-              if (isNullable) {
-                return "($valueExpression as List<dynamic>?)?.cast<$cleanItemType>()$defaultValue";
-              } else {
-                if (defaultValue.isNotEmpty) {
-                  return "($valueExpression as List<dynamic>?)?.cast<$cleanItemType>()$defaultValue";
-                } else {
-                  return "($valueExpression as List<dynamic>?)?.cast<$cleanItemType>() ?? []";
-                }
-              }
-            }
-
-            // Check if it's an enum type
-            if (_isEnumType(cleanItemType)) {
-              // Enum type, use DefaultEnumConverter
-              if (isNullable) {
-                return "($valueExpression as List<dynamic>?)?.map((e) => const ${_dataforgeAnnotationPrefix}DefaultEnumConverter<$cleanItemType>($cleanItemType.values).fromJson(e)).toList()?.cast<$castType>()$defaultValue";
-              } else {
-                if (defaultValue.isNotEmpty) {
-                  return "($valueExpression as List<dynamic>?)?.map((e) => const ${_dataforgeAnnotationPrefix}DefaultEnumConverter<$cleanItemType>($cleanItemType.values).fromJson(e)).toList()?.cast<$castType>()$defaultValue";
-                } else {
-                  return "($valueExpression as List<dynamic>?)?.map((e) => const ${_dataforgeAnnotationPrefix}DefaultEnumConverter<$cleanItemType>($cleanItemType.values).fromJson(e)).toList()?.cast<$castType>() ?? []";
-                }
-              }
-            } else {
-              // Custom type, use fromJson
-              if (isNullable) {
-                return "($valueExpression as List<dynamic>?)?.map((e) => $cleanItemType.fromJson(e as Map<String, dynamic>)).toList()?.cast<$castType>()$defaultValue";
-              } else {
-                // Non-null List type
-                if (defaultValue.isNotEmpty) {
-                  return "($valueExpression as List<dynamic>?)?.map((e) => $cleanItemType.fromJson(e as Map<String, dynamic>)).toList()?.cast<$castType>()$defaultValue";
-                } else {
-                  return "($valueExpression as List<dynamic>?)?.map((e) => $cleanItemType.fromJson(e as Map<String, dynamic>)).toList()?.cast<$castType>() ?? []";
-                }
-              }
-            }
-          }
-        }
-      } else if (type.isMap()) {
-        // Extract Map key and value types
-        final mapMatch = RegExp(r'Map<([^,]+),\s*(.+)>').firstMatch(type);
-        if (mapMatch != null) {
-          final keyType = mapMatch.group(1)?.trim() ?? 'String';
-          final valueType = mapMatch.group(2)?.trim() ?? 'dynamic';
-          final cleanValueType = valueType.replaceAll('?', '');
-
-          // Check if valueType is a single generic parameter (like T, U, etc.)
-          if (RegExp(r'^[A-Z]$').hasMatch(cleanValueType)) {
-            // For generic type parameters, use direct cast to avoid fromJson calls
-            if (isNullable) {
-              return "($valueExpression as Map<dynamic, dynamic>?)?.map((key, value) => MapEntry(key as $keyType, value as $valueType))$defaultValue";
-            } else {
-              return "(($valueExpression as Map<dynamic, dynamic>?) ?? {}).map((key, value) => MapEntry(key as $keyType, value as $valueType))$defaultValue";
-            }
-          } else if (![
-                'String',
-                'int',
-                'double',
-                'bool',
-                'DateTime',
-                'Uri',
-                'Duration',
-                'dynamic'
-              ].contains(cleanValueType) &&
-              !cleanValueType.startsWith('Map<')) {
-            // Check if it's an enum type
-            if (_isEnumType(cleanValueType)) {
-              // Enum type, use DefaultEnumConverter
-              if (isNullable) {
-                return "($valueExpression as Map<String, dynamic>?)?.map((key, value) => MapEntry(key, const ${_dataforgeAnnotationPrefix}DefaultEnumConverter<$cleanValueType>($cleanValueType.values).fromJson(value)!))$defaultValue";
-              } else {
-                return "($valueExpression as Map<String, dynamic>?)?.map((key, value) => MapEntry(key, const ${_dataforgeAnnotationPrefix}DefaultEnumConverter<$cleanValueType>($cleanValueType.values).fromJson(value)!)) ?? {}$defaultValue";
-              }
-            } else {
-              // Check if valueType is a List type
-              if (valueType.startsWith('List<')) {
-                final listItemType = valueType
-                    .substring(5, valueType.length - 1)
-                    .replaceAll('?', '');
-                final cleanListItemType = _removeGenericParameters(
-                    listItemType); // Remove generic parameters
-
-                // Check if it's a built-in type list
-                if (['String', 'int', 'double', 'bool']
-                    .contains(cleanListItemType)) {
-                  if (isNullable) {
-                    return "($valueExpression as Map<String, dynamic>?)?.map((key, value) => MapEntry(key, (value as List<dynamic>).cast<$cleanListItemType>()))$defaultValue";
-                  } else {
-                    return "($valueExpression as Map<String, dynamic>?)?.map((key, value) => MapEntry(key, (value as List<dynamic>).cast<$cleanListItemType>())) ?? {}$defaultValue";
-                  }
-                } else {
-                  // Custom type list
-                  if (isNullable) {
-                    return "($valueExpression as Map<String, dynamic>?)?.map((key, value) => MapEntry(key, (value as List<dynamic>).map((item) => $cleanListItemType.fromJson(item as Map<String, dynamic>)).toList()))$defaultValue";
-                  } else {
-                    return "($valueExpression as Map<String, dynamic>?)?.map((key, value) => MapEntry(key, (value as List<dynamic>).map((item) => $cleanListItemType.fromJson(item as Map<String, dynamic>)).toList())) ?? {}$defaultValue";
-                  }
-                }
-              } else {
-                // Custom type, need fromJson conversion
-                if (isNullable) {
-                  return "($valueExpression as Map<String, dynamic>?)?.map((key, value) => MapEntry(key, $cleanValueType.fromJson(value as Map<String, dynamic>)))$defaultValue";
-                } else {
-                  return "($valueExpression as Map<String, dynamic>?)?.map((key, value) => MapEntry(key, $cleanValueType.fromJson(value as Map<String, dynamic>))) ?? {}$defaultValue";
-                }
-              }
-            }
-          } else {
-            // Built-in types, direct cast
-            if (isNullable) {
-              return "($valueExpression as Map<$keyType, $valueType>?)$defaultValue";
-            } else {
-              return "($valueExpression as Map<$keyType, $valueType>?) ?? {}$defaultValue";
-            }
-          }
-        } else {
-          // Fallback for unmatched Map types
-          if (isNullable) {
-            return "($valueExpression as Map<dynamic, dynamic>?)$defaultValue";
-          } else {
-            return "($valueExpression as Map<dynamic, dynamic>?) ?? {}$defaultValue";
-          }
-        }
-      } else if (type.startsWith('List<') && type.contains('Map<')) {
-        // List<Map<...>> type handling
-        final itemType = type.substring(5, type.length - 1).replaceAll('?', '');
-        if (isNullable) {
-          return "($valueExpression as List<dynamic>?)?.cast<$itemType>()$defaultValue";
-        } else {
-          return "(($valueExpression as List<dynamic>?) ?? []).cast<$itemType>()$defaultValue";
-        }
-      } else if (type.startsWith('List<')) {
-        // List<T> type handling
-        final itemType = type.substring(5, type.length - 1).replaceAll('?', '');
-
-        // Check if it's a built-in type
-        if (['DateTime', 'Uri', 'Duration', 'String', 'int', 'double', 'bool']
-            .contains(itemType)) {
-          if (itemType == 'String') {
-            if (isNullable) {
-              return "($valueExpression as List<dynamic>?)?.map((e) => e.toString()).toList()$defaultValue";
-            } else {
-              return "(($valueExpression as List<dynamic>?) ?? []).map((e) => e.toString()).toList()";
-            }
-          }
-          if (isNullable) {
-            return "($valueExpression as List<dynamic>?)?.cast<$itemType>()$defaultValue";
-          } else {
-            return "(($valueExpression as List<dynamic>?) ?? []).cast<$itemType>()$defaultValue";
-          }
-        } else {
-          // Custom type, use static method
-          final cleanItemType =
-              _removeGenericParameters(itemType); // Remove generic parameters
-
-          // Check if itemType contains generic parameters
-          final castType =
-              RegExp(r'\b[A-Z]\b').hasMatch(itemType) ? 'dynamic' : itemType;
-
-          // Check if it's a single generic type parameter (like T, U, etc.)
-          if (RegExp(r'^[A-Z]$').hasMatch(cleanItemType)) {
-            // For single generic type parameters, cast to the generic type
-            if (isNullable) {
-              return "($valueExpression as List<dynamic>?)?.cast<$cleanItemType>()$defaultValue";
-            } else {
-              return "(($valueExpression as List<dynamic>?) ?? []).cast<$cleanItemType>()$defaultValue";
-            }
-          }
-
-          // Check if it's an enum type
-          if (_isEnumType(cleanItemType)) {
-            // Enum type, use DefaultEnumConverter
-            if (isNullable) {
-              return "($valueExpression as List<dynamic>?)?.map((e) => const ${_dataforgeAnnotationPrefix}DefaultEnumConverter<$cleanItemType>($cleanItemType.values).fromJson(e)).toList()?.cast<$castType>()$defaultValue";
-            } else {
-              return "(($valueExpression as List<dynamic>?) ?? []).map((e) => const ${_dataforgeAnnotationPrefix}DefaultEnumConverter<$cleanItemType>($cleanItemType.values).fromJson(e)).toList().cast<$castType>()$defaultValue";
-            }
-          } else {
-            // Custom type, use fromJson
-            if (isNullable) {
-              return "($valueExpression as List<dynamic>?)?.map((e) => $cleanItemType.fromJson(e as Map<String, dynamic>)).toList()?.cast<$castType>()$defaultValue";
-            } else {
-              return "(($valueExpression as List<dynamic>?) ?? []).map((e) => $cleanItemType.fromJson(e as Map<String, dynamic>)).toList().cast<$castType>()$defaultValue";
-            }
-          }
-        }
-      } else {
-        // Custom type - use top-level function
-        String cleanType = _removeGenericParameters(
-            type.replaceAll('?', '')); // Remove generic parameters
-
-        // Skip built-in types
-        if (['DateTime', 'Uri', 'Duration'].contains(cleanType)) {
-          return "($valueExpression as $type)$defaultValue";
-        }
-
-        // Check if it's a single generic type parameter (like T, U, etc.)
-        if (RegExp(r'^[A-Z]$').hasMatch(cleanType)) {
-          // For generic type parameters, use dynamic conversion to avoid bound constraint issues
-          if (isNullable) {
-            return "$valueExpression as dynamic";
-          } else {
-            return "$valueExpression as dynamic";
-          }
-        }
-
-        // Check if it's a Map type containing generic parameters (like Map<String,T>)
-        if (type.startsWith('Map<') && RegExp(r'\b[A-Z]\b').hasMatch(type)) {
-          // Extract the key and value types
-          final mapMatch = RegExp(r'Map<([^,]+),\s*(.+)>').firstMatch(type);
-          if (mapMatch != null) {
-            final keyType = mapMatch.group(1)?.trim() ?? 'dynamic';
-            final valueType = mapMatch.group(2)?.trim() ?? 'dynamic';
-
-            // Check if valueType is a single generic parameter (like T, U, etc.)
-            if (RegExp(r'^[A-Z]$').hasMatch(valueType)) {
-              // For generic type parameters, use direct cast to avoid fromJson calls
-              if (isNullable) {
-                return "($valueExpression as Map<dynamic, dynamic>?)?.map((key, value) => MapEntry(key as $keyType, value as $valueType))$defaultValue";
-              } else {
-                return "(($valueExpression as Map<dynamic, dynamic>?) ?? {}).map((key, value) => MapEntry(key as $keyType, value as $valueType))$defaultValue";
-              }
-            } else {
-              // For Map types containing generic parameters, cast appropriately
-              if (isNullable) {
-                return "($valueExpression as Map<dynamic, dynamic>?)?.cast<$keyType, $valueType>()$defaultValue";
-              } else {
-                return "(($valueExpression as Map<dynamic, dynamic>?) ?? {}).cast<$keyType, $valueType>()$defaultValue";
-              }
-            }
-          } else {
-            // Fallback to dynamic conversion
-            if (isNullable) {
-              return "($valueExpression as Map<dynamic, dynamic>?)$defaultValue";
-            } else {
-              return "($valueExpression as Map<dynamic, dynamic>?) ?? {}$defaultValue";
-            }
-          }
-        }
-
-        // Check if it's a List type containing generic parameters (like List<GenericContainer<T>>)
-        if (type.startsWith('List<') && RegExp(r'\b[A-Z]\b').hasMatch(type)) {
-          // Extract the item type
-          final listMatch = RegExp(r'List<(.+)>').firstMatch(type);
-          if (listMatch != null) {
-            final itemType = listMatch.group(1)?.trim() ?? 'dynamic';
-            // For List types containing generic parameters, cast appropriately
-            if (isNullable) {
-              return "($valueExpression as List<dynamic>?)?.cast<$itemType>()$defaultValue";
-            } else {
-              return "(($valueExpression as List<dynamic>?) ?? []).cast<$itemType>()$defaultValue";
-            }
-          }
-        }
-
-        // Check if it's an enum type
-        if (_isEnumType(cleanType)) {
-          // Enum type, use DefaultEnumConverter
-          if (isNullable) {
-            return "$valueExpression != null ? const ${_dataforgeAnnotationPrefix}DefaultEnumConverter<$cleanType>($cleanType.values).fromJson($valueExpression) : null$defaultValue";
-          } else {
-            if (defaultValue.isNotEmpty) {
-              return "$valueExpression != null ? const ${_dataforgeAnnotationPrefix}DefaultEnumConverter<$cleanType>($cleanType.values).fromJson($valueExpression) : ${defaultValue.substring(4)}";
-            } else {
-              return "const ${_dataforgeAnnotationPrefix}DefaultEnumConverter<$cleanType>($cleanType.values).fromJson($valueExpression ?? '')";
-            }
-          }
-        } else {
-          // Custom type, use fromJson
-          if (isNullable) {
-            return "$valueExpression != null ? $cleanType.fromJson($valueExpression as Map<String, dynamic>) : null$defaultValue";
-          } else {
-            if (defaultValue.isNotEmpty) {
-              return "$valueExpression != null ? $cleanType.fromJson($valueExpression as Map<String, dynamic>) : ${defaultValue.substring(4)}";
-            } else {
-              return "$cleanType.fromJson(($valueExpression ?? {}) as Map<String, dynamic>)";
-            }
-          }
-        }
-      }
-    } catch (e) {
-      // Re-throw ArgumentError for readValue type restrictions
-      if (e is ArgumentError) {
-        rethrow;
-      }
-      print(
-          'Warning: Error generating default fromMap expression for ${field.name}: $e');
-      return "$valueExpression$defaultValue";
-    }
-
-    return "$valueExpression$defaultValue";
-  }
-
-  String _generateSafeReadValueExpression(
-      FieldInfo field, String valueExpression, String defaultValue) {
-    final type = field.type.replaceAll('?', '');
-    final isNullable = field.type.endsWith('?');
-
-    // Use safeCasteUtil for basic types only: int, double, String, bool
-    if (['String', 'int', 'double', 'bool'].contains(type)) {
-      if (isNullable) {
-        return "${_getSafeCasteUtil()}.safeCast<$type>($valueExpression)$defaultValue";
-      } else {
-        if (defaultValue.isNotEmpty) {
-          return "${_getSafeCasteUtil()}.safeCast<$type>($valueExpression)$defaultValue";
-        } else {
-          // For non-nullable types without default value, provide fallback
-          final fallbackValue = _getDefaultValueForType(type);
-          return "${_getSafeCasteUtil()}.safeCast<$type>($valueExpression) ?? $fallbackValue";
-        }
-      }
-    }
-
-    // Handle other types with original logic
-    switch (type) {
-      case 'num':
-        if (isNullable) {
-          return "$valueExpression != null ? num.tryParse($valueExpression.toString()) : null$defaultValue";
-        } else {
-          if (defaultValue.isNotEmpty) {
-            return "num.tryParse(($valueExpression ?? '').toString())$defaultValue";
-          } else {
-            return "num.tryParse(($valueExpression ?? '').toString()) ?? 0";
-          }
-        }
-      case 'DateTime':
-        if (isNullable) {
-          return "$valueExpression != null ? DateTime.tryParse($valueExpression.toString()) : null$defaultValue";
-        } else {
-          return "DateTime.parse(($valueExpression ?? '').toString())$defaultValue";
-        }
-      case 'Uri':
-        if (isNullable) {
-          return "$valueExpression != null ? Uri.tryParse($valueExpression.toString()) : null$defaultValue";
-        } else {
-          return "Uri.parse(($valueExpression ?? '').toString())$defaultValue";
-        }
-      case 'Duration':
-        if (isNullable) {
-          return "$valueExpression != null ? Duration(milliseconds: $valueExpression as int? ?? 0) : null$defaultValue";
-        } else {
-          return "Duration(milliseconds: ($valueExpression as int? ?? 0))$defaultValue";
-        }
-    }
-
-    // For complex types, use safer conversion logic
-    if (type.startsWith('List<')) {
-      final itemType = type.substring(5, type.length - 1);
-      final cleanItemType = _removeGenericParameters(itemType);
-
-      // Check if it's a basic type that can use cast
-      if ([
-            'String',
-            'int',
-            'double',
-            'bool',
-            'num',
-            'DateTime',
-            'Uri',
-            'Duration',
-            'dynamic',
-            'Object'
-          ].contains(cleanItemType) ||
-          RegExp(r'^[A-Z]$')
-              .hasMatch(cleanItemType) || // Generic type parameter
-          _isEnumType(cleanItemType)) {
-        // Use cast for basic types
-        if (isNullable) {
-          return "$valueExpression != null ? ($valueExpression as List?)?.cast<$itemType>() : null$defaultValue";
-        } else {
-          return "($valueExpression as List?)?.cast<$itemType>() ?? []$defaultValue";
-        }
-      } else {
-        // For custom types, use map and fromJson for each element
-        if (isNullable) {
-          return "$valueExpression != null ? ($valueExpression as List?)?.map((e) => $cleanItemType.fromJson(e as Map<String, dynamic>)).toList() : null$defaultValue";
-        } else {
-          return "(($valueExpression as List?) ?? []).map((e) => $cleanItemType.fromJson(e as Map<String, dynamic>)).toList()$defaultValue";
-        }
-      }
-    } else if (type.startsWith('Map<')) {
-      // Extract the key and value types from Map<K, V>
-      final mapMatch = RegExp(r'Map<([^,]+),\s*(.+)>').firstMatch(type);
-      if (mapMatch != null) {
-        final keyType = mapMatch.group(1)!.trim();
-        final valueType = mapMatch.group(2)!.trim();
-        if (isNullable) {
-          return "$valueExpression != null ? ($valueExpression as Map?)?.cast<$keyType, $valueType>() : null$defaultValue";
-        } else {
-          return "($valueExpression as Map?)?.cast<$keyType, $valueType>() ?? {}$defaultValue";
-        }
-      } else {
-        // Fallback to dynamic if parsing fails
-        if (isNullable) {
-          return "$valueExpression != null ? ($valueExpression as Map?)?.cast<String, dynamic>() : null$defaultValue";
-        } else {
-          return "($valueExpression as Map?)?.cast<String, dynamic>() ?? {}$defaultValue";
-        }
-      }
-    } else {
-      // For custom types (classes), check if json is not null and call fromJson
-      final cleanType = _removeGenericParameters(type);
-
-      // Check if it's a built-in type that doesn't need fromJson
-      if (['dynamic', 'Object'].contains(cleanType)) {
-        if (isNullable) {
-          return "$valueExpression as ${field.type}$defaultValue";
-        } else {
-          return "$valueExpression as ${field.type}$defaultValue";
-        }
-      }
-
-      // Check if it's an enum type - enums don't have fromJson methods
-      if (_isEnumType(cleanType)) {
-        if (isNullable) {
-          return "$valueExpression as ${field.type}$defaultValue";
-        } else {
-          return "$valueExpression as ${field.type}$defaultValue";
-        }
-      }
-
-      // For custom types (classes), check if the value is not null and call fromJson
-      // readValue can return any type, we need to handle the conversion properly
-      if (isNullable) {
-        return "$valueExpression != null ? $cleanType.fromJson(Map<String, dynamic>.from($valueExpression as Map)) : null$defaultValue";
-      } else {
-        return "$cleanType.fromJson(Map<String, dynamic>.from(($valueExpression ?? {}) as Map))$defaultValue";
-      }
-    }
-  }
-
-  String _generateCopyWithParameterType(FieldInfo field) {
-    if (field.type.endsWith('?')) {
-      return field.type;
-    } else {
-      return '${field.type}?';
-    }
-  }
-
-  String _getDefaultValueForType(String type) {
-    if (type.startsWith('List<')) {
-      return '[]';
-    } else if (type.startsWith('Map<')) {
-      return '{}';
-    } else if (type == 'String') {
-      return "''";
-    } else if (type == 'int') {
-      return '0';
-    } else if (type == 'double') {
-      return '0.0';
-    } else if (type == 'bool') {
-      return 'false';
-    } else if (type == 'DateTime') {
-      return 'DateTime.now()';
-    } else if (type == 'Duration') {
-      return 'Duration.zero';
-    } else {
-      return 'null';
-    }
+  /// Check if a type has a fromJson method (heuristic: assume custom classes do)
+  bool _hasFromJsonMethod(String type) {
+    // Primitive types don't have fromJson
+    const primitiveTypes = {
+      'String',
+      'int',
+      'double',
+      'bool',
+      'num',
+      'Object',
+      'dynamic',
+      'DateTime',
+      'Duration',
+      'Uri',
+      'BigInt'
+    };
+    final cleanType = _removeGenericParameters(type.replaceAll('?', ''));
+    if (primitiveTypes.contains(cleanType)) return false;
+    if (cleanType.startsWith('List<') || cleanType.startsWith('Map<'))
+      return false;
+    // Assume other types (custom classes) have fromJson
+    return true;
   }
 
   /// Recursively generate nested field accessors for deep copyWith operations
@@ -2217,306 +1430,108 @@ class Writer {
     String genericParams,
     List<FieldInfo> validFields,
     List<String> fieldPath,
+    ClassInfo rootClazz,
   ) {
     for (final field in validFields) {
-      if (_isNestedCopyWithField(field)) {
-        final nestedType = _getNestedCopyWithType(field);
-        final nestedClazz = result.classes.firstWhere(
-          (clazz) => clazz.name == nestedType.replaceAll('?', ''),
-          orElse: () => ClassInfo(name: '', mixinName: '', fields: []),
-        );
+      // Check if field type matches any parsed Dataforge class
+      final nestedTypeName = field.type.replaceAll('?', '');
+      final nestedClass = _findClassByName(nestedTypeName);
 
-        if (nestedClazz.name.isNotEmpty) {
-          final currentPath = [...fieldPath, field.name];
+      if (nestedClass != null) {
+        final currentPath = [...fieldPath, field.name];
 
-          // Generate direct field accessors for this level
-          for (final nestedField in nestedClazz.fields) {
-            final fullPath = [...currentPath, nestedField.name];
-            final getterName = _buildFieldAccessorName(fullPath);
-            final paramType = _generateCopyWithParameterType(nestedField);
+        // Generate accessors for fields of the nested class
+        for (final nestedField in nestedClass.fields) {
+          final fullPath = [...currentPath, nestedField.name];
+          final getterName = _buildFieldAccessorName(fullPath);
+          final paramType = nestedField.type;
 
-            buffer.writeln(
-                '\n  /// Direct field access getter for ${fullPath.join('.')}');
-            buffer.writeln(
-                '  ${clazz.name}$genericParams Function($paramType) get $getterName {');
-            buffer.writeln('    return ($paramType value) {');
-
-            // Build the nested copyWith chain
-            _generateNestedCopyWithChain(
-                buffer, currentPath, nestedField.name, field);
-
-            buffer.writeln('    };');
-            buffer.writeln('  }');
-          }
-
-          // Recursively generate deeper nested accessors
-          _generateNestedFieldAccessors(
-            buffer,
-            clazz,
-            genericParams,
-            nestedClazz.fields,
-            currentPath,
-          );
+          buffer.writeln('\n  R $getterName($paramType value) {');
+          _generateNestedCopyWithChainNew(
+              buffer, currentPath, nestedField.name, field, rootClazz);
+          buffer.writeln('  }');
         }
+
+        // Recursively generate deeper accessors
+        _generateNestedFieldAccessors(buffer, nestedClass, genericParams,
+            nestedClass.fields, currentPath, rootClazz);
       }
     }
   }
 
-  /// Build field accessor name using $ separator
-  String _buildFieldAccessorName(List<String> fieldPath) {
-    return fieldPath.asMap().entries.map((entry) {
-      final index = entry.key;
-      final name = entry.value;
-      // 第一个字段名保持小写，后续字段名首字母大写
-      if (index == 0) {
-        return name;
-      } else {
-        return name[0].toUpperCase() + name.substring(1);
-      }
-    }).join('\$');
-  }
-
-  /// Generate the nested copyWith chain for deep field access
-  void _generateNestedCopyWithChain(
-    StringBuffer buffer,
-    List<String> fieldPath,
-    String targetField,
-    FieldInfo rootField,
-  ) {
-    if (fieldPath.length == 1) {
-      // Single level nesting
-      if (rootField.type.endsWith('?')) {
-        buffer.writeln('      final currentValue = _instance.${fieldPath[0]};');
-        buffer.writeln('      if (currentValue == null) {');
-        buffer.writeln(
-            '        throw StateError(\'Cannot update field $targetField when ${fieldPath[0]} is null. Set ${fieldPath[0]} first.\');');
-        buffer.writeln('      } else {');
-        buffer.writeln(
-            '        return ${fieldPath[0]}(currentValue.copyWith($targetField: value));');
-        buffer.writeln('      }');
-      } else {
-        buffer.writeln(
-            '      return ${fieldPath[0]}(_instance.${fieldPath[0]}.copyWith($targetField: value));');
-      }
-    } else {
-      // Multi-level nesting - always use nullable handling for deep nesting
-      final rootFieldName = fieldPath[0];
-      final nestedPath = fieldPath.sublist(1);
-
-      buffer.writeln('      final currentValue = _instance.$rootFieldName;');
-      buffer.writeln('      if (currentValue == null) {');
-      buffer.writeln(
-          '        throw StateError(\'Cannot update field $targetField when $rootFieldName is null. Set $rootFieldName first.\');');
-      buffer.writeln('      } else {');
-
-      // Always use nullable handling for multi-level nesting to handle potential null fields
-      buffer.writeln('        return $rootFieldName(currentValue.copyWith(');
-      _generateDeepCopyWithChainForNullable(
-          buffer, nestedPath, targetField, '        ', fieldPath);
-      buffer.writeln('        ));');
-      buffer.writeln('      }');
+  // Helper to find a ClassInfo by name
+  ClassInfo? _findClassByName(String name) {
+    for (final c in result.classes) {
+      if (c.name == name) return c;
     }
+    return null;
   }
 
-  /// Generate deep copyWith chain for multi-level nesting
-  void _generateDeepCopyWithChain(
-    StringBuffer buffer,
-    List<String> nestedPath,
-    String targetField,
-    String indent,
-    List<String> fullPath,
-  ) {
-    if (nestedPath.length == 1) {
-      final accessPath = '_instance.${fullPath.join('.')}';
-      buffer.writeln(
-          '$indent  ${nestedPath[0]}: $accessPath.copyWith($targetField: value),');
-    } else {
-      final currentField = nestedPath[0];
-      final remainingPath = nestedPath.sublist(1);
-      final accessPath =
-          '_instance.${fullPath.sublist(0, fullPath.length - remainingPath.length).join('.')}';
-      buffer.writeln('$indent  $currentField: $accessPath.copyWith(');
-      _generateDeepCopyWithChain(
-          buffer, remainingPath, targetField, '$indent  ', fullPath);
-      buffer.writeln('$indent  ),');
-    }
+  // Helper to build a combined field accessor name (e.g., user$address$street)
+  // Uses $ separator to avoid conflicts with existing property names
+  String _buildFieldAccessorName(List<String> path) {
+    if (path.isEmpty) return '';
+    return path.join('\$');
   }
 
-  /// Generate deep copyWith chain for nullable fields
-  void _generateDeepCopyWithChainForNullable(
-    StringBuffer buffer,
-    List<String> nestedPath,
-    String targetField,
-    String indent,
-    List<String> fullPath,
-  ) {
-    if (nestedPath.length == 1) {
-      final accessPath = 'currentValue.${nestedPath.join('.')}';
-      // Check if the nested field is nullable by looking at the field definition
-      final parentPath = fullPath.sublist(0, fullPath.length - 1);
-      final nestedField = _findNestedFieldByPath(parentPath, nestedPath[0]);
-      if (nestedField?.type.endsWith('?') == true) {
-        buffer.writeln(
-            '$indent  ${nestedPath[0]}: $accessPath?.copyWith($targetField: value),');
-      } else {
-        buffer.writeln(
-            '$indent  ${nestedPath[0]}: $accessPath.copyWith($targetField: value),');
-      }
-    } else {
-      final currentField = nestedPath[0];
-      final remainingPath = nestedPath.sublist(1);
-      final accessPath = 'currentValue.${nestedPath.sublist(0, 1).join('.')}';
-      // Check if the current field is nullable by looking at the field definition
-      final parentPath =
-          fullPath.sublist(0, fullPath.length - remainingPath.length);
-      final currentFieldInfo = _findNestedFieldByPath(parentPath, currentField);
-      if (currentFieldInfo?.type.endsWith('?') == true) {
-        buffer.writeln('$indent  $currentField: $accessPath?.copyWith(');
-        _generateDeepCopyWithChainForNullable(
-            buffer, remainingPath, targetField, '$indent  ', fullPath);
-        buffer.writeln('$indent  ),');
-      } else {
-        buffer.writeln('$indent  $currentField: $accessPath.copyWith(');
-        _generateDeepCopyWithChainForNullable(
-            buffer, remainingPath, targetField, '$indent  ', fullPath);
-        buffer.writeln('$indent  ),');
-      }
-    }
+  // Helper to generate the nested copyWith chain for the call method
+  // Uses recursion to handle multi-level null checks
+  void _generateNestedCopyWithChainNew(
+      StringBuffer buffer,
+      List<String> currentPath,
+      String nestedFieldName,
+      FieldInfo parentField,
+      ClassInfo rootClazz) {
+    buffer.write('    return call(');
+
+    final rootFieldName = currentPath.first;
+
+    // Build the value expression recursively
+    final valueExpression = _buildNestedValueExpression(
+        currentPath, nestedFieldName, '_instance', rootClazz, 0);
+
+    buffer.writeln('      $rootFieldName: $valueExpression,');
+    buffer.writeln('    );');
   }
 
-  /// Find nested field by navigating through the path
-  FieldInfo? _findNestedFieldByPath(List<String> parentPath, String fieldName) {
-    if (parentPath.isEmpty) {
-      // Look in the root class
-      final rootClass = result.classes.firstWhere(
-        (clazz) => clazz.fields.any((f) => f.name == fieldName),
-        orElse: () => ClassInfo(name: '', mixinName: '', fields: []),
-      );
-      return rootClass.fields.firstWhere(
-        (f) => f.name == fieldName,
+  String _buildNestedValueExpression(List<String> path, String targetField,
+      String currentAccess, ClassInfo currentClass, int index) {
+    final fieldName = path[index];
+    final field = currentClass.fields.firstWhere((f) => f.name == fieldName,
         orElse: () => FieldInfo(
-            name: '',
-            type: '',
-            isFinal: false,
-            isFunction: false,
-            isRecord: false,
-            defaultValue: ''),
-      );
-    }
-
-    // Navigate through the path to find the correct class
-    var currentType = '';
-    for (int i = 0; i < parentPath.length; i++) {
-      if (i == 0) {
-        // Find the root field type
-        final rootField = result.classes
-            .expand((clazz) => clazz.fields)
-            .firstWhere((field) => field.name == parentPath[i],
-                orElse: () => FieldInfo(
-                    name: '',
-                    type: '',
-                    isFinal: false,
-                    isFunction: false,
-                    isRecord: false,
-                    defaultValue: ''));
-        currentType = _getNestedCopyWithType(rootField);
-      } else {
-        // Find the nested field type
-        final clazz = result.classes.firstWhere(
-          (c) => c.name == currentType.replaceAll('?', ''),
-          orElse: () => ClassInfo(name: '', mixinName: '', fields: []),
-        );
-
-        final field = clazz.fields.firstWhere(
-          (f) => f.name == parentPath[i],
-          orElse: () => FieldInfo(
-              name: '',
-              type: '',
-              isFinal: false,
-              isFunction: false,
-              isRecord: false,
-              defaultValue: ''),
-        );
-        currentType = field.type;
-      }
-    }
-
-    // Find the target field in the final class
-    final targetClazz = result.classes.firstWhere(
-      (c) => c.name == currentType.replaceAll('?', ''),
-      orElse: () => ClassInfo(name: '', mixinName: '', fields: []),
-    );
-
-    return targetClazz.fields.firstWhere(
-      (f) => f.name == fieldName,
-      orElse: () => FieldInfo(
-          name: '',
-          type: '',
-          isFinal: false,
-          isFunction: false,
-          isRecord: false,
-          defaultValue: ''),
-    );
-  }
-
-  /// Find nested field info for nullable checking
-  FieldInfo? _findNestedField(List<String> fullPath, String fieldName) {
-    if (fullPath.isEmpty) return null;
-
-    final rootFieldName = fullPath[0];
-    final rootField = result.classes.expand((clazz) => clazz.fields).firstWhere(
-        (field) => field.name == rootFieldName,
-        orElse: () => FieldInfo(
-            name: '',
-            type: '',
+            name: fieldName,
+            type: 'dynamic',
             isFinal: false,
             isFunction: false,
             isRecord: false,
             defaultValue: ''));
+    final isLast = index == path.length - 1;
 
-    if (rootField.name.isEmpty) return null;
+    final access = '$currentAccess.$fieldName';
+    final safeAccess = field.type.endsWith('?') ? '$access!' : access;
 
-    // Navigate through the nested structure
-    var currentType = _getNestedCopyWithType(rootField);
-    for (int i = 1; i < fullPath.length; i++) {
-      final clazz = result.classes.firstWhere(
-        (c) => c.name == currentType.replaceAll('?', ''),
-        orElse: () => ClassInfo(name: '', mixinName: '', fields: []),
-      );
+    String nextValue;
+    if (isLast) {
+      nextValue = '$safeAccess.copyWith($targetField: value)';
+    } else {
+      final nextClassName = field.type.replaceAll('?', '');
+      final nextClass = _findClassByName(nextClassName);
 
-      if (clazz.name.isEmpty) return null;
-
-      final field = clazz.fields.firstWhere(
-        (f) => f.name == fullPath[i],
-        orElse: () => FieldInfo(
-            name: '',
-            type: '',
-            isFinal: false,
-            isFunction: false,
-            isRecord: false,
-            defaultValue: ''),
-      );
-
-      if (field.name.isEmpty) return null;
-      currentType = field.type;
+      if (nextClass == null) {
+        nextValue = 'value';
+      } else {
+        nextValue = _buildNestedValueExpression(
+            path, targetField, access, nextClass, index + 1);
+      }
+      final nextFieldName = path[index + 1];
+      nextValue = '$safeAccess.copyWith($nextFieldName: $nextValue)';
     }
 
-    // Find the target field
-    final targetClazz = result.classes.firstWhere(
-      (c) => c.name == currentType.replaceAll('?', ''),
-      orElse: () => ClassInfo(name: '', mixinName: '', fields: []),
-    );
-
-    return targetClazz.fields.firstWhere(
-      (f) => f.name == fieldName,
-      orElse: () => FieldInfo(
-          name: '',
-          type: '',
-          isFinal: false,
-          isFunction: false,
-          isRecord: false,
-          defaultValue: ''),
-    );
+    if (field.type.endsWith('?')) {
+      return '($access == null ? $access : $nextValue)';
+    } else {
+      return nextValue;
+    }
   }
 
   void _buildToString(StringBuffer buffer, ClassInfo clazz) {

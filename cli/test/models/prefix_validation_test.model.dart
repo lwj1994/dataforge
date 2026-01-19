@@ -1,3 +1,4 @@
+import 'package:collection/collection.dart';
 import 'package:dataforge_annotation/dataforge_annotation.dart'
     as dataforge_annotation;
 
