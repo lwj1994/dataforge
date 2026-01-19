@@ -472,15 +472,32 @@ mixin _AlternateNamesTest {
     if (identical(this, other)) return true;
     if (other is! AlternateNamesTest) return false;
 
-    return other.name == name &&
-        other.age == age &&
-        other.email == email &&
-        other.isActive == isActive &&
-        other.tags == tags;
+    if (name != other.name) {
+      return false;
+    }
+    if (age != other.age) {
+      return false;
+    }
+    if (email != other.email) {
+      return false;
+    }
+    if (isActive != other.isActive) {
+      return false;
+    }
+    if (!const DeepCollectionEquality().equals(tags, other.tags)) {
+      return false;
+    }
+    return true;
   }
 
   @override
-  int get hashCode => Object.hashAll([name, age, email, isActive, tags]);
+  int get hashCode => Object.hashAll([
+    name,
+    age,
+    email,
+    isActive,
+    const DeepCollectionEquality().hash(tags),
+  ]);
 
   @override
   String toString() =>
@@ -1028,11 +1045,15 @@ mixin _ListObjectExample {
     if (identical(this, other)) return true;
     if (other is! ListObjectExample) return false;
 
-    return other.users == users;
+    if (!const DeepCollectionEquality().equals(users, other.users)) {
+      return false;
+    }
+    return true;
   }
 
   @override
-  int get hashCode => Object.hashAll([users]);
+  int get hashCode =>
+      Object.hashAll([const DeepCollectionEquality().hash(users)]);
 
   @override
   String toString() => 'ListObjectExample(users: $users)';
@@ -1280,13 +1301,22 @@ class _CustomFunctionsExampleCopyWith<R> {
 ''')
 @Dataforge()
 class CustomFunctionsExample {
-  @JsonKey(name: 'custom_name', fromJson: customStringFromJson, toJson: customStringToJson)
+  @JsonKey(
+      name: 'custom_name',
+      fromJson: customStringFromJson,
+      toJson: customStringToJson)
   final String name;
 
-  @JsonKey(name: 'custom_count', fromJson: customIntFromJson, toJson: customIntToJson)
+  @JsonKey(
+      name: 'custom_count',
+      fromJson: customIntFromJson,
+      toJson: customIntToJson)
   final int count;
 
-  @JsonKey(name: 'optional_value', fromJson: customStringFromJson, toJson: customStringToJson)
+  @JsonKey(
+      name: 'optional_value',
+      fromJson: customStringFromJson,
+      toJson: customStringToJson)
   final String? optionalValue;
 
   // Regular field without custom functions for comparison

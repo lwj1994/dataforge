@@ -301,6 +301,12 @@ class GeneratorWriter {
         '      ${field.name}: ${field.name} ?? $instance.${field.name},');
   }
 
+  /// Check if a field type is a collection type (List or Map)
+  bool _isCollectionType(String type) {
+    final cleanType = type.replaceAll('?', '').trim();
+    return cleanType.startsWith('List<') || cleanType.startsWith('Map<');
+  }
+
   void _buildEquality(
       StringBuffer buffer, ClassInfo clazz, List<FieldInfo> validFields) {
     buffer.writeln('  @override');
@@ -312,16 +318,39 @@ class GeneratorWriter {
     if (validFields.isEmpty) {
       buffer.writeln('    return true;');
     } else {
-      buffer.write('    return ');
-      for (int i = 0; i < validFields.length; i++) {
-        final field = validFields[i];
-        final isLast = i == validFields.length - 1;
-        buffer.write('other.${field.name} == ${field.name}');
-        if (!isLast) {
-          buffer.write(' && ');
+      // Check if any field is a collection type
+      final hasCollectionField =
+          validFields.any((f) => _isCollectionType(f.type));
+
+      if (hasCollectionField) {
+        // Use field-by-field comparison when collection types are present
+        for (final field in validFields) {
+          if (_isCollectionType(field.type)) {
+            // Use DeepCollectionEquality for List and Map types
+            buffer.writeln(
+                '    if (!const DeepCollectionEquality().equals(${field.name}, other.${field.name})) {');
+            buffer.writeln('      return false;');
+            buffer.writeln('    }');
+          } else {
+            buffer.writeln('    if (${field.name} != other.${field.name}) {');
+            buffer.writeln('      return false;');
+            buffer.writeln('    }');
+          }
         }
+        buffer.writeln('    return true;');
+      } else {
+        // Use compact single-line return for non-collection classes
+        buffer.write('    return ');
+        for (int i = 0; i < validFields.length; i++) {
+          final field = validFields[i];
+          final isLast = i == validFields.length - 1;
+          buffer.write('other.${field.name} == ${field.name}');
+          if (!isLast) {
+            buffer.write(' && ');
+          }
+        }
+        buffer.writeln(';');
       }
-      buffer.writeln(';');
     }
     buffer.writeln('  }');
     buffer.writeln();
@@ -332,7 +361,13 @@ class GeneratorWriter {
     buffer.writeln('  @override');
     buffer.writeln('  int get hashCode => Object.hashAll([');
     for (final field in validFields) {
-      buffer.writeln('        ${field.name},');
+      if (_isCollectionType(field.type)) {
+        // Use DeepCollectionEquality.hash for List and Map types
+        buffer.writeln(
+            '        const DeepCollectionEquality().hash(${field.name}),');
+      } else {
+        buffer.writeln('        ${field.name},');
+      }
     }
     buffer.writeln('      ]);');
     buffer.writeln();

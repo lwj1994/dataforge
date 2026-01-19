@@ -3,3 +3,5 @@
 export 'src/annotation.dart';
 export 'src/converter.dart';
 export 'src/safe_type_converter.dart';
+
+export 'package:collection/collection.dart';

@@ -8,3 +8,7 @@ documentation: https://github.com/your_username/dataforge#readme
 
 environment:
   sdk: ^3.0.0
+
+
+dependencies:
+  collection: 
