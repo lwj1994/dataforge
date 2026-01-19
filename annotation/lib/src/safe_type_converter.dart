@@ -85,6 +85,17 @@ class SafeCasteUtil {
     return value;
   }
 
+  static T readRequiredObject<T>(
+    Map<String, dynamic>? map,
+    String key,
+    T Function(Map<String, dynamic>) factory,
+  ) {
+    final res = readObject(map, key, factory);
+    if (res == null)
+      throw Exception("Key \"$key\" is required and must be of type $T.");
+    return res;
+  }
+
   // --- 对象解析相关方法 ---
 
   /// 解析嵌套对象

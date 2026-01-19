@@ -46,8 +46,11 @@ class BaseParser {
         annotationResult.prefix,
       );
 
-      final libraryName =
-          classElement.library.identifier.split('/').last.split('.').first;
+      final libraryName = classElement.library.identifier
+          .split('/')
+          .last
+          .split('.')
+          .first;
 
       return ParseResult(
         '',
@@ -115,12 +118,17 @@ class BaseParser {
   }
 
   ClassInfo _parseClassInfo(
-      ClassElement element, DartObject annotation, String? prefix) {
+    ClassElement element,
+    DartObject annotation,
+    String? prefix,
+  ) {
     final name = _readString(annotation, 'name') ?? '';
-    final includeFromJson = _readBool(annotation, 'includeFromJson') ??
+    final includeFromJson =
+        _readBool(annotation, 'includeFromJson') ??
         _readBool(annotation, 'fromMap') ??
         true;
-    final includeToJson = _readBool(annotation, 'includeToJson') ??
+    final includeToJson =
+        _readBool(annotation, 'includeToJson') ??
         _readBool(annotation, 'fromMap') ??
         true;
     final deepCopyWith = _readBool(annotation, 'deepCopyWith') ?? true;
@@ -211,8 +219,9 @@ class BaseParser {
           if (parameterDefaults.isEmpty && parameterRequired.isEmpty) {
             final signature = constructor.toString();
             // Matches: Type fieldName = defaultValue
-            final defaultRegex =
-                RegExp(r'(?:[\w\<\>\?]+\s+)?(\w+)\s*=\s*([^,\)]+)');
+            final defaultRegex = RegExp(
+              r'(?:[\w\<\>\?]+\s+)?(\w+)\s*=\s*([^,\)]+)',
+            );
             for (final match in defaultRegex.allMatches(signature)) {
               final name = match.group(1);
               final value = match.group(2)?.trim();
@@ -221,8 +230,9 @@ class BaseParser {
               }
             }
             // Matches: required Type fieldName
-            final requiredRegex =
-                RegExp(r'required\s+(?:[\w\<\>\?]+\s+)?(\w+)');
+            final requiredRegex = RegExp(
+              r'required\s+(?:[\w\<\>\?]+\s+)?(\w+)',
+            );
             for (final match in requiredRegex.allMatches(signature)) {
               final name = match.group(1);
               if (name != null) {
@@ -249,7 +259,8 @@ class BaseParser {
 
       final typeElement = field.type.element;
       final isEnum = typeElement is EnumElement;
-      final isDateTime = typeElement?.name == 'DateTime' &&
+      final isDateTime =
+          typeElement?.name == 'DateTime' &&
           typeElement?.library?.isDartCore == true;
 
       bool isDataforge = false;
@@ -317,21 +328,23 @@ class BaseParser {
         }
       }
 
-      fields.add(FieldInfo(
-        name: fieldName ?? '',
-        type: type,
-        isFinal: field.isFinal,
-        isFunction: isFunction,
-        isRecord: isRecord,
-        isDataforge: isDataforge,
-        isEnum: isEnum,
-        isDateTime: isDateTime,
-        jsonKey: jsonKeyInfo,
-        defaultValue: defaultValue,
-        isRequired: isRequired,
-        isInnerEnum: isInnerEnum,
-        isInnerDataforge: isInnerDataforge,
-      ));
+      fields.add(
+        FieldInfo(
+          name: fieldName ?? '',
+          type: type,
+          isFinal: field.isFinal,
+          isFunction: isFunction,
+          isRecord: isRecord,
+          isDataforge: isDataforge,
+          isEnum: isEnum,
+          isDateTime: isDateTime,
+          jsonKey: jsonKeyInfo,
+          defaultValue: defaultValue,
+          isRequired: isRequired,
+          isInnerEnum: isInnerEnum,
+          isInnerDataforge: isInnerDataforge,
+        ),
+      );
     }
 
     return fields;
@@ -387,10 +400,10 @@ class BaseParser {
       ignore: obj.getField('ignore')?.toBoolValue() ?? false,
       converter: (obj.getField('converter')?.isNull == false)
           ? obj
-                  .getField('converter')
-                  ?.type
-                  ?.getDisplayString(withNullability: false) ??
-              ''
+                    .getField('converter')
+                    ?.type
+                    ?.getDisplayString(withNullability: false) ??
+                ''
           : '',
       includeIfNull: obj.getField('includeIfNull')?.toBoolValue(),
       fromJson: fromJsonFunc,

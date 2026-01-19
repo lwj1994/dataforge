@@ -3,7 +3,8 @@ import 'package:dataforge_annotation/dataforge_annotation.dart';
 part 'api_base_response.data.dart';
 
 @Dataforge()
-class EchoApiResponse<T> with _EchoApiResponse<T>, _EchoApiResponse<T> {
+class EchoApiResponse<T>
+    with _EchoApiResponse<T>, _EchoApiResponse<T>, _EchoApiResponse<T> {
   // int or string ??
   @JsonKey(name: 'code', readValue: _readApiResponseValue)
   final String code;
