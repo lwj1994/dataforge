@@ -155,7 +155,7 @@ class Parser {
         bool? fromMap;
         bool? includeFromJson;
         bool? includeToJson;
-        bool? chainedCopyWith;
+        bool? deepCopyWith;
         String mixinName = "";
         final arguments = meta.arguments?.arguments ?? [];
 
@@ -190,12 +190,12 @@ class Parser {
                   includeToJson = expressionSource == "true";
                 }
                 break;
-              case "chainedCopyWith":
+              case "deepCopyWith":
                 // If null, default to true (matches annotation default)
                 if (expressionSource == "null") {
-                  chainedCopyWith = true;
+                  deepCopyWith = true;
                 } else {
-                  chainedCopyWith = expressionSource == "true";
+                  deepCopyWith = expressionSource == "true";
                 }
                 break;
               case "name":
@@ -393,7 +393,7 @@ class Parser {
         // Handle backward compatibility: if new parameters are not specified, use fromMap parameter or configuration defaults
         final finalIncludeFromJson = includeFromJson ?? fromMap ?? true;
         final finalIncludeToJson = includeToJson ?? fromMap ?? true;
-        final finalChainedCopyWith = chainedCopyWith ?? true;
+        final finalChainedCopyWith = deepCopyWith ?? true;
 
         classes.add(
           ClassInfo(
@@ -403,7 +403,7 @@ class Parser {
             includeFromJson: finalIncludeFromJson,
             includeToJson: finalIncludeToJson,
             genericParameters: genericParameters,
-            chainedCopyWith: finalChainedCopyWith,
+            deepCopyWith: finalChainedCopyWith,
           ),
         );
       }

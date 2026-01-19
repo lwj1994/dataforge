@@ -4,7 +4,7 @@ import 'package:dataforge_annotation/dataforge_annotation.dart';
 
 part 'default_chained_test.model.data.dart';
 
-@dataforge // Should use chainedCopyWith = true by default
+@dataforge // Should use deepCopyWith = true by default
 class DefaultChainedTest with _DefaultChainedTest {
   @override
   final String name;

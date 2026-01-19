@@ -3,7 +3,7 @@ import 'package:dataforge_annotation/dataforge_annotation.dart';
 part 'traditional_copywith_test.model.data.dart';
 
 /// Test class with traditional copyWith (default behavior)
-@Dataforge(chainedCopyWith: false)
+@Dataforge(deepCopyWith: false)
 class User with _User {
   @override
   final String name;

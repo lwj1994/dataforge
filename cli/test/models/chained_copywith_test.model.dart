@@ -4,7 +4,7 @@ import 'package:collection/collection.dart';
 part 'chained_copywith_test.model.data.dart';
 
 /// Test class with chained copyWith enabled
-@Dataforge(chainedCopyWith: true)
+@Dataforge(deepCopyWith: true)
 class User with _User {
   @override
   final String name;
@@ -24,7 +24,7 @@ class User with _User {
 }
 
 /// Test nested class for chained copyWith
-@Dataforge(chainedCopyWith: true)
+@Dataforge(deepCopyWith: true)
 class Address with _Address {
   @override
   final String street;
@@ -44,7 +44,7 @@ class Address with _Address {
 }
 
 /// Test class with nested objects
-@Dataforge(chainedCopyWith: true)
+@Dataforge(deepCopyWith: true)
 class Profile with _Profile {
   @override
   final User user;

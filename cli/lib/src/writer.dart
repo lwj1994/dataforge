@@ -836,7 +836,7 @@ class Writer {
     }
 
     for (final clazz in result.classes) {
-      if (clazz.chainedCopyWith &&
+      if (clazz.deepCopyWith &&
           clazz.name.isNotEmpty &&
           clazz.mixinName.isNotEmpty) {
         final genericParams = clazz.genericParameters.isNotEmpty
@@ -992,7 +992,7 @@ class Writer {
             f.name.isNotEmpty && f.type.isNotEmpty && f.type != 'dynamic')
         .toList();
 
-    if (clazz.chainedCopyWith) {
+    if (clazz.deepCopyWith) {
       // Generate chained copyWith getter and helper class
       _buildChainedCopyWith(buffer, clazz, genericParams, validFields);
     } else {

@@ -96,7 +96,7 @@ void main() {
 @Dataforge(
   includeFromJson: true,    // Generate fromJson method (default: false)
   includeToJson: true,      // Generate toJson method (default: false)
-  chainedCopyWith: false,   // Disable chained copyWith (default: true)
+  deepCopyWith: false,   // Disable chained copyWith (default: true)
 )
 class MyClass with _MyClass {
   // ...
@@ -139,7 +139,7 @@ class User with _User {
 For complex nested objects, enable powerful chained updates:
 
 ```dart
-@Dataforge(chainedCopyWith: true)
+@Dataforge(deepCopyWith: true)
 class Address with _Address {
   @override
   final String street;
@@ -151,7 +151,7 @@ class Address with _Address {
   const Address({required this.street, required this.city, required this.zipCode});
 }
 
-@Dataforge(chainedCopyWith: true)
+@Dataforge(deepCopyWith: true)
 class Person with _Person {
   @override
   final String name;
@@ -165,7 +165,7 @@ class Person with _Person {
   const Person({required this.name, required this.age, required this.address, this.workAddress});
 }
 
-@Dataforge(chainedCopyWith: true)
+@Dataforge(deepCopyWith: true)
 class Company with _Company {
   @override
   final String name;

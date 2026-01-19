@@ -19,7 +19,7 @@ class EchoApiResponse<T>
   final String message;
 
   @override
-  @JsonKey(name: "data", readValue: readValue)
+  @JsonKey(name: "data", fromJson: jsonToObject)
   final T? data;
 
   const EchoApiResponse({
@@ -30,22 +30,5 @@ class EchoApiResponse<T>
 
   factory EchoApiResponse.fromJson(Map<String, dynamic> json) {
     return _EchoApiResponse.fromJson(json);
-  }
-}
-
-class EchoApiResponseConverter<T> extends JsonTypeConverter<T, dynamic> {
-  const EchoApiResponseConverter();
-
-  @override
-  T? fromJson(dynamic json) {
-    if (json is String) {
-      return json as T;
-    }
-    return null;
-  }
-
-  @override
-  dynamic toJson(T? object) {
-    return null;
   }
 }

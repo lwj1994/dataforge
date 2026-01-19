@@ -18,11 +18,13 @@ dependencies:
   collection: ^1.17.0
   path: ^1.7.0
   args: ^2.7.0
-  dataforge_annotation: 0.5.0-dev.5
-    
+  dataforge_annotation:
 
 dev_dependencies:
   lints: ^5.0.0
   test: ^1.25.15
 
 
+dependency_overrides: 
+  dataforge_annotation: 
+    path: ../annotation

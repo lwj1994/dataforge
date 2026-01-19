@@ -100,7 +100,7 @@ void main() {
 @Dataforge(
   includeFromJson: true,    // 生成 fromJson 方法（默认：false）
   includeToJson: true,      // 生成 toJson 方法（默认：false）
-  chainedCopyWith: false,   // 禁用链式 copyWith（默认：true）
+  deepCopyWith: false,   // 禁用链式 copyWith（默认：true）
 )
 class MyClass with _MyClass {
   // ...
@@ -143,7 +143,7 @@ class User with _User {
 对于复杂的嵌套对象，启用强大的链式更新：
 
 ```dart
-@Dataforge(chainedCopyWith: true)
+@Dataforge(deepCopyWith: true)
 class Address with _Address {
   @override
   final String street;
@@ -155,7 +155,7 @@ class Address with _Address {
   const Address({required this.street, required this.city, required this.zipCode});
 }
 
-@Dataforge(chainedCopyWith: true)
+@Dataforge(deepCopyWith: true)
 class Person with _Person {
   @override
   final String name;
@@ -169,7 +169,7 @@ class Person with _Person {
   const Person({required this.name, required this.age, required this.address, this.workAddress});
 }
 
-@Dataforge(chainedCopyWith: true)
+@Dataforge(deepCopyWith: true)
 class Company with _Company {
   @override
   final String name;

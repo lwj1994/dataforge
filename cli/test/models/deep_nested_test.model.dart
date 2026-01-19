@@ -4,7 +4,7 @@ import 'package:collection/collection.dart';
 part 'deep_nested_test.model.data.dart';
 
 /// Employee class - Level 4 (deepest)
-@Dataforge(chainedCopyWith: true)
+@Dataforge(deepCopyWith: true)
 class Employee with _Employee {
   @override
   final String name;
@@ -25,7 +25,7 @@ class Employee with _Employee {
 }
 
 /// Team class - Level 3
-@Dataforge(chainedCopyWith: true)
+@Dataforge(deepCopyWith: true)
 class Team with _Team {
   @override
   final String name;
@@ -46,7 +46,7 @@ class Team with _Team {
 }
 
 /// Department class - Level 2
-@Dataforge(chainedCopyWith: true)
+@Dataforge(deepCopyWith: true)
 class Department with _Department {
   @override
   final String name;
@@ -67,7 +67,7 @@ class Department with _Department {
 }
 
 /// Company class - Level 1 (top level)
-@Dataforge(chainedCopyWith: true)
+@Dataforge(deepCopyWith: true)
 class Company with _Company {
   @override
   final String name;

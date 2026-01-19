@@ -4,7 +4,7 @@ import 'package:collection/collection.dart';
 part 'multilevel_copywith_test.model.data.dart';
 
 /// Test model for multi-level copyWith functionality
-@Dataforge(chainedCopyWith: true)
+@Dataforge(deepCopyWith: true)
 class Address with _Address {
   @override
   final String street;
@@ -24,7 +24,7 @@ class Address with _Address {
 }
 
 /// Test model with nested Address
-@Dataforge(chainedCopyWith: true)
+@Dataforge(deepCopyWith: true)
 class User with _User {
   @override
   final String name;
@@ -44,7 +44,7 @@ class User with _User {
 }
 
 /// Test model with deeply nested structure
-@Dataforge(chainedCopyWith: true)
+@Dataforge(deepCopyWith: true)
 class Company with _Company {
   @override
   final String name;
@@ -64,7 +64,7 @@ class Company with _Company {
 }
 
 /// Test model for complex nested structure
-@Dataforge(chainedCopyWith: true)
+@Dataforge(deepCopyWith: true)
 class Profile with _Profile {
   @override
   final String id;
