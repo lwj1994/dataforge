@@ -209,3 +209,18 @@ class ComplexUser with _ComplexUser {
   factory ComplexUser.fromJson(Map<String, dynamic> json) =>
       _ComplexUser.fromJson(json);
 }
+
+
+
+@Dataforge(deepCopyWith: true)
+class ListExample with _ListExample {
+  ListExample({
+    required this.user,
+    required this.nickname,
+  });
+
+  @override
+  final List<User> user; // Nullable nested
+  @override
+  final String nickname;
+}

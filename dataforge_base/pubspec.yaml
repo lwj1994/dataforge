@@ -1,0 +1,12 @@
+name: dataforge_base
+description: Base package for dataforge containing models, parser, and writer.
+version: 0.1.0
+homepage: https://github.com/your_username/dataforge
+repository: https://github.com/your_username/dataforge
+
+environment:
+  sdk: ^3.0.0
+
+dependencies:
+  collection: ^1.17.0
+  analyzer: ^8.1.1

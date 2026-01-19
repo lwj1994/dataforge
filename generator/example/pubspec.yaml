@@ -18,3 +18,5 @@ dev_dependencies:
 dependency_overrides:
   dataforge_annotation:
     path: ../../annotation
+  dataforge_base:
+    path: ../../dataforge_base

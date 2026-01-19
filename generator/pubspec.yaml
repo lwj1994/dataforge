@@ -13,6 +13,7 @@ dependencies:
   build_config: ^1.1.0
   collection: ^1.17.0
   dataforge_annotation:
+  dataforge_base:
   path: ^1.7.0
   analyzer: ^8.1.1
   source_gen: ^4.0.0
@@ -27,3 +28,5 @@ dev_dependencies:
 dependency_overrides:
   dataforge_annotation:
     path: ../annotation
+  dataforge_base:
+    path: ../dataforge_base

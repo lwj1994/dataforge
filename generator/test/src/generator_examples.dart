@@ -535,9 +535,9 @@ mixin _AlternateNamesTest {
           ) ??
           false,
       tags:
-          ((json['tags'] ?? json['tags_list'] ?? json['labels'])
-                  as List<dynamic>?)
-              ?.cast<String>() ??
+          SafeCasteUtil.safeCast<List<dynamic>>(
+            (json['tags'] ?? json['tags_list'] ?? json['labels']),
+          )?.cast<String>() ??
           const [],
     );
   }
@@ -1065,7 +1065,7 @@ mixin _ListObjectExample {
   static ListObjectExample fromJson(Map<String, dynamic> json) {
     return ListObjectExample(
       users:
-          (json['users'] as List<dynamic>?)
+          SafeCasteUtil.readValue<List<dynamic>>(json, 'users')
               ?.map((e) => BasicUser.fromJson(e as Map<String, dynamic>))
               .toList() ??
           const [],

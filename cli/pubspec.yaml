@@ -19,6 +19,8 @@ dependencies:
   path: ^1.7.0
   args: ^2.7.0
   dataforge_annotation:
+  dataforge_base:
+    path: ../dataforge_base
 
 dev_dependencies:
   lints: ^5.0.0
