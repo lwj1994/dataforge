@@ -1070,7 +1070,7 @@ mixin _ListObjectExample {
   static ListObjectExample fromJson(Map<String, dynamic> json) {
     return ListObjectExample(
       users:
-          (((SafeCasteUtil.readValue<List<dynamic>>(json, 'users')
+          (((SafeCasteUtil.safeCast<List<dynamic>>(json['users'])
               ?.map((e) => (BasicUser.fromJson(e as Map<String, dynamic>)))
               .toList())) ??
           (const [])),
@@ -1403,4 +1403,246 @@ class ReadValueWithFromJsonExample {
   final String name;
 
   ReadValueWithFromJsonExample({required this.name});
+}
+
+@ShouldGenerate(r'''
+mixin _ImageListModel {
+  abstract final String id;
+  abstract final List<ImageBean> watermarkImages;
+  _ImageListModelCopyWith<ImageListModel> get copyWith =>
+      _ImageListModelCopyWith<ImageListModel>._(this);
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+    if (other is! ImageListModel) return false;
+
+    if (id != other.id) {
+      return false;
+    }
+    if (!const DeepCollectionEquality().equals(
+      watermarkImages,
+      other.watermarkImages,
+    )) {
+      return false;
+    }
+    return true;
+  }
+
+  @override
+  int get hashCode => Object.hashAll([
+    id,
+    const DeepCollectionEquality().hash(watermarkImages),
+  ]);
+
+  @override
+  String toString() =>
+      'ImageListModel(id: $id, watermarkImages: $watermarkImages)';
+
+  Map<String, dynamic> toJson() {
+    return {'id': id, 'watermarkImages': watermarkImages};
+  }
+
+  static ImageListModel fromJson(Map<String, dynamic> json) {
+    return ImageListModel(
+      id: SafeCasteUtil.readRequiredValue<String>(json, 'id'),
+      watermarkImages:
+          (((SafeCasteUtil.safeCast<List<dynamic>>(
+                ImageListModel._readValue(json, 'watermarkImages'),
+              )
+              ?.map((e) => (ImageBean.fromJson(e as Map<String, dynamic>)))
+              .toList())) ??
+          (const [])),
+    );
+  }
+}
+
+class _ImageListModelCopyWith<R> {
+  final _ImageListModel _instance;
+  final R Function(ImageListModel)? _then;
+  _ImageListModelCopyWith._(this._instance, [this._then]);
+
+  R call({
+    Object? id = dataforgeUndefined,
+    Object? watermarkImages = dataforgeUndefined,
+  }) {
+    final res = ImageListModel(
+      id: (id == dataforgeUndefined ? _instance.id : id as String),
+      watermarkImages: (watermarkImages == dataforgeUndefined
+          ? _instance.watermarkImages
+          : (watermarkImages as List).cast<ImageBean>()),
+    );
+    return (_then != null ? _then!(res) : res as R);
+  }
+
+  R id(String value) {
+    final res = ImageListModel(
+      id: value,
+      watermarkImages: _instance.watermarkImages,
+    );
+    return (_then != null ? _then!(res) : res as R);
+  }
+
+  R watermarkImages(List<ImageBean> value) {
+    final res = ImageListModel(id: _instance.id, watermarkImages: value);
+    return (_then != null ? _then!(res) : res as R);
+  }
+}
+''')
+@Dataforge()
+class ImageListModel {
+  final String id;
+  @JsonKey(readValue: ImageListModel._readValue)
+  final List<ImageBean> watermarkImages;
+
+  ImageListModel({required this.id, this.watermarkImages = const []});
+
+  static Object? _readValue(Map<dynamic, dynamic> map, String key) {
+    return map[key];
+  }
+}
+
+@Dataforge()
+class ImageBean {
+  final String url;
+  ImageBean({required this.url});
+}
+
+@ShouldGenerate(r'''
+mixin _EnumListModel {
+  abstract final List<Status> statuses;
+  _EnumListModelCopyWith<EnumListModel> get copyWith =>
+      _EnumListModelCopyWith<EnumListModel>._(this);
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+    if (other is! EnumListModel) return false;
+
+    if (!const DeepCollectionEquality().equals(statuses, other.statuses)) {
+      return false;
+    }
+    return true;
+  }
+
+  @override
+  int get hashCode =>
+      Object.hashAll([const DeepCollectionEquality().hash(statuses)]);
+
+  @override
+  String toString() => 'EnumListModel(statuses: $statuses)';
+
+  Map<String, dynamic> toJson() {
+    return {
+      'statuses': statuses
+          .map(
+            (e) => const DefaultEnumConverter<Status>(Status.values).toJson(e),
+          )
+          .toList(),
+    };
+  }
+
+  static EnumListModel fromJson(Map<String, dynamic> json) {
+    return EnumListModel(
+      statuses:
+          (((SafeCasteUtil.safeCast<List<dynamic>>(json['statuses'])
+              ?.map(
+                (e) =>
+                    (Status.values.firstWhere((ev) => ev.name == e.toString())),
+              )
+              .toList())) ??
+          (const [])),
+    );
+  }
+}
+
+class _EnumListModelCopyWith<R> {
+  final _EnumListModel _instance;
+  final R Function(EnumListModel)? _then;
+  _EnumListModelCopyWith._(this._instance, [this._then]);
+
+  R call({Object? statuses = dataforgeUndefined}) {
+    final res = EnumListModel(
+      statuses: (statuses == dataforgeUndefined
+          ? _instance.statuses
+          : (statuses as List).cast<Status>()),
+    );
+    return (_then != null ? _then!(res) : res as R);
+  }
+
+  R statuses(List<Status> value) {
+    final res = EnumListModel(statuses: value);
+    return (_then != null ? _then!(res) : res as R);
+  }
+}
+''')
+@Dataforge()
+class EnumListModel {
+  final List<Status> statuses;
+  EnumListModel({this.statuses = const []});
+}
+
+@ShouldGenerate(r'''
+mixin _RequiredListModel {
+  abstract final List<BasicUser> users;
+  _RequiredListModelCopyWith<RequiredListModel> get copyWith =>
+      _RequiredListModelCopyWith<RequiredListModel>._(this);
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+    if (other is! RequiredListModel) return false;
+
+    if (!const DeepCollectionEquality().equals(users, other.users)) {
+      return false;
+    }
+    return true;
+  }
+
+  @override
+  int get hashCode =>
+      Object.hashAll([const DeepCollectionEquality().hash(users)]);
+
+  @override
+  String toString() => 'RequiredListModel(users: $users)';
+
+  Map<String, dynamic> toJson() {
+    return {'users': users};
+  }
+
+  static RequiredListModel fromJson(Map<String, dynamic> json) {
+    return RequiredListModel(
+      users:
+          (((SafeCasteUtil.safeCast<List<dynamic>>(json['users'])
+              ?.map((e) => (BasicUser.fromJson(e as Map<String, dynamic>)))
+              .toList())) ??
+          (const [])),
+    );
+  }
+}
+
+class _RequiredListModelCopyWith<R> {
+  final _RequiredListModel _instance;
+  final R Function(RequiredListModel)? _then;
+  _RequiredListModelCopyWith._(this._instance, [this._then]);
+
+  R call({Object? users = dataforgeUndefined}) {
+    final res = RequiredListModel(
+      users: (users == dataforgeUndefined
+          ? _instance.users
+          : (users as List).cast<BasicUser>()),
+    );
+    return (_then != null ? _then!(res) : res as R);
+  }
+
+  R users(List<BasicUser> value) {
+    final res = RequiredListModel(users: value);
+    return (_then != null ? _then!(res) : res as R);
+  }
+}
+''')
+@Dataforge()
+class RequiredListModel {
+  final List<BasicUser> users;
+  RequiredListModel({required this.users});
 }

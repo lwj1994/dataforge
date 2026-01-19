@@ -32,7 +32,8 @@ class GeneratorWriter {
       // Validate class information
       if (clazz.name.isEmpty || clazz.mixinName.isEmpty) {
         print(
-            'Warning: Skipping class with empty name or mixinName: ${clazz.name}');
+          'Warning: Skipping class with empty name or mixinName: ${clazz.name}',
+        );
         continue;
       }
 
@@ -50,7 +51,8 @@ class GeneratorWriter {
             field.type.isEmpty ||
             field.type == 'dynamic') {
           print(
-              'Warning: Skipping invalid field: name="${field.name}", type="${field.type}"');
+            'Warning: Skipping invalid field: name="${field.name}", type="${field.type}"',
+          );
           continue;
         }
         buffer.writeln('  abstract final ${field.type} ${field.name};');
@@ -58,11 +60,13 @@ class GeneratorWriter {
 
       // Generate methods
       final validFields = clazz.fields
-          .where((field) =>
-              field.name.isNotEmpty &&
-              field.type.isNotEmpty &&
-              field.type != 'dynamic' &&
-              !field.isFunction)
+          .where(
+            (field) =>
+                field.name.isNotEmpty &&
+                field.type.isNotEmpty &&
+                field.type != 'dynamic' &&
+                !field.isFunction,
+          )
           .toList();
 
       _buildCopyWith(buffer, clazz, genericParams, validFields);
@@ -84,7 +88,11 @@ class GeneratorWriter {
       // Generate chained copyWith helper class if needed
       if (clazz.deepCopyWith) {
         _buildChainedCopyWithHelperClass(
-            buffer, clazz, genericParams, validFields);
+          buffer,
+          clazz,
+          genericParams,
+          validFields,
+        );
       }
     }
 
@@ -92,15 +100,20 @@ class GeneratorWriter {
   }
 
   /// Build copyWith method
-  void _buildCopyWith(StringBuffer buffer, ClassInfo clazz,
-      String genericParams, List<FieldInfo> validFields) {
+  void _buildCopyWith(
+    StringBuffer buffer,
+    ClassInfo clazz,
+    String genericParams,
+    List<FieldInfo> validFields,
+  ) {
     if (clazz.deepCopyWith) {
       // Chained copyWith style
       final genericArgs = genericParams.isEmpty
           ? '<${clazz.name}>'
           : genericParams.replaceFirst('>', ', ${clazz.name}$genericParams>');
       buffer.writeln(
-          '  ${clazz.mixinName}CopyWith$genericArgs get copyWith => ${clazz.mixinName}CopyWith$genericArgs._(this);');
+        '  ${clazz.mixinName}CopyWith$genericArgs get copyWith => ${clazz.mixinName}CopyWith$genericArgs._(this);',
+      );
     } else {
       // Traditional copyWith style
       _buildTraditionalCopyWith(buffer, clazz, genericParams, validFields);
@@ -109,8 +122,12 @@ class GeneratorWriter {
   }
 
   /// Build traditional copyWith method
-  void _buildTraditionalCopyWith(StringBuffer buffer, ClassInfo clazz,
-      String genericParams, List<FieldInfo> validFields) {
+  void _buildTraditionalCopyWith(
+    StringBuffer buffer,
+    ClassInfo clazz,
+    String genericParams,
+    List<FieldInfo> validFields,
+  ) {
     buffer.writeln('  ${clazz.name}$genericParams copyWith({');
     for (final field in validFields) {
       _writeParameter(buffer, field);
@@ -148,8 +165,12 @@ class GeneratorWriter {
   }
 
   /// Build chained copyWith helper class
-  void _buildChainedCopyWithHelperClass(StringBuffer buffer, ClassInfo clazz,
-      String genericParams, List<FieldInfo> validFields) {
+  void _buildChainedCopyWithHelperClass(
+    StringBuffer buffer,
+    ClassInfo clazz,
+    String genericParams,
+    List<FieldInfo> validFields,
+  ) {
     final copyWithClassName = '${clazz.mixinName}CopyWith';
     final returnType = 'R';
     final genericParamsWithR = genericParams.isEmpty
@@ -159,7 +180,8 @@ class GeneratorWriter {
     buffer.writeln('class $copyWithClassName$genericParamsWithR {');
     buffer.writeln('  final ${clazz.mixinName}$genericParams _instance;');
     buffer.writeln(
-        '  final $returnType Function(${clazz.name}$genericParams)? _then;');
+      '  final $returnType Function(${clazz.name}$genericParams)? _then;',
+    );
     buffer.writeln('  $copyWithClassName._(this._instance, [this._then]);');
 
     buffer.writeln();
@@ -167,7 +189,8 @@ class GeneratorWriter {
     // Use Object? with sentinel default for all parameters
     for (final field in validFields) {
       buffer.writeln(
-          '    Object? ${field.name} = ${_getPrefix(clazz)}dataforgeUndefined,');
+        '    Object? ${field.name} = ${_getPrefix(clazz)}dataforgeUndefined,',
+      );
     }
     buffer.writeln('  }) {');
     buffer.writeln('    final res = ${clazz.name}$genericParams(');
@@ -175,7 +198,8 @@ class GeneratorWriter {
       // Use sentinel check to distinguish null from omitted
       final castExpr = _buildTypeCastExpression(field.name, field.type);
       buffer.writeln(
-          '      ${field.name}: (${field.name} == ${_getPrefix(clazz)}dataforgeUndefined ? _instance.${field.name} : $castExpr),');
+        '      ${field.name}: (${field.name} == ${_getPrefix(clazz)}dataforgeUndefined ? _instance.${field.name} : $castExpr),',
+      );
     }
     buffer.writeln('    );');
     buffer.writeln('    return (_then != null ? _then!(res) : res as R);');
@@ -202,7 +226,13 @@ class GeneratorWriter {
     // Generate chained copyWith accessors (Flat Accessor Pattern)
     if (clazz.deepCopyWith) {
       _generateNestedFieldAccessors(
-          buffer, clazz, genericParams, validFields, [], clazz);
+        buffer,
+        clazz,
+        genericParams,
+        validFields,
+        [],
+        clazz,
+      );
     }
 
     buffer.writeln('}');
@@ -232,13 +262,24 @@ class GeneratorWriter {
 
           buffer.writeln('\n  R $getterName($paramType value) {');
           _generateNestedCopyWithChain(
-              buffer, currentPath, nestedField.name, field, rootClazz);
+            buffer,
+            currentPath,
+            nestedField.name,
+            field,
+            rootClazz,
+          );
           buffer.writeln('  }');
         }
 
         // Recursively generate deeper accessors
-        _generateNestedFieldAccessors(buffer, nestedClass, genericParams,
-            nestedClass.fields, currentPath, rootClazz);
+        _generateNestedFieldAccessors(
+          buffer,
+          nestedClass,
+          genericParams,
+          nestedClass.fields,
+          currentPath,
+          rootClazz,
+        );
       }
     }
   }
@@ -258,28 +299,40 @@ class GeneratorWriter {
   // Helper to generate the nested copyWith chain for the call method
   // Uses recursion to handle multi-level null checks
   void _generateNestedCopyWithChain(
-      StringBuffer buffer,
-      List<String> currentPath,
-      String nestedFieldName,
-      FieldInfo parentField,
-      ClassInfo rootClazz) {
+    StringBuffer buffer,
+    List<String> currentPath,
+    String nestedFieldName,
+    FieldInfo parentField,
+    ClassInfo rootClazz,
+  ) {
     buffer.write('    return call(');
 
     final rootFieldName = currentPath.first;
 
     // Build the value expression recursively
     final valueExpression = _buildNestedValueExpression(
-        currentPath, nestedFieldName, rootClazz, 0, rootClazz);
+      currentPath,
+      nestedFieldName,
+      rootClazz,
+      0,
+      rootClazz,
+    );
 
     buffer.writeln('      $rootFieldName: $valueExpression,');
     buffer.writeln('    );');
   }
 
-  String _buildNestedValueExpression(List<String> path, String targetField,
-      ClassInfo currentClassContext, int index, ClassInfo rootClass) {
+  String _buildNestedValueExpression(
+    List<String> path,
+    String targetField,
+    ClassInfo currentClassContext,
+    int index,
+    ClassInfo rootClass,
+  ) {
     final fieldName = path[index];
-    final field =
-        currentClassContext.fields.firstWhere((f) => f.name == fieldName);
+    final field = currentClassContext.fields.firstWhere(
+      (f) => f.name == fieldName,
+    );
     final isLast = index == path.length - 1;
 
     // Determine the access string for the CURRENT field being called with .copyWith
@@ -287,8 +340,9 @@ class GeneratorWriter {
     final access = pathInfo.path;
     // Since copyWith is a getter returning a callable object,
     // we must use ?.call(...) if the receiver is nullable.
-    final copyWithAccess =
-        pathInfo.isNullable ? '$access?.copyWith?.call' : '$access.copyWith';
+    final copyWithAccess = pathInfo.isNullable
+        ? '$access?.copyWith?.call'
+        : '$access.copyWith';
 
     if (isLast) {
       return '($copyWithAccess($targetField: value))';
@@ -300,14 +354,22 @@ class GeneratorWriter {
 
       final nextFieldName = path[index + 1];
       final innerValue = _buildNestedValueExpression(
-          path, targetField, nextClass, index + 1, rootClass);
+        path,
+        targetField,
+        nextClass,
+        index + 1,
+        rootClass,
+      );
 
       return '($copyWithAccess($nextFieldName: $innerValue))';
     }
   }
 
   ({String path, bool isNullable}) _buildPathForIndex(
-      List<String> path, int endIndex, ClassInfo rootClass) {
+    List<String> path,
+    int endIndex,
+    ClassInfo rootClass,
+  ) {
     StringBuffer sb = StringBuffer('_instance');
     bool alreadyNullable = false;
 
@@ -315,14 +377,16 @@ class GeneratorWriter {
 
     for (int i = 0; i <= endIndex; i++) {
       final f = currentClass?.fields.firstWhere(
-          (field) => field.name == path[i],
-          orElse: () => FieldInfo(
-              name: path[i],
-              type: 'dynamic',
-              isFinal: false,
-              isFunction: false,
-              isRecord: false,
-              defaultValue: ''));
+        (field) => field.name == path[i],
+        orElse: () => FieldInfo(
+          name: path[i],
+          type: 'dynamic',
+          isFinal: false,
+          isFunction: false,
+          isRecord: false,
+          defaultValue: '',
+        ),
+      );
 
       final isFieldNullable = f?.type.endsWith('?') ?? false;
 
@@ -349,7 +413,8 @@ class GeneratorWriter {
 
   void _writeAssignment(StringBuffer buffer, FieldInfo field, String instance) {
     buffer.writeln(
-        '      ${field.name}: (${field.name} ?? $instance.${field.name}),');
+      '      ${field.name}: (${field.name} ?? $instance.${field.name}),',
+    );
   }
 
   /// Check if a field type is a collection type (List or Map)
@@ -359,7 +424,10 @@ class GeneratorWriter {
   }
 
   void _buildEquality(
-      StringBuffer buffer, ClassInfo clazz, List<FieldInfo> validFields) {
+    StringBuffer buffer,
+    ClassInfo clazz,
+    List<FieldInfo> validFields,
+  ) {
     buffer.writeln('  @override');
     buffer.writeln('  bool operator ==(Object other) {');
     buffer.writeln('    if (identical(this, other)) return true;');
@@ -370,8 +438,9 @@ class GeneratorWriter {
       buffer.writeln('    return true;');
     } else {
       // Check if any field is a collection type
-      final hasCollectionField =
-          validFields.any((f) => _isCollectionType(f.type));
+      final hasCollectionField = validFields.any(
+        (f) => _isCollectionType(f.type),
+      );
 
       if (hasCollectionField) {
         // Use field-by-field comparison when collection types are present
@@ -379,7 +448,8 @@ class GeneratorWriter {
           if (_isCollectionType(field.type)) {
             // Use DeepCollectionEquality for List and Map types
             buffer.writeln(
-                '    if (!const DeepCollectionEquality().equals(${field.name}, other.${field.name})) {');
+              '    if (!const DeepCollectionEquality().equals(${field.name}, other.${field.name})) {',
+            );
             buffer.writeln('      return false;');
             buffer.writeln('    }');
           } else {
@@ -408,14 +478,18 @@ class GeneratorWriter {
   }
 
   void _buildHashCode(
-      StringBuffer buffer, ClassInfo clazz, List<FieldInfo> validFields) {
+    StringBuffer buffer,
+    ClassInfo clazz,
+    List<FieldInfo> validFields,
+  ) {
     buffer.writeln('  @override');
     buffer.writeln('  int get hashCode => Object.hashAll([');
     for (final field in validFields) {
       if (_isCollectionType(field.type)) {
         // Use DeepCollectionEquality.hash for List and Map types
         buffer.writeln(
-            '        const DeepCollectionEquality().hash(${field.name}),');
+          '        const DeepCollectionEquality().hash(${field.name}),',
+        );
       } else {
         buffer.writeln('        ${field.name},');
       }
@@ -425,7 +499,10 @@ class GeneratorWriter {
   }
 
   void _buildToString(
-      StringBuffer buffer, ClassInfo clazz, List<FieldInfo> validFields) {
+    StringBuffer buffer,
+    ClassInfo clazz,
+    List<FieldInfo> validFields,
+  ) {
     buffer.writeln('  @override');
     buffer.write('  String toString() => \'${clazz.name}(');
 
@@ -440,7 +517,10 @@ class GeneratorWriter {
   }
 
   void _buildToJson(
-      StringBuffer buffer, ClassInfo clazz, List<FieldInfo> validFields) {
+    StringBuffer buffer,
+    ClassInfo clazz,
+    List<FieldInfo> validFields,
+  ) {
     buffer.writeln('  Map<String, dynamic> toJson() {');
     buffer.writeln('    return {');
 
@@ -491,8 +571,10 @@ class GeneratorWriter {
         }
       } else if (cleanType.startsWith('Map<') && field.isInnerEnum) {
         // Handle Map<String, Enum>
-        final innerType =
-            cleanType.substring(4, cleanType.length - 1).split(',')[1].trim();
+        final innerType = cleanType
+            .substring(4, cleanType.length - 1)
+            .split(',')[1]
+            .trim();
         final innerTypeClean = innerType.replaceAll('?', '').trim();
         final mapLogic =
             '(k, e) => MapEntry(k, const ${_getPrefix(clazz)}DefaultEnumConverter<$innerTypeClean>($innerTypeClean.values).toJson(e))';
@@ -515,14 +597,19 @@ class GeneratorWriter {
     buffer.writeln();
   }
 
-  void _buildFromJson(StringBuffer buffer, ClassInfo clazz,
-      String genericParams, List<FieldInfo> validFields) {
+  void _buildFromJson(
+    StringBuffer buffer,
+    ClassInfo clazz,
+    String genericParams,
+    List<FieldInfo> validFields,
+  ) {
     final genericConstraints = clazz.genericParameters.isNotEmpty
         ? '<${clazz.genericParameters.map((p) => p.name).join(', ')}>'
         : '';
 
     buffer.writeln(
-        '  static ${clazz.name}$genericConstraints fromJson$genericConstraints(Map<String, dynamic> json) {');
+      '  static ${clazz.name}$genericConstraints fromJson$genericConstraints(Map<String, dynamic> json) {',
+    );
     buffer.writeln('    return ${clazz.name}(');
 
     for (final field in validFields) {
@@ -598,7 +685,8 @@ class GeneratorWriter {
         if (field.defaultValue.isNotEmpty) {
           conversion = '(($conversion) ?? (${field.defaultValue}))';
         } else if (!isNullable && !usedRequired) {
-          final defaultValue = ({
+          final defaultValue =
+              ({
                 'int': '0',
                 'double': '0.0',
                 'String': "''",
@@ -650,7 +738,8 @@ class GeneratorWriter {
       } else if (cleanType.startsWith('List<')) {
         final innerType = cleanType.substring(5, cleanType.length - 1);
         final innerTypeClean = innerType.replaceAll('?', '').trim();
-        final isSupportedBasic = [
+        final isSupportedBasic =
+            [
               'int',
               'double',
               'num',
@@ -658,7 +747,7 @@ class GeneratorWriter {
               'bool',
               'dynamic',
               'Object',
-              'DateTime'
+              'DateTime',
             ].contains(innerTypeClean) ||
             innerTypeClean == 'Map<String, dynamic>';
 
@@ -668,22 +757,38 @@ class GeneratorWriter {
         if (jsonKeyInfo == null ||
             (jsonKeyInfo.readValue.isEmpty &&
                 jsonKeyInfo.alternateNames.isEmpty)) {
-          if (field.isRequired && !isNullable && field.defaultValue.isEmpty) {
+          final isCustom = field.isInnerDataforge || field.isInnerEnum;
+          if (isCustom) {
             listExpr =
-                "${_getPrefix(clazz)}SafeCasteUtil.readRequiredValue<List<dynamic>>(json, '$jsonKey')";
-            isListExprNullable = false;
+                "${_getPrefix(clazz)}SafeCasteUtil.safeCast<List<dynamic>>(json['$jsonKey'])";
+            isListExprNullable = true;
           } else {
-            listExpr =
-                "${_getPrefix(clazz)}SafeCasteUtil.readValue<List<dynamic>>(json, '$jsonKey')";
+            if (field.isRequired && !isNullable && field.defaultValue.isEmpty) {
+              listExpr =
+                  "${_getPrefix(clazz)}SafeCasteUtil.readRequiredValue<List<dynamic>>(json, '$jsonKey')";
+              isListExprNullable = false;
+            } else {
+              listExpr =
+                  "${_getPrefix(clazz)}SafeCasteUtil.readValue<List<dynamic>>(json, '$jsonKey')";
+            }
           }
         } else {
+          final safeCastType = (field.isInnerDataforge || field.isInnerEnum)
+              ? 'List<dynamic>'
+              : cleanType;
           listExpr =
-              "${_getPrefix(clazz)}SafeCasteUtil.safeCast<$cleanType>($valueExpression)";
+              "${_getPrefix(clazz)}SafeCasteUtil.safeCast<$safeCastType>($valueExpression)";
         }
 
         if (isSupportedBasic) {
-          if (['String', 'int', 'double', 'bool', 'num', 'DateTime']
-              .contains(innerTypeClean)) {
+          if ([
+            'String',
+            'int',
+            'double',
+            'bool',
+            'num',
+            'DateTime',
+          ].contains(innerTypeClean)) {
             String safeCastExpr;
             if (innerType.endsWith('?')) {
               safeCastExpr =
@@ -716,11 +821,11 @@ class GeneratorWriter {
                   ".map((e) => (${_getPrefix(clazz)}SafeCasteUtil.safeCast<$innerTypeClean>(e) ?? $defaultValue)).toList()";
             }
             conversion = (isListExprNullable
-                ? "($listExpr?$safeCastExpr)"
+                ? "(($listExpr?$safeCastExpr))"
                 : "($listExpr$safeCastExpr)");
           } else {
             conversion = (isListExprNullable
-                ? "($listExpr?.cast<$innerType>())"
+                ? "(($listExpr?.cast<$innerType>()))"
                 : "($listExpr.cast<$innerType>())");
           }
         } else if (field.isInnerEnum) {
@@ -730,10 +835,10 @@ class GeneratorWriter {
                 ".map((e) => ( e == null ? null : $innerTypeClean.values.firstWhere((ev) => ev.name == e.toString()) )).toList()";
           } else {
             mapLogic =
-                ".map((e) => ( $innerTypeClean.values.firstWhere((ev) => ev.name == e.toString()) )).toList()";
+                ".map((e) => ($innerTypeClean.values.firstWhere((ev) => ev.name == e.toString()))).toList()";
           }
           conversion = (isListExprNullable
-              ? "($listExpr?$mapLogic)"
+              ? "(($listExpr?$mapLogic))"
               : "($listExpr$mapLogic)");
         } else if (field.isInnerDataforge) {
           String mapLogic;
@@ -742,35 +847,41 @@ class GeneratorWriter {
                 ".map((e) => ( e == null ? null : $innerTypeClean.fromJson(e as Map<String, dynamic>) )).toList()";
           } else {
             mapLogic =
-                ".map((e) => ( $innerTypeClean.fromJson(e as Map<String, dynamic>) )).toList()";
+                ".map((e) => ($innerTypeClean.fromJson(e as Map<String, dynamic>))).toList()";
           }
           conversion = (isListExprNullable
-              ? "($listExpr?$mapLogic)"
+              ? "(($listExpr?$mapLogic))"
               : "($listExpr$mapLogic)");
         } else {
           throw Exception(
-              'Unsupported nested type in List: $innerTypeClean for field ${field.name}. Only primitives, enums, dataforge objects, and Map<String, dynamic> are supported.');
+            'Unsupported nested type in List: $innerTypeClean for field ${field.name}. Only primitives, enums, dataforge objects, and Map<String, dynamic> are supported.',
+          );
         }
 
         if (field.defaultValue.isNotEmpty) {
-          conversion = '(($conversion) ?? (${field.defaultValue}))';
+          conversion = '($conversion ?? (${field.defaultValue}))';
         } else if (!isNullable) {
           if (isListExprNullable) {
-            conversion = '($conversion ?? [])';
+            conversion = '($conversion ?? (const []))';
           }
         }
       } else if (cleanType.startsWith('Map<')) {
-        final keyType =
-            cleanType.substring(4, cleanType.length - 1).split(',')[0].trim();
+        final keyType = cleanType
+            .substring(4, cleanType.length - 1)
+            .split(',')[0]
+            .trim();
         if (keyType != 'String' &&
             keyType != 'dynamic' &&
             keyType != 'Object') {
           throw Exception(
-              'Unsupported Map key type: $keyType for field ${field.name}. Only String keys are supported for JSON mapping.');
+            'Unsupported Map key type: $keyType for field ${field.name}. Only String keys are supported for JSON mapping.',
+          );
         }
 
-        final innerType =
-            cleanType.substring(4, cleanType.length - 1).split(',')[1].trim();
+        final innerType = cleanType
+            .substring(4, cleanType.length - 1)
+            .split(',')[1]
+            .trim();
         final innerTypeClean = innerType.replaceAll('?', '').trim();
 
         if (innerTypeClean == 'DateTime') {
@@ -858,7 +969,7 @@ class GeneratorWriter {
           'bool',
           'num',
           'dynamic',
-          'Object'
+          'Object',
         ].contains(innerTypeClean)) {
           // Basic Map: cast generated map
           if (field.isRequired && !isNullable && field.defaultValue.isEmpty) {
@@ -870,7 +981,8 @@ class GeneratorWriter {
           }
         } else {
           throw Exception(
-              'Unsupported nested type in Map value: $innerTypeClean for field ${field.name}. Only primitives, enums, and dataforge objects are supported.');
+            'Unsupported nested type in Map value: $innerTypeClean for field ${field.name}. Only primitives, enums, and dataforge objects are supported.',
+          );
         }
 
         if (field.defaultValue.isNotEmpty) {
