@@ -841,17 +841,8 @@ class GeneratorWriter {
               ? "(($listExpr?$mapLogic))"
               : "($listExpr$mapLogic)");
         } else if (field.isInnerDataforge) {
-          String mapLogic;
-          if (innerType.endsWith('?')) {
-            mapLogic =
-                ".map((e) => ( e == null ? null : $innerTypeClean.fromJson(e as Map<String, dynamic>) )).toList()";
-          } else {
-            mapLogic =
-                ".map((e) => ($innerTypeClean.fromJson(e as Map<String, dynamic>))).toList()";
-          }
-          conversion = (isListExprNullable
-              ? "(($listExpr?$mapLogic))"
-              : "($listExpr$mapLogic)");
+          conversion =
+              "${_getPrefix(clazz)}SafeCasteUtil.readObjectList($listExpr, $innerTypeClean.fromJson)";
         } else {
           throw Exception(
             'Unsupported nested type in List: $innerTypeClean for field ${field.name}. Only primitives, enums, dataforge objects, and Map<String, dynamic> are supported.',
@@ -1007,15 +998,15 @@ class GeneratorWriter {
                   jsonKeyInfo.alternateNames.isEmpty)) {
             if (field.isRequired && !isNullable && field.defaultValue.isEmpty) {
               baseExpression =
-                  "${_getPrefix(clazz)}SafeCasteUtil.readRequiredObject(json, '$jsonKey', $cleanType.fromJson)";
+                  "${_getPrefix(clazz)}SafeCasteUtil.readRequiredObject(json['$jsonKey'], $cleanType.fromJson)";
               usedRequired = true;
             } else {
               baseExpression =
-                  "${_getPrefix(clazz)}SafeCasteUtil.readObject(json, '$jsonKey', $cleanType.fromJson)";
+                  "${_getPrefix(clazz)}SafeCasteUtil.readObject(json['$jsonKey'], $cleanType.fromJson)";
             }
           } else {
             baseExpression =
-                "${_getPrefix(clazz)}SafeCasteUtil.parseObject($valueExpression, $cleanType.fromJson)";
+                "${_getPrefix(clazz)}SafeCasteUtil.readObject($valueExpression, $cleanType.fromJson)";
           }
         }
 

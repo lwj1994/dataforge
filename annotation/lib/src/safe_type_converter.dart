@@ -1,3 +1,7 @@
+import 'dart:convert';
+
+import 'package:dataforge_annotation/src/converter.dart';
+
 /// 安全类型转换工具类
 /// 解决 Dart 泛型在运行时无法直接通过 T == type 判断的问题
 class SafeCasteUtil {
@@ -60,6 +64,10 @@ class SafeCasteUtil {
         if (value is num) return (value != 0) as T;
       }
 
+      // 8. DateTime 转换 (支持时间戳和 ISO-8601 字符串)
+      if (T == DateTime || <DateTime>[] is List<T>) {
+        return DefaultDateTimeConverter().fromJson(json) as T?;
+      }
       return null;
     } catch (e) {
       // 开发环境下建议打印错误，生产环境保持静默
@@ -86,13 +94,12 @@ class SafeCasteUtil {
   }
 
   static T readRequiredObject<T>(
-    Map<String, dynamic>? map,
-    String key,
+    dynamic value,
     T Function(Map<String, dynamic>) factory,
   ) {
-    final res = readObject(map, key, factory);
+    final res = readObject(value, factory);
     if (res == null)
-      throw Exception("Key \"$key\" is required and must be of type $T.");
+      throw Exception("Required object of type $T is missing or invalid.");
     return res;
   }
 
@@ -100,22 +107,20 @@ class SafeCasteUtil {
 
   /// 解析嵌套对象
   static T? readObject<T>(
-    Map<String, dynamic>? map,
-    String key,
+    dynamic value,
     T Function(Map<String, dynamic>) factory,
   ) {
-    final data = readValue<Map<String, dynamic>>(map, key);
+    final data = safeCast<Map<String, dynamic>>(value);
     if (data == null) return null;
     return factory(data);
   }
 
   /// 解析对象列表
   static List<T>? readObjectList<T>(
-    Map<String, dynamic>? map,
-    String key,
+    dynamic value,
     T Function(Map<String, dynamic>) factory,
   ) {
-    final list = readValue<List>(map, key);
+    final list = safeCast<List>(value);
     if (list == null) return null;
     return list
         .map((e) => safeCast<Map<String, dynamic>>(e))
