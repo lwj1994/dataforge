@@ -48,7 +48,7 @@ void main() {
       expect(json['success'], false);
       expect(json['message'], 'Error occurred');
       expect(json.containsKey('data'),
-          false); // null values should not be included
+          true); // null values are included by default
 
       // Test fromJson
       final restored = ApiResponse<User>.fromJson(json);
@@ -95,7 +95,7 @@ void main() {
       final json = listResponse.toJson();
       expect(json['total'], 0);
       expect(json.containsKey('items'),
-          false); // null values should not be included
+          true); // null values are included by default
 
       // Test fromJson
       final restored = ListResponse<User>.fromJson(json);

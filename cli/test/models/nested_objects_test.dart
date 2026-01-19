@@ -42,7 +42,7 @@ void main() {
         () {
       // Test employer$Headquarters$Street
       final updatedStreet =
-          testObject.copyWith.employer$Headquarters$Street('New HQ Street');
+          testObject.copyWith.employer$headquarters$street('New HQ Street');
       expect(
           updatedStreet.employer!.headquarters.street, equals('New HQ Street'));
       expect(updatedStreet.employer!.headquarters.city,
@@ -50,30 +50,30 @@ void main() {
 
       // Test employer$Headquarters$City
       final updatedCity =
-          testObject.copyWith.employer$Headquarters$City('New HQ City');
+          testObject.copyWith.employer$headquarters$city('New HQ City');
       expect(updatedCity.employer!.headquarters.city, equals('New HQ City'));
       expect(updatedCity.employer!.headquarters.street,
           equals('HQ Street')); // Other fields unchanged
 
       // Test employer$Headquarters$State
       final updatedState =
-          testObject.copyWith.employer$Headquarters$State('New HQ State');
+          testObject.copyWith.employer$headquarters$state('New HQ State');
       expect(updatedState.employer!.headquarters.state, equals('New HQ State'));
 
       // Test employer$Headquarters$ZipCode
       final updatedZip =
-          testObject.copyWith.employer$Headquarters$ZipCode('99999');
+          testObject.copyWith.employer$headquarters$zipcode('99999');
       expect(updatedZip.employer!.headquarters.zipCode, equals('99999'));
 
       // Test employer$Headquarters$Country
       final updatedCountry =
-          testObject.copyWith.employer$Headquarters$Country('New Country');
+          testObject.copyWith.employer$headquarters$country('New Country');
       expect(
           updatedCountry.employer!.headquarters.country, equals('New Country'));
 
       // Test employer$Headquarters$IsPrimary
       final updatedPrimary =
-          testObject.copyWith.employer$Headquarters$IsPrimary(true);
+          testObject.copyWith.employer$headquarters$isprimary(true);
       expect(updatedPrimary.employer!.headquarters.isPrimary, equals(true));
     });
 
@@ -82,7 +82,7 @@ void main() {
         () {
       // Test employer$PrimaryContact$Email
       final updatedEmail =
-          testObject.copyWith.employer$PrimaryContact$Email('new@company.com');
+          testObject.copyWith.employer$primarycontact$email('new@company.com');
       expect(updatedEmail.employer!.primaryContact.email,
           equals('new@company.com'));
       expect(updatedEmail.employer!.primaryContact.phone,
@@ -90,20 +90,20 @@ void main() {
 
       // Test employer$PrimaryContact$Phone
       final updatedPhone =
-          testObject.copyWith.employer$PrimaryContact$Phone('999-888-7777');
+          testObject.copyWith.employer$primarycontact$phone('999-888-7777');
       expect(
           updatedPhone.employer!.primaryContact.phone, equals('999-888-7777'));
 
       // Test employer$PrimaryContact$ContactType
       final updatedType =
-          testObject.copyWith.employer$PrimaryContact$ContactType('personal');
+          testObject.copyWith.employer$primarycontact$contacttype('personal');
       expect(
           updatedType.employer!.primaryContact.contactType, equals('personal'));
     });
 
     test('should preserve other fields when using deep nested copyWith', () {
       final updated =
-          testObject.copyWith.employer$Headquarters$Street('Updated Street');
+          testObject.copyWith.employer$headquarters$street('Updated Street');
 
       // Verify that non-nested fields are preserved
       expect(updated.homeAddress.street, equals('Home Street'));
@@ -121,11 +121,11 @@ void main() {
 
     test('should work with chained deep nested updates', () {
       final updated = testObject.copyWith
-          .employer$Headquarters$Street('New Street')
+          .employer$headquarters$street('New Street')
           .copyWith
-          .employer$Headquarters$City('New City')
+          .employer$headquarters$city('New City')
           .copyWith
-          .employer$PrimaryContact$Email('new@email.com');
+          .employer$primarycontact$email('new@email.com');
 
       expect(updated.employer!.headquarters.street, equals('New Street'));
       expect(updated.employer!.headquarters.city, equals('New City'));

@@ -17,8 +17,14 @@ class BaseParser {
 
   final List<ClassInfo> _extraClasses = [];
   final Set<String> _processedClasses = {};
+  late final Set<String> _libraryEnums;
 
-  BaseParser(this.classElement, this.annotation);
+  BaseParser(this.classElement, this.annotation) {
+    _libraryEnums = classElement.library.enums
+        .map((e) => e.name)
+        .whereType<String>()
+        .toSet();
+  }
 
   /// Parse the class element and return parse result
   ParseResult? parse() {
@@ -258,6 +264,44 @@ class BaseParser {
         }
       }
 
+      bool isInnerEnum = false;
+      bool isInnerDataforge = false;
+
+      final fieldType = field.type;
+      final typeStr = fieldType.getDisplayString();
+      if (typeStr.contains('<')) {
+        final innerName = typeStr
+            .substring(typeStr.indexOf('<') + 1, typeStr.lastIndexOf('>'))
+            .split(',')
+            .last // handle Map key,value
+            .replaceAll('?', '')
+            .trim();
+
+        if (_libraryEnums.contains(innerName)) {
+          isInnerEnum = true;
+        } else {
+          // Check for Dataforge annotation on inner type if it's a class
+          if (fieldType is InterfaceType &&
+              fieldType.typeArguments.isNotEmpty) {
+            final innerType = fieldType.typeArguments.last;
+            final innerElement = innerType.element;
+            if (innerElement?.kind == ElementKind.ENUM) {
+              isInnerEnum = true;
+            }
+            if (innerElement is ClassElement) {
+              for (final metadata in _getAnnotations(innerElement)) {
+                final obj = (metadata as dynamic).computeConstantValue();
+                if (obj?.type?.element?.name == 'Dataforge') {
+                  isInnerDataforge = true;
+                  _parseExtraClass(innerElement, obj);
+                  break;
+                }
+              }
+            }
+          }
+        }
+      }
+
       final fieldName = field.name;
       final defaultValue = parameterDefaults[fieldName] ?? '';
       final isRequired = parameterRequired[fieldName] ?? false;
@@ -285,6 +329,8 @@ class BaseParser {
         jsonKey: jsonKeyInfo,
         defaultValue: defaultValue,
         isRequired: isRequired,
+        isInnerEnum: isInnerEnum,
+        isInnerDataforge: isInnerDataforge,
       ));
     }
 

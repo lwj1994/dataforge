@@ -1,5 +1,4 @@
 import 'package:dataforge_annotation/dataforge_annotation.dart';
-import 'package:collection/collection.dart';
 
 part 'deep_nested_test.model.data.dart';
 

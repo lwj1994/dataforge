@@ -36,6 +36,7 @@ class DefaultDateTimeConverter extends JsonTypeConverter<DateTime, String> {
 
   @override
   DateTime? fromJson(Object? json) {
+    if (json is DateTime) return json;
     if (json == null) return null;
 
     // Handle numeric timestamps (milliseconds since epoch)

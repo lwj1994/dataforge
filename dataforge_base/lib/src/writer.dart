@@ -124,6 +124,29 @@ class GeneratorWriter {
     buffer.writeln('  }');
   }
 
+  String _buildTypeCastExpression(String variable, String type) {
+    final cleanType = type.replaceAll('?', '').trim();
+    final isNullable = type.endsWith('?');
+
+    if (cleanType.startsWith('List<')) {
+      final innerType = cleanType.substring(5, cleanType.length - 1);
+      if (isNullable) {
+        return '($variable as List?)?.cast<$innerType>()';
+      } else {
+        return '($variable as List).cast<$innerType>()';
+      }
+    } else if (cleanType.startsWith('Map<')) {
+      final innerTypes = cleanType.substring(4, cleanType.length - 1);
+      if (isNullable) {
+        return '($variable as Map?)?.cast<$innerTypes>()';
+      } else {
+        return '($variable as Map).cast<$innerTypes>()';
+      }
+    } else {
+      return '$variable as $type';
+    }
+  }
+
   /// Build chained copyWith helper class
   void _buildChainedCopyWithHelperClass(StringBuffer buffer, ClassInfo clazz,
       String genericParams, List<FieldInfo> validFields) {
@@ -150,11 +173,12 @@ class GeneratorWriter {
     buffer.writeln('    final res = ${clazz.name}$genericParams(');
     for (final field in validFields) {
       // Use sentinel check to distinguish null from omitted
+      final castExpr = _buildTypeCastExpression(field.name, field.type);
       buffer.writeln(
-          '      ${field.name}: ${field.name} == ${_getPrefix(clazz)}dataforgeUndefined ? _instance.${field.name} : ${field.name} as ${field.type},');
+          '      ${field.name}: (${field.name} == ${_getPrefix(clazz)}dataforgeUndefined ? _instance.${field.name} : $castExpr),');
     }
     buffer.writeln('    );');
-    buffer.writeln('    return _then != null ? _then!(res) : res as R;');
+    buffer.writeln('    return (_then != null ? _then!(res) : res as R);');
     buffer.writeln('  }');
     buffer.writeln();
 
@@ -170,7 +194,7 @@ class GeneratorWriter {
         }
       }
       buffer.writeln('    );');
-      buffer.writeln('    return _then != null ? _then!(res) : res as R;');
+      buffer.writeln('    return (_then != null ? _then!(res) : res as R);');
       buffer.writeln('  }');
       buffer.writeln();
     }
@@ -228,7 +252,7 @@ class GeneratorWriter {
   // Uses $ separator to avoid conflicts with existing property names
   String _buildFieldAccessorName(List<String> path) {
     if (path.isEmpty) return '';
-    return path.join('\$');
+    return path.join('\$').toLowerCase();
   }
 
   // Helper to generate the nested copyWith chain for the call method
@@ -245,50 +269,77 @@ class GeneratorWriter {
 
     // Build the value expression recursively
     final valueExpression = _buildNestedValueExpression(
-        currentPath, nestedFieldName, '_instance', rootClazz, 0);
+        currentPath, nestedFieldName, rootClazz, 0, rootClazz);
 
     buffer.writeln('      $rootFieldName: $valueExpression,');
     buffer.writeln('    );');
   }
 
   String _buildNestedValueExpression(List<String> path, String targetField,
-      String currentAccess, ClassInfo currentClass, int index) {
+      ClassInfo currentClassContext, int index, ClassInfo rootClass) {
     final fieldName = path[index];
-    final field = currentClass.fields.firstWhere((f) => f.name == fieldName,
-        orElse: () => FieldInfo(
-            name: fieldName,
-            type: 'dynamic',
-            isFinal: false,
-            isFunction: false,
-            isRecord: false,
-            defaultValue: ''));
+    final field =
+        currentClassContext.fields.firstWhere((f) => f.name == fieldName);
     final isLast = index == path.length - 1;
 
-    final access = '$currentAccess.$fieldName';
-    final safeAccess = field.type.endsWith('?') ? '$access!' : access;
+    // Determine the access string for the CURRENT field being called with .copyWith
+    final pathInfo = _buildPathForIndex(path, index, rootClass);
+    final access = pathInfo.path;
+    // Since copyWith is a getter returning a callable object,
+    // we must use ?.call(...) if the receiver is nullable.
+    final copyWithAccess =
+        pathInfo.isNullable ? '$access?.copyWith?.call' : '$access.copyWith';
 
-    String nextValue;
     if (isLast) {
-      nextValue = '$safeAccess.copyWith($targetField: value)';
+      return '($copyWithAccess($targetField: value))';
     } else {
       final nextClassName = field.type.replaceAll('?', '');
       final nextClass = _findClassByName(nextClassName);
+      if (nextClass == null)
+        return 'value'; // Should not happen for valid paths
 
-      if (nextClass == null) {
-        nextValue = 'value';
-      } else {
-        nextValue = _buildNestedValueExpression(
-            path, targetField, access, nextClass, index + 1);
-      }
       final nextFieldName = path[index + 1];
-      nextValue = '$safeAccess.copyWith($nextFieldName: $nextValue)';
+      final innerValue = _buildNestedValueExpression(
+          path, targetField, nextClass, index + 1, rootClass);
+
+      return '($copyWithAccess($nextFieldName: $innerValue))';
+    }
+  }
+
+  ({String path, bool isNullable}) _buildPathForIndex(
+      List<String> path, int endIndex, ClassInfo rootClass) {
+    StringBuffer sb = StringBuffer('_instance');
+    bool alreadyNullable = false;
+
+    ClassInfo? currentClass = rootClass;
+
+    for (int i = 0; i <= endIndex; i++) {
+      final f = currentClass?.fields.firstWhere(
+          (field) => field.name == path[i],
+          orElse: () => FieldInfo(
+              name: path[i],
+              type: 'dynamic',
+              isFinal: false,
+              isFunction: false,
+              isRecord: false,
+              defaultValue: ''));
+
+      final isFieldNullable = f?.type.endsWith('?') ?? false;
+
+      if (alreadyNullable) {
+        sb.write('?.${path[i]}');
+      } else {
+        sb.write('.${path[i]}');
+        if (isFieldNullable) {
+          alreadyNullable = true;
+        }
+      }
+
+      final nextClassName = f?.type.replaceAll('?', '') ?? 'dynamic';
+      currentClass = _findClassByName(nextClassName);
     }
 
-    if (field.type.endsWith('?')) {
-      return '($access == null ? $access : $nextValue)';
-    } else {
-      return nextValue;
-    }
+    return (path: sb.toString(), isNullable: alreadyNullable);
   }
 
   void _writeParameter(StringBuffer buffer, FieldInfo field) {
@@ -298,7 +349,7 @@ class GeneratorWriter {
 
   void _writeAssignment(StringBuffer buffer, FieldInfo field, String instance) {
     buffer.writeln(
-        '      ${field.name}: ${field.name} ?? $instance.${field.name},');
+        '      ${field.name}: (${field.name} ?? $instance.${field.name}),');
   }
 
   /// Check if a field type is a collection type (List or Map)
@@ -400,7 +451,7 @@ class GeneratorWriter {
           ? field.jsonKey!.name
           : field.name;
 
-      final cleanType = field.type.replaceAll('?', '');
+      final cleanType = field.type.replaceAll('?', '').trim();
       final isNullable = field.type.endsWith('?');
       String valueAccess;
       final jsonKeyInfo = field.jsonKey;
@@ -411,9 +462,9 @@ class GeneratorWriter {
       if (customToJson != null && customToJson.isNotEmpty) {
         if (isNullable) {
           valueAccess =
-              '${field.name} != null ? $customToJson(${field.name}!) : null';
+              '(${field.name} != null ? $customToJson(${field.name}!) : null)';
         } else {
-          valueAccess = '$customToJson(${field.name})';
+          valueAccess = '($customToJson(${field.name}))';
         }
       }
       // Priority 2: Custom converter
@@ -421,12 +472,35 @@ class GeneratorWriter {
         valueAccess = 'const $customConverter().toJson(${field.name})';
       }
       // Priority 3: Auto-matched converters (DateTime, Enum)
-      else if (field.isDateTime) {
+      else if (field.isDateTime || cleanType == 'DateTime') {
         valueAccess =
             'const ${_getPrefix(clazz)}DefaultDateTimeConverter().toJson(${field.name})';
       } else if (field.isEnum) {
         valueAccess =
             '${_getPrefix(clazz)}DefaultEnumConverter($cleanType.values).toJson(${field.name})';
+      } else if (cleanType.startsWith('List<') && field.isInnerEnum) {
+        // Handle List<Enum>
+        final innerType = cleanType.substring(5, cleanType.length - 1);
+        final innerTypeClean = innerType.replaceAll('?', '').trim();
+        final mapLogic =
+            '(e) => const ${_getPrefix(clazz)}DefaultEnumConverter<$innerTypeClean>($innerTypeClean.values).toJson(e)';
+        if (isNullable) {
+          valueAccess = '${field.name}?.map($mapLogic).toList()';
+        } else {
+          valueAccess = '${field.name}.map($mapLogic).toList()';
+        }
+      } else if (cleanType.startsWith('Map<') && field.isInnerEnum) {
+        // Handle Map<String, Enum>
+        final innerType =
+            cleanType.substring(4, cleanType.length - 1).split(',')[1].trim();
+        final innerTypeClean = innerType.replaceAll('?', '').trim();
+        final mapLogic =
+            '(k, e) => MapEntry(k, const ${_getPrefix(clazz)}DefaultEnumConverter<$innerTypeClean>($innerTypeClean.values).toJson(e))';
+        if (isNullable) {
+          valueAccess = '${field.name}?.map($mapLogic)';
+        } else {
+          valueAccess = '${field.name}.map($mapLogic)';
+        }
       }
       // Priority 4: Default (direct access)
       else {
@@ -470,7 +544,7 @@ class GeneratorWriter {
         valueExpression = "json['$jsonKey']";
       }
 
-      final cleanType = field.type.replaceAll('?', '');
+      final cleanType = field.type.replaceAll('?', '').trim();
       final isNullable = field.type.endsWith('?');
       final customFromJson = jsonKeyInfo?.fromJson;
       final customConverter = jsonKeyInfo?.converter;
@@ -480,9 +554,9 @@ class GeneratorWriter {
       if (customFromJson != null && customFromJson.isNotEmpty) {
         if (isNullable) {
           conversion =
-              '$valueExpression != null ? $customFromJson($valueExpression) : null';
+              '($valueExpression != null ? $customFromJson($valueExpression) : null)';
         } else {
-          conversion = '$customFromJson($valueExpression)';
+          conversion = '($customFromJson($valueExpression))';
         }
       }
       // Priority 2: Custom converter
@@ -491,8 +565,11 @@ class GeneratorWriter {
           // If readValue is used, check if the value is already the
           // target type. If so, return it directly. Otherwise, use
           // the converter.
+          final nullHandler = isNullable
+              ? '(v == null ? null :'
+              : "(v == null ? throw Exception('Null value for non-nullable field ${field.name}') :";
           conversion =
-              "((dynamic v) => v is $cleanType ? v : const $customConverter().fromJson(v))($valueExpression)";
+              "((dynamic v) => $nullHandler (v is $cleanType ? v : const $customConverter().fromJson(v))))($valueExpression)";
         } else {
           conversion = "const $customConverter().fromJson($valueExpression)";
         }
@@ -518,26 +595,39 @@ class GeneratorWriter {
               "${_getPrefix(clazz)}SafeCasteUtil.safeCast<$cleanType>($valueExpression)";
         }
 
-        if (!isNullable && !usedRequired) {
-          final defaultValue = field.defaultValue.isNotEmpty
-              ? field.defaultValue
-              : ({
-                    'int': '0',
-                    'double': '0.0',
-                    'String': "''",
-                    'bool': 'false',
-                  }[cleanType] ??
-                  'null');
-          conversion += ' ?? $defaultValue';
+        if (field.defaultValue.isNotEmpty) {
+          conversion = '(($conversion) ?? (${field.defaultValue}))';
+        } else if (!isNullable && !usedRequired) {
+          final defaultValue = ({
+                'int': '0',
+                'double': '0.0',
+                'String': "''",
+                'bool': 'false',
+              }[cleanType] ??
+              'null');
+          conversion = '($conversion ?? $defaultValue)';
         }
-      } else if (field.isDateTime) {
-        conversion =
-            "const ${_getPrefix(clazz)}DefaultDateTimeConverter().fromJson($valueExpression)";
-        if (!isNullable) {
-          final defaultValue = field.defaultValue.isNotEmpty
-              ? ' ?? ${field.defaultValue}'
-              : ' ?? DateTime.fromMillisecondsSinceEpoch(0)';
-          conversion += defaultValue;
+      } else if (field.isDateTime || cleanType == 'DateTime') {
+        if (jsonKeyInfo == null ||
+            (jsonKeyInfo.readValue.isEmpty &&
+                jsonKeyInfo.alternateNames.isEmpty)) {
+          if (field.isRequired && !isNullable && field.defaultValue.isEmpty) {
+            conversion =
+                "${_getPrefix(clazz)}SafeCasteUtil.readRequiredValue<DateTime>(json, '$jsonKey')";
+          } else {
+            conversion =
+                "${_getPrefix(clazz)}SafeCasteUtil.readValue<DateTime>(json, '$jsonKey')";
+          }
+        } else {
+          conversion =
+              "${_getPrefix(clazz)}SafeCasteUtil.safeCast<DateTime>($valueExpression)";
+        }
+
+        if (field.defaultValue.isNotEmpty) {
+          conversion = '(($conversion) ?? (${field.defaultValue}))';
+        } else if (!isNullable) {
+          conversion =
+              '($conversion ?? DateTime.fromMillisecondsSinceEpoch(0))';
         }
       } else if (field.isEnum) {
         String stringValueExpr;
@@ -552,16 +642,15 @@ class GeneratorWriter {
         }
         conversion =
             "${_getPrefix(clazz)}DefaultEnumConverter($cleanType.values).fromJson($stringValueExpr)";
-        if (!isNullable) {
-          final defaultValue = field.defaultValue.isNotEmpty
-              ? ' ?? ${field.defaultValue}'
-              : ' ?? $cleanType.values.first';
-          conversion += defaultValue;
+        if (field.defaultValue.isNotEmpty) {
+          conversion = '(($conversion) ?? (${field.defaultValue}))';
+        } else if (!isNullable) {
+          conversion = '($conversion ?? $cleanType.values.first)';
         }
       } else if (cleanType.startsWith('List<')) {
         final innerType = cleanType.substring(5, cleanType.length - 1);
         final innerTypeClean = innerType.replaceAll('?', '').trim();
-        final isPrimitive = [
+        final isSupportedBasic = [
               'int',
               'double',
               'num',
@@ -571,8 +660,7 @@ class GeneratorWriter {
               'Object',
               'DateTime'
             ].contains(innerTypeClean) ||
-            innerTypeClean.startsWith('Map<') ||
-            innerTypeClean.startsWith('List<');
+            innerTypeClean == 'Map<String, dynamic>';
 
         String listExpr;
         bool isListExprNullable = true;
@@ -590,37 +678,203 @@ class GeneratorWriter {
           }
         } else {
           listExpr =
-              "${_getPrefix(clazz)}SafeCasteUtil.safeCast<List<dynamic>>($valueExpression)";
+              "${_getPrefix(clazz)}SafeCasteUtil.safeCast<$cleanType>($valueExpression)";
         }
 
-        if (isPrimitive) {
-          conversion = isListExprNullable
-              ? "$listExpr?.cast<$innerType>()"
-              : "$listExpr.cast<$innerType>()";
-        } else {
+        if (isSupportedBasic) {
+          if (['String', 'int', 'double', 'bool', 'num', 'DateTime']
+              .contains(innerTypeClean)) {
+            String safeCastExpr;
+            if (innerType.endsWith('?')) {
+              safeCastExpr =
+                  ".map((e) => ${_getPrefix(clazz)}SafeCasteUtil.safeCast<$innerTypeClean>(e)).toList()";
+            } else {
+              String defaultValue;
+              switch (innerTypeClean) {
+                case 'String':
+                  defaultValue = "''";
+                  break;
+                case 'int':
+                  defaultValue = '0';
+                  break;
+                case 'double':
+                  defaultValue = '0.0';
+                  break;
+                case 'bool':
+                  defaultValue = 'false';
+                  break;
+                case 'num':
+                  defaultValue = '0';
+                  break;
+                case 'DateTime':
+                  defaultValue = 'DateTime.fromMillisecondsSinceEpoch(0)';
+                  break;
+                default:
+                  defaultValue = 'null';
+              }
+              safeCastExpr =
+                  ".map((e) => (${_getPrefix(clazz)}SafeCasteUtil.safeCast<$innerTypeClean>(e) ?? $defaultValue)).toList()";
+            }
+            conversion = (isListExprNullable
+                ? "($listExpr?$safeCastExpr)"
+                : "($listExpr$safeCastExpr)");
+          } else {
+            conversion = (isListExprNullable
+                ? "($listExpr?.cast<$innerType>())"
+                : "($listExpr.cast<$innerType>())");
+          }
+        } else if (field.isInnerEnum) {
           String mapLogic;
           if (innerType.endsWith('?')) {
             mapLogic =
-                ".map((e) => e == null ? null : $innerTypeClean.fromJson(e as Map<String, dynamic>)).toList()";
+                ".map((e) => ( e == null ? null : $innerTypeClean.values.firstWhere((ev) => ev.name == e.toString()) )).toList()";
           } else {
             mapLogic =
-                ".map((e) => $innerTypeClean.fromJson(e as Map<String, dynamic>)).toList()";
+                ".map((e) => ( $innerTypeClean.values.firstWhere((ev) => ev.name == e.toString()) )).toList()";
           }
-          conversion =
-              isListExprNullable ? "$listExpr?$mapLogic" : "$listExpr$mapLogic";
+          conversion = (isListExprNullable
+              ? "($listExpr?$mapLogic)"
+              : "($listExpr$mapLogic)");
+        } else if (field.isInnerDataforge) {
+          String mapLogic;
+          if (innerType.endsWith('?')) {
+            mapLogic =
+                ".map((e) => ( e == null ? null : $innerTypeClean.fromJson(e as Map<String, dynamic>) )).toList()";
+          } else {
+            mapLogic =
+                ".map((e) => ( $innerTypeClean.fromJson(e as Map<String, dynamic>) )).toList()";
+          }
+          conversion = (isListExprNullable
+              ? "($listExpr?$mapLogic)"
+              : "($listExpr$mapLogic)");
+        } else {
+          throw Exception(
+              'Unsupported nested type in List: $innerTypeClean for field ${field.name}. Only primitives, enums, dataforge objects, and Map<String, dynamic> are supported.');
         }
 
-        if (!isNullable) {
-          if (field.defaultValue.isNotEmpty) {
-            conversion += ' ?? ${field.defaultValue}';
-          } else if (isListExprNullable) {
-            conversion += ' ?? []';
+        if (field.defaultValue.isNotEmpty) {
+          conversion = '(($conversion) ?? (${field.defaultValue}))';
+        } else if (!isNullable) {
+          if (isListExprNullable) {
+            conversion = '($conversion ?? [])';
           }
         }
       } else if (cleanType.startsWith('Map<')) {
-        conversion = "$valueExpression as Map<String, dynamic>?";
-        if (!isNullable && field.defaultValue.isNotEmpty) {
-          conversion += ' ?? ${field.defaultValue}';
+        final keyType =
+            cleanType.substring(4, cleanType.length - 1).split(',')[0].trim();
+        if (keyType != 'String' &&
+            keyType != 'dynamic' &&
+            keyType != 'Object') {
+          throw Exception(
+              'Unsupported Map key type: $keyType for field ${field.name}. Only String keys are supported for JSON mapping.');
+        }
+
+        final innerType =
+            cleanType.substring(4, cleanType.length - 1).split(',')[1].trim();
+        final innerTypeClean = innerType.replaceAll('?', '').trim();
+
+        if (innerTypeClean == 'DateTime') {
+          String mapExpr;
+          bool isMapExprNullable = true;
+          if (jsonKeyInfo == null ||
+              (jsonKeyInfo.readValue.isEmpty &&
+                  jsonKeyInfo.alternateNames.isEmpty)) {
+            if (field.isRequired && !isNullable && field.defaultValue.isEmpty) {
+              mapExpr =
+                  "${_getPrefix(clazz)}SafeCasteUtil.readRequiredValue<Map<String, dynamic>>(json, '$jsonKey')";
+              isMapExprNullable = false;
+            } else {
+              mapExpr =
+                  "${_getPrefix(clazz)}SafeCasteUtil.readValue<Map<String, dynamic>>(json, '$jsonKey')";
+            }
+          } else {
+            mapExpr =
+                "${_getPrefix(clazz)}SafeCasteUtil.safeCast<Map<String, dynamic>>($valueExpression)";
+          }
+
+          final safeCastExpr = innerType.endsWith('?')
+              ? ".map((k, v) => MapEntry(k.toString(), ${_getPrefix(clazz)}SafeCasteUtil.safeCast<DateTime>(v)))"
+              : ".map((k, v) => MapEntry(k.toString(), (${_getPrefix(clazz)}SafeCasteUtil.safeCast<DateTime>(v) ?? DateTime.fromMillisecondsSinceEpoch(0))))";
+
+          conversion = (isMapExprNullable
+              ? "($mapExpr?$safeCastExpr)"
+              : "($mapExpr$safeCastExpr)");
+        } else if (field.isInnerEnum) {
+          String mapExpr;
+          bool isMapExprNullable = true;
+          if (jsonKeyInfo == null ||
+              (jsonKeyInfo.readValue.isEmpty &&
+                  jsonKeyInfo.alternateNames.isEmpty)) {
+            if (field.isRequired && !isNullable && field.defaultValue.isEmpty) {
+              mapExpr =
+                  "${_getPrefix(clazz)}SafeCasteUtil.readRequiredValue<Map<String, dynamic>>(json, '$jsonKey')";
+              isMapExprNullable = false;
+            } else {
+              mapExpr =
+                  "${_getPrefix(clazz)}SafeCasteUtil.readValue<Map<String, dynamic>>(json, '$jsonKey')";
+            }
+          } else {
+            mapExpr =
+                "${_getPrefix(clazz)}SafeCasteUtil.safeCast<Map<String, dynamic>>($valueExpression)";
+          }
+
+          final safeCastExpr = innerType.endsWith('?')
+              ? ".map((k, v) => MapEntry(k.toString(), (v == null ? null : $innerTypeClean.values.firstWhere((ev) => ev.name == v.toString()))))"
+              : ".map((k, v) => MapEntry(k.toString(), ($innerTypeClean.values.firstWhere((ev) => ev.name == v.toString()))))";
+
+          conversion = (isMapExprNullable
+              ? "($mapExpr?$safeCastExpr)"
+              : "($mapExpr$safeCastExpr)");
+        } else if (field.isInnerDataforge) {
+          String mapExpr;
+          bool isMapExprNullable = true;
+          if (jsonKeyInfo == null ||
+              (jsonKeyInfo.readValue.isEmpty &&
+                  jsonKeyInfo.alternateNames.isEmpty)) {
+            if (field.isRequired && !isNullable && field.defaultValue.isEmpty) {
+              mapExpr =
+                  "${_getPrefix(clazz)}SafeCasteUtil.readRequiredValue<Map<String, dynamic>>(json, '$jsonKey')";
+              isMapExprNullable = false;
+            } else {
+              mapExpr =
+                  "${_getPrefix(clazz)}SafeCasteUtil.readValue<Map<String, dynamic>>(json, '$jsonKey')";
+            }
+          } else {
+            mapExpr =
+                "${_getPrefix(clazz)}SafeCasteUtil.safeCast<Map<String, dynamic>>($valueExpression)";
+          }
+
+          final safeCastExpr = innerType.endsWith('?')
+              ? ".map((k, v) => MapEntry(k.toString(), (v == null ? null : $innerTypeClean.fromJson(v as Map<String, dynamic>))))"
+              : ".map((k, v) => MapEntry(k.toString(), ($innerTypeClean.fromJson(v as Map<String, dynamic>))))";
+
+          conversion = (isMapExprNullable
+              ? "($mapExpr?$safeCastExpr)"
+              : "($mapExpr$safeCastExpr)");
+        } else if ([
+          'String',
+          'int',
+          'double',
+          'bool',
+          'num',
+          'dynamic',
+          'Object'
+        ].contains(innerTypeClean)) {
+          // Basic Map: cast generated map
+          if (field.isRequired && !isNullable && field.defaultValue.isEmpty) {
+            conversion =
+                "${_getPrefix(clazz)}SafeCasteUtil.readRequiredValue<Map<String, dynamic>>(json, '$jsonKey').cast<String, $innerTypeClean>()";
+          } else {
+            conversion =
+                "${_getPrefix(clazz)}SafeCasteUtil.readValue<Map<String, dynamic>>(json, '$jsonKey')?.cast<String, $innerTypeClean>()";
+          }
+        } else {
+          throw Exception(
+              'Unsupported nested type in Map value: $innerTypeClean for field ${field.name}. Only primitives, enums, and dataforge objects are supported.');
+        }
+
+        if (field.defaultValue.isNotEmpty) {
+          conversion = '(($conversion) ?? (${field.defaultValue}))';
         }
       } else if (field.isDataforge) {
         String baseExpression;
@@ -628,12 +882,13 @@ class GeneratorWriter {
 
         if (jsonKeyInfo != null && jsonKeyInfo.readValue.isNotEmpty) {
           final valParam = 'v';
-          final castExpression = (isNullable || field.defaultValue.isNotEmpty)
-              ? 'as $cleanType?'
-              : 'as $cleanType';
+
+          final nullCheck = (isNullable || field.defaultValue.isNotEmpty)
+              ? "if ($valParam == null) return null;"
+              : "if ($valParam == null) throw Exception('Required field ${field.name} is null');";
 
           baseExpression =
-              "((dynamic $valParam) { if ($valParam is $cleanType) return $valParam; if ($valParam is Map<String, dynamic>) return $cleanType.fromJson($valParam); return $valParam $castExpression; })($valueExpression)";
+              "((dynamic $valParam) { $nullCheck if ($valParam is $cleanType) return $valParam; if ($valParam is Map) return $cleanType.fromJson(($valParam as Map).cast<String, dynamic>()); throw Exception('Field ${field.name} value must be Map or $cleanType'); })($valueExpression)";
         } else {
           if (jsonKeyInfo == null ||
               (jsonKeyInfo.readValue.isEmpty &&
@@ -653,17 +908,15 @@ class GeneratorWriter {
         }
 
         conversion = baseExpression;
-        if (!isNullable && !usedRequired) {
-          if (field.defaultValue.isNotEmpty) {
-            conversion = "($baseExpression) ?? ${field.defaultValue}";
-          } else {
-            conversion = "($baseExpression)!";
-          }
+        if (field.defaultValue.isNotEmpty) {
+          conversion = '(($conversion) ?? (${field.defaultValue}))';
+        } else if (!isNullable && !usedRequired) {
+          conversion = "($baseExpression)!";
         }
       } else {
         conversion = "$valueExpression";
-        if (!isNullable && field.defaultValue.isNotEmpty) {
-          conversion += ' ?? ${field.defaultValue}';
+        if (field.defaultValue.isNotEmpty) {
+          conversion = '(($conversion) ?? (${field.defaultValue}))';
         }
       }
 

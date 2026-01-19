@@ -1,35 +1,38 @@
 import 'package:dataforge_annotation/dataforge_annotation.dart';
 
-import 'utils.dart';
-import 'package:collection/collection.dart';
-
 part 'api_base_response.data.dart';
 
 @Dataforge()
-class EchoApiResponse<T>
-    with _EchoApiResponse<T>, _EchoApiResponse<T>, _EchoApiResponse<T> {
+class EchoApiResponse<T> with _EchoApiResponse<T>, _EchoApiResponse<T> {
   // int or string ??
-  @override
-  @JsonKey(name: 'code')
+  @JsonKey(name: 'code', readValue: _readApiResponseValue)
   final String code;
 
-  @override
-  @JsonKey(
-    name: 'message',
-  )
+  @JsonKey(name: 'message')
   final String message;
 
-  @override
   @JsonKey(name: "data", fromJson: jsonToObject)
   final T? data;
 
   const EchoApiResponse({
-    this.code = "",
+    this.code = "22",
     this.message = "",
     this.data,
   });
 
-  factory EchoApiResponse.fromJson(Map<String, dynamic> json) {
-    return _EchoApiResponse.fromJson(json);
+  @override
+  String toString() {
+    return 'EchoApiResponse{code: $code, message: $message, data: $data}';
   }
+
+  factory EchoApiResponse.fromJson(Map<String, dynamic> json) =>
+      _EchoApiResponse.fromJson(json);
+}
+
+T? jsonToObject<T>(Object? json, {String? typeName}) {
+  return null;
+}
+
+Object? _readApiResponseValue(Map<dynamic, dynamic> map, String key) {
+  return null;
 }

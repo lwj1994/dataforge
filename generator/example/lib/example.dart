@@ -210,8 +210,6 @@ class ComplexUser with _ComplexUser {
       _ComplexUser.fromJson(json);
 }
 
-
-
 @Dataforge(deepCopyWith: true)
 class ListExample with _ListExample {
   ListExample({

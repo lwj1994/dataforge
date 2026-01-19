@@ -208,6 +208,8 @@ class FieldInfo {
   final bool isDataforge;
   final bool isDateTime;
   final bool isRequired;
+  final bool isInnerEnum;
+  final bool isInnerDataforge;
 
   const FieldInfo({
     required this.name,
@@ -221,6 +223,8 @@ class FieldInfo {
     this.isDataforge = false,
     this.isDateTime = false,
     this.isRequired = false,
+    this.isInnerEnum = false,
+    this.isInnerDataforge = false,
   });
 
   FieldInfo copyWith({
@@ -234,6 +238,8 @@ class FieldInfo {
     bool? isEnum,
     bool? isDataforge,
     bool? isRequired,
+    bool? isInnerEnum,
+    bool? isInnerDataforge,
   }) {
     return FieldInfo(
       name: name ?? this.name,
@@ -246,6 +252,8 @@ class FieldInfo {
       isEnum: isEnum ?? this.isEnum,
       isDataforge: isDataforge ?? this.isDataforge,
       isRequired: isRequired ?? this.isRequired,
+      isInnerEnum: isInnerEnum ?? this.isInnerEnum,
+      isInnerDataforge: isInnerDataforge ?? this.isInnerDataforge,
     );
   }
 
@@ -261,6 +269,8 @@ class FieldInfo {
       'isEnum': isEnum,
       'isDataforge': isDataforge,
       'isRequired': isRequired,
+      'isInnerEnum': isInnerEnum,
+      'isInnerDataforge': isInnerDataforge,
     };
   }
 
@@ -278,12 +288,14 @@ class FieldInfo {
       isEnum: map['isEnum'] as bool? ?? false,
       isDataforge: map['isDataforge'] as bool? ?? false,
       isRequired: map['isRequired'] as bool? ?? false,
+      isInnerEnum: map['isInnerEnum'] as bool? ?? false,
+      isInnerDataforge: map['isInnerDataforge'] as bool? ?? false,
     );
   }
 
   @override
   String toString() {
-    return 'FieldInfo(name: $name, type: $type, isFinal: $isFinal, isFunction: $isFunction, jsonKey: $jsonKey, isRecord: $isRecord, defaultValue: $defaultValue, isEnum: $isEnum, isDataforge: $isDataforge, isRequired: $isRequired)';
+    return 'FieldInfo(name: $name, type: $type, isFinal: $isFinal, isFunction: $isFunction, jsonKey: $jsonKey, isRecord: $isRecord, defaultValue: $defaultValue, isEnum: $isEnum, isDataforge: $isDataforge, isRequired: $isRequired, isInnerEnum: $isInnerEnum, isInnerDataforge: $isInnerDataforge)';
   }
 
   @override
@@ -299,7 +311,9 @@ class FieldInfo {
         other.defaultValue == defaultValue &&
         other.isEnum == isEnum &&
         other.isDataforge == isDataforge &&
-        other.isRequired == isRequired;
+        other.isRequired == isRequired &&
+        other.isInnerEnum == isInnerEnum &&
+        other.isInnerDataforge == isInnerDataforge;
   }
 
   @override
@@ -314,6 +328,8 @@ class FieldInfo {
         isEnum,
         isDataforge,
         isRequired,
+        isInnerEnum,
+        isInnerDataforge,
       ]);
 }
 

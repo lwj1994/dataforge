@@ -62,20 +62,20 @@ class _BasicUserCopyWith<R> {
     Object? age = dataforgeUndefined,
   }) {
     final res = BasicUser(
-      name: name == dataforgeUndefined ? _instance.name : name as String,
-      age: age == dataforgeUndefined ? _instance.age : age as int,
+      name: (name == dataforgeUndefined ? _instance.name : name as String),
+      age: (age == dataforgeUndefined ? _instance.age : age as int),
     );
-    return _then != null ? _then!(res) : res as R;
+    return (_then != null ? _then!(res) : res as R);
   }
 
   R name(String value) {
     final res = BasicUser(name: value, age: _instance.age);
-    return _then != null ? _then!(res) : res as R;
+    return (_then != null ? _then!(res) : res as R);
   }
 
   R age(int value) {
     final res = BasicUser(name: _instance.name, age: value);
-    return _then != null ? _then!(res) : res as R;
+    return (_then != null ? _then!(res) : res as R);
   }
 }
 ''')
@@ -122,14 +122,14 @@ class _GenericResultCopyWith<T, R> {
 
   R call({Object? data = dataforgeUndefined}) {
     final res = GenericResult<T>(
-      data: data == dataforgeUndefined ? _instance.data : data as T?,
+      data: (data == dataforgeUndefined ? _instance.data : data as T?),
     );
-    return _then != null ? _then!(res) : res as R;
+    return (_then != null ? _then!(res) : res as R);
   }
 
   R data(T? value) {
     final res = GenericResult<T>(data: value);
-    return _then != null ? _then!(res) : res as R;
+    return (_then != null ? _then!(res) : res as R);
   }
 }
 ''')
@@ -183,13 +183,13 @@ class _ProductCopyWith<R> {
     Object? name = dataforgeUndefined,
   }) {
     final res = Product(
-      id: id == dataforgeUndefined ? _instance.id : id as String,
-      secret: secret == dataforgeUndefined
+      id: (id == dataforgeUndefined ? _instance.id : id as String),
+      secret: (secret == dataforgeUndefined
           ? _instance.secret
-          : secret as String,
-      name: name == dataforgeUndefined ? _instance.name : name as String,
+          : secret as String),
+      name: (name == dataforgeUndefined ? _instance.name : name as String),
     );
-    return _then != null ? _then!(res) : res as R;
+    return (_then != null ? _then!(res) : res as R);
   }
 
   R id(String value) {
@@ -198,12 +198,12 @@ class _ProductCopyWith<R> {
       secret: _instance.secret,
       name: _instance.name,
     );
-    return _then != null ? _then!(res) : res as R;
+    return (_then != null ? _then!(res) : res as R);
   }
 
   R secret(String value) {
     final res = Product(id: _instance.id, secret: value, name: _instance.name);
-    return _then != null ? _then!(res) : res as R;
+    return (_then != null ? _then!(res) : res as R);
   }
 
   R name(String value) {
@@ -212,7 +212,7 @@ class _ProductCopyWith<R> {
       secret: _instance.secret,
       name: value,
     );
-    return _then != null ? _then!(res) : res as R;
+    return (_then != null ? _then!(res) : res as R);
   }
 }
 ''')
@@ -255,7 +255,7 @@ mixin _DateTimeExample {
 
   static DateTimeExample fromJson(Map<String, dynamic> json) {
     return DateTimeExample(
-      dateTime: const DefaultDateTimeConverter().fromJson(json['dateTime']),
+      dateTime: SafeCasteUtil.readValue<DateTime>(json, 'dateTime'),
     );
   }
 }
@@ -267,16 +267,16 @@ class _DateTimeExampleCopyWith<R> {
 
   R call({Object? dateTime = dataforgeUndefined}) {
     final res = DateTimeExample(
-      dateTime: dateTime == dataforgeUndefined
+      dateTime: (dateTime == dataforgeUndefined
           ? _instance.dateTime
-          : dateTime as DateTime?,
+          : dateTime as DateTime?),
     );
-    return _then != null ? _then!(res) : res as R;
+    return (_then != null ? _then!(res) : res as R);
   }
 
   R dateTime(DateTime? value) {
     final res = DateTimeExample(dateTime: value);
-    return _then != null ? _then!(res) : res as R;
+    return (_then != null ? _then!(res) : res as R);
   }
 }
 ''')
@@ -313,10 +313,10 @@ mixin _EnumTypes {
   static EnumTypes fromJson(Map<String, dynamic> json) {
     return EnumTypes(
       status:
-          DefaultEnumConverter(
+          (DefaultEnumConverter(
             Status.values,
           ).fromJson(SafeCasteUtil.readValue<String>(json, 'status')) ??
-          Status.values.first,
+          Status.values.first),
     );
   }
 }
@@ -328,16 +328,16 @@ class _EnumTypesCopyWith<R> {
 
   R call({Object? status = dataforgeUndefined}) {
     final res = EnumTypes(
-      status: status == dataforgeUndefined
+      status: (status == dataforgeUndefined
           ? _instance.status
-          : status as Status,
+          : status as Status),
     );
-    return _then != null ? _then!(res) : res as R;
+    return (_then != null ? _then!(res) : res as R);
   }
 
   R status(Status value) {
     final res = EnumTypes(status: value);
-    return _then != null ? _then!(res) : res as R;
+    return (_then != null ? _then!(res) : res as R);
   }
 }
 ''')
@@ -384,10 +384,11 @@ mixin _DefaultValues {
 
   static DefaultValues fromJson(Map<String, dynamic> json) {
     return DefaultValues(
-      intValue: SafeCasteUtil.readValue<int>(json, 'intValue') ?? 42,
+      intValue: ((SafeCasteUtil.readValue<int>(json, 'intValue')) ?? (42)),
       stringValue:
-          SafeCasteUtil.readValue<String>(json, 'stringValue') ?? 'default',
-      boolValue: SafeCasteUtil.readValue<bool>(json, 'boolValue') ?? true,
+          ((SafeCasteUtil.readValue<String>(json, 'stringValue')) ??
+          ('default')),
+      boolValue: ((SafeCasteUtil.readValue<bool>(json, 'boolValue')) ?? (true)),
     );
   }
 }
@@ -403,17 +404,17 @@ class _DefaultValuesCopyWith<R> {
     Object? boolValue = dataforgeUndefined,
   }) {
     final res = DefaultValues(
-      intValue: intValue == dataforgeUndefined
+      intValue: (intValue == dataforgeUndefined
           ? _instance.intValue
-          : intValue as int,
-      stringValue: stringValue == dataforgeUndefined
+          : intValue as int),
+      stringValue: (stringValue == dataforgeUndefined
           ? _instance.stringValue
-          : stringValue as String,
-      boolValue: boolValue == dataforgeUndefined
+          : stringValue as String),
+      boolValue: (boolValue == dataforgeUndefined
           ? _instance.boolValue
-          : boolValue as bool,
+          : boolValue as bool),
     );
-    return _then != null ? _then!(res) : res as R;
+    return (_then != null ? _then!(res) : res as R);
   }
 
   R intValue(int value) {
@@ -422,7 +423,7 @@ class _DefaultValuesCopyWith<R> {
       stringValue: _instance.stringValue,
       boolValue: _instance.boolValue,
     );
-    return _then != null ? _then!(res) : res as R;
+    return (_then != null ? _then!(res) : res as R);
   }
 
   R stringValue(String value) {
@@ -431,7 +432,7 @@ class _DefaultValuesCopyWith<R> {
       stringValue: value,
       boolValue: _instance.boolValue,
     );
-    return _then != null ? _then!(res) : res as R;
+    return (_then != null ? _then!(res) : res as R);
   }
 
   R boolValue(bool value) {
@@ -440,7 +441,7 @@ class _DefaultValuesCopyWith<R> {
       stringValue: _instance.stringValue,
       boolValue: value,
     );
-    return _then != null ? _then!(res) : res as R;
+    return (_then != null ? _then!(res) : res as R);
   }
 }
 ''')
@@ -517,28 +518,28 @@ mixin _AlternateNamesTest {
     return AlternateNamesTest(
       name: SafeCasteUtil.readRequiredValue<String>(json, 'name'),
       age:
-          SafeCasteUtil.safeCast<int>(
+          (SafeCasteUtil.safeCast<int>(
             (json['user_age'] ?? json['age'] ?? json['years']),
           ) ??
-          0,
+          0),
       email:
-          SafeCasteUtil.safeCast<String>(
+          (SafeCasteUtil.safeCast<String>(
             (json['email'] ??
                 json['email_address'] ??
                 json['mail'] ??
                 json['e_mail']),
           ) ??
-          '',
+          ''),
       isActive:
-          SafeCasteUtil.safeCast<bool>(
+          (SafeCasteUtil.safeCast<bool>(
             (json['is_active'] ?? json['active'] ?? json['enabled']),
           ) ??
-          false,
+          false),
       tags:
-          SafeCasteUtil.safeCast<List<dynamic>>(
+          (((SafeCasteUtil.safeCast<List<String>>(
             (json['tags'] ?? json['tags_list'] ?? json['labels']),
-          )?.cast<String>() ??
-          const [],
+          )?.map((e) => (SafeCasteUtil.safeCast<String>(e) ?? '')).toList())) ??
+          (const [])),
     );
   }
 }
@@ -556,15 +557,17 @@ class _AlternateNamesTestCopyWith<R> {
     Object? tags = dataforgeUndefined,
   }) {
     final res = AlternateNamesTest(
-      name: name == dataforgeUndefined ? _instance.name : name as String,
-      age: age == dataforgeUndefined ? _instance.age : age as int,
-      email: email == dataforgeUndefined ? _instance.email : email as String,
-      isActive: isActive == dataforgeUndefined
+      name: (name == dataforgeUndefined ? _instance.name : name as String),
+      age: (age == dataforgeUndefined ? _instance.age : age as int),
+      email: (email == dataforgeUndefined ? _instance.email : email as String),
+      isActive: (isActive == dataforgeUndefined
           ? _instance.isActive
-          : isActive as bool,
-      tags: tags == dataforgeUndefined ? _instance.tags : tags as List<String>,
+          : isActive as bool),
+      tags: (tags == dataforgeUndefined
+          ? _instance.tags
+          : (tags as List).cast<String>()),
     );
-    return _then != null ? _then!(res) : res as R;
+    return (_then != null ? _then!(res) : res as R);
   }
 
   R name(String value) {
@@ -575,7 +578,7 @@ class _AlternateNamesTestCopyWith<R> {
       isActive: _instance.isActive,
       tags: _instance.tags,
     );
-    return _then != null ? _then!(res) : res as R;
+    return (_then != null ? _then!(res) : res as R);
   }
 
   R age(int value) {
@@ -586,7 +589,7 @@ class _AlternateNamesTestCopyWith<R> {
       isActive: _instance.isActive,
       tags: _instance.tags,
     );
-    return _then != null ? _then!(res) : res as R;
+    return (_then != null ? _then!(res) : res as R);
   }
 
   R email(String value) {
@@ -597,7 +600,7 @@ class _AlternateNamesTestCopyWith<R> {
       isActive: _instance.isActive,
       tags: _instance.tags,
     );
-    return _then != null ? _then!(res) : res as R;
+    return (_then != null ? _then!(res) : res as R);
   }
 
   R isActive(bool value) {
@@ -608,7 +611,7 @@ class _AlternateNamesTestCopyWith<R> {
       isActive: value,
       tags: _instance.tags,
     );
-    return _then != null ? _then!(res) : res as R;
+    return (_then != null ? _then!(res) : res as R);
   }
 
   R tags(List<String> value) {
@@ -619,7 +622,7 @@ class _AlternateNamesTestCopyWith<R> {
       isActive: _instance.isActive,
       tags: value,
     );
-    return _then != null ? _then!(res) : res as R;
+    return (_then != null ? _then!(res) : res as R);
   }
 }
 ''')
@@ -692,20 +695,20 @@ mixin _CustomReadValue {
       id: SafeCasteUtil.readRequiredValue<String>(json, 'id'),
       name: SafeCasteUtil.readRequiredValue<String>(json, 'name'),
       title:
-          SafeCasteUtil.safeCast<String>(
+          (SafeCasteUtil.safeCast<String>(
             CustomReadValue._readValue(json, 'title'),
           ) ??
-          '',
+          ''),
       count:
-          SafeCasteUtil.safeCast<int>(
+          (SafeCasteUtil.safeCast<int>(
             CustomReadValue._readValue(json, 'count'),
           ) ??
-          0,
+          0),
       enabled:
-          SafeCasteUtil.safeCast<bool>(
+          (SafeCasteUtil.safeCast<bool>(
             CustomReadValue._readValue(json, 'enabled'),
           ) ??
-          false,
+          false),
     );
   }
 }
@@ -723,15 +726,15 @@ class _CustomReadValueCopyWith<R> {
     Object? enabled = dataforgeUndefined,
   }) {
     final res = CustomReadValue(
-      id: id == dataforgeUndefined ? _instance.id : id as String,
-      name: name == dataforgeUndefined ? _instance.name : name as String,
-      title: title == dataforgeUndefined ? _instance.title : title as String,
-      count: count == dataforgeUndefined ? _instance.count : count as int,
-      enabled: enabled == dataforgeUndefined
+      id: (id == dataforgeUndefined ? _instance.id : id as String),
+      name: (name == dataforgeUndefined ? _instance.name : name as String),
+      title: (title == dataforgeUndefined ? _instance.title : title as String),
+      count: (count == dataforgeUndefined ? _instance.count : count as int),
+      enabled: (enabled == dataforgeUndefined
           ? _instance.enabled
-          : enabled as bool,
+          : enabled as bool),
     );
-    return _then != null ? _then!(res) : res as R;
+    return (_then != null ? _then!(res) : res as R);
   }
 
   R id(String value) {
@@ -742,7 +745,7 @@ class _CustomReadValueCopyWith<R> {
       count: _instance.count,
       enabled: _instance.enabled,
     );
-    return _then != null ? _then!(res) : res as R;
+    return (_then != null ? _then!(res) : res as R);
   }
 
   R name(String value) {
@@ -753,7 +756,7 @@ class _CustomReadValueCopyWith<R> {
       count: _instance.count,
       enabled: _instance.enabled,
     );
-    return _then != null ? _then!(res) : res as R;
+    return (_then != null ? _then!(res) : res as R);
   }
 
   R title(String value) {
@@ -764,7 +767,7 @@ class _CustomReadValueCopyWith<R> {
       count: _instance.count,
       enabled: _instance.enabled,
     );
-    return _then != null ? _then!(res) : res as R;
+    return (_then != null ? _then!(res) : res as R);
   }
 
   R count(int value) {
@@ -775,7 +778,7 @@ class _CustomReadValueCopyWith<R> {
       count: value,
       enabled: _instance.enabled,
     );
-    return _then != null ? _then!(res) : res as R;
+    return (_then != null ? _then!(res) : res as R);
   }
 
   R enabled(bool value) {
@@ -786,7 +789,7 @@ class _CustomReadValueCopyWith<R> {
       count: _instance.count,
       enabled: value,
     );
-    return _then != null ? _then!(res) : res as R;
+    return (_then != null ? _then!(res) : res as R);
   }
 }
 ''')
@@ -850,14 +853,14 @@ class _GenericContainerCopyWith<T, R> {
 
   R call({Object? data = dataforgeUndefined}) {
     final res = GenericContainer<T>(
-      data: data == dataforgeUndefined ? _instance.data : data as T,
+      data: (data == dataforgeUndefined ? _instance.data : data as T),
     );
-    return _then != null ? _then!(res) : res as R;
+    return (_then != null ? _then!(res) : res as R);
   }
 
   R data(T value) {
     final res = GenericContainer<T>(data: value);
-    return _then != null ? _then!(res) : res as R;
+    return (_then != null ? _then!(res) : res as R);
   }
 }
 ''')
@@ -895,10 +898,12 @@ mixin _NestedDefaultValues {
 
   static NestedDefaultValues fromJson(Map<String, dynamic> json) {
     return NestedDefaultValues(
-      name: SafeCasteUtil.readValue<String>(json, 'name') ?? 'nested_default',
+      name:
+          ((SafeCasteUtil.readValue<String>(json, 'name')) ??
+          ('nested_default')),
       nested:
-          (SafeCasteUtil.readObject(json, 'nested', DefaultValues.fromJson)) ??
-          const DefaultValues(),
+          ((SafeCasteUtil.readObject(json, 'nested', DefaultValues.fromJson)) ??
+          (const DefaultValues())),
     );
   }
 }
@@ -913,34 +918,34 @@ class _NestedDefaultValuesCopyWith<R> {
     Object? nested = dataforgeUndefined,
   }) {
     final res = NestedDefaultValues(
-      name: name == dataforgeUndefined ? _instance.name : name as String,
-      nested: nested == dataforgeUndefined
+      name: (name == dataforgeUndefined ? _instance.name : name as String),
+      nested: (nested == dataforgeUndefined
           ? _instance.nested
-          : nested as DefaultValues,
+          : nested as DefaultValues),
     );
-    return _then != null ? _then!(res) : res as R;
+    return (_then != null ? _then!(res) : res as R);
   }
 
   R name(String value) {
     final res = NestedDefaultValues(name: value, nested: _instance.nested);
-    return _then != null ? _then!(res) : res as R;
+    return (_then != null ? _then!(res) : res as R);
   }
 
   R nested(DefaultValues value) {
     final res = NestedDefaultValues(name: _instance.name, nested: value);
-    return _then != null ? _then!(res) : res as R;
+    return (_then != null ? _then!(res) : res as R);
   }
 
-  R nested$intValue(int value) {
-    return call(nested: _instance.nested.copyWith(intValue: value));
+  R nested$intvalue(int value) {
+    return call(nested: (_instance.nested.copyWith(intValue: value)));
   }
 
-  R nested$stringValue(String value) {
-    return call(nested: _instance.nested.copyWith(stringValue: value));
+  R nested$stringvalue(String value) {
+    return call(nested: (_instance.nested.copyWith(stringValue: value)));
   }
 
-  R nested$boolValue(bool value) {
-    return call(nested: _instance.nested.copyWith(boolValue: value));
+  R nested$boolvalue(bool value) {
+    return call(nested: (_instance.nested.copyWith(boolValue: value)));
   }
 }
 ''')
@@ -994,28 +999,28 @@ class _ChainedExampleCopyWith<R> {
 
   R call({Object? id = dataforgeUndefined, Object? user = dataforgeUndefined}) {
     final res = ChainedExample(
-      id: id == dataforgeUndefined ? _instance.id : id as String,
-      user: user == dataforgeUndefined ? _instance.user : user as BasicUser,
+      id: (id == dataforgeUndefined ? _instance.id : id as String),
+      user: (user == dataforgeUndefined ? _instance.user : user as BasicUser),
     );
-    return _then != null ? _then!(res) : res as R;
+    return (_then != null ? _then!(res) : res as R);
   }
 
   R id(String value) {
     final res = ChainedExample(id: value, user: _instance.user);
-    return _then != null ? _then!(res) : res as R;
+    return (_then != null ? _then!(res) : res as R);
   }
 
   R user(BasicUser value) {
     final res = ChainedExample(id: _instance.id, user: value);
-    return _then != null ? _then!(res) : res as R;
+    return (_then != null ? _then!(res) : res as R);
   }
 
   R user$name(String value) {
-    return call(user: _instance.user.copyWith(name: value));
+    return call(user: (_instance.user.copyWith(name: value)));
   }
 
   R user$age(int value) {
-    return call(user: _instance.user.copyWith(age: value));
+    return call(user: (_instance.user.copyWith(age: value)));
   }
 }
 ''')
@@ -1065,10 +1070,10 @@ mixin _ListObjectExample {
   static ListObjectExample fromJson(Map<String, dynamic> json) {
     return ListObjectExample(
       users:
-          SafeCasteUtil.readValue<List<dynamic>>(json, 'users')
-              ?.map((e) => BasicUser.fromJson(e as Map<String, dynamic>))
-              .toList() ??
-          const [],
+          (((SafeCasteUtil.readValue<List<dynamic>>(json, 'users')
+              ?.map((e) => (BasicUser.fromJson(e as Map<String, dynamic>)))
+              .toList())) ??
+          (const [])),
     );
   }
 }
@@ -1080,16 +1085,16 @@ class _ListObjectExampleCopyWith<R> {
 
   R call({Object? users = dataforgeUndefined}) {
     final res = ListObjectExample(
-      users: users == dataforgeUndefined
+      users: (users == dataforgeUndefined
           ? _instance.users
-          : users as List<BasicUser>,
+          : (users as List).cast<BasicUser>()),
     );
-    return _then != null ? _then!(res) : res as R;
+    return (_then != null ? _then!(res) : res as R);
   }
 
   R users(List<BasicUser> value) {
     final res = ListObjectExample(users: value);
-    return _then != null ? _then!(res) : res as R;
+    return (_then != null ? _then!(res) : res as R);
   }
 }
 ''')
@@ -1137,14 +1142,14 @@ class _PrefixedExampleCopyWith<R> {
 
   R call({Object? name = df.dataforgeUndefined}) {
     final res = PrefixedExample(
-      name: name == df.dataforgeUndefined ? _instance.name : name as String,
+      name: (name == df.dataforgeUndefined ? _instance.name : name as String),
     );
-    return _then != null ? _then!(res) : res as R;
+    return (_then != null ? _then!(res) : res as R);
   }
 
   R name(String value) {
     final res = PrefixedExample(name: value);
-    return _then != null ? _then!(res) : res as R;
+    return (_then != null ? _then!(res) : res as R);
   }
 }
 ''')
@@ -1210,22 +1215,22 @@ mixin _CustomFunctionsExample {
 
   Map<String, dynamic> toJson() {
     return {
-      'custom_name': customStringToJson(name),
-      'custom_count': customIntToJson(count),
-      'optional_value': optionalValue != null
+      'custom_name': (customStringToJson(name)),
+      'custom_count': (customIntToJson(count)),
+      'optional_value': (optionalValue != null
           ? customStringToJson(optionalValue!)
-          : null,
+          : null),
       'regularField': regularField,
     };
   }
 
   static CustomFunctionsExample fromJson(Map<String, dynamic> json) {
     return CustomFunctionsExample(
-      name: customStringFromJson(json['custom_name']),
-      count: customIntFromJson(json['custom_count']),
-      optionalValue: json['optional_value'] != null
+      name: (customStringFromJson(json['custom_name'])),
+      count: (customIntFromJson(json['custom_count'])),
+      optionalValue: (json['optional_value'] != null
           ? customStringFromJson(json['optional_value'])
-          : null,
+          : null),
       regularField: SafeCasteUtil.readRequiredValue<String>(
         json,
         'regularField',
@@ -1246,16 +1251,16 @@ class _CustomFunctionsExampleCopyWith<R> {
     Object? regularField = dataforgeUndefined,
   }) {
     final res = CustomFunctionsExample(
-      name: name == dataforgeUndefined ? _instance.name : name as String,
-      count: count == dataforgeUndefined ? _instance.count : count as int,
-      optionalValue: optionalValue == dataforgeUndefined
+      name: (name == dataforgeUndefined ? _instance.name : name as String),
+      count: (count == dataforgeUndefined ? _instance.count : count as int),
+      optionalValue: (optionalValue == dataforgeUndefined
           ? _instance.optionalValue
-          : optionalValue as String?,
-      regularField: regularField == dataforgeUndefined
+          : optionalValue as String?),
+      regularField: (regularField == dataforgeUndefined
           ? _instance.regularField
-          : regularField as String,
+          : regularField as String),
     );
-    return _then != null ? _then!(res) : res as R;
+    return (_then != null ? _then!(res) : res as R);
   }
 
   R name(String value) {
@@ -1265,7 +1270,7 @@ class _CustomFunctionsExampleCopyWith<R> {
       optionalValue: _instance.optionalValue,
       regularField: _instance.regularField,
     );
-    return _then != null ? _then!(res) : res as R;
+    return (_then != null ? _then!(res) : res as R);
   }
 
   R count(int value) {
@@ -1275,7 +1280,7 @@ class _CustomFunctionsExampleCopyWith<R> {
       optionalValue: _instance.optionalValue,
       regularField: _instance.regularField,
     );
-    return _then != null ? _then!(res) : res as R;
+    return (_then != null ? _then!(res) : res as R);
   }
 
   R optionalValue(String? value) {
@@ -1285,7 +1290,7 @@ class _CustomFunctionsExampleCopyWith<R> {
       optionalValue: value,
       regularField: _instance.regularField,
     );
-    return _then != null ? _then!(res) : res as R;
+    return (_then != null ? _then!(res) : res as R);
   }
 
   R regularField(String value) {
@@ -1295,7 +1300,7 @@ class _CustomFunctionsExampleCopyWith<R> {
       optionalValue: _instance.optionalValue,
       regularField: value,
     );
-    return _then != null ? _then!(res) : res as R;
+    return (_then != null ? _then!(res) : res as R);
   }
 }
 ''')
@@ -1369,7 +1374,7 @@ mixin _ReadValueWithFromJsonExample {
 
   static ReadValueWithFromJsonExample fromJson(Map<String, dynamic> json) {
     return ReadValueWithFromJsonExample(
-      name: readValueWithFromJson(customReadValue(json, 'name')),
+      name: (readValueWithFromJson(customReadValue(json, 'name'))),
     );
   }
 }
@@ -1381,14 +1386,14 @@ class _ReadValueWithFromJsonExampleCopyWith<R> {
 
   R call({Object? name = dataforgeUndefined}) {
     final res = ReadValueWithFromJsonExample(
-      name: name == dataforgeUndefined ? _instance.name : name as String,
+      name: (name == dataforgeUndefined ? _instance.name : name as String),
     );
-    return _then != null ? _then!(res) : res as R;
+    return (_then != null ? _then!(res) : res as R);
   }
 
   R name(String value) {
     final res = ReadValueWithFromJsonExample(name: value);
-    return _then != null ? _then!(res) : res as R;
+    return (_then != null ? _then!(res) : res as R);
   }
 }
 ''')

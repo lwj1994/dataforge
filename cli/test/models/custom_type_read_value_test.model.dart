@@ -1,5 +1,4 @@
 import 'package:dataforge_annotation/dataforge_annotation.dart';
-import 'package:collection/collection.dart';
 
 part 'custom_type_read_value_test.model.data.dart';
 
@@ -32,7 +31,8 @@ class CustomTypeReadValueTest with _CustomTypeReadValueTest {
 
   /// Custom readValue method that returns UserInfo (custom type)
   static Object? _readUserInfo(Map<dynamic, dynamic> map, String key) {
-    final value = map[key] ?? map["user"] ?? {};
+    // Return a map with required fields 'name' and 'age'
+    final value = map[key] ?? map["user"] ?? {'name': '', 'age': 0};
     return value;
   }
 

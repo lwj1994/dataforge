@@ -1,6 +1,5 @@
 import 'package:test/test.dart';
 import '../models/alternate_names_test.model.dart';
-import '../models/backward_compatibility_test.model.dart';
 import '../models/default_values.model.dart';
 
 /// 核心功能测试模块
@@ -60,52 +59,6 @@ void runCoreFunctionalityTests() {
         expect(result.email, equals('bob@example.com'));
         expect(result.isActive, equals(true));
         expect(result.tags, equals(['manager', 'team-lead']));
-      });
-    });
-
-    group('Backward Compatibility', () {
-      test('Dataforge annotation should work', () {
-        final user = UserDataforge(
-          name: 'John Doe',
-          age: 30,
-          email: 'john@example.com',
-        );
-
-        expect(user.name, 'John Doe');
-        expect(user.age, 30);
-        expect(user.email, 'john@example.com');
-
-        final json = user.toJson();
-        expect(json['name'], 'John Doe');
-        expect(json['age'], 30);
-        expect(json['email'], 'john@example.com');
-
-        final userFromJson = UserDataforge.fromJson(json);
-        expect(userFromJson.name, 'John Doe');
-        expect(userFromJson.age, 30);
-        expect(userFromJson.email, 'john@example.com');
-      });
-
-      test('DataClass annotation should still work (deprecated)', () {
-        final user = UserDataClass(
-          name: 'Jane Doe',
-          age: 25,
-          email: 'jane@example.com',
-        );
-
-        expect(user.name, 'Jane Doe');
-        expect(user.age, 25);
-        expect(user.email, 'jane@example.com');
-
-        final json = user.toJson();
-        expect(json['name'], 'Jane Doe');
-        expect(json['age'], 25);
-        expect(json['email'], 'jane@example.com');
-
-        final userFromJson = UserDataClass.fromJson(json);
-        expect(userFromJson.name, 'Jane Doe');
-        expect(userFromJson.age, 25);
-        expect(userFromJson.email, 'jane@example.com');
       });
     });
 

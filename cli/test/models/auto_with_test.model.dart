@@ -1,5 +1,4 @@
 import 'package:dataforge_annotation/dataforge_annotation.dart';
-import 'package:collection/collection.dart';
 
 part 'auto_with_test.model.data.dart';
 
@@ -22,8 +21,7 @@ class TestUser with _TestUser {
 
 // Test class with existing with clause - should add , _TestAdmin
 @Dataforge(includeFromJson: true, includeToJson: true)
-class TestAdmin
-    with SomeOtherMixin, _TestAdmin, _TestAdmin, _TestAdmin, _TestAdmin {
+class TestAdmin with SomeOtherMixin, _TestAdmin {
   @override
   final String username;
   @override

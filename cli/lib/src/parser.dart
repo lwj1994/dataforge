@@ -6,7 +6,7 @@ import 'package:analyzer/dart/ast/ast.dart';
 import 'package:collection/collection.dart';
 import 'package:path/path.dart' as p;
 
-import 'model.dart';
+import 'package:dataforge_base/src/model.dart';
 
 /// Parse Dart files and extract DataClass annotation information
 ///
@@ -217,6 +217,13 @@ class Parser {
           if (member.factoryKeyword == null) {
             // Primary constructor
             for (var parameter in member.parameters.parameters) {
+              // Get the actual parameter node (unwrap DefaultFormalParameter if present)
+              var effectiveParam = parameter;
+              if (parameter is DefaultFormalParameter) {
+                effectiveParam = parameter.parameter;
+              }
+
+              // Handle default values (always on DefaultFormalParameter or similar if available)
               if (parameter is DefaultFormalParameter &&
                   parameter.defaultValue != null) {
                 final paramName = parameter.name?.lexeme;
@@ -225,18 +232,44 @@ class Parser {
                   defaultValueMap[paramName] = defaultValue;
                 }
               }
+
               // Check for required parameters
-              if (parameter is DefaultFormalParameter) {
-                if (parameter.requiredKeyword != null) {
-                  final paramName = parameter.name?.lexeme;
-                  if (paramName != null) {
-                    requiredParams.add(paramName);
-                  }
-                }
+              bool isRequired = false;
+              String? paramName;
+
+              // Check requiredKeyword on the outer parameter (DefaultFormalParameter)
+              if (parameter is DefaultFormalParameter &&
+                  parameter.requiredKeyword != null) {
+                isRequired = true;
+              }
+
+              // Also check the effective parameter (FieldFormalParameter might have it in some contexts)
+              if (!isRequired &&
+                  effectiveParam is FieldFormalParameter &&
+                  effectiveParam.requiredKeyword != null) {
+                isRequired = true;
+              }
+
+              if (!isRequired &&
+                  effectiveParam is SimpleFormalParameter &&
+                  effectiveParam.requiredKeyword != null) {
+                isRequired = true;
+              }
+
+              if (effectiveParam is FieldFormalParameter) {
+                paramName = effectiveParam.name.lexeme;
+              } else if (effectiveParam is SimpleFormalParameter) {
+                paramName = effectiveParam.name?.lexeme;
+              }
+
+              if (isRequired && paramName != null) {
+                requiredParams.add(paramName);
               }
             }
           }
         }
+        print(
+            'Required params for ${declaration.name.lexeme}: $requiredParams');
 
         // Parse fields
         for (final member in declaration.members) {
@@ -291,8 +324,12 @@ class Parser {
                         );
                         break;
                       case "readValue":
+                        String readValue = expressionSource;
+                        if (_isStaticMethod(declaration, readValue)) {
+                          readValue = '${declaration.name.lexeme}.$readValue';
+                        }
                         jsonKeyInfo = jsonKeyInfo!.copyWith(
-                          readValue: expressionSource,
+                          readValue: readValue,
                         );
                         break;
                       case "ignore":
@@ -319,9 +356,19 @@ class Parser {
                               'Warning: Failed to parse alternateNames for ${member.fields.variables.first.name.lexeme}: $e');
                         }
                         break;
+
                       case "converter":
+                        String converter = expressionSource;
+                        // Remove leading const
+                        converter =
+                            converter.replaceAll(RegExp(r'^const\s+'), '');
+                        // Remove trailing () if present (heuristic for default constructor)
+                        if (converter.endsWith('()')) {
+                          converter =
+                              converter.substring(0, converter.length - 2);
+                        }
                         jsonKeyInfo = jsonKeyInfo!.copyWith(
-                          converter: expressionSource,
+                          converter: converter,
                         );
                         break;
 
@@ -331,13 +378,21 @@ class Parser {
                         );
                         break;
                       case "fromJson":
+                        String fromJson = expressionSource;
+                        if (_isStaticMethod(declaration, fromJson)) {
+                          fromJson = '${declaration.name.lexeme}.$fromJson';
+                        }
                         jsonKeyInfo = jsonKeyInfo!.copyWith(
-                          fromJson: expressionSource,
+                          fromJson: fromJson,
                         );
                         break;
                       case "toJson":
+                        String toJson = expressionSource;
+                        if (_isStaticMethod(declaration, toJson)) {
+                          toJson = '${declaration.name.lexeme}.$toJson';
+                        }
                         jsonKeyInfo = jsonKeyInfo!.copyWith(
-                          toJson: expressionSource,
+                          toJson: toJson,
                         );
                         break;
                     }
@@ -384,6 +439,8 @@ class Parser {
                     defaultValue: defaultValueMap[name] ?? "",
                     isDateTime: isDateTime,
                     isRequired: requiredParams.contains(name),
+                    isInnerEnum: _isInnerEnum(type),
+                    isInnerDataforge: _isInnerDataforge(type),
                   ),
                 );
               }
@@ -440,5 +497,50 @@ class Parser {
     }
 
     return ParseResult(outputPath, partOf, classes, imports);
+  }
+
+  /// Determine whether an inner type is an enum
+  bool _isInnerEnum(String type) {
+    return false; // Will be refined in CliWriter
+  }
+
+  /// Determine whether an inner type is a Dataforge object
+  bool _isInnerDataforge(String type) {
+    if (!type.contains('<')) return false;
+    final inner = type
+        .substring(type.indexOf('<') + 1, type.lastIndexOf('>'))
+        .split(',')
+        .last
+        .replaceAll('?', '')
+        .trim();
+    // Default primitives that are definitely not Dataforge
+    const primitives = {
+      'String',
+      'int',
+      'double',
+      'bool',
+      'num',
+      'DateTime',
+      'dynamic'
+    };
+    if (inner.startsWith('List<') || inner.startsWith('Map<')) return false;
+    return !primitives.contains(inner);
+  }
+
+  bool _isStaticMethod(CompilationUnitMember member, String methodName) {
+    if (member is! ClassDeclaration && member is! MixinDeclaration) {
+      return false;
+    }
+
+    final members = member is ClassDeclaration
+        ? member.members
+        : (member as MixinDeclaration).members;
+
+    for (var m in members) {
+      if (m is MethodDeclaration && m.isStatic && m.name.lexeme == methodName) {
+        return true;
+      }
+    }
+    return false;
   }
 }
