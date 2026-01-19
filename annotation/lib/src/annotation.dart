@@ -38,6 +38,36 @@ class JsonKey {
   final JsonTypeConverter? converter;
   final bool? includeIfNull;
 
+  /// Custom function for deserializing the field from JSON.
+  ///
+  /// When specified, this function takes the raw JSON value and returns the
+  /// deserialized field value. This has the highest priority and will override
+  /// any [converter] specified for this field.
+  ///
+  /// Example:
+  /// ```dart
+  /// String customStringFromJson(dynamic value) => 'custom_$value';
+  ///
+  /// @JsonKey(fromJson: customStringFromJson)
+  /// final String name;
+  /// ```
+  final Function? fromJson;
+
+  /// Custom function for serializing the field to JSON.
+  ///
+  /// When specified, this function takes the field value and returns the
+  /// JSON-serializable value. This has the highest priority and will override
+  /// any [converter] specified for this field.
+  ///
+  /// Example:
+  /// ```dart
+  /// String customStringToJson(String value) => value.toUpperCase();
+  ///
+  /// @JsonKey(toJson: customStringToJson)
+  /// final String name;
+  /// ```
+  final Function? toJson;
+
   const JsonKey({
     this.name = "",
     this.alternateNames = const [],
@@ -45,6 +75,8 @@ class JsonKey {
     this.ignore = false,
     this.converter,
     this.includeIfNull,
+    this.fromJson,
+    this.toJson,
   });
 }
 

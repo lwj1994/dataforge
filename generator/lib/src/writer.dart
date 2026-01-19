@@ -366,19 +366,35 @@ class GeneratorWriter {
           : field.name;
 
       final cleanType = field.type.replaceAll('?', '');
+      final isNullable = field.type.endsWith('?');
       String valueAccess;
       final jsonKeyInfo = field.jsonKey;
+      final customToJson = jsonKeyInfo?.toJson;
       final customConverter = jsonKeyInfo?.converter;
 
-      if (customConverter != null && customConverter.isNotEmpty) {
+      // Priority 1: Custom toJson function (highest priority)
+      if (customToJson != null && customToJson.isNotEmpty) {
+        if (isNullable) {
+          valueAccess =
+              '${field.name} != null ? $customToJson(${field.name}!) : null';
+        } else {
+          valueAccess = '$customToJson(${field.name})';
+        }
+      }
+      // Priority 2: Custom converter
+      else if (customConverter != null && customConverter.isNotEmpty) {
         valueAccess = 'const $customConverter().toJson(${field.name})';
-      } else if (field.isDateTime) {
+      }
+      // Priority 3: Auto-matched converters (DateTime, Enum)
+      else if (field.isDateTime) {
         valueAccess =
             'const ${_getPrefix(clazz)}DefaultDateTimeConverter().toJson(${field.name})';
       } else if (field.isEnum) {
         valueAccess =
             '${_getPrefix(clazz)}DefaultEnumConverter($cleanType.values).toJson(${field.name})';
-      } else {
+      }
+      // Priority 4: Default (direct access)
+      else {
         valueAccess = field.name;
       }
 
@@ -421,10 +437,21 @@ class GeneratorWriter {
 
       final cleanType = field.type.replaceAll('?', '');
       final isNullable = field.type.endsWith('?');
+      final customFromJson = jsonKeyInfo?.fromJson;
       final customConverter = jsonKeyInfo?.converter;
 
       String conversion;
-      if (customConverter != null && customConverter.isNotEmpty) {
+      // Priority 1: Custom fromJson function (highest priority)
+      if (customFromJson != null && customFromJson.isNotEmpty) {
+        if (isNullable) {
+          conversion =
+              '$valueExpression != null ? $customFromJson($valueExpression) : null';
+        } else {
+          conversion = '$customFromJson($valueExpression)';
+        }
+      }
+      // Priority 2: Custom converter
+      else if (customConverter != null && customConverter.isNotEmpty) {
         if (jsonKeyInfo != null && jsonKeyInfo.readValue.isNotEmpty) {
           // If readValue is used, check if the value is already the target type
           // If so, return it directly. Otherwise, use the converter.

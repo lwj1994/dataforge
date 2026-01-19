@@ -19,7 +19,7 @@ class EchoApiResponse<T>
   final String message;
 
   @override
-  @JsonKey(name: "data", converter: const EchoApiResponseConverter<T>())
+  @JsonKey(name: "data", readValue: readValue)
   final T? data;
 
   const EchoApiResponse({

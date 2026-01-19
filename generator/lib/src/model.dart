@@ -325,6 +325,14 @@ class JsonKeyInfo {
   final String converter;
   final bool? includeIfNull;
 
+  /// Custom function for deserializing the field from JSON.
+  /// When specified, this has the highest priority and will override any converter.
+  final String fromJson;
+
+  /// Custom function for serializing the field to JSON.
+  /// When specified, this has the highest priority and will override any converter.
+  final String toJson;
+
   const JsonKeyInfo({
     required this.name,
     required this.alternateNames,
@@ -332,6 +340,8 @@ class JsonKeyInfo {
     required this.ignore,
     this.converter = '',
     this.includeIfNull,
+    this.fromJson = '',
+    this.toJson = '',
   });
 
   JsonKeyInfo copyWith({
@@ -341,6 +351,8 @@ class JsonKeyInfo {
     bool? ignore,
     String? converter,
     bool? includeIfNull,
+    String? fromJson,
+    String? toJson,
   }) {
     return JsonKeyInfo(
       name: name ?? this.name,
@@ -349,6 +361,8 @@ class JsonKeyInfo {
       ignore: ignore ?? this.ignore,
       converter: converter ?? this.converter,
       includeIfNull: includeIfNull ?? this.includeIfNull,
+      fromJson: fromJson ?? this.fromJson,
+      toJson: toJson ?? this.toJson,
     );
   }
 
@@ -360,6 +374,8 @@ class JsonKeyInfo {
       'ignore': ignore,
       'converter': converter,
       'includeIfNull': includeIfNull,
+      'fromJson': fromJson,
+      'toJson': toJson,
     };
   }
 
@@ -374,12 +390,14 @@ class JsonKeyInfo {
       ignore: map['ignore'] as bool? ?? false,
       converter: map['converter'] as String? ?? '',
       includeIfNull: map['includeIfNull'] as bool?,
+      fromJson: map['fromJson'] as String? ?? '',
+      toJson: map['toJson'] as String? ?? '',
     );
   }
 
   @override
   String toString() {
-    return 'JsonKeyInfo(name: $name, alternateNames: $alternateNames, readValue: $readValue, ignore: $ignore, converter: $converter, includeIfNull: $includeIfNull)';
+    return 'JsonKeyInfo(name: $name, alternateNames: $alternateNames, readValue: $readValue, ignore: $ignore, converter: $converter, includeIfNull: $includeIfNull, fromJson: $fromJson, toJson: $toJson)';
   }
 
   @override
@@ -392,7 +410,9 @@ class JsonKeyInfo {
         other.readValue == readValue &&
         other.ignore == ignore &&
         other.converter == converter &&
-        other.includeIfNull == includeIfNull;
+        other.includeIfNull == includeIfNull &&
+        other.fromJson == fromJson &&
+        other.toJson == toJson;
   }
 
   @override
@@ -403,5 +423,7 @@ class JsonKeyInfo {
         ignore,
         converter,
         includeIfNull,
+        fromJson,
+        toJson,
       ]);
 }

@@ -271,6 +271,28 @@ class GeneratorParser {
           .toList();
     }
 
+    // Extract fromJson function reference
+    String fromJsonFunc = '';
+    final fromJsonObj = reader.peek('fromJson');
+    if (fromJsonObj != null && !fromJsonObj.isNull) {
+      try {
+        fromJsonFunc = fromJsonObj.revive().accessor;
+      } catch (_) {
+        // If revive fails, try to get the function name from the type
+      }
+    }
+
+    // Extract toJson function reference
+    String toJsonFunc = '';
+    final toJsonObj = reader.peek('toJson');
+    if (toJsonObj != null && !toJsonObj.isNull) {
+      try {
+        toJsonFunc = toJsonObj.revive().accessor;
+      } catch (_) {
+        // If revive fails, try to get the function name from the type
+      }
+    }
+
     return JsonKeyInfo(
       name: reader.peek('name')?.stringValue ?? '',
       alternateNames: alternateNames,
@@ -283,6 +305,8 @@ class GeneratorParser {
               ?.getDisplayString(withNullability: false) ??
           '',
       includeIfNull: reader.peek('includeIfNull')?.boolValue,
+      fromJson: fromJsonFunc,
+      toJson: toJsonFunc,
     );
   }
 }
