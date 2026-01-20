@@ -363,7 +363,7 @@ class GeneratorWriter {
     List<FieldInfo> validFields,
   ) {
     buffer.writeln('  @override');
-    buffer.write('  String toString() => \'${clazz.name}(');
+    buffer.write("  String toString() => '${clazz.name}(");
 
     for (int i = 0; i < validFields.length; i++) {
       final field = validFields[i];
@@ -371,7 +371,7 @@ class GeneratorWriter {
       buffer.write('${field.name}: \$${field.name}${isLast ? '' : ', '}');
     }
 
-    buffer.writeln(')\';');
+    buffer.writeln(")';");
     buffer.writeln();
   }
 
