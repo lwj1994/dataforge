@@ -40,41 +40,17 @@ class DefaultDateTimeConverter extends JsonTypeConverter<DateTime, String> {
     if (json == null) return null;
 
     // Handle numeric timestamps (milliseconds since epoch)
-    if (json is int) {
+
+    final maybeInt = int.tryParse(json.toString());
+
+    if (json is num || maybeInt != null) {
       final timestamp = json.toString();
       if (timestamp.length <= 13) {
         // Pad to 13 digits if needed (to handle seconds or other shorter timestamps)
         final paddedTimestamp = timestamp.padRight(13, '0');
         return DateTime.fromMillisecondsSinceEpoch(int.parse(paddedTimestamp));
       }
-      return DateTime.fromMillisecondsSinceEpoch(json);
-    }
-
-    // Handle string timestamps
-    if (json is String) {
-      // Handle empty string
-      if (json.isEmpty) {
-        return null;
-      }
-
-      // Try to parse as number first
-      if (RegExp(r'^\d+$').hasMatch(json)) {
-        final timestamp = json;
-        if (timestamp.length <= 13) {
-          // Pad to 13 digits if needed
-          final paddedTimestamp = timestamp.padRight(13, '0');
-          return DateTime.fromMillisecondsSinceEpoch(
-              int.parse(paddedTimestamp));
-        }
-        return DateTime.fromMillisecondsSinceEpoch(int.parse(timestamp));
-      }
-
-      // Otherwise try to parse as ISO date string
-      try {
-        return DateTime.parse(json);
-      } catch (e) {
-        // Ignore parsing errors and try next method
-      }
+      return DateTime.fromMillisecondsSinceEpoch(int.parse(timestamp));
     }
 
     // Last resort: try to convert to string and parse
