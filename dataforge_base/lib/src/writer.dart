@@ -340,9 +340,8 @@ class GeneratorWriter {
     final access = pathInfo.path;
     // Since copyWith is a getter returning a callable object,
     // we must use ?.call(...) if the receiver is nullable.
-    final copyWithAccess = pathInfo.isNullable
-        ? '$access?.copyWith?.call'
-        : '$access.copyWith';
+    final copyWithAccess =
+        pathInfo.isNullable ? '$access?.copyWith?.call' : '$access.copyWith';
 
     if (isLast) {
       return '($copyWithAccess($targetField: value))';
@@ -571,10 +570,8 @@ class GeneratorWriter {
         }
       } else if (cleanType.startsWith('Map<') && field.isInnerEnum) {
         // Handle Map<String, Enum>
-        final innerType = cleanType
-            .substring(4, cleanType.length - 1)
-            .split(',')[1]
-            .trim();
+        final innerType =
+            cleanType.substring(4, cleanType.length - 1).split(',')[1].trim();
         final innerTypeClean = innerType.replaceAll('?', '').trim();
         final mapLogic =
             '(k, e) => MapEntry(k, const ${_getPrefix(clazz)}DefaultEnumConverter<$innerTypeClean>($innerTypeClean.values).toJson(e))';
@@ -685,8 +682,7 @@ class GeneratorWriter {
         if (field.defaultValue.isNotEmpty) {
           conversion = '(($conversion) ?? (${field.defaultValue}))';
         } else if (!isNullable && !usedRequired) {
-          final defaultValue =
-              ({
+          final defaultValue = ({
                 'int': '0',
                 'double': '0.0',
                 'String': "''",
@@ -696,16 +692,12 @@ class GeneratorWriter {
           conversion = '($conversion ?? $defaultValue)';
         }
       } else if (field.isDateTime || cleanType == 'DateTime') {
+        // DateTime 是基本类型，统一使用 readValue + 兜底值，不使用 readRequiredValue
         if (jsonKeyInfo == null ||
             (jsonKeyInfo.readValue.isEmpty &&
                 jsonKeyInfo.alternateNames.isEmpty)) {
-          if (field.isRequired && !isNullable && field.defaultValue.isEmpty) {
-            conversion =
-                "${_getPrefix(clazz)}SafeCasteUtil.readRequiredValue<DateTime>(json, '$jsonKey')";
-          } else {
-            conversion =
-                "${_getPrefix(clazz)}SafeCasteUtil.readValue<DateTime>(json, '$jsonKey')";
-          }
+          conversion =
+              "${_getPrefix(clazz)}SafeCasteUtil.readValue<DateTime>(json, '$jsonKey')";
         } else {
           conversion =
               "${_getPrefix(clazz)}SafeCasteUtil.safeCast<DateTime>($valueExpression)";
@@ -738,8 +730,7 @@ class GeneratorWriter {
       } else if (cleanType.startsWith('List<')) {
         final innerType = cleanType.substring(5, cleanType.length - 1);
         final innerTypeClean = innerType.replaceAll('?', '').trim();
-        final isSupportedBasic =
-            [
+        final isSupportedBasic = [
               'int',
               'double',
               'num',
@@ -757,8 +748,11 @@ class GeneratorWriter {
         if (jsonKeyInfo == null ||
             (jsonKeyInfo.readValue.isEmpty &&
                 jsonKeyInfo.alternateNames.isEmpty)) {
-          final isCustom = field.isInnerDataforge || field.isInnerEnum;
-          if (isCustom) {
+          if (field.isInnerDataforge) {
+            // readObjectList 内部已处理类型转换，无需外层 safeCast
+            listExpr = "json['$jsonKey']";
+            isListExprNullable = true;
+          } else if (field.isInnerEnum) {
             listExpr =
                 "${_getPrefix(clazz)}SafeCasteUtil.safeCast<List<dynamic>>(json['$jsonKey'])";
             isListExprNullable = true;
@@ -773,11 +767,15 @@ class GeneratorWriter {
             }
           }
         } else {
-          final safeCastType = (field.isInnerDataforge || field.isInnerEnum)
-              ? 'List<dynamic>'
-              : cleanType;
-          listExpr =
-              "${_getPrefix(clazz)}SafeCasteUtil.safeCast<$safeCastType>($valueExpression)";
+          if (field.isInnerDataforge) {
+            // readObjectList 内部已处理类型转换，无需外层 safeCast
+            listExpr = valueExpression;
+          } else {
+            final safeCastType =
+                field.isInnerEnum ? 'List<dynamic>' : cleanType;
+            listExpr =
+                "${_getPrefix(clazz)}SafeCasteUtil.safeCast<$safeCastType>($valueExpression)";
+          }
         }
 
         if (isSupportedBasic) {
@@ -857,10 +855,8 @@ class GeneratorWriter {
           }
         }
       } else if (cleanType.startsWith('Map<')) {
-        final keyType = cleanType
-            .substring(4, cleanType.length - 1)
-            .split(',')[0]
-            .trim();
+        final keyType =
+            cleanType.substring(4, cleanType.length - 1).split(',')[0].trim();
         if (keyType != 'String' &&
             keyType != 'dynamic' &&
             keyType != 'Object') {
@@ -869,10 +865,8 @@ class GeneratorWriter {
           );
         }
 
-        final innerType = cleanType
-            .substring(4, cleanType.length - 1)
-            .split(',')[1]
-            .trim();
+        final innerType =
+            cleanType.substring(4, cleanType.length - 1).split(',')[1].trim();
         final innerTypeClean = innerType.replaceAll('?', '').trim();
 
         if (innerTypeClean == 'DateTime') {

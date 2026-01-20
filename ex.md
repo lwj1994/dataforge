@@ -1,20 +1,18 @@
+  abstract final DateTime date;
+
+  DoujinLatestRank({required this.date, this.list = const []});
 
 
-
-  final List<ImageBean> watermarkImages;
-
-
-
-
-   watermarkImages:
-          (((dataforge_annotation.SafeCasteUtil.safeCast<List<ImageBean>>(
-                TokenBean._readValue(json, 'watermarkImages'),
-              )
-              ?.map((e) => (ImageBean.fromJson(e as Map<String, dynamic>)))
-              .toList())) ??
-          (const [])),
+    date:
+          (SafeCasteUtil.readRequiredValue<DateTime>(json, 'date') ??
+          DateTime.fromMillisecondsSinceEpoch(0)),
 
 
 
 
-    
+
+ (SafeCasteUtil.readObjectList(
+            SafeCasteUtil.safeCast<List<dynamic>>(json['list']),
+            KurilTag.fromJson,
+          ) ??
+          (const [])),       

@@ -40,12 +40,12 @@ class ImportInfo {
 
   @override
   int get hashCode => Object.hashAll([
-    uri,
-    alias,
-    isDeferred,
-    const DeepCollectionEquality().hash(showCombinators),
-    const DeepCollectionEquality().hash(hideCombinators),
-  ]);
+        uri,
+        alias,
+        isDeferred,
+        const DeepCollectionEquality().hash(showCombinators),
+        const DeepCollectionEquality().hash(hideCombinators),
+      ]);
 }
 
 class ParseResult {
@@ -158,15 +158,13 @@ class ClassInfo {
     return ClassInfo(
       name: map['name'] as String? ?? '',
       mixinName: map['mixinName'] as String? ?? '',
-      fields:
-          (map['fields'] as List<dynamic>?)
+      fields: (map['fields'] as List<dynamic>?)
               ?.map((e) => FieldInfo.fromMap(e as Map<String, dynamic>))
               .toList() ??
           [],
       includeFromJson: map['includeFromJson'] as bool? ?? legacyIncludeFromMap,
       includeToJson: map['includeToJson'] as bool? ?? legacyIncludeToMap,
-      genericParameters:
-          (map['genericParameters'] as List<dynamic>?)
+      genericParameters: (map['genericParameters'] as List<dynamic>?)
               ?.map(
                 (e) => e is Map<String, dynamic>
                     ? GenericParameter(
@@ -204,14 +202,14 @@ class ClassInfo {
 
   @override
   int get hashCode => Object.hashAll([
-    name,
-    mixinName,
-    const DeepCollectionEquality().hash(fields),
-    includeFromJson,
-    includeToJson,
-    const DeepCollectionEquality().hash(genericParameters),
-    deepCopyWith,
-  ]);
+        name,
+        mixinName,
+        const DeepCollectionEquality().hash(fields),
+        includeFromJson,
+        includeToJson,
+        const DeepCollectionEquality().hash(genericParameters),
+        deepCopyWith,
+      ]);
 }
 
 class FieldInfo {
@@ -336,19 +334,19 @@ class FieldInfo {
 
   @override
   int get hashCode => Object.hashAll([
-    name,
-    type,
-    isFinal,
-    isFunction,
-    jsonKey,
-    isRecord,
-    defaultValue,
-    isEnum,
-    isDataforge,
-    isRequired,
-    isInnerEnum,
-    isInnerDataforge,
-  ]);
+        name,
+        type,
+        isFinal,
+        isFunction,
+        jsonKey,
+        isRecord,
+        defaultValue,
+        isEnum,
+        isDataforge,
+        isRequired,
+        isInnerEnum,
+        isInnerDataforge,
+      ]);
 }
 
 class JsonKeyInfo {
@@ -418,8 +416,7 @@ class JsonKeyInfo {
   static JsonKeyInfo fromMap(Map<String, dynamic> map) {
     return JsonKeyInfo(
       name: map['name'] as String? ?? '',
-      alternateNames:
-          (map['alternateNames'] as List<dynamic>?)
+      alternateNames: (map['alternateNames'] as List<dynamic>?)
               ?.map((e) => e.toString())
               .toList() ??
           [],
@@ -456,13 +453,13 @@ class JsonKeyInfo {
 
   @override
   int get hashCode => Object.hashAll([
-    name,
-    const DeepCollectionEquality().hash(alternateNames),
-    readValue,
-    ignore,
-    converter,
-    includeIfNull,
-    fromJson,
-    toJson,
-  ]);
+        name,
+        const DeepCollectionEquality().hash(alternateNames),
+        readValue,
+        ignore,
+        converter,
+        includeIfNull,
+        fromJson,
+        toJson,
+      ]);
 }

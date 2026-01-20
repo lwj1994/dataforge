@@ -46,11 +46,8 @@ class BaseParser {
         annotationResult.prefix,
       );
 
-      final libraryName = classElement.library.identifier
-          .split('/')
-          .last
-          .split('.')
-          .first;
+      final libraryName =
+          classElement.library.identifier.split('/').last.split('.').first;
 
       return ParseResult(
         '',
@@ -123,12 +120,10 @@ class BaseParser {
     String? prefix,
   ) {
     final name = _readString(annotation, 'name') ?? '';
-    final includeFromJson =
-        _readBool(annotation, 'includeFromJson') ??
+    final includeFromJson = _readBool(annotation, 'includeFromJson') ??
         _readBool(annotation, 'fromMap') ??
         true;
-    final includeToJson =
-        _readBool(annotation, 'includeToJson') ??
+    final includeToJson = _readBool(annotation, 'includeToJson') ??
         _readBool(annotation, 'fromMap') ??
         true;
     final deepCopyWith = _readBool(annotation, 'deepCopyWith') ?? true;
@@ -259,8 +254,7 @@ class BaseParser {
 
       final typeElement = field.type.element;
       final isEnum = typeElement is EnumElement;
-      final isDateTime =
-          typeElement?.name == 'DateTime' &&
+      final isDateTime = typeElement?.name == 'DateTime' &&
           typeElement?.library?.isDartCore == true;
 
       bool isDataforge = false;
@@ -400,10 +394,10 @@ class BaseParser {
       ignore: obj.getField('ignore')?.toBoolValue() ?? false,
       converter: (obj.getField('converter')?.isNull == false)
           ? obj
-                    .getField('converter')
-                    ?.type
-                    ?.getDisplayString(withNullability: false) ??
-                ''
+                  .getField('converter')
+                  ?.type
+                  ?.getDisplayString(withNullability: false) ??
+              ''
           : '',
       includeIfNull: obj.getField('includeIfNull')?.toBoolValue(),
       fromJson: fromJsonFunc,

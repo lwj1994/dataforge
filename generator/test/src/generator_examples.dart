@@ -1070,10 +1070,7 @@ mixin _ListObjectExample {
   static ListObjectExample fromJson(Map<String, dynamic> json) {
     return ListObjectExample(
       users:
-          (SafeCasteUtil.readObjectList(
-            SafeCasteUtil.safeCast<List<dynamic>>(json['users']),
-            BasicUser.fromJson,
-          ) ??
+          (SafeCasteUtil.readObjectList(json['users'], BasicUser.fromJson) ??
           (const [])),
     );
   }
@@ -1449,9 +1446,7 @@ mixin _ImageListModel {
       id: SafeCasteUtil.readRequiredValue<String>(json, 'id'),
       watermarkImages:
           (SafeCasteUtil.readObjectList(
-            SafeCasteUtil.safeCast<List<dynamic>>(
-              ImageListModel._readValue(json, 'watermarkImages'),
-            ),
+            ImageListModel._readValue(json, 'watermarkImages'),
             ImageBean.fromJson,
           ) ??
           (const [])),
@@ -1615,10 +1610,7 @@ mixin _RequiredListModel {
   static RequiredListModel fromJson(Map<String, dynamic> json) {
     return RequiredListModel(
       users:
-          (SafeCasteUtil.readObjectList(
-            SafeCasteUtil.safeCast<List<dynamic>>(json['users']),
-            BasicUser.fromJson,
-          ) ??
+          (SafeCasteUtil.readObjectList(json['users'], BasicUser.fromJson) ??
           (const [])),
     );
   }

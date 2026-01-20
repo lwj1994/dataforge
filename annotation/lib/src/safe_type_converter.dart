@@ -1,5 +1,3 @@
-import 'dart:convert';
-
 import 'package:dataforge_annotation/src/converter.dart';
 
 /// 安全类型转换工具类
@@ -65,8 +63,8 @@ class SafeCasteUtil {
       }
 
       // 8. DateTime 转换 (支持时间戳和 ISO-8601 字符串)
-      if (T == DateTime || <DateTime>[] is List<T>) {
-        return DefaultDateTimeConverter().fromJson(json) as T?;
+      if (<DateTime>[] is List<T>) {
+        return DefaultDateTimeConverter().fromJson(value) as T?;
       }
       return null;
     } catch (e) {
