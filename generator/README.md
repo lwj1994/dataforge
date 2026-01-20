@@ -2,6 +2,22 @@
 
 A powerful code generator that produces immutable data classes, JSON serialization logic, and deep copy methods for Dart applications. Designed to work seamlessly with `dataforge_annotation`.
 
+## Why Dataforge?
+
+- **Dual Mode Support**: Works seamlessly with both **build_runner** (standard Dart workflow) and a high-performance **CLI** tool for instant code generation.
+- **Type-Safe Data Classes**: Automatically generates `copyWith`, `operator ==`, `hashCode`, and `toString` for robust immutable models.
+- **Smart JSON Conversion**: 
+    - **Safe Casting**: Gracefully handles type mismatches (e.g., automatically parses a String "123" into an `int`, or converts an `int` to `String`).
+    - **Flexible Extraction**: Supports `readValue` for custom key logic, `alternateNames` for legacy API support, and custom `JsonConverter`s for complex types.
+- **Deep Immutable Updates**: Industry-leading chained `copyWith` syntax (e.g., `user.copyWith.$address.city('NY')`) for effortless nested state management.
+
+| Package | Pub |
+|---------|-----|
+| [dataforge_annotation](https://pub.dev/packages/dataforge_annotation) | [![pub package](https://img.shields.io/pub/v/dataforge_annotation.svg)](https://pub.dev/packages/dataforge_annotation) |
+| [dataforge_base](https://pub.dev/packages/dataforge_base) | [![pub package](https://img.shields.io/pub/v/dataforge_base.svg)](https://pub.dev/packages/dataforge_base) |
+| [dataforge_cli](https://pub.dev/packages/dataforge_cli) | [![pub package](https://img.shields.io/pub/v/dataforge_cli.svg)](https://pub.dev/packages/dataforge_cli) |
+| [dataforge](https://pub.dev/packages/dataforge) | [![pub package](https://img.shields.io/pub/v/dataforge.svg)](https://pub.dev/packages/dataforge) |
+
 ## Features
 
 - **Immutable Data Classes**: Generates `mixin`s with `copyWith`, `operator ==`, `hashCode`, and `toString`.
@@ -101,7 +117,7 @@ final newProfile = profile.copyWith(
 
 *Dataforge Way:*
 ```dart
-final newProfile = profile.copyWith.address.street('New St');
+final newProfile = profile.copyWith.$address.street('New St');
 ```
 
 This feature is **enabled by default**. To disable it (e.g., to generate less code for simple classes), set `deepCopyWith` to `false`:
@@ -131,7 +147,7 @@ void main() {
   final profile = Profile(address: Address(city: 'NY', street: '5th Ave'));
 
   // Update nested field directly!
-  final newProfile = profile.copyWith.address$street('4th Ave');
+  final newProfile = profile.copyWith.$address.street('4th Ave');
 }
 ```
 

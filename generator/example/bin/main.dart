@@ -64,10 +64,10 @@ void main() {
   );
   print('\nOriginal complex user: $complexUser');
 
-  // Test Flat Accessor CopyWith: updates sub-fields using flat methods with $ separator
+  // Test Chained CopyWith: updates sub-fields using getters with $ prefix
   final updatedComplexUser =
-      complexUser.copyWith.user$name('Jane').copyWith.address$city('Chicago');
-  print('Updated complex user (true chain): $updatedComplexUser');
+      complexUser.copyWith.$user.name('Jane').copyWith.$address.city('Chicago');
+  print('Updated complex user (chained): $updatedComplexUser');
 
   // Verify changes
   if (updatedComplexUser.user.name == 'Jane' &&

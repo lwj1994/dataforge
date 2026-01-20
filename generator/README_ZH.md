@@ -1,14 +1,27 @@
 # Dart Dataforge 数据锻造厂
 
-[![Pub Version](https://img.shields.io/pub/v/dataforge)](https://pub.dev/packages/dataforge)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-
 强大的 Dart 代码生成器，用于创建不可变数据类，支持 `copyWith`、`==`、`hashCode`、`toJson`、`fromJson` 等功能。基于 `build_runner` 构建，与您的 Dart 工作流无缝集成。
+
+## 为什么选择 Dataforge？
+
+- **双模式支持**：完美支持 **build_runner**（标准 Dart 工作流）和高性能 **CLI** 工具，实现即时代码生成。
+- **类型安全的数据类**：自动生成 `copyWith`、`operator ==`、`hashCode` 和 `toString`，构建健壮的不可变模型。
+- **智能 JSON 转换**：
+    - **安全类型转换 (Safe Casting)**：优雅处理类型不匹配（例如：自动将字符串 "123" 转换为 `int`，或将 `int` 转换为 `String`）。
+    - **灵活的数据提取**：支持 `readValue` 自定义取值逻辑、`alternateNames` 备用键名（兼容老旧 API）以及针对复杂类型的自定义 `JsonConverter`。
+- **深度不可变更新**：领先的链式 `copyWith` 语法（如 `user.copyWith.$address.city('NY')`），轻松管理嵌套状态。
+
+| Package | Pub |
+|---------|-----|
+| [dataforge_annotation](https://pub.dev/packages/dataforge_annotation) | [![pub package](https://img.shields.io/pub/v/dataforge_annotation.svg)](https://pub.dev/packages/dataforge_annotation) |
+| [dataforge_base](https://pub.dev/packages/dataforge_base) | [![pub package](https://img.shields.io/pub/v/dataforge_base.svg)](https://pub.dev/packages/dataforge_base) |
+| [dataforge_cli](https://pub.dev/packages/dataforge_cli) | [![pub package](https://img.shields.io/pub/v/dataforge_cli.svg)](https://pub.dev/packages/dataforge_cli) |
+| [dataforge](https://pub.dev/packages/dataforge) | [![pub package](https://img.shields.io/pub/v/dataforge.svg)](https://pub.dev/packages/dataforge) |
 
 ## ✨ 功能特性
 
 - 📦 **完整代码生成**：`copyWith`、`==`、`hashCode`、`toJson`、`fromJson`、`toString`
-- 🔗 **嵌套 CopyWith**：使用 `$` 分隔符语法更新深层嵌套字段（如 `user$address$city`）
+- 🔗 **嵌套 CopyWith**：使用链式调用语法更新深层嵌套字段（如 `.$address.city`）
 - 🔧 **灵活的 JSON 映射**：自定义字段名、备用名称、自定义转换器
 - 🌟 **类型安全**：支持泛型的完整编译时类型检查
 - 🎯 **Build Runner 集成**：与现有构建设置无缝配合
@@ -109,7 +122,7 @@ class MyClass with _MyClass {
 **字段说明：**
 - `includeFromJson`: 生成 `static MyClass fromJson(Map<String, dynamic> json)`
 - `includeToJson`: 生成 `Map<String, dynamic> toJson()`
-- `deepCopyWith`: 启用嵌套 Dataforge 类的 `user$name(...)` 语法
+- `deepCopyWith`: 启用嵌套 Dataforge 类的 `.$user.name(...)` 语法
 
 ### @JsonKey
 
@@ -175,7 +188,7 @@ class Product with _Product {
 
 ## 🔗 链式 CopyWith (嵌套更新)
 
-当 `deepCopyWith: true` (默认) 时，生成器会使用 `$` 分隔符为嵌套 Dataforge 类创建 **扁平化访问器**：
+当 `deepCopyWith: true` (默认) 时，生成器会为嵌套 Dataforge 类创建 **链式访问器**，通过 `$` 前缀的 getter 访问：
 
 ### 示例
 
@@ -197,7 +210,7 @@ class Person with _Person {
 }
 ```
 
-对于复杂的嵌套对象，dataforge 提供 **扁平访问器模式（Flat Accessor Pattern）**，使用 `$` 分隔符实现强大的链式更新：
+对于复杂的嵌套对象，dataforge 提供 **链式访问器模式（Chained Accessor Pattern）**，使用 `$` 前缀的 getter 实现强大的链式更新：
 
 ```dart
 @Dataforge(deepCopyWith: true)
@@ -237,20 +250,20 @@ final complexUser = ComplexUser(
   nickname: '小张',
 );
 
-// ✅ 使用 $ 分隔符直接访问嵌套字段
+// ✅ 使用 $ 前缀的 getter 访问嵌套字段
 // 这种语法避免与现有属性名冲突
-final updated1 = complexUser.copyWith.user$name('李四');
+final updated1 = complexUser.copyWith.$user.name('李四');
 // 结果：user.name = '李四'，其他字段保持不变
 
 // ✅ 更新深层嵌套字段
-final updated2 = complexUser.copyWith.address$city('上海');
+final updated2 = complexUser.copyWith.$address.city('上海');
 // 结果：address.city = '上海'，其他字段保持不变
 
 // ✅ 链式更新多个嵌套字段
 final updated3 = complexUser
-    .copyWith.user$name('王五')
-    .copyWith.user$age(25)
-    .copyWith.address$city('广州')
+    .copyWith.$user.name('王五')
+    .copyWith.$user.age(25)
+    .copyWith.$address.city('广州')
     .copyWith.nickname('小王');
 // 结果：一次性更新多个字段
 
@@ -263,9 +276,9 @@ final updated5 = complexUser.copyWith(
 );
 ```
 
-### 为什么使用 `$` 分隔符？
+### 为什么使用 `$` 前缀？
 
-`$` 分隔符（例如 `user$name`）提供以下优势：
+`$` 前缀（例如 `.$user.name`）提供以下优势：
 
 1. **避免命名冲突**：不会与现有属性名（如 `userName`）产生冲突
 2. **清晰的层级关系**：明确显示嵌套路径（`user` → `name`）
@@ -279,7 +292,7 @@ final updated5 = complexUser.copyWith(
 ```dart
 // 如果 person.address 为 null，此调用将安全地返回原始 person 对象
 // 正确处理 null 路径而不会崩溃
-final updated = person.copyWith.address$city('New York');
+final updated = person.copyWith.$address.city('New York');
 ```
 
 ## 🎯 设置 Null 值

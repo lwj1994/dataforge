@@ -4,7 +4,9 @@ part 'nested.data.dart';
 
 @Dataforge()
 class NestedDefaultValues with _NestedDefaultValues {
+  @override
   final String name;
+  @override
   final InnerDefaultValues nested;
   NestedDefaultValues({
     this.name = 'nested_default',
@@ -17,7 +19,9 @@ class NestedDefaultValues with _NestedDefaultValues {
 
 @Dataforge()
 class DeepRootExample with _DeepRootExample {
+  @override
   final String id;
+  @override
   final NestedDefaultValues root;
 
   DeepRootExample({
@@ -31,6 +35,7 @@ class DeepRootExample with _DeepRootExample {
 
 @Dataforge()
 class SuperDeepRoot with _SuperDeepRoot {
+  @override
   final DeepRootExample root;
   SuperDeepRoot({required this.root});
 
@@ -40,8 +45,11 @@ class SuperDeepRoot with _SuperDeepRoot {
 
 @Dataforge()
 class InnerDefaultValues with _InnerDefaultValues {
+  @override
   final int intValue;
+  @override
   final String stringValue;
+  @override
   final bool boolValue;
 
   const InnerDefaultValues({

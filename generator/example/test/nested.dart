@@ -1,5 +1,5 @@
 import 'package:test/test.dart';
-import '../lib/nested.dart';
+import 'package:dataforge_generator_example/nested.dart';
 
 void main() {
   group('Nested CopyWith Tests', () {

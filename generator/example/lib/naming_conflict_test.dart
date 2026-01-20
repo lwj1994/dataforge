@@ -40,8 +40,8 @@ void main() {
     userName: 'john_doe',
   );
 
-  // No conflict! user\$name updates the nested user.name
-  final updated1 = profile.copyWith.user$name('Jane');
+  // No conflict! $user.name updates the nested user.name
+  final updated1 = profile.copyWith.$user.name('Jane');
   print('Updated nested user.name: ${updated1.user.name}'); // Jane
   print('userName property unchanged: ${updated1.userName}'); // john_doe
 

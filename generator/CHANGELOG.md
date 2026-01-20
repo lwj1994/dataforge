@@ -1,3 +1,6 @@
+## 0.6.0-dev.0
+- Refine nested `copyWith` API: use chained getter syntax (e.g., `.$address.street`) and remove flat accessor syntax.
+
 ## 0.5.0-dev.5
 - Add `isRequired` field parsing for constructor parameters.
 - Use `readRequiredValue` for required non-nullable basic types in `fromJson`.

@@ -1,7 +1,6 @@
 // @author luwenjie on 2025/1/15 10:00:00
 
 import 'package:dataforge_annotation/dataforge_annotation.dart';
-import 'package:collection/collection.dart';
 
 part 'default_chained_test.model.data.dart';
 
