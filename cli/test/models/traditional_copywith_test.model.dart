@@ -1,4 +1,5 @@
 import 'package:dataforge_annotation/dataforge_annotation.dart';
+import 'package:collection/collection.dart';
 
 part 'traditional_copywith_test.model.data.dart';
 

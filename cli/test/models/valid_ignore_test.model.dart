@@ -1,4 +1,5 @@
 import 'package:dataforge_annotation/dataforge_annotation.dart';
+import 'package:collection/collection.dart';
 
 part 'valid_ignore_test.model.data.dart';
 

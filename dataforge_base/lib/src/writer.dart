@@ -223,186 +223,46 @@ class GeneratorWriter {
       buffer.writeln();
     }
 
-    // Generate chained copyWith accessors (Flat Accessor Pattern)
-    if (clazz.deepCopyWith) {
-      _generateNestedFieldAccessors(
-        buffer,
-        clazz,
-        genericParams,
-        validFields,
-        [],
-        clazz,
-      );
+    // Generate nested copyWith getters
+    for (final field in validFields) {
+      final type = field.type.replaceAll('?', '').trim();
+      final baseName = type.split('<').first;
+      final nestedClass = _findClassByName(baseName);
+
+      if (nestedClass != null) {
+        final isNullable = field.type.endsWith('?');
+        final genericPart = type.contains('<')
+            ? type.substring(type.indexOf('<') + 1, type.lastIndexOf('>'))
+            : '';
+
+        final nestedCopyWithName = '${nestedClass.mixinName}CopyWith';
+        final nestedGenericArgs = genericPart.isEmpty ? 'R' : '$genericPart, R';
+        final nestedType = '$nestedCopyWithName<$nestedGenericArgs>';
+
+        if (isNullable) {
+          buffer.writeln(
+            '  $nestedType? get \$${field.name} => _instance.${field.name} == null',
+          );
+          buffer.writeln('      ? null');
+          buffer.writeln(
+            '      : $nestedType._(_instance.${field.name}!, (v) => call(${field.name}: v));',
+          );
+        } else {
+          buffer.writeln(
+            '  $nestedType get \$${field.name} => $nestedType._(_instance.${field.name}, (v) => call(${field.name}: v));',
+          );
+        }
+        buffer.writeln();
+      }
     }
 
     buffer.writeln('}');
   }
 
-  void _generateNestedFieldAccessors(
-    StringBuffer buffer,
-    ClassInfo clazz,
-    String genericParams,
-    List<FieldInfo> validFields,
-    List<String> fieldPath,
-    ClassInfo rootClazz,
-  ) {
-    for (final field in validFields) {
-      // Check if field type matches any parsed Dataforge class
-      final nestedTypeName = field.type.replaceAll('?', '');
-      final nestedClass = _findClassByName(nestedTypeName);
-
-      if (nestedClass != null) {
-        final currentPath = [...fieldPath, field.name];
-
-        // Generate accessors for fields of the nested class
-        for (final nestedField in nestedClass.fields) {
-          final fullPath = [...currentPath, nestedField.name];
-          final getterName = _buildFieldAccessorName(fullPath);
-          final paramType = nestedField.type;
-
-          buffer.writeln('\n  R $getterName($paramType value) {');
-          _generateNestedCopyWithChain(
-            buffer,
-            currentPath,
-            nestedField.name,
-            field,
-            rootClazz,
-          );
-          buffer.writeln('  }');
-        }
-
-        // Recursively generate deeper accessors
-        _generateNestedFieldAccessors(
-          buffer,
-          nestedClass,
-          genericParams,
-          nestedClass.fields,
-          currentPath,
-          rootClazz,
-        );
-      }
-    }
-  }
-
   // Helper to find a ClassInfo by name
   ClassInfo? _findClassByName(String name) {
-    return result.classes.firstWhereOrNull((c) => c.name == name);
-  }
-
-  // Helper to build a combined field accessor name (e.g., user$address$street)
-  // Uses $ separator to avoid conflicts with existing property names
-  String _buildFieldAccessorName(List<String> path) {
-    if (path.isEmpty) return '';
-    return path.join('\$').toLowerCase();
-  }
-
-  // Helper to generate the nested copyWith chain for the call method
-  // Uses recursion to handle multi-level null checks
-  void _generateNestedCopyWithChain(
-    StringBuffer buffer,
-    List<String> currentPath,
-    String nestedFieldName,
-    FieldInfo parentField,
-    ClassInfo rootClazz,
-  ) {
-    buffer.write('    return call(');
-
-    final rootFieldName = currentPath.first;
-
-    // Build the value expression recursively
-    final valueExpression = _buildNestedValueExpression(
-      currentPath,
-      nestedFieldName,
-      rootClazz,
-      0,
-      rootClazz,
-    );
-
-    buffer.writeln('      $rootFieldName: $valueExpression,');
-    buffer.writeln('    );');
-  }
-
-  String _buildNestedValueExpression(
-    List<String> path,
-    String targetField,
-    ClassInfo currentClassContext,
-    int index,
-    ClassInfo rootClass,
-  ) {
-    final fieldName = path[index];
-    final field = currentClassContext.fields.firstWhere(
-      (f) => f.name == fieldName,
-    );
-    final isLast = index == path.length - 1;
-
-    // Determine the access string for the CURRENT field being called with .copyWith
-    final pathInfo = _buildPathForIndex(path, index, rootClass);
-    final access = pathInfo.path;
-    // Since copyWith is a getter returning a callable object,
-    // we must use ?.call(...) if the receiver is nullable.
-    final copyWithAccess =
-        pathInfo.isNullable ? '$access?.copyWith?.call' : '$access.copyWith';
-
-    if (isLast) {
-      return '($copyWithAccess($targetField: value))';
-    } else {
-      final nextClassName = field.type.replaceAll('?', '');
-      final nextClass = _findClassByName(nextClassName);
-      if (nextClass == null)
-        return 'value'; // Should not happen for valid paths
-
-      final nextFieldName = path[index + 1];
-      final innerValue = _buildNestedValueExpression(
-        path,
-        targetField,
-        nextClass,
-        index + 1,
-        rootClass,
-      );
-
-      return '($copyWithAccess($nextFieldName: $innerValue))';
-    }
-  }
-
-  ({String path, bool isNullable}) _buildPathForIndex(
-    List<String> path,
-    int endIndex,
-    ClassInfo rootClass,
-  ) {
-    StringBuffer sb = StringBuffer('_instance');
-    bool alreadyNullable = false;
-
-    ClassInfo? currentClass = rootClass;
-
-    for (int i = 0; i <= endIndex; i++) {
-      final f = currentClass?.fields.firstWhere(
-        (field) => field.name == path[i],
-        orElse: () => FieldInfo(
-          name: path[i],
-          type: 'dynamic',
-          isFinal: false,
-          isFunction: false,
-          isRecord: false,
-          defaultValue: '',
-        ),
-      );
-
-      final isFieldNullable = f?.type.endsWith('?') ?? false;
-
-      if (alreadyNullable) {
-        sb.write('?.${path[i]}');
-      } else {
-        sb.write('.${path[i]}');
-        if (isFieldNullable) {
-          alreadyNullable = true;
-        }
-      }
-
-      final nextClassName = f?.type.replaceAll('?', '') ?? 'dynamic';
-      currentClass = _findClassByName(nextClassName);
-    }
-
-    return (path: sb.toString(), isNullable: alreadyNullable);
+    final baseName = name.split('<').first.trim();
+    return result.classes.firstWhereOrNull((c) => c.name == baseName);
   }
 
   void _writeParameter(StringBuffer buffer, FieldInfo field) {

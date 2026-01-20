@@ -1,4 +1,5 @@
 import 'package:dataforge_annotation/dataforge_annotation.dart';
+import 'package:collection/collection.dart';
 
 part 'alternate_names_test.model.data.dart';
 

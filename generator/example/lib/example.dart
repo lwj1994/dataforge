@@ -208,6 +208,8 @@ class ComplexUser with _ComplexUser {
 
   factory ComplexUser.fromJson(Map<String, dynamic> json) =>
       _ComplexUser.fromJson(json);
+
+  
 }
 
 @Dataforge(deepCopyWith: true)
