@@ -1,10 +1,299 @@
 00:00 +0: loading test/should_generate_test.dart
-00:00 +0 -1: loading test/should_generate_test.dart [E]
-  Failed to load "test/should_generate_test.dart":
-  ../dataforge_base/lib/src/parser.dart:32:42: Error: The argument type 'String?' can't be assigned to the parameter type 'String'.
-        _processedClasses.add(classElement.name);
-                                           ^
-  ../dataforge_base/lib/src/parser.dart:98:35: Error: The argument type 'String?' can't be assigned to the parameter type 'String'.
-      _processedClasses.add(element.name);
+  0s _ResolveSourceBuilder<LibraryElement> on 14 inputs; $package$
+  3s _ResolveSourceBuilder<LibraryElement> on 14 inputs: 3 no-op; spent 3s sdk; lib/collection_examples.dart
+  3s _ResolveSourceBuilder<LibraryElement> on 14 inputs: 14 no-op; spent 3s sdk
+  Built with build_runner/jit in 3s; wrote 0 outputs.
+  0s _ResolveSourceBuilder<LibraryElement> on 14 inputs; spent 3s sdk; $package$
+  0s _ResolveSourceBuilder<LibraryElement> on 14 inputs: 14 no-op; spent 3s sdk
+  Built with build_runner/jit in 0s; wrote 0 outputs.
+  0s _ResolveSourceBuilder<LibraryElement> on 14 inputs; spent 3s sdk; $package$
+  0s _ResolveSourceBuilder<LibraryElement> on 14 inputs: 14 no-op; spent 3s sdk
+  Built with build_runner/jit in 0s; wrote 0 outputs.
+  0s _ResolveSourceBuilder<LibraryElement> on 14 inputs; spent 3s sdk; $package$
+  0s _ResolveSourceBuilder<LibraryElement> on 14 inputs: 1 no-op; spent 3s sdk; lib/$lib$
+  0s _ResolveSourceBuilder<LibraryElement> on 14 inputs: 14 no-op; spent 3s sdk
+  Built with build_runner/jit in 0s; wrote 0 outputs.
+  0s _ResolveSourceBuilder<LibraryElement> on 14 inputs; spent 3s sdk; $package$
+  0s _ResolveSourceBuilder<LibraryElement> on 14 inputs: 14 no-op; spent 3s sdk
+  Built with build_runner/jit in 0s; wrote 0 outputs.
+  0s _ResolveSourceBuilder<LibraryElement> on 14 inputs; spent 3s sdk; $package$
+  0s _ResolveSourceBuilder<LibraryElement> on 14 inputs: 14 no-op; spent 3s sdk
+  Built with build_runner/jit in 0s; wrote 0 outputs.
+  0s _ResolveSourceBuilder<LibraryElement> on 14 inputs; spent 3s sdk; $package$
+  0s _ResolveSourceBuilder<LibraryElement> on 14 inputs: 1 no-op; spent 3s sdk; lib/$lib$
+  0s _ResolveSourceBuilder<LibraryElement> on 14 inputs: 14 no-op; spent 3s sdk
+  Built with build_runner/jit in 0s; wrote 0 outputs.
+  0s _ResolveSourceBuilder<LibraryElement> on 14 inputs; spent 3s sdk; $package$
+  0s _ResolveSourceBuilder<LibraryElement> on 14 inputs: 14 no-op; spent 3s sdk
+  Built with build_runner/jit in 0s; wrote 0 outputs.
+  0s _ResolveSourceBuilder<LibraryElement> on 14 inputs; spent 3s sdk; $package$
+  0s _ResolveSourceBuilder<LibraryElement> on 14 inputs: 14 no-op; spent 3s sdk
+  Built with build_runner/jit in 0s; wrote 0 outputs.
+  0s _ResolveSourceBuilder<LibraryElement> on 14 inputs; spent 3s sdk; $package$
+  0s _ResolveSourceBuilder<LibraryElement> on 14 inputs: 1 no-op; spent 3s sdk; lib/$lib$
+  0s _ResolveSourceBuilder<LibraryElement> on 14 inputs: 14 no-op; spent 3s sdk
+  Built with build_runner/jit in 0s; wrote 0 outputs.
+00:00 +0: Product
+00:00 +0 -1: Product [E]
+  Expected: 'mixin _Product {\n'
+              '  abstract final String id;\n'
+              '  abstract final String secret;\n'
+              '  abstract final String name;\n'
+              '  _ProductCopyWith<Product> get copyWith => _ProductCopyWith<Product>._(this);\n'
+              '\n'
+              '  @override\n'
+              '  bool operator ==(Object other) {\n'
+              '    if (identical(this, other)) return true;\n'
+              '    if (other is! Product) return false;\n'
+              '\n'
+              '    return other.id == id && other.secret == secret && other.name == name;\n'
+              '  }\n'
+              '\n'
+              '  @override\n'
+              '  int get hashCode => Object.hashAll([id, secret, name]);\n'
+              '\n'
+              '  @override\n'
+              '  String toString() => \'Product(id: $id, secret: $secret, name: $name)\';\n'
+              '\n'
+              '  Map<String, dynamic> toJson() {\n'
+              '    return {\'product_id\': id, \'name\': name};\n'
+              '  }\n'
+              '\n'
+              '  static Product fromJson(Map<String, dynamic> json) {\n'
+              '    return Product(\n'
+              '      id: SafeCasteUtil.readRequiredValue<String>(json, \'product_id\'),\n'
+              '      name: SafeCasteUtil.readRequiredValue<String>(json, \'name\'),\n'
+              '    );\n'
+              '  }\n'
+              '}\n'
+              '\n'
+              'class _ProductCopyWith<R> {\n'
+              '  final _Product _instance;\n'
+              '  final R Function(Product)? _then;\n'
+              '  _ProductCopyWith._(this._instance, [this._then]);\n'
+              '\n'
+              '  @pragma(\'vm:prefer-inline\')\n'
+              '  R call({\n'
+              '    Object? id = dataforgeUndefined,\n'
+              '    Object? secret = dataforgeUndefined,\n'
+              '    Object? name = dataforgeUndefined,\n'
+              '  }) {\n'
+              '    final res = Product(\n'
+              '      id: (id == dataforgeUndefined ? _instance.id : id as String),\n'
+              '      secret: (secret == dataforgeUndefined\n'
+              '          ? _instance.secret\n'
+              '          : secret as String),\n'
+              '      name: (name == dataforgeUndefined ? _instance.name : name as String),\n'
+              '    );\n'
+              '    return (_then != null ? _then!(res) : res as R);\n'
+              '  }\n'
+              '\n'
+              '  @pragma(\'vm:prefer-inline\')\n'
+              '  R id(String value) {\n'
+              '    final res = Product(\n'
+              '      id: value,\n'
+              '      secret: _instance.secret,\n'
+              '      name: _instance.name,\n'
+              '    );\n'
+              '    return (_then != null ? _then!(res) : res as R);\n'
+              '  }\n'
+              '\n'
+              '  @pragma(\'vm:prefer-inline\')\n'
+              '  R secret(String value) {\n'
+              '    final res = Product(\n'
+              '      id: _instance.id,\n'
+              '      secret: value,\n'
+              '      name: _instance.name,\n'
+              '    );\n'
+              '    return (_then != null ? _then!(res) : res as R);\n'
+              '  }\n'
+              '\n'
+              '  @pragma(\'vm:prefer-inline\')\n'
+              '  R name(String value) {\n'
+              '    final res = Product(\n'
+              '      id: _instance.id,\n'
+              '      secret: _instance.secret,\n'
+              '      name: value,\n'
+              '    );\n'
+              '    return (_then != null ? _then!(res) : res as R);\n'
+              '  }\n'
+              '}\n'
+              ''
+    Actual: 'mixin _Product {\n'
+              '  abstract final String id;\n'
+              '  abstract final String secret;\n'
+              '  abstract final String name;\n'
+              '  @pragma(\'vm:prefer-inline\')\n'
+              '  _ProductCopyWith<Product> get copyWith => _ProductCopyWith<Product>._(this);\n'
+              '\n'
+              '  @override\n'
+              '  bool operator ==(Object other) {\n'
+              '    if (identical(this, other)) return true;\n'
+              '    if (other is! Product) return false;\n'
+              '\n'
+              '    return other.id == id && other.secret == secret && other.name == name;\n'
+              '  }\n'
+              '\n'
+              '  @override\n'
+              '  int get hashCode => Object.hashAll([id, secret, name]);\n'
+              '\n'
+              '  @override\n'
+              '  String toString() => \'Product(id: $id, secret: $secret, name: $name)\';\n'
+              '\n'
+              '  Map<String, dynamic> toJson() {\n'
+              '    return {\'product_id\': id, \'name\': name};\n'
+              '  }\n'
+              '\n'
+              '  static Product fromJson(Map<String, dynamic> json) {\n'
+              '    return Product(\n'
+              '      id: SafeCasteUtil.readRequiredValue<String>(json, \'product_id\'),\n'
+              '      name: SafeCasteUtil.readRequiredValue<String>(json, \'name\'),\n'
+              '    );\n'
+              '  }\n'
+              '}\n'
+              '\n'
+              'class _ProductCopyWith<R> {\n'
+              '  final _Product _instance;\n'
+              '  final R Function(Product)? _then;\n'
+              '  _ProductCopyWith._(this._instance, [this._then]);\n'
+              '\n'
+              '  @pragma(\'vm:prefer-inline\')\n'
+              '  R call({\n'
+              '    Object? id = dataforgeUndefined,\n'
+              '    Object? secret = dataforgeUndefined,\n'
+              '    Object? name = dataforgeUndefined,\n'
+              '  }) {\n'
+              '    final res = Product(\n'
+              '      id: (id == dataforgeUndefined ? _instance.id : id as String),\n'
+              '      secret: (secret == dataforgeUndefined\n'
+              '          ? _instance.secret\n'
+              '          : secret as String),\n'
+              '      name: (name == dataforgeUndefined ? _instance.name : name as String),\n'
+              '    );\n'
+              '    return (_then != null ? _then!(res) : res as R);\n'
+              '  }\n'
+              '\n'
+              '  @pragma(\'vm:prefer-inline\')\n'
+              '  R id(String value) {\n'
+              '    final res = Product(\n'
+              '      id: value,\n'
+              '      secret: _instance.secret,\n'
+              '      name: _instance.name,\n'
+              '    );\n'
+              '    return (_then != null ? _then!(res) : res as R);\n'
+              '  }\n'
+              '\n'
+              '  @pragma(\'vm:prefer-inline\')\n'
+              '  R secret(String value) {\n'
+              '    final res = Product(id: _instance.id, secret: value, name: _instance.name);\n'
+              '    return (_then != null ? _then!(res) : res as R);\n'
+              '  }\n'
+              '\n'
+              '  @pragma(\'vm:prefer-inline\')\n'
+              '  R name(String value) {\n'
+              '    final res = Product(\n'
+              '      id: _instance.id,\n'
+              '      secret: _instance.secret,\n'
+              '      name: value,\n'
+              '    );\n'
+              '    return (_then != null ? _then!(res) : res as R);\n'
+              '  }\n'
+              '}\n'
+              ''
+     Which: is different.
+            Expected: ...  name;\n  _ProductCo ...
+              Actual: ...  name;\n  @pragma('v ...
                                     ^
+             Differ at offset 113
+  
+  package:matcher                                                expect
+  package:source_gen_test/src/test_annotated_classes.dart 258:7  AnnotatedTest._shouldGenerateTest
+  
+ACTUAL CONTENT:
+r'''
+mixin _Product {
+  abstract final String id;
+  abstract final String secret;
+  abstract final String name;
+  @pragma('vm:prefer-inline')
+  _ProductCopyWith<Product> get copyWith => _ProductCopyWith<Product>._(this);
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+    if (other is! Product) return false;
+
+    return other.id == id && other.secret == secret && other.name == name;
+  }
+
+  @override
+  int get hashCode => Object.hashAll([id, secret, name]);
+
+  @override
+  String toString() => 'Product(id: $id, secret: $secret, name: $name)';
+
+  Map<String, dynamic> toJson() {
+    return {'product_id': id, 'name': name};
+  }
+
+  static Product fromJson(Map<String, dynamic> json) {
+    return Product(
+      id: SafeCasteUtil.readRequiredValue<String>(json, 'product_id'),
+      name: SafeCasteUtil.readRequiredValue<String>(json, 'name'),
+    );
+  }
+}
+
+class _ProductCopyWith<R> {
+  final _Product _instance;
+  final R Function(Product)? _then;
+  _ProductCopyWith._(this._instance, [this._then]);
+
+  @pragma('vm:prefer-inline')
+  R call({
+    Object? id = dataforgeUndefined,
+    Object? secret = dataforgeUndefined,
+    Object? name = dataforgeUndefined,
+  }) {
+    final res = Product(
+      id: (id == dataforgeUndefined ? _instance.id : id as String),
+      secret: (secret == dataforgeUndefined
+          ? _instance.secret
+          : secret as String),
+      name: (name == dataforgeUndefined ? _instance.name : name as String),
+    );
+    return (_then != null ? _then!(res) : res as R);
+  }
+
+  @pragma('vm:prefer-inline')
+  R id(String value) {
+    final res = Product(
+      id: value,
+      secret: _instance.secret,
+      name: _instance.name,
+    );
+    return (_then != null ? _then!(res) : res as R);
+  }
+
+  @pragma('vm:prefer-inline')
+  R secret(String value) {
+    final res = Product(id: _instance.id, secret: value, name: _instance.name);
+    return (_then != null ? _then!(res) : res as R);
+  }
+
+  @pragma('vm:prefer-inline')
+  R name(String value) {
+    final res = Product(
+      id: _instance.id,
+      secret: _instance.secret,
+      name: value,
+    );
+    return (_then != null ? _then!(res) : res as R);
+  }
+}
+'''
+00:00 +0 -1: (tearDownAll)
 00:00 +0 -1: Some tests failed.
+
+Consider enabling the flag chain-stack-traces to receive more detailed exceptions.
+For example, 'dart test --chain-stack-traces'.

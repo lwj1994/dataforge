@@ -4,6 +4,7 @@ import 'package:source_gen_test/annotations.dart';
 @ShouldGenerate(r'''
 mixin _DateTimeExample {
   abstract final DateTime? dateTime;
+  @pragma('vm:prefer-inline')
   _DateTimeExampleCopyWith<DateTimeExample> get copyWith =>
       _DateTimeExampleCopyWith<DateTimeExample>._(this);
 
@@ -37,6 +38,7 @@ class _DateTimeExampleCopyWith<R> {
   final R Function(DateTimeExample)? _then;
   _DateTimeExampleCopyWith._(this._instance, [this._then]);
 
+  @pragma('vm:prefer-inline')
   R call({Object? dateTime = dataforgeUndefined}) {
     final res = DateTimeExample(
       dateTime: (dateTime == dataforgeUndefined
@@ -46,6 +48,7 @@ class _DateTimeExampleCopyWith<R> {
     return (_then != null ? _then!(res) : res as R);
   }
 
+  @pragma('vm:prefer-inline')
   R dateTime(DateTime? value) {
     final res = DateTimeExample(dateTime: value);
     return (_then != null ? _then!(res) : res as R);
@@ -62,6 +65,7 @@ class DateTimeExample {
 mixin _RequiredDateTimeExample {
   abstract final DateTime createdAt;
   abstract final DateTime updatedAt;
+  @pragma('vm:prefer-inline')
   _RequiredDateTimeExampleCopyWith<RequiredDateTimeExample> get copyWith =>
       _RequiredDateTimeExampleCopyWith<RequiredDateTimeExample>._(this);
 
@@ -104,6 +108,7 @@ class _RequiredDateTimeExampleCopyWith<R> {
   final R Function(RequiredDateTimeExample)? _then;
   _RequiredDateTimeExampleCopyWith._(this._instance, [this._then]);
 
+  @pragma('vm:prefer-inline')
   R call({
     Object? createdAt = dataforgeUndefined,
     Object? updatedAt = dataforgeUndefined,
@@ -119,6 +124,7 @@ class _RequiredDateTimeExampleCopyWith<R> {
     return (_then != null ? _then!(res) : res as R);
   }
 
+  @pragma('vm:prefer-inline')
   R createdAt(DateTime value) {
     final res = RequiredDateTimeExample(
       createdAt: value,
@@ -127,6 +133,7 @@ class _RequiredDateTimeExampleCopyWith<R> {
     return (_then != null ? _then!(res) : res as R);
   }
 
+  @pragma('vm:prefer-inline')
   R updatedAt(DateTime value) {
     final res = RequiredDateTimeExample(
       createdAt: _instance.createdAt,
@@ -150,6 +157,7 @@ class RequiredDateTimeExample {
 @ShouldGenerate(r'''
 mixin _ListDateTimeExample {
   abstract final List<DateTime> timestamps;
+  @pragma('vm:prefer-inline')
   _ListDateTimeExampleCopyWith<ListDateTimeExample> get copyWith =>
       _ListDateTimeExampleCopyWith<ListDateTimeExample>._(this);
 
@@ -195,6 +203,7 @@ class _ListDateTimeExampleCopyWith<R> {
   final R Function(ListDateTimeExample)? _then;
   _ListDateTimeExampleCopyWith._(this._instance, [this._then]);
 
+  @pragma('vm:prefer-inline')
   R call({Object? timestamps = dataforgeUndefined}) {
     final res = ListDateTimeExample(
       timestamps: (timestamps == dataforgeUndefined
@@ -204,6 +213,7 @@ class _ListDateTimeExampleCopyWith<R> {
     return (_then != null ? _then!(res) : res as R);
   }
 
+  @pragma('vm:prefer-inline')
   R timestamps(List<DateTime> value) {
     final res = ListDateTimeExample(timestamps: value);
     return (_then != null ? _then!(res) : res as R);
@@ -236,6 +246,7 @@ class CustomDateTimeConverter extends JsonTypeConverter<DateTime, String> {
 @ShouldGenerate(r'''
 mixin _CustomDateTimeConverterExample {
   abstract final DateTime? customDateTime;
+  @pragma('vm:prefer-inline')
   _CustomDateTimeConverterExampleCopyWith<CustomDateTimeConverterExample>
   get copyWith =>
       _CustomDateTimeConverterExampleCopyWith<CustomDateTimeConverterExample>._(
@@ -277,6 +288,7 @@ class _CustomDateTimeConverterExampleCopyWith<R> {
   final R Function(CustomDateTimeConverterExample)? _then;
   _CustomDateTimeConverterExampleCopyWith._(this._instance, [this._then]);
 
+  @pragma('vm:prefer-inline')
   R call({Object? customDateTime = dataforgeUndefined}) {
     final res = CustomDateTimeConverterExample(
       customDateTime: (customDateTime == dataforgeUndefined
@@ -286,6 +298,7 @@ class _CustomDateTimeConverterExampleCopyWith<R> {
     return (_then != null ? _then!(res) : res as R);
   }
 
+  @pragma('vm:prefer-inline')
   R customDateTime(DateTime? value) {
     final res = CustomDateTimeConverterExample(customDateTime: value);
     return (_then != null ? _then!(res) : res as R);
@@ -303,6 +316,7 @@ class CustomDateTimeConverterExample {
 @ShouldGenerate(r'''
 mixin _DateTimeWithDefaultExample {
   abstract final DateTime createdAt;
+  @pragma('vm:prefer-inline')
   _DateTimeWithDefaultExampleCopyWith<DateTimeWithDefaultExample>
   get copyWith =>
       _DateTimeWithDefaultExampleCopyWith<DateTimeWithDefaultExample>._(this);
@@ -339,6 +353,7 @@ class _DateTimeWithDefaultExampleCopyWith<R> {
   final R Function(DateTimeWithDefaultExample)? _then;
   _DateTimeWithDefaultExampleCopyWith._(this._instance, [this._then]);
 
+  @pragma('vm:prefer-inline')
   R call({Object? createdAt = dataforgeUndefined}) {
     final res = DateTimeWithDefaultExample(
       createdAt: (createdAt == dataforgeUndefined
@@ -348,6 +363,7 @@ class _DateTimeWithDefaultExampleCopyWith<R> {
     return (_then != null ? _then!(res) : res as R);
   }
 
+  @pragma('vm:prefer-inline')
   R createdAt(DateTime value) {
     final res = DateTimeWithDefaultExample(createdAt: value);
     return (_then != null ? _then!(res) : res as R);

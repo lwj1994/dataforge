@@ -7,6 +7,7 @@ mixin _NullableFieldsExample {
   abstract final int? nullableInt;
   abstract final double? nullableDouble;
   abstract final bool? nullableBool;
+  @pragma('vm:prefer-inline')
   _NullableFieldsExampleCopyWith<NullableFieldsExample> get copyWith =>
       _NullableFieldsExampleCopyWith<NullableFieldsExample>._(this);
 
@@ -57,6 +58,7 @@ class _NullableFieldsExampleCopyWith<R> {
   final R Function(NullableFieldsExample)? _then;
   _NullableFieldsExampleCopyWith._(this._instance, [this._then]);
 
+  @pragma('vm:prefer-inline')
   R call({
     Object? nullableString = dataforgeUndefined,
     Object? nullableInt = dataforgeUndefined,
@@ -80,6 +82,7 @@ class _NullableFieldsExampleCopyWith<R> {
     return (_then != null ? _then!(res) : res as R);
   }
 
+  @pragma('vm:prefer-inline')
   R nullableString(String? value) {
     final res = NullableFieldsExample(
       nullableString: value,
@@ -90,6 +93,7 @@ class _NullableFieldsExampleCopyWith<R> {
     return (_then != null ? _then!(res) : res as R);
   }
 
+  @pragma('vm:prefer-inline')
   R nullableInt(int? value) {
     final res = NullableFieldsExample(
       nullableString: _instance.nullableString,
@@ -100,6 +104,7 @@ class _NullableFieldsExampleCopyWith<R> {
     return (_then != null ? _then!(res) : res as R);
   }
 
+  @pragma('vm:prefer-inline')
   R nullableDouble(double? value) {
     final res = NullableFieldsExample(
       nullableString: _instance.nullableString,
@@ -110,6 +115,7 @@ class _NullableFieldsExampleCopyWith<R> {
     return (_then != null ? _then!(res) : res as R);
   }
 
+  @pragma('vm:prefer-inline')
   R nullableBool(bool? value) {
     final res = NullableFieldsExample(
       nullableString: _instance.nullableString,
@@ -140,6 +146,7 @@ class NullableFieldsExample {
 mixin _RequiredNullableExample {
   abstract final String? nullableName;
   abstract final int? nullableAge;
+  @pragma('vm:prefer-inline')
   _RequiredNullableExampleCopyWith<RequiredNullableExample> get copyWith =>
       _RequiredNullableExampleCopyWith<RequiredNullableExample>._(this);
 
@@ -176,6 +183,7 @@ class _RequiredNullableExampleCopyWith<R> {
   final R Function(RequiredNullableExample)? _then;
   _RequiredNullableExampleCopyWith._(this._instance, [this._then]);
 
+  @pragma('vm:prefer-inline')
   R call({
     Object? nullableName = dataforgeUndefined,
     Object? nullableAge = dataforgeUndefined,
@@ -191,6 +199,7 @@ class _RequiredNullableExampleCopyWith<R> {
     return (_then != null ? _then!(res) : res as R);
   }
 
+  @pragma('vm:prefer-inline')
   R nullableName(String? value) {
     final res = RequiredNullableExample(
       nullableName: value,
@@ -199,6 +208,7 @@ class _RequiredNullableExampleCopyWith<R> {
     return (_then != null ? _then!(res) : res as R);
   }
 
+  @pragma('vm:prefer-inline')
   R nullableAge(int? value) {
     final res = RequiredNullableExample(
       nullableName: _instance.nullableName,
@@ -223,6 +233,7 @@ class RequiredNullableExample {
 mixin _NullableWithDefaultExample {
   abstract final String? name;
   abstract final int? count;
+  @pragma('vm:prefer-inline')
   _NullableWithDefaultExampleCopyWith<NullableWithDefaultExample>
   get copyWith =>
       _NullableWithDefaultExampleCopyWith<NullableWithDefaultExample>._(this);
@@ -258,6 +269,7 @@ class _NullableWithDefaultExampleCopyWith<R> {
   final R Function(NullableWithDefaultExample)? _then;
   _NullableWithDefaultExampleCopyWith._(this._instance, [this._then]);
 
+  @pragma('vm:prefer-inline')
   R call({
     Object? name = dataforgeUndefined,
     Object? count = dataforgeUndefined,
@@ -269,11 +281,13 @@ class _NullableWithDefaultExampleCopyWith<R> {
     return (_then != null ? _then!(res) : res as R);
   }
 
+  @pragma('vm:prefer-inline')
   R name(String? value) {
     final res = NullableWithDefaultExample(name: value, count: _instance.count);
     return (_then != null ? _then!(res) : res as R);
   }
 
+  @pragma('vm:prefer-inline')
   R count(int? value) {
     final res = NullableWithDefaultExample(name: _instance.name, count: value);
     return (_then != null ? _then!(res) : res as R);

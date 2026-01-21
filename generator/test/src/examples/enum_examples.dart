@@ -8,6 +8,7 @@ enum Priority { low, medium, high, critical }
 @ShouldGenerate(r'''
 mixin _EnumTypes {
   abstract final Status status;
+  @pragma('vm:prefer-inline')
   _EnumTypesCopyWith<EnumTypes> get copyWith =>
       _EnumTypesCopyWith<EnumTypes>._(this);
 
@@ -45,6 +46,7 @@ class _EnumTypesCopyWith<R> {
   final R Function(EnumTypes)? _then;
   _EnumTypesCopyWith._(this._instance, [this._then]);
 
+  @pragma('vm:prefer-inline')
   R call({Object? status = dataforgeUndefined}) {
     final res = EnumTypes(
       status: (status == dataforgeUndefined
@@ -54,6 +56,7 @@ class _EnumTypesCopyWith<R> {
     return (_then != null ? _then!(res) : res as R);
   }
 
+  @pragma('vm:prefer-inline')
   R status(Status value) {
     final res = EnumTypes(status: value);
     return (_then != null ? _then!(res) : res as R);
@@ -69,6 +72,7 @@ class EnumTypes {
 @ShouldGenerate(r'''
 mixin _EnumListModel {
   abstract final List<Status> statuses;
+  @pragma('vm:prefer-inline')
   _EnumListModelCopyWith<EnumListModel> get copyWith =>
       _EnumListModelCopyWith<EnumListModel>._(this);
 
@@ -119,6 +123,7 @@ class _EnumListModelCopyWith<R> {
   final R Function(EnumListModel)? _then;
   _EnumListModelCopyWith._(this._instance, [this._then]);
 
+  @pragma('vm:prefer-inline')
   R call({Object? statuses = dataforgeUndefined}) {
     final res = EnumListModel(
       statuses: (statuses == dataforgeUndefined
@@ -128,6 +133,7 @@ class _EnumListModelCopyWith<R> {
     return (_then != null ? _then!(res) : res as R);
   }
 
+  @pragma('vm:prefer-inline')
   R statuses(List<Status> value) {
     final res = EnumListModel(statuses: value);
     return (_then != null ? _then!(res) : res as R);
@@ -144,6 +150,7 @@ class EnumListModel {
 mixin _NullableEnumExample {
   abstract final Status? status;
   abstract final Priority? priority;
+  @pragma('vm:prefer-inline')
   _NullableEnumExampleCopyWith<NullableEnumExample> get copyWith =>
       _NullableEnumExampleCopyWith<NullableEnumExample>._(this);
 
@@ -186,6 +193,7 @@ class _NullableEnumExampleCopyWith<R> {
   final R Function(NullableEnumExample)? _then;
   _NullableEnumExampleCopyWith._(this._instance, [this._then]);
 
+  @pragma('vm:prefer-inline')
   R call({
     Object? status = dataforgeUndefined,
     Object? priority = dataforgeUndefined,
@@ -201,6 +209,7 @@ class _NullableEnumExampleCopyWith<R> {
     return (_then != null ? _then!(res) : res as R);
   }
 
+  @pragma('vm:prefer-inline')
   R status(Status? value) {
     final res = NullableEnumExample(
       status: value,
@@ -209,6 +218,7 @@ class _NullableEnumExampleCopyWith<R> {
     return (_then != null ? _then!(res) : res as R);
   }
 
+  @pragma('vm:prefer-inline')
   R priority(Priority? value) {
     final res = NullableEnumExample(status: _instance.status, priority: value);
     return (_then != null ? _then!(res) : res as R);
@@ -230,6 +240,7 @@ class NullableEnumExample {
 mixin _EnumWithDefaultExample {
   abstract final Status status;
   abstract final Priority priority;
+  @pragma('vm:prefer-inline')
   _EnumWithDefaultExampleCopyWith<EnumWithDefaultExample> get copyWith =>
       _EnumWithDefaultExampleCopyWith<EnumWithDefaultExample>._(this);
 
@@ -276,6 +287,7 @@ class _EnumWithDefaultExampleCopyWith<R> {
   final R Function(EnumWithDefaultExample)? _then;
   _EnumWithDefaultExampleCopyWith._(this._instance, [this._then]);
 
+  @pragma('vm:prefer-inline')
   R call({
     Object? status = dataforgeUndefined,
     Object? priority = dataforgeUndefined,
@@ -291,6 +303,7 @@ class _EnumWithDefaultExampleCopyWith<R> {
     return (_then != null ? _then!(res) : res as R);
   }
 
+  @pragma('vm:prefer-inline')
   R status(Status value) {
     final res = EnumWithDefaultExample(
       status: value,
@@ -299,6 +312,7 @@ class _EnumWithDefaultExampleCopyWith<R> {
     return (_then != null ? _then!(res) : res as R);
   }
 
+  @pragma('vm:prefer-inline')
   R priority(Priority value) {
     final res = EnumWithDefaultExample(
       status: _instance.status,
@@ -324,6 +338,7 @@ mixin _MultipleEnumsExample {
   abstract final Status status;
   abstract final Priority priority;
   abstract final List<Status> statusHistory;
+  @pragma('vm:prefer-inline')
   _MultipleEnumsExampleCopyWith<MultipleEnumsExample> get copyWith =>
       _MultipleEnumsExampleCopyWith<MultipleEnumsExample>._(this);
 
@@ -399,6 +414,7 @@ class _MultipleEnumsExampleCopyWith<R> {
   final R Function(MultipleEnumsExample)? _then;
   _MultipleEnumsExampleCopyWith._(this._instance, [this._then]);
 
+  @pragma('vm:prefer-inline')
   R call({
     Object? status = dataforgeUndefined,
     Object? priority = dataforgeUndefined,
@@ -418,6 +434,7 @@ class _MultipleEnumsExampleCopyWith<R> {
     return (_then != null ? _then!(res) : res as R);
   }
 
+  @pragma('vm:prefer-inline')
   R status(Status value) {
     final res = MultipleEnumsExample(
       status: value,
@@ -427,6 +444,7 @@ class _MultipleEnumsExampleCopyWith<R> {
     return (_then != null ? _then!(res) : res as R);
   }
 
+  @pragma('vm:prefer-inline')
   R priority(Priority value) {
     final res = MultipleEnumsExample(
       status: _instance.status,
@@ -436,6 +454,7 @@ class _MultipleEnumsExampleCopyWith<R> {
     return (_then != null ? _then!(res) : res as R);
   }
 
+  @pragma('vm:prefer-inline')
   R statusHistory(List<Status> value) {
     final res = MultipleEnumsExample(
       status: _instance.status,

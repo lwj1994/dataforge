@@ -111,6 +111,7 @@ class GeneratorWriter {
       final genericArgs = genericParams.isEmpty
           ? '<${clazz.name}>'
           : genericParams.replaceFirst('>', ', ${clazz.name}$genericParams>');
+      buffer.writeln("  @pragma('vm:prefer-inline')");
       buffer.writeln(
         '  ${clazz.mixinName}CopyWith$genericArgs get copyWith => ${clazz.mixinName}CopyWith$genericArgs._(this);',
       );
@@ -128,6 +129,7 @@ class GeneratorWriter {
     String genericParams,
     List<FieldInfo> validFields,
   ) {
+    buffer.writeln("  @pragma('vm:prefer-inline')");
     buffer.writeln('  ${clazz.name}$genericParams copyWith({');
     for (final field in validFields) {
       _writeParameter(buffer, field);
@@ -193,6 +195,7 @@ class GeneratorWriter {
     buffer.writeln('  $copyWithClassName._(this._instance, [this._then]);');
 
     buffer.writeln();
+    buffer.writeln("  @pragma('vm:prefer-inline')");
     buffer.writeln('  R call({');
     // Use Object? with sentinel default for all parameters
     for (final field in validFields) {
@@ -216,6 +219,7 @@ class GeneratorWriter {
 
     // Generate single-field update methods
     for (final field in validFields) {
+      buffer.writeln("  @pragma('vm:prefer-inline')");
       buffer.writeln('  R ${field.name}(${field.type} value) {');
       buffer.writeln('    final res = ${clazz.name}$genericParams(');
       for (final f in validFields) {
@@ -248,6 +252,7 @@ class GeneratorWriter {
         final nestedType = '$nestedCopyWithName<$nestedGenericArgs>';
 
         if (isNullable) {
+          buffer.writeln("  @pragma('vm:prefer-inline')");
           buffer.writeln(
             '  $nestedType? get \$${field.name} => _instance.${field.name} == null',
           );
@@ -256,6 +261,7 @@ class GeneratorWriter {
             '      : $nestedType._(_instance.${field.name}!, (v) => call(${field.name}: v));',
           );
         } else {
+          buffer.writeln("  @pragma('vm:prefer-inline')");
           buffer.writeln(
             '  $nestedType get \$${field.name} => $nestedType._(_instance.${field.name}, (v) => call(${field.name}: v));',
           );

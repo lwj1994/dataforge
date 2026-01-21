@@ -6,6 +6,7 @@ mixin _Product {
   abstract final String id;
   abstract final String secret;
   abstract final String name;
+  @pragma('vm:prefer-inline')
   _ProductCopyWith<Product> get copyWith => _ProductCopyWith<Product>._(this);
 
   @override
@@ -39,6 +40,7 @@ class _ProductCopyWith<R> {
   final R Function(Product)? _then;
   _ProductCopyWith._(this._instance, [this._then]);
 
+  @pragma('vm:prefer-inline')
   R call({
     Object? id = dataforgeUndefined,
     Object? secret = dataforgeUndefined,
@@ -54,6 +56,7 @@ class _ProductCopyWith<R> {
     return (_then != null ? _then!(res) : res as R);
   }
 
+  @pragma('vm:prefer-inline')
   R id(String value) {
     final res = Product(
       id: value,
@@ -63,11 +66,13 @@ class _ProductCopyWith<R> {
     return (_then != null ? _then!(res) : res as R);
   }
 
+  @pragma('vm:prefer-inline')
   R secret(String value) {
     final res = Product(id: _instance.id, secret: value, name: _instance.name);
     return (_then != null ? _then!(res) : res as R);
   }
 
+  @pragma('vm:prefer-inline')
   R name(String value) {
     final res = Product(
       id: _instance.id,
@@ -98,6 +103,7 @@ mixin _AlternateNamesTest {
   abstract final String email;
   abstract final bool isActive;
   abstract final List<String> tags;
+  @pragma('vm:prefer-inline')
   _AlternateNamesTestCopyWith<AlternateNamesTest> get copyWith =>
       _AlternateNamesTestCopyWith<AlternateNamesTest>._(this);
 
@@ -182,6 +188,7 @@ class _AlternateNamesTestCopyWith<R> {
   final R Function(AlternateNamesTest)? _then;
   _AlternateNamesTestCopyWith._(this._instance, [this._then]);
 
+  @pragma('vm:prefer-inline')
   R call({
     Object? name = dataforgeUndefined,
     Object? age = dataforgeUndefined,
@@ -203,6 +210,7 @@ class _AlternateNamesTestCopyWith<R> {
     return (_then != null ? _then!(res) : res as R);
   }
 
+  @pragma('vm:prefer-inline')
   R name(String value) {
     final res = AlternateNamesTest(
       name: value,
@@ -214,6 +222,7 @@ class _AlternateNamesTestCopyWith<R> {
     return (_then != null ? _then!(res) : res as R);
   }
 
+  @pragma('vm:prefer-inline')
   R age(int value) {
     final res = AlternateNamesTest(
       name: _instance.name,
@@ -225,6 +234,7 @@ class _AlternateNamesTestCopyWith<R> {
     return (_then != null ? _then!(res) : res as R);
   }
 
+  @pragma('vm:prefer-inline')
   R email(String value) {
     final res = AlternateNamesTest(
       name: _instance.name,
@@ -236,6 +246,7 @@ class _AlternateNamesTestCopyWith<R> {
     return (_then != null ? _then!(res) : res as R);
   }
 
+  @pragma('vm:prefer-inline')
   R isActive(bool value) {
     final res = AlternateNamesTest(
       name: _instance.name,
@@ -247,6 +258,7 @@ class _AlternateNamesTestCopyWith<R> {
     return (_then != null ? _then!(res) : res as R);
   }
 
+  @pragma('vm:prefer-inline')
   R tags(List<String> value) {
     final res = AlternateNamesTest(
       name: _instance.name,
@@ -291,6 +303,7 @@ mixin _CustomReadValue {
   abstract final String title;
   abstract final int count;
   abstract final bool enabled;
+  @pragma('vm:prefer-inline')
   _CustomReadValueCopyWith<CustomReadValue> get copyWith =>
       _CustomReadValueCopyWith<CustomReadValue>._(this);
 
@@ -351,6 +364,7 @@ class _CustomReadValueCopyWith<R> {
   final R Function(CustomReadValue)? _then;
   _CustomReadValueCopyWith._(this._instance, [this._then]);
 
+  @pragma('vm:prefer-inline')
   R call({
     Object? id = dataforgeUndefined,
     Object? name = dataforgeUndefined,
@@ -370,6 +384,7 @@ class _CustomReadValueCopyWith<R> {
     return (_then != null ? _then!(res) : res as R);
   }
 
+  @pragma('vm:prefer-inline')
   R id(String value) {
     final res = CustomReadValue(
       id: value,
@@ -381,6 +396,7 @@ class _CustomReadValueCopyWith<R> {
     return (_then != null ? _then!(res) : res as R);
   }
 
+  @pragma('vm:prefer-inline')
   R name(String value) {
     final res = CustomReadValue(
       id: _instance.id,
@@ -392,6 +408,7 @@ class _CustomReadValueCopyWith<R> {
     return (_then != null ? _then!(res) : res as R);
   }
 
+  @pragma('vm:prefer-inline')
   R title(String value) {
     final res = CustomReadValue(
       id: _instance.id,
@@ -403,6 +420,7 @@ class _CustomReadValueCopyWith<R> {
     return (_then != null ? _then!(res) : res as R);
   }
 
+  @pragma('vm:prefer-inline')
   R count(int value) {
     final res = CustomReadValue(
       id: _instance.id,
@@ -414,6 +432,7 @@ class _CustomReadValueCopyWith<R> {
     return (_then != null ? _then!(res) : res as R);
   }
 
+  @pragma('vm:prefer-inline')
   R enabled(bool value) {
     final res = CustomReadValue(
       id: _instance.id,
@@ -453,6 +472,7 @@ mixin _IncludeIfNullExample {
   abstract final String name;
   abstract final String? description;
   abstract final int? count;
+  @pragma('vm:prefer-inline')
   _IncludeIfNullExampleCopyWith<IncludeIfNullExample> get copyWith =>
       _IncludeIfNullExampleCopyWith<IncludeIfNullExample>._(this);
 
@@ -491,6 +511,7 @@ class _IncludeIfNullExampleCopyWith<R> {
   final R Function(IncludeIfNullExample)? _then;
   _IncludeIfNullExampleCopyWith._(this._instance, [this._then]);
 
+  @pragma('vm:prefer-inline')
   R call({
     Object? name = dataforgeUndefined,
     Object? description = dataforgeUndefined,
@@ -506,6 +527,7 @@ class _IncludeIfNullExampleCopyWith<R> {
     return (_then != null ? _then!(res) : res as R);
   }
 
+  @pragma('vm:prefer-inline')
   R name(String value) {
     final res = IncludeIfNullExample(
       name: value,
@@ -515,6 +537,7 @@ class _IncludeIfNullExampleCopyWith<R> {
     return (_then != null ? _then!(res) : res as R);
   }
 
+  @pragma('vm:prefer-inline')
   R description(String? value) {
     final res = IncludeIfNullExample(
       name: _instance.name,
@@ -524,6 +547,7 @@ class _IncludeIfNullExampleCopyWith<R> {
     return (_then != null ? _then!(res) : res as R);
   }
 
+  @pragma('vm:prefer-inline')
   R count(int? value) {
     final res = IncludeIfNullExample(
       name: _instance.name,

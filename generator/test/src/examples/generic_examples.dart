@@ -4,6 +4,7 @@ import 'package:source_gen_test/annotations.dart';
 @ShouldGenerate(r'''
 mixin _GenericResult<T> {
   abstract final T? data;
+  @pragma('vm:prefer-inline')
   _GenericResultCopyWith<T, GenericResult<T>> get copyWith =>
       _GenericResultCopyWith<T, GenericResult<T>>._(this);
 
@@ -35,6 +36,7 @@ class _GenericResultCopyWith<T, R> {
   final R Function(GenericResult<T>)? _then;
   _GenericResultCopyWith._(this._instance, [this._then]);
 
+  @pragma('vm:prefer-inline')
   R call({Object? data = dataforgeUndefined}) {
     final res = GenericResult<T>(
       data: (data == dataforgeUndefined ? _instance.data : data as T?),
@@ -42,6 +44,7 @@ class _GenericResultCopyWith<T, R> {
     return (_then != null ? _then!(res) : res as R);
   }
 
+  @pragma('vm:prefer-inline')
   R data(T? value) {
     final res = GenericResult<T>(data: value);
     return (_then != null ? _then!(res) : res as R);
@@ -58,6 +61,7 @@ class GenericResult<T> {
 mixin _MultiGenericExample<T, U> {
   abstract final T first;
   abstract final U second;
+  @pragma('vm:prefer-inline')
   _MultiGenericExampleCopyWith<T, U, MultiGenericExample<T, U>> get copyWith =>
       _MultiGenericExampleCopyWith<T, U, MultiGenericExample<T, U>>._(this);
 
@@ -89,6 +93,7 @@ class _MultiGenericExampleCopyWith<T, U, R> {
   final R Function(MultiGenericExample<T, U>)? _then;
   _MultiGenericExampleCopyWith._(this._instance, [this._then]);
 
+  @pragma('vm:prefer-inline')
   R call({
     Object? first = dataforgeUndefined,
     Object? second = dataforgeUndefined,
@@ -100,6 +105,7 @@ class _MultiGenericExampleCopyWith<T, U, R> {
     return (_then != null ? _then!(res) : res as R);
   }
 
+  @pragma('vm:prefer-inline')
   R first(T value) {
     final res = MultiGenericExample<T, U>(
       first: value,
@@ -108,6 +114,7 @@ class _MultiGenericExampleCopyWith<T, U, R> {
     return (_then != null ? _then!(res) : res as R);
   }
 
+  @pragma('vm:prefer-inline')
   R second(U value) {
     final res = MultiGenericExample<T, U>(
       first: _instance.first,

@@ -21,6 +21,7 @@ class GenericConverter<T> extends JsonTypeConverter<T, Object?> {
 @ShouldGenerate(r'''
 mixin _GenericContainer<T> {
   abstract final T data;
+  @pragma('vm:prefer-inline')
   _GenericContainerCopyWith<T, GenericContainer<T>> get copyWith =>
       _GenericContainerCopyWith<T, GenericContainer<T>>._(this);
 
@@ -54,6 +55,7 @@ class _GenericContainerCopyWith<T, R> {
   final R Function(GenericContainer<T>)? _then;
   _GenericContainerCopyWith._(this._instance, [this._then]);
 
+  @pragma('vm:prefer-inline')
   R call({Object? data = dataforgeUndefined}) {
     final res = GenericContainer<T>(
       data: (data == dataforgeUndefined ? _instance.data : data as T),
@@ -61,6 +63,7 @@ class _GenericContainerCopyWith<T, R> {
     return (_then != null ? _then!(res) : res as R);
   }
 
+  @pragma('vm:prefer-inline')
   R data(T value) {
     final res = GenericContainer<T>(data: value);
     return (_then != null ? _then!(res) : res as R);
@@ -106,6 +109,7 @@ mixin _CustomFunctionsExample {
   abstract final int count;
   abstract final String? optionalValue;
   abstract final String regularField;
+  @pragma('vm:prefer-inline')
   _CustomFunctionsExampleCopyWith<CustomFunctionsExample> get copyWith =>
       _CustomFunctionsExampleCopyWith<CustomFunctionsExample>._(this);
 
@@ -159,6 +163,7 @@ class _CustomFunctionsExampleCopyWith<R> {
   final R Function(CustomFunctionsExample)? _then;
   _CustomFunctionsExampleCopyWith._(this._instance, [this._then]);
 
+  @pragma('vm:prefer-inline')
   R call({
     Object? name = dataforgeUndefined,
     Object? count = dataforgeUndefined,
@@ -178,6 +183,7 @@ class _CustomFunctionsExampleCopyWith<R> {
     return (_then != null ? _then!(res) : res as R);
   }
 
+  @pragma('vm:prefer-inline')
   R name(String value) {
     final res = CustomFunctionsExample(
       name: value,
@@ -188,6 +194,7 @@ class _CustomFunctionsExampleCopyWith<R> {
     return (_then != null ? _then!(res) : res as R);
   }
 
+  @pragma('vm:prefer-inline')
   R count(int value) {
     final res = CustomFunctionsExample(
       name: _instance.name,
@@ -198,6 +205,7 @@ class _CustomFunctionsExampleCopyWith<R> {
     return (_then != null ? _then!(res) : res as R);
   }
 
+  @pragma('vm:prefer-inline')
   R optionalValue(String? value) {
     final res = CustomFunctionsExample(
       name: _instance.name,
@@ -208,6 +216,7 @@ class _CustomFunctionsExampleCopyWith<R> {
     return (_then != null ? _then!(res) : res as R);
   }
 
+  @pragma('vm:prefer-inline')
   R regularField(String value) {
     final res = CustomFunctionsExample(
       name: _instance.name,
@@ -263,6 +272,7 @@ String readValueWithFromJson(dynamic value) {
 @ShouldGenerate(r'''
 mixin _ReadValueWithFromJsonExample {
   abstract final String name;
+  @pragma('vm:prefer-inline')
   _ReadValueWithFromJsonExampleCopyWith<ReadValueWithFromJsonExample>
   get copyWith =>
       _ReadValueWithFromJsonExampleCopyWith<ReadValueWithFromJsonExample>._(
@@ -299,6 +309,7 @@ class _ReadValueWithFromJsonExampleCopyWith<R> {
   final R Function(ReadValueWithFromJsonExample)? _then;
   _ReadValueWithFromJsonExampleCopyWith._(this._instance, [this._then]);
 
+  @pragma('vm:prefer-inline')
   R call({Object? name = dataforgeUndefined}) {
     final res = ReadValueWithFromJsonExample(
       name: (name == dataforgeUndefined ? _instance.name : name as String),
@@ -306,6 +317,7 @@ class _ReadValueWithFromJsonExampleCopyWith<R> {
     return (_then != null ? _then!(res) : res as R);
   }
 
+  @pragma('vm:prefer-inline')
   R name(String value) {
     final res = ReadValueWithFromJsonExample(name: value);
     return (_then != null ? _then!(res) : res as R);

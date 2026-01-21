@@ -5,6 +5,7 @@ import 'package:source_gen_test/annotations.dart';
 mixin _NoFromJsonExample {
   abstract final String name;
   abstract final int age;
+  @pragma('vm:prefer-inline')
   _NoFromJsonExampleCopyWith<NoFromJsonExample> get copyWith =>
       _NoFromJsonExampleCopyWith<NoFromJsonExample>._(this);
 
@@ -32,6 +33,7 @@ class _NoFromJsonExampleCopyWith<R> {
   final R Function(NoFromJsonExample)? _then;
   _NoFromJsonExampleCopyWith._(this._instance, [this._then]);
 
+  @pragma('vm:prefer-inline')
   R call({
     Object? name = dataforgeUndefined,
     Object? age = dataforgeUndefined,
@@ -43,11 +45,13 @@ class _NoFromJsonExampleCopyWith<R> {
     return (_then != null ? _then!(res) : res as R);
   }
 
+  @pragma('vm:prefer-inline')
   R name(String value) {
     final res = NoFromJsonExample(name: value, age: _instance.age);
     return (_then != null ? _then!(res) : res as R);
   }
 
+  @pragma('vm:prefer-inline')
   R age(int value) {
     final res = NoFromJsonExample(name: _instance.name, age: value);
     return (_then != null ? _then!(res) : res as R);
@@ -66,6 +70,7 @@ class NoFromJsonExample {
 mixin _NoToJsonExample {
   abstract final String name;
   abstract final int age;
+  @pragma('vm:prefer-inline')
   _NoToJsonExampleCopyWith<NoToJsonExample> get copyWith =>
       _NoToJsonExampleCopyWith<NoToJsonExample>._(this);
 
@@ -96,6 +101,7 @@ class _NoToJsonExampleCopyWith<R> {
   final R Function(NoToJsonExample)? _then;
   _NoToJsonExampleCopyWith._(this._instance, [this._then]);
 
+  @pragma('vm:prefer-inline')
   R call({
     Object? name = dataforgeUndefined,
     Object? age = dataforgeUndefined,
@@ -107,11 +113,13 @@ class _NoToJsonExampleCopyWith<R> {
     return (_then != null ? _then!(res) : res as R);
   }
 
+  @pragma('vm:prefer-inline')
   R name(String value) {
     final res = NoToJsonExample(name: value, age: _instance.age);
     return (_then != null ? _then!(res) : res as R);
   }
 
+  @pragma('vm:prefer-inline')
   R age(int value) {
     final res = NoToJsonExample(name: _instance.name, age: value);
     return (_then != null ? _then!(res) : res as R);
@@ -130,6 +138,7 @@ class NoToJsonExample {
 mixin _NoJsonExample {
   abstract final String name;
   abstract final int age;
+  @pragma('vm:prefer-inline')
   _NoJsonExampleCopyWith<NoJsonExample> get copyWith =>
       _NoJsonExampleCopyWith<NoJsonExample>._(this);
 
@@ -153,6 +162,7 @@ class _NoJsonExampleCopyWith<R> {
   final R Function(NoJsonExample)? _then;
   _NoJsonExampleCopyWith._(this._instance, [this._then]);
 
+  @pragma('vm:prefer-inline')
   R call({
     Object? name = dataforgeUndefined,
     Object? age = dataforgeUndefined,
@@ -164,11 +174,13 @@ class _NoJsonExampleCopyWith<R> {
     return (_then != null ? _then!(res) : res as R);
   }
 
+  @pragma('vm:prefer-inline')
   R name(String value) {
     final res = NoJsonExample(name: value, age: _instance.age);
     return (_then != null ? _then!(res) : res as R);
   }
 
+  @pragma('vm:prefer-inline')
   R age(int value) {
     final res = NoJsonExample(name: _instance.name, age: value);
     return (_then != null ? _then!(res) : res as R);
@@ -187,6 +199,7 @@ class NoJsonExample {
 mixin _NoCopyWithChainExample {
   abstract final String name;
   abstract final int age;
+  @pragma('vm:prefer-inline')
   NoCopyWithChainExample copyWith({String? name, int? age}) {
     return NoCopyWithChainExample(
       name: (name ?? this.name),
@@ -231,6 +244,7 @@ class NoCopyWithChainExample {
 @ShouldGenerate(r'''
 mixin _CustomMixinName {
   abstract final String value;
+  @pragma('vm:prefer-inline')
   _CustomMixinNameCopyWith<CustomMixinName> get copyWith =>
       _CustomMixinNameCopyWith<CustomMixinName>._(this);
 
@@ -264,6 +278,7 @@ class _CustomMixinNameCopyWith<R> {
   final R Function(CustomMixinName)? _then;
   _CustomMixinNameCopyWith._(this._instance, [this._then]);
 
+  @pragma('vm:prefer-inline')
   R call({Object? value = dataforgeUndefined}) {
     final res = CustomMixinName(
       value: (value == dataforgeUndefined ? _instance.value : value as String),
@@ -271,6 +286,7 @@ class _CustomMixinNameCopyWith<R> {
     return (_then != null ? _then!(res) : res as R);
   }
 
+  @pragma('vm:prefer-inline')
   R value(String value) {
     final res = CustomMixinName(value: value);
     return (_then != null ? _then!(res) : res as R);

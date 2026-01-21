@@ -1,3 +1,6 @@
+## 0.6.0-dev.4
+- Optimize generated code performance by adding `@pragma('vm:prefer-inline')`.
+
 ## 0.6.0-dev.2
 - Fix type casting mismatch for `double` fields in `copyWith` by enabling smart casting from `int` (via `num`).
 

@@ -12,6 +12,7 @@ class SimpleUser {
 @ShouldGenerate(r'''
 mixin _ListObjectExample {
   abstract final List<SimpleUser> users;
+  @pragma('vm:prefer-inline')
   _ListObjectExampleCopyWith<ListObjectExample> get copyWith =>
       _ListObjectExampleCopyWith<ListObjectExample>._(this);
 
@@ -51,6 +52,7 @@ class _ListObjectExampleCopyWith<R> {
   final R Function(ListObjectExample)? _then;
   _ListObjectExampleCopyWith._(this._instance, [this._then]);
 
+  @pragma('vm:prefer-inline')
   R call({Object? users = dataforgeUndefined}) {
     final res = ListObjectExample(
       users: (users == dataforgeUndefined
@@ -60,6 +62,7 @@ class _ListObjectExampleCopyWith<R> {
     return (_then != null ? _then!(res) : res as R);
   }
 
+  @pragma('vm:prefer-inline')
   R users(List<SimpleUser> value) {
     final res = ListObjectExample(users: value);
     return (_then != null ? _then!(res) : res as R);
@@ -82,6 +85,7 @@ class ImageBean {
 mixin _ImageListModel {
   abstract final String id;
   abstract final List<ImageBean> watermarkImages;
+  @pragma('vm:prefer-inline')
   _ImageListModelCopyWith<ImageListModel> get copyWith =>
       _ImageListModelCopyWith<ImageListModel>._(this);
 
@@ -134,6 +138,7 @@ class _ImageListModelCopyWith<R> {
   final R Function(ImageListModel)? _then;
   _ImageListModelCopyWith._(this._instance, [this._then]);
 
+  @pragma('vm:prefer-inline')
   R call({
     Object? id = dataforgeUndefined,
     Object? watermarkImages = dataforgeUndefined,
@@ -147,6 +152,7 @@ class _ImageListModelCopyWith<R> {
     return (_then != null ? _then!(res) : res as R);
   }
 
+  @pragma('vm:prefer-inline')
   R id(String value) {
     final res = ImageListModel(
       id: value,
@@ -155,6 +161,7 @@ class _ImageListModelCopyWith<R> {
     return (_then != null ? _then!(res) : res as R);
   }
 
+  @pragma('vm:prefer-inline')
   R watermarkImages(List<ImageBean> value) {
     final res = ImageListModel(id: _instance.id, watermarkImages: value);
     return (_then != null ? _then!(res) : res as R);
@@ -177,6 +184,7 @@ class ImageListModel {
 @ShouldGenerate(r'''
 mixin _RequiredListModel {
   abstract final List<SimpleUser> users;
+  @pragma('vm:prefer-inline')
   _RequiredListModelCopyWith<RequiredListModel> get copyWith =>
       _RequiredListModelCopyWith<RequiredListModel>._(this);
 
@@ -216,6 +224,7 @@ class _RequiredListModelCopyWith<R> {
   final R Function(RequiredListModel)? _then;
   _RequiredListModelCopyWith._(this._instance, [this._then]);
 
+  @pragma('vm:prefer-inline')
   R call({Object? users = dataforgeUndefined}) {
     final res = RequiredListModel(
       users: (users == dataforgeUndefined
@@ -225,6 +234,7 @@ class _RequiredListModelCopyWith<R> {
     return (_then != null ? _then!(res) : res as R);
   }
 
+  @pragma('vm:prefer-inline')
   R users(List<SimpleUser> value) {
     final res = RequiredListModel(users: value);
     return (_then != null ? _then!(res) : res as R);
@@ -243,6 +253,7 @@ mixin _ListPrimitiveExample {
   abstract final List<int> numbers;
   abstract final List<double> values;
   abstract final List<bool> flags;
+  @pragma('vm:prefer-inline')
   _ListPrimitiveExampleCopyWith<ListPrimitiveExample> get copyWith =>
       _ListPrimitiveExampleCopyWith<ListPrimitiveExample>._(this);
 
@@ -320,6 +331,7 @@ class _ListPrimitiveExampleCopyWith<R> {
   final R Function(ListPrimitiveExample)? _then;
   _ListPrimitiveExampleCopyWith._(this._instance, [this._then]);
 
+  @pragma('vm:prefer-inline')
   R call({
     Object? names = dataforgeUndefined,
     Object? numbers = dataforgeUndefined,
@@ -343,6 +355,7 @@ class _ListPrimitiveExampleCopyWith<R> {
     return (_then != null ? _then!(res) : res as R);
   }
 
+  @pragma('vm:prefer-inline')
   R names(List<String> value) {
     final res = ListPrimitiveExample(
       names: value,
@@ -353,6 +366,7 @@ class _ListPrimitiveExampleCopyWith<R> {
     return (_then != null ? _then!(res) : res as R);
   }
 
+  @pragma('vm:prefer-inline')
   R numbers(List<int> value) {
     final res = ListPrimitiveExample(
       names: _instance.names,
@@ -363,6 +377,7 @@ class _ListPrimitiveExampleCopyWith<R> {
     return (_then != null ? _then!(res) : res as R);
   }
 
+  @pragma('vm:prefer-inline')
   R values(List<double> value) {
     final res = ListPrimitiveExample(
       names: _instance.names,
@@ -373,6 +388,7 @@ class _ListPrimitiveExampleCopyWith<R> {
     return (_then != null ? _then!(res) : res as R);
   }
 
+  @pragma('vm:prefer-inline')
   R flags(List<bool> value) {
     final res = ListPrimitiveExample(
       names: _instance.names,
@@ -403,6 +419,7 @@ class ListPrimitiveExample {
 mixin _NullableListExample {
   abstract final List<String>? nullableNames;
   abstract final List<int>? nullableNumbers;
+  @pragma('vm:prefer-inline')
   _NullableListExampleCopyWith<NullableListExample> get copyWith =>
       _NullableListExampleCopyWith<NullableListExample>._(this);
 
@@ -459,6 +476,7 @@ class _NullableListExampleCopyWith<R> {
   final R Function(NullableListExample)? _then;
   _NullableListExampleCopyWith._(this._instance, [this._then]);
 
+  @pragma('vm:prefer-inline')
   R call({
     Object? nullableNames = dataforgeUndefined,
     Object? nullableNumbers = dataforgeUndefined,
@@ -474,6 +492,7 @@ class _NullableListExampleCopyWith<R> {
     return (_then != null ? _then!(res) : res as R);
   }
 
+  @pragma('vm:prefer-inline')
   R nullableNames(List<String>? value) {
     final res = NullableListExample(
       nullableNames: value,
@@ -482,6 +501,7 @@ class _NullableListExampleCopyWith<R> {
     return (_then != null ? _then!(res) : res as R);
   }
 
+  @pragma('vm:prefer-inline')
   R nullableNumbers(List<int>? value) {
     final res = NullableListExample(
       nullableNames: _instance.nullableNames,
@@ -507,6 +527,7 @@ mixin _MapStringExample {
   abstract final Map<String, String> stringMap;
   abstract final Map<String, int> intMap;
   abstract final Map<String, dynamic> dynamicMap;
+  @pragma('vm:prefer-inline')
   _MapStringExampleCopyWith<MapStringExample> get copyWith =>
       _MapStringExampleCopyWith<MapStringExample>._(this);
 
@@ -571,6 +592,7 @@ class _MapStringExampleCopyWith<R> {
   final R Function(MapStringExample)? _then;
   _MapStringExampleCopyWith._(this._instance, [this._then]);
 
+  @pragma('vm:prefer-inline')
   R call({
     Object? stringMap = dataforgeUndefined,
     Object? intMap = dataforgeUndefined,
@@ -590,6 +612,7 @@ class _MapStringExampleCopyWith<R> {
     return (_then != null ? _then!(res) : res as R);
   }
 
+  @pragma('vm:prefer-inline')
   R stringMap(Map<String, String> value) {
     final res = MapStringExample(
       stringMap: value,
@@ -599,6 +622,7 @@ class _MapStringExampleCopyWith<R> {
     return (_then != null ? _then!(res) : res as R);
   }
 
+  @pragma('vm:prefer-inline')
   R intMap(Map<String, int> value) {
     final res = MapStringExample(
       stringMap: _instance.stringMap,
@@ -608,6 +632,7 @@ class _MapStringExampleCopyWith<R> {
     return (_then != null ? _then!(res) : res as R);
   }
 
+  @pragma('vm:prefer-inline')
   R dynamicMap(Map<String, dynamic> value) {
     final res = MapStringExample(
       stringMap: _instance.stringMap,
@@ -634,6 +659,7 @@ class MapStringExample {
 @ShouldGenerate(r'''
 mixin _MapObjectExample {
   abstract final Map<String, SimpleUser> userMap;
+  @pragma('vm:prefer-inline')
   _MapObjectExampleCopyWith<MapObjectExample> get copyWith =>
       _MapObjectExampleCopyWith<MapObjectExample>._(this);
 
@@ -681,6 +707,7 @@ class _MapObjectExampleCopyWith<R> {
   final R Function(MapObjectExample)? _then;
   _MapObjectExampleCopyWith._(this._instance, [this._then]);
 
+  @pragma('vm:prefer-inline')
   R call({Object? userMap = dataforgeUndefined}) {
     final res = MapObjectExample(
       userMap: (userMap == dataforgeUndefined
@@ -690,6 +717,7 @@ class _MapObjectExampleCopyWith<R> {
     return (_then != null ? _then!(res) : res as R);
   }
 
+  @pragma('vm:prefer-inline')
   R userMap(Map<String, SimpleUser> value) {
     final res = MapObjectExample(userMap: value);
     return (_then != null ? _then!(res) : res as R);

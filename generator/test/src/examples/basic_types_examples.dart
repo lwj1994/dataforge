@@ -6,6 +6,7 @@ import 'package:source_gen_test/annotations.dart';
 mixin _BasicUser {
   abstract final String name;
   abstract final int age;
+  @pragma('vm:prefer-inline')
   _BasicUserCopyWith<BasicUser> get copyWith =>
       _BasicUserCopyWith<BasicUser>._(this);
 
@@ -40,6 +41,7 @@ class _BasicUserCopyWith<R> {
   final R Function(BasicUser)? _then;
   _BasicUserCopyWith._(this._instance, [this._then]);
 
+  @pragma('vm:prefer-inline')
   R call({
     Object? name = dataforgeUndefined,
     Object? age = dataforgeUndefined,
@@ -51,11 +53,13 @@ class _BasicUserCopyWith<R> {
     return (_then != null ? _then!(res) : res as R);
   }
 
+  @pragma('vm:prefer-inline')
   R name(String value) {
     final res = BasicUser(name: value, age: _instance.age);
     return (_then != null ? _then!(res) : res as R);
   }
 
+  @pragma('vm:prefer-inline')
   R age(int value) {
     final res = BasicUser(name: _instance.name, age: value);
     return (_then != null ? _then!(res) : res as R);
@@ -74,6 +78,7 @@ mixin _DefaultValues {
   abstract final int intValue;
   abstract final String stringValue;
   abstract final bool boolValue;
+  @pragma('vm:prefer-inline')
   _DefaultValuesCopyWith<DefaultValues> get copyWith =>
       _DefaultValuesCopyWith<DefaultValues>._(this);
 
@@ -118,6 +123,7 @@ class _DefaultValuesCopyWith<R> {
   final R Function(DefaultValues)? _then;
   _DefaultValuesCopyWith._(this._instance, [this._then]);
 
+  @pragma('vm:prefer-inline')
   R call({
     Object? intValue = dataforgeUndefined,
     Object? stringValue = dataforgeUndefined,
@@ -137,6 +143,7 @@ class _DefaultValuesCopyWith<R> {
     return (_then != null ? _then!(res) : res as R);
   }
 
+  @pragma('vm:prefer-inline')
   R intValue(int value) {
     final res = DefaultValues(
       intValue: value,
@@ -146,6 +153,7 @@ class _DefaultValuesCopyWith<R> {
     return (_then != null ? _then!(res) : res as R);
   }
 
+  @pragma('vm:prefer-inline')
   R stringValue(String value) {
     final res = DefaultValues(
       intValue: _instance.intValue,
@@ -155,6 +163,7 @@ class _DefaultValuesCopyWith<R> {
     return (_then != null ? _then!(res) : res as R);
   }
 
+  @pragma('vm:prefer-inline')
   R boolValue(bool value) {
     final res = DefaultValues(
       intValue: _instance.intValue,
@@ -181,6 +190,7 @@ class DefaultValues {
 @ShouldGenerate(r'''
 mixin _PrefixedExample {
   abstract final String name;
+  @pragma('vm:prefer-inline')
   _PrefixedExampleCopyWith<PrefixedExample> get copyWith =>
       _PrefixedExampleCopyWith<PrefixedExample>._(this);
 
@@ -214,6 +224,7 @@ class _PrefixedExampleCopyWith<R> {
   final R Function(PrefixedExample)? _then;
   _PrefixedExampleCopyWith._(this._instance, [this._then]);
 
+  @pragma('vm:prefer-inline')
   R call({Object? name = df.dataforgeUndefined}) {
     final res = PrefixedExample(
       name: (name == df.dataforgeUndefined ? _instance.name : name as String),
@@ -221,6 +232,7 @@ class _PrefixedExampleCopyWith<R> {
     return (_then != null ? _then!(res) : res as R);
   }
 
+  @pragma('vm:prefer-inline')
   R name(String value) {
     final res = PrefixedExample(name: value);
     return (_then != null ? _then!(res) : res as R);
@@ -237,6 +249,7 @@ class PrefixedExample {
 mixin _DoubleExample {
   abstract final double value;
   abstract final double? optionalValue;
+  @pragma('vm:prefer-inline')
   _DoubleExampleCopyWith<DoubleExample> get copyWith =>
       _DoubleExampleCopyWith<DoubleExample>._(this);
 
@@ -272,6 +285,7 @@ class _DoubleExampleCopyWith<R> {
   final R Function(DoubleExample)? _then;
   _DoubleExampleCopyWith._(this._instance, [this._then]);
 
+  @pragma('vm:prefer-inline')
   R call({
     Object? value = dataforgeUndefined,
     Object? optionalValue = dataforgeUndefined,
@@ -287,6 +301,7 @@ class _DoubleExampleCopyWith<R> {
     return (_then != null ? _then!(res) : res as R);
   }
 
+  @pragma('vm:prefer-inline')
   R value(double value) {
     final res = DoubleExample(
       value: value,
@@ -295,6 +310,7 @@ class _DoubleExampleCopyWith<R> {
     return (_then != null ? _then!(res) : res as R);
   }
 
+  @pragma('vm:prefer-inline')
   R optionalValue(double? value) {
     final res = DoubleExample(value: _instance.value, optionalValue: value);
     return (_then != null ? _then!(res) : res as R);
@@ -312,6 +328,7 @@ class DoubleExample {
 mixin _NumExample {
   abstract final num value;
   abstract final num? optionalValue;
+  @pragma('vm:prefer-inline')
   _NumExampleCopyWith<NumExample> get copyWith =>
       _NumExampleCopyWith<NumExample>._(this);
 
@@ -347,6 +364,7 @@ class _NumExampleCopyWith<R> {
   final R Function(NumExample)? _then;
   _NumExampleCopyWith._(this._instance, [this._then]);
 
+  @pragma('vm:prefer-inline')
   R call({
     Object? value = dataforgeUndefined,
     Object? optionalValue = dataforgeUndefined,
@@ -360,6 +378,7 @@ class _NumExampleCopyWith<R> {
     return (_then != null ? _then!(res) : res as R);
   }
 
+  @pragma('vm:prefer-inline')
   R value(num value) {
     final res = NumExample(
       value: value,
@@ -368,6 +387,7 @@ class _NumExampleCopyWith<R> {
     return (_then != null ? _then!(res) : res as R);
   }
 
+  @pragma('vm:prefer-inline')
   R optionalValue(num? value) {
     final res = NumExample(value: _instance.value, optionalValue: value);
     return (_then != null ? _then!(res) : res as R);

@@ -4,7 +4,6 @@ description: Workflow for publishing dataforge packages (annotation, generator) 
 ---
 
 # Publish Process
-
 1. 发布前保证 所有  test passed
 2. 只更改 changelog.md 和 pubspec.yaml 里的 version 字段
 2. 不要删除 dependency_overrides。 
@@ -12,6 +11,7 @@ description: Workflow for publishing dataforge packages (annotation, generator) 
 2. 始终保持  cli 和 generator 的   `dataforge_annotation:` 和 `dataforge_base` 版本为空,
 2. 始终保持  dataforge_base   `dataforge_annotation:`  版本为空,
 2. 编写 changelog
+3. 使用 `dart compile exe cli/bin/dataforge_cli.dart -o cli/dataforge-${version}` 编译一个 产物
 3. 按顺序发布 
     a. dataforge_annotation
     b. dataforge_base
