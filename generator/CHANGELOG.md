@@ -1,3 +1,6 @@
+## 0.6.0-dev.2
+- Bump version.
+
 ## 0.6.0-dev.1
 - Fix `readObject` call arguments to pass value directly instead of map and key.
 

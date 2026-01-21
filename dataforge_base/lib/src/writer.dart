@@ -141,6 +141,7 @@ class GeneratorWriter {
     buffer.writeln('  }');
   }
 
+  /// Build a type cast expression for copyWith method
   String _buildTypeCastExpression(String variable, String type) {
     final cleanType = type.replaceAll('?', '').trim();
     final isNullable = type.endsWith('?');
@@ -158,6 +159,13 @@ class GeneratorWriter {
         return '($variable as Map?)?.cast<$innerTypes>()';
       } else {
         return '($variable as Map).cast<$innerTypes>()';
+      }
+    } else if (cleanType == 'double') {
+      // Special handling for double to allow int values (e.g. 1) to be passed
+      if (isNullable) {
+        return '($variable as num?)?.toDouble()';
+      } else {
+        return '($variable as num).toDouble()';
       }
     } else {
       return '$variable as $type';

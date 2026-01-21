@@ -72,7 +72,7 @@ class _NullableFieldsExampleCopyWith<R> {
           : nullableInt as int?),
       nullableDouble: (nullableDouble == dataforgeUndefined
           ? _instance.nullableDouble
-          : nullableDouble as double?),
+          : (nullableDouble as num?)?.toDouble()),
       nullableBool: (nullableBool == dataforgeUndefined
           ? _instance.nullableBool
           : nullableBool as bool?),

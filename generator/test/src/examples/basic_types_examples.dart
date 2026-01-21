@@ -277,10 +277,12 @@ class _DoubleExampleCopyWith<R> {
     Object? optionalValue = dataforgeUndefined,
   }) {
     final res = DoubleExample(
-      value: (value == dataforgeUndefined ? _instance.value : value as double),
+      value: (value == dataforgeUndefined
+          ? _instance.value
+          : (value as num).toDouble()),
       optionalValue: (optionalValue == dataforgeUndefined
           ? _instance.optionalValue
-          : optionalValue as double?),
+          : (optionalValue as num?)?.toDouble()),
     );
     return (_then != null ? _then!(res) : res as R);
   }
