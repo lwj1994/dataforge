@@ -18,8 +18,8 @@ dependencies:
   collection: ^1.17.0
   path: ^1.7.0
   args: ^2.7.0
-  dataforge_annotation:
-  dataforge_base:
+  dataforge_annotation: ^0.6.0
+  dataforge_base: ^0.6.0
 
 dev_dependencies:
   lints: ^5.0.0

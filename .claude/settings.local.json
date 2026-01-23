@@ -5,7 +5,12 @@
       "Bash(dart pub get:*)",
       "Bash(wc:*)",
       "Bash(dart analyze:*)",
-      "Bash(dart run:*)"
+      "Bash(dart run:*)",
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(git tag:*)",
+      "Bash(git push:*)",
+      "Bash(dart pub publish:*)"
     ]
   }
 }
