@@ -1,3 +1,10 @@
+## 0.6.0
+- **Documentation**: Complete CLI documentation in README
+  - Added installation and usage instructions
+  - Performance comparison with build_runner
+  - Debug mode documentation
+- Stable release with all features from 0.6.0-dev.x
+
 ## 0.6.0-dev.4
 - Optimize generated code performance by adding `@pragma('vm:prefer-inline')`.
 

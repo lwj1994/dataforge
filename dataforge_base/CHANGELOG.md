@@ -1,3 +1,15 @@
+## 0.6.0
+- **Bug Fixes**:
+  - Fixed DateTime converter padding logic that could produce incorrect dates
+  - Now correctly handles 10-digit (seconds) and 13-digit (milliseconds) timestamps
+  - Throws `FormatException` for ambiguous timestamp lengths
+- **New Features**:
+  - Added circular dependency detection
+  - Added structured logging with `DataforgeLogger`
+- **Performance**:
+  - Code generation optimized with `@pragma('vm:prefer-inline')`
+- Stable release
+
 ## 0.6.0-dev.4
 - Optimize generated code performance by adding `@pragma('vm:prefer-inline')`.
 

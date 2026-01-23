@@ -1,3 +1,18 @@
+## 0.6.0
+- **Documentation**: Comprehensive README updates with complete feature documentation
+  - Added detailed table of contents and navigation
+  - Expanded JSON serialization documentation (DateTime, Enum, type casting)
+  - Added complete `@JsonKey` annotation reference (8 parameters)
+  - Added CLI tool documentation and performance tips
+  - Added advanced features (custom converters, generics, collection handling)
+  - Added comparison table with json_serializable and freezed
+  - Added troubleshooting and migration guides
+  - Updated all code examples with `@override` annotations (required for mixin pattern)
+- Chinese README (README_ZH.md) fully synchronized with English version
+
+## 0.6.0-dev.6
+- Previous development version
+
 ## 0.6.0-dev.4
 - Optimize generated code performance by adding `@pragma('vm:prefer-inline')`.
 

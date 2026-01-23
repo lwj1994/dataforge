@@ -1,3 +1,33 @@
+## 0.6.0
+### Added
+- **Comprehensive Documentation**: Complete README overhaul for all packages
+  - Detailed feature documentation with examples
+  - CLI tool usage and performance tips
+  - Advanced features guide (custom converters, generics, collections)
+  - Comparison table with json_serializable and freezed
+  - Migration guides and troubleshooting
+  - Chinese README fully synchronized
+- **Circular Dependency Detection**: Automatic detection with clear warnings
+- **Structured Logging**: `DataforgeLogger` with debug/info/warning/error levels
+
+### Fixed
+- **DateTime Converter**: Fixed dangerous padding logic
+  - Correctly handles 10-digit seconds timestamps (Unix standard)
+  - Correctly handles 13-digit milliseconds timestamps
+  - Throws `FormatException` for ambiguous lengths
+  - Supports ISO 8601 date string parsing
+- Type casting for `double` fields in `copyWith` (smart casting from `int` via `num`)
+
+### Changed
+- Updated all code examples with `@override` annotations (required for mixin pattern)
+- Unified `analyzer` dependency to ^8.1.1 across all packages
+- Performance optimizations with `@pragma('vm:prefer-inline')`
+
+### Documentation
+- 25 new tests added (6 for circular dependencies, 19 for DateTime converter)
+- README expanded from ~200 lines to 760+ lines with comprehensive guides
+- All documentation properly synchronized between English and Chinese versions
+
 ## 0.6.0-dev.6
 ### Added
 - **Circular Dependency Detection**: Automatic detection of circular references between Dataforge classes with clear warnings
