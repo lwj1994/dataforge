@@ -1,6 +1,8 @@
 // @author luwenjie on 2026/01/17 14:37:53
 
 import 'package:collection/collection.dart';
+import 'circular_dependency_detector.dart';
+import 'logger.dart';
 import 'model.dart';
 
 /// Code writer for generating data class code
@@ -23,6 +25,17 @@ class GeneratorWriter {
   String generate() {
     final buffer = StringBuffer();
 
+    // Detect circular dependencies
+    final detector = CircularDependencyDetector();
+    for (final clazz in result.classes) {
+      detector.addClass(clazz);
+    }
+    final cycles = detector.detectCycles();
+    if (cycles.isNotEmpty) {
+      final warning = CircularDependencyDetector.formatCycleWarning(cycles);
+      DataforgeLogger.warning(warning);
+    }
+
     // Generate code for each class
     for (final clazz in result.classes) {
       if (result.primaryClassName != null &&
@@ -31,8 +44,8 @@ class GeneratorWriter {
       }
       // Validate class information
       if (clazz.name.isEmpty || clazz.mixinName.isEmpty) {
-        print(
-          'Warning: Skipping class with empty name or mixinName: ${clazz.name}',
+        DataforgeLogger.warning(
+          'Skipping class with empty name or mixinName: ${clazz.name}',
         );
         continue;
       }
@@ -50,8 +63,8 @@ class GeneratorWriter {
         if (field.name.isEmpty ||
             field.type.isEmpty ||
             field.type == 'dynamic') {
-          print(
-            'Warning: Skipping invalid field: name="${field.name}", type="${field.type}"',
+          DataforgeLogger.warning(
+            'Skipping invalid field: name="${field.name}", type="${field.type}"',
           );
           continue;
         }

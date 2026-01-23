@@ -4,6 +4,7 @@ import 'package:analyzer/dart/constant/value.dart';
 import 'package:analyzer/dart/element/element.dart';
 import 'package:analyzer/dart/element/type.dart';
 
+import 'logger.dart';
 import 'model.dart';
 
 /// Parser for extracting class information from Dart analyzer elements.
@@ -57,7 +58,7 @@ class BaseParser {
         primaryClassName: classElement.name,
       );
     } catch (e, stackTrace) {
-      print('Error parsing class: $e\n$stackTrace');
+      DataforgeLogger.error('Error parsing class', e, stackTrace);
       return null;
     }
   }
@@ -73,7 +74,7 @@ class BaseParser {
         return meta.annotations;
       } catch (_) {}
     } catch (e) {
-      print('Error accessing metadata for ${element.name}: $e');
+      DataforgeLogger.warning('Error accessing metadata for ${element.name}: $e');
     }
     return [];
   }
@@ -236,7 +237,7 @@ class BaseParser {
             }
           }
         } catch (e) {
-          print('Error parsing constructor params: $e');
+          DataforgeLogger.warning('Error parsing constructor params: $e');
         }
       }
     }

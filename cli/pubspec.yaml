@@ -1,6 +1,6 @@
 name: dataforge_cli
 description: A Dart code generator that forges data classes with JSON serialization support from annotated classes.
-version: 0.6.0-dev.4
+version: 0.6.0-dev.6
 homepage: https://github.com/your_username/dataforge
 repository: https://github.com/your_username/dataforge
 issue_tracker: https://github.com/your_username/dataforge/issues
@@ -14,7 +14,7 @@ environment:
 
 # Add regular dependencies here.
 dependencies:
-  analyzer: ^8.0.0
+  analyzer: ^8.1.1
   collection: ^1.17.0
   path: ^1.7.0
   args: ^2.7.0

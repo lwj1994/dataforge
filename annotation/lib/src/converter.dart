@@ -27,10 +27,31 @@ abstract class JsonTypeConverter<T, S> {
 }
 
 /// Built-in converter for DateTime objects that supports nullable values.
-/// Accepts any object type and tries to convert it to DateTime.
-/// - If input is a number (13-digit milliseconds timestamp), uses DateTime.fromMillisecondsSinceEpoch
-/// - If input is a number with less than 13 digits, pads it to 13 digits
-/// - Otherwise tries to parse using DateTime.parse as fallback
+///
+/// Accepts various input formats and converts them to DateTime:
+/// - DateTime objects are returned as-is
+/// - Numeric timestamps (milliseconds since Unix epoch):
+///   * 13-digit numbers: treated as milliseconds (e.g., 1737619200000)
+///   * 10-digit numbers: treated as seconds and converted to milliseconds (e.g., 1737619200)
+///   * Other lengths: throws FormatException to avoid ambiguous interpretation
+/// - String values: parsed using DateTime.parse() which supports ISO 8601 format
+///
+/// ## Timestamp Format Examples
+/// ```dart
+/// // Milliseconds (13 digits) - Preferred for precise timestamps
+/// fromJson(1737619200000) // => 2026-01-23 08:00:00.000Z
+///
+/// // Seconds (10 digits) - Common in Unix timestamps
+/// fromJson(1737619200)    // => 2026-01-23 08:00:00.000Z
+///
+/// // ISO 8601 string - Standard date format
+/// fromJson("2026-01-23T08:00:00.000Z") // => 2026-01-23 08:00:00.000Z
+/// ```
+///
+/// ## Error Handling
+/// - Ambiguous timestamp lengths (not 10 or 13 digits) will throw FormatException
+/// - Invalid date strings will return null instead of throwing
+/// - Null input always returns null
 class DefaultDateTimeConverter extends JsonTypeConverter<DateTime, String> {
   const DefaultDateTimeConverter();
 
@@ -39,25 +60,40 @@ class DefaultDateTimeConverter extends JsonTypeConverter<DateTime, String> {
     if (json is DateTime) return json;
     if (json == null) return null;
 
-    // Handle numeric timestamps (milliseconds since epoch)
-
+    // Handle numeric timestamps (milliseconds or seconds since epoch)
     final maybeInt = int.tryParse(json.toString());
 
     if (json is num || maybeInt != null) {
       final timestamp = json.toString();
-      if (timestamp.length <= 13) {
-        // Pad to 13 digits if needed (to handle seconds or other shorter timestamps)
-        final paddedTimestamp = timestamp.padRight(13, '0');
-        return DateTime.fromMillisecondsSinceEpoch(int.parse(paddedTimestamp));
+      final length = timestamp.length;
+
+      // Standard milliseconds timestamp (13 digits)
+      if (length == 13) {
+        return DateTime.fromMillisecondsSinceEpoch(int.parse(timestamp));
       }
-      return DateTime.fromMillisecondsSinceEpoch(int.parse(timestamp));
+
+      // Standard seconds timestamp (10 digits) - convert to milliseconds
+      if (length == 10) {
+        return DateTime.fromMillisecondsSinceEpoch(int.parse(timestamp) * 1000);
+      }
+
+      // Reject ambiguous timestamp lengths to prevent incorrect conversions
+      // Examples of problematic cases:
+      // - "123" could be seconds, milliseconds, or invalid
+      // - "12345678" could be partial timestamp or invalid
+      throw FormatException(
+        'Ambiguous timestamp length: $length digits. '
+        'Expected 10 digits (seconds) or 13 digits (milliseconds). '
+        'Received: $timestamp',
+      );
     }
 
-    // Last resort: try to convert to string and parse
+    // Try to parse as ISO 8601 or other standard date string format
     try {
       return DateTime.parse(json.toString());
     } catch (e) {
-      // If all conversion attempts fail, return null instead of throwing
+      // If parsing fails, return null instead of throwing
+      // This allows graceful handling of invalid date strings
       return null;
     }
   }
@@ -65,6 +101,7 @@ class DefaultDateTimeConverter extends JsonTypeConverter<DateTime, String> {
   @override
   String? toJson(DateTime? object) {
     if (object == null) return null;
+    // Always serialize as milliseconds timestamp for consistency
     return object.millisecondsSinceEpoch.toString();
   }
 }
