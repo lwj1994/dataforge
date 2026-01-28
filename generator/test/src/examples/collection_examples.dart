@@ -144,7 +144,9 @@ class _ImageListModelCopyWith<R> {
     Object? watermarkImages = dataforgeUndefined,
   }) {
     final res = ImageListModel(
-      id: (id == dataforgeUndefined ? _instance.id : id as String),
+      id: (id == dataforgeUndefined
+          ? _instance.id
+          : (id == null ? '' : id as String)),
       watermarkImages: (watermarkImages == dataforgeUndefined
           ? _instance.watermarkImages
           : (watermarkImages as List).cast<ImageBean>()),

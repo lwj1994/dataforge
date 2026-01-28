@@ -1,3 +1,17 @@
+## 0.6.1-dev.0
+### Added
+- **Error Callback API**: New `DataforgeConfig` and `DataforgeInit.init()` for registering error callbacks
+  - Allows developers to capture and handle type conversion errors in `copyWith`
+  - `SafeCasteUtil.copyWithCast` and `SafeCasteUtil.copyWithCastNullable` for safe type conversion with error reporting
+
+### Fixed
+- **copyWith Null Handling**: Improved null handling for non-nullable primitive types
+  - `String`: uses `''` as default when null is passed
+  - `int`: uses `0` as default when null is passed
+  - `double`: uses `0.0` as default when null is passed
+  - `bool`: uses `false` as default when null is passed
+  - Prevents runtime `TypeError` when null is incorrectly passed to non-nullable fields
+
 ## 0.6.0
 ### Added
 - **Comprehensive Documentation**: Complete README overhaul for all packages

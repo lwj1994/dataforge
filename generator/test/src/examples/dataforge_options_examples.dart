@@ -39,8 +39,12 @@ class _NoFromJsonExampleCopyWith<R> {
     Object? age = dataforgeUndefined,
   }) {
     final res = NoFromJsonExample(
-      name: (name == dataforgeUndefined ? _instance.name : name as String),
-      age: (age == dataforgeUndefined ? _instance.age : age as int),
+      name: (name == dataforgeUndefined
+          ? _instance.name
+          : (name == null ? '' : name as String)),
+      age: (age == dataforgeUndefined
+          ? _instance.age
+          : (age == null ? 0 : age as int)),
     );
     return (_then != null ? _then!(res) : res as R);
   }
@@ -107,8 +111,12 @@ class _NoToJsonExampleCopyWith<R> {
     Object? age = dataforgeUndefined,
   }) {
     final res = NoToJsonExample(
-      name: (name == dataforgeUndefined ? _instance.name : name as String),
-      age: (age == dataforgeUndefined ? _instance.age : age as int),
+      name: (name == dataforgeUndefined
+          ? _instance.name
+          : (name == null ? '' : name as String)),
+      age: (age == dataforgeUndefined
+          ? _instance.age
+          : (age == null ? 0 : age as int)),
     );
     return (_then != null ? _then!(res) : res as R);
   }
@@ -168,8 +176,12 @@ class _NoJsonExampleCopyWith<R> {
     Object? age = dataforgeUndefined,
   }) {
     final res = NoJsonExample(
-      name: (name == dataforgeUndefined ? _instance.name : name as String),
-      age: (age == dataforgeUndefined ? _instance.age : age as int),
+      name: (name == dataforgeUndefined
+          ? _instance.name
+          : (name == null ? '' : name as String)),
+      age: (age == dataforgeUndefined
+          ? _instance.age
+          : (age == null ? 0 : age as int)),
     );
     return (_then != null ? _then!(res) : res as R);
   }
@@ -281,7 +293,9 @@ class _CustomMixinNameCopyWith<R> {
   @pragma('vm:prefer-inline')
   R call({Object? value = dataforgeUndefined}) {
     final res = CustomMixinName(
-      value: (value == dataforgeUndefined ? _instance.value : value as String),
+      value: (value == dataforgeUndefined
+          ? _instance.value
+          : (value == null ? '' : value as String)),
     );
     return (_then != null ? _then!(res) : res as R);
   }

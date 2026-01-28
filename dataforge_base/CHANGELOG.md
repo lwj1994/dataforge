@@ -1,3 +1,8 @@
+## 0.6.1-dev.0
+- **copyWith Null Handling**: Improved null handling for non-nullable primitive types (String, int, double, bool)
+  - Provides default values instead of throwing `TypeError` when null is passed
+  - String: `''`, int: `0`, double: `0.0`, bool: `false`
+
 ## 0.6.0
 - **Bug Fixes**:
   - Fixed DateTime converter padding logic that could produce incorrect dates

@@ -171,14 +171,18 @@ class _CustomFunctionsExampleCopyWith<R> {
     Object? regularField = dataforgeUndefined,
   }) {
     final res = CustomFunctionsExample(
-      name: (name == dataforgeUndefined ? _instance.name : name as String),
-      count: (count == dataforgeUndefined ? _instance.count : count as int),
+      name: (name == dataforgeUndefined
+          ? _instance.name
+          : (name == null ? '' : name as String)),
+      count: (count == dataforgeUndefined
+          ? _instance.count
+          : (count == null ? 0 : count as int)),
       optionalValue: (optionalValue == dataforgeUndefined
           ? _instance.optionalValue
           : optionalValue as String?),
       regularField: (regularField == dataforgeUndefined
           ? _instance.regularField
-          : regularField as String),
+          : (regularField == null ? '' : regularField as String)),
     );
     return (_then != null ? _then!(res) : res as R);
   }
@@ -312,7 +316,9 @@ class _ReadValueWithFromJsonExampleCopyWith<R> {
   @pragma('vm:prefer-inline')
   R call({Object? name = dataforgeUndefined}) {
     final res = ReadValueWithFromJsonExample(
-      name: (name == dataforgeUndefined ? _instance.name : name as String),
+      name: (name == dataforgeUndefined
+          ? _instance.name
+          : (name == null ? '' : name as String)),
     );
     return (_then != null ? _then!(res) : res as R);
   }

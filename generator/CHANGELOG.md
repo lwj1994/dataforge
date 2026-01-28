@@ -1,3 +1,7 @@
+## 0.6.1-dev.0
+- **copyWith Null Handling**: Improved null handling for non-nullable primitive types
+  - Provides default values instead of throwing `TypeError` when null is passed
+
 ## 0.6.0
 - **Documentation**: Comprehensive README updates with complete feature documentation
   - Added detailed table of contents and navigation

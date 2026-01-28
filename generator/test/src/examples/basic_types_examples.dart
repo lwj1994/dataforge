@@ -47,8 +47,12 @@ class _BasicUserCopyWith<R> {
     Object? age = dataforgeUndefined,
   }) {
     final res = BasicUser(
-      name: (name == dataforgeUndefined ? _instance.name : name as String),
-      age: (age == dataforgeUndefined ? _instance.age : age as int),
+      name: (name == dataforgeUndefined
+          ? _instance.name
+          : (name == null ? '' : name as String)),
+      age: (age == dataforgeUndefined
+          ? _instance.age
+          : (age == null ? 0 : age as int)),
     );
     return (_then != null ? _then!(res) : res as R);
   }
@@ -132,13 +136,13 @@ class _DefaultValuesCopyWith<R> {
     final res = DefaultValues(
       intValue: (intValue == dataforgeUndefined
           ? _instance.intValue
-          : intValue as int),
+          : (intValue == null ? 0 : intValue as int)),
       stringValue: (stringValue == dataforgeUndefined
           ? _instance.stringValue
-          : stringValue as String),
+          : (stringValue == null ? '' : stringValue as String)),
       boolValue: (boolValue == dataforgeUndefined
           ? _instance.boolValue
-          : boolValue as bool),
+          : (boolValue == null ? false : boolValue as bool)),
     );
     return (_then != null ? _then!(res) : res as R);
   }
@@ -227,7 +231,9 @@ class _PrefixedExampleCopyWith<R> {
   @pragma('vm:prefer-inline')
   R call({Object? name = df.dataforgeUndefined}) {
     final res = PrefixedExample(
-      name: (name == df.dataforgeUndefined ? _instance.name : name as String),
+      name: (name == df.dataforgeUndefined
+          ? _instance.name
+          : (name == null ? '' : name as String)),
     );
     return (_then != null ? _then!(res) : res as R);
   }
@@ -293,7 +299,7 @@ class _DoubleExampleCopyWith<R> {
     final res = DoubleExample(
       value: (value == dataforgeUndefined
           ? _instance.value
-          : (value as num).toDouble()),
+          : (value == null ? 0.0 : (value as num).toDouble())),
       optionalValue: (optionalValue == dataforgeUndefined
           ? _instance.optionalValue
           : (optionalValue as num?)?.toDouble()),

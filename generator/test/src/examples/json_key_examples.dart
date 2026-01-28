@@ -47,11 +47,15 @@ class _ProductCopyWith<R> {
     Object? name = dataforgeUndefined,
   }) {
     final res = Product(
-      id: (id == dataforgeUndefined ? _instance.id : id as String),
+      id: (id == dataforgeUndefined
+          ? _instance.id
+          : (id == null ? '' : id as String)),
       secret: (secret == dataforgeUndefined
           ? _instance.secret
-          : secret as String),
-      name: (name == dataforgeUndefined ? _instance.name : name as String),
+          : (secret == null ? '' : secret as String)),
+      name: (name == dataforgeUndefined
+          ? _instance.name
+          : (name == null ? '' : name as String)),
     );
     return (_then != null ? _then!(res) : res as R);
   }
@@ -197,12 +201,18 @@ class _AlternateNamesTestCopyWith<R> {
     Object? tags = dataforgeUndefined,
   }) {
     final res = AlternateNamesTest(
-      name: (name == dataforgeUndefined ? _instance.name : name as String),
-      age: (age == dataforgeUndefined ? _instance.age : age as int),
-      email: (email == dataforgeUndefined ? _instance.email : email as String),
+      name: (name == dataforgeUndefined
+          ? _instance.name
+          : (name == null ? '' : name as String)),
+      age: (age == dataforgeUndefined
+          ? _instance.age
+          : (age == null ? 0 : age as int)),
+      email: (email == dataforgeUndefined
+          ? _instance.email
+          : (email == null ? '' : email as String)),
       isActive: (isActive == dataforgeUndefined
           ? _instance.isActive
-          : isActive as bool),
+          : (isActive == null ? false : isActive as bool)),
       tags: (tags == dataforgeUndefined
           ? _instance.tags
           : (tags as List).cast<String>()),
@@ -373,13 +383,21 @@ class _CustomReadValueCopyWith<R> {
     Object? enabled = dataforgeUndefined,
   }) {
     final res = CustomReadValue(
-      id: (id == dataforgeUndefined ? _instance.id : id as String),
-      name: (name == dataforgeUndefined ? _instance.name : name as String),
-      title: (title == dataforgeUndefined ? _instance.title : title as String),
-      count: (count == dataforgeUndefined ? _instance.count : count as int),
+      id: (id == dataforgeUndefined
+          ? _instance.id
+          : (id == null ? '' : id as String)),
+      name: (name == dataforgeUndefined
+          ? _instance.name
+          : (name == null ? '' : name as String)),
+      title: (title == dataforgeUndefined
+          ? _instance.title
+          : (title == null ? '' : title as String)),
+      count: (count == dataforgeUndefined
+          ? _instance.count
+          : (count == null ? 0 : count as int)),
       enabled: (enabled == dataforgeUndefined
           ? _instance.enabled
-          : enabled as bool),
+          : (enabled == null ? false : enabled as bool)),
     );
     return (_then != null ? _then!(res) : res as R);
   }
@@ -518,7 +536,9 @@ class _IncludeIfNullExampleCopyWith<R> {
     Object? count = dataforgeUndefined,
   }) {
     final res = IncludeIfNullExample(
-      name: (name == dataforgeUndefined ? _instance.name : name as String),
+      name: (name == dataforgeUndefined
+          ? _instance.name
+          : (name == null ? '' : name as String)),
       description: (description == dataforgeUndefined
           ? _instance.description
           : description as String?),

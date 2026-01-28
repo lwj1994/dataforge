@@ -74,7 +74,9 @@ class _NestedDefaultValuesCopyWith<R> {
     Object? nested = dataforgeUndefined,
   }) {
     final res = NestedDefaultValues(
-      name: (name == dataforgeUndefined ? _instance.name : name as String),
+      name: (name == dataforgeUndefined
+          ? _instance.name
+          : (name == null ? '' : name as String)),
       nested: (nested == dataforgeUndefined
           ? _instance.nested
           : nested as InnerDefaultValues),
@@ -154,7 +156,9 @@ class _ChainedExampleCopyWith<R> {
   @pragma('vm:prefer-inline')
   R call({Object? id = dataforgeUndefined, Object? user = dataforgeUndefined}) {
     final res = ChainedExample(
-      id: (id == dataforgeUndefined ? _instance.id : id as String),
+      id: (id == dataforgeUndefined
+          ? _instance.id
+          : (id == null ? '' : id as String)),
       user: (user == dataforgeUndefined ? _instance.user : user as InnerUser),
     );
     return (_then != null ? _then!(res) : res as R);
@@ -233,7 +237,9 @@ class _NullableNestedExampleCopyWith<R> {
     Object? optionalUser = dataforgeUndefined,
   }) {
     final res = NullableNestedExample(
-      name: (name == dataforgeUndefined ? _instance.name : name as String),
+      name: (name == dataforgeUndefined
+          ? _instance.name
+          : (name == null ? '' : name as String)),
       optionalUser: (optionalUser == dataforgeUndefined
           ? _instance.optionalUser
           : optionalUser as InnerUser?),
@@ -339,7 +345,9 @@ class _MultiLevelNestedExampleCopyWith<R> {
     Object? person = dataforgeUndefined,
   }) {
     final res = MultiLevelNestedExample(
-      id: (id == dataforgeUndefined ? _instance.id : id as String),
+      id: (id == dataforgeUndefined
+          ? _instance.id
+          : (id == null ? '' : id as String)),
       person: (person == dataforgeUndefined
           ? _instance.person
           : person as Person),
@@ -420,7 +428,9 @@ class _DeepRootExampleCopyWith<R> {
   @pragma('vm:prefer-inline')
   R call({Object? id = dataforgeUndefined, Object? root = dataforgeUndefined}) {
     final res = DeepRootExample(
-      id: (id == dataforgeUndefined ? _instance.id : id as String),
+      id: (id == dataforgeUndefined
+          ? _instance.id
+          : (id == null ? '' : id as String)),
       root: (root == dataforgeUndefined
           ? _instance.root
           : root as NestedDefaultValues),

@@ -1,6 +1,6 @@
 name: dataforge_annotation
 description: Annotations for dataforge package to generate data classes with JSON serialization support.
-version: 0.6.0
+version: 0.6.1-dev.0
 homepage: https://github.com/your_username/dataforge
 repository: https://github.com/your_username/dataforge
 issue_tracker: https://github.com/your_username/dataforge/issues

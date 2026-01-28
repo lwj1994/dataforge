@@ -157,6 +157,10 @@ class GeneratorWriter {
   }
 
   /// Build a type cast expression for copyWith method
+  ///
+  /// For non-nullable primitive types (String, int, double, bool), this method
+  /// provides fallback default values when null is passed, instead of directly
+  /// casting which would cause runtime errors.
   String _buildTypeCastExpression(String variable, String type) {
     final cleanType = type.replaceAll('?', '').trim();
     final isNullable = type.endsWith('?');
@@ -180,7 +184,29 @@ class GeneratorWriter {
       if (isNullable) {
         return '($variable as num?)?.toDouble()';
       } else {
-        return '($variable as num).toDouble()';
+        // First check null, then cast - provide default value 0.0 when null
+        return '($variable == null ? 0.0 : ($variable as num).toDouble())';
+      }
+    } else if (cleanType == 'int') {
+      if (isNullable) {
+        return '$variable as $type';
+      } else {
+        // First check null, then cast - provide default value 0 when null
+        return '($variable == null ? 0 : $variable as int)';
+      }
+    } else if (cleanType == 'String') {
+      if (isNullable) {
+        return '$variable as $type';
+      } else {
+        // First check null, then cast - provide default value '' when null
+        return "($variable == null ? '' : $variable as String)";
+      }
+    } else if (cleanType == 'bool') {
+      if (isNullable) {
+        return '$variable as $type';
+      } else {
+        // First check null, then cast - provide default value false when null
+        return '($variable == null ? false : $variable as bool)';
       }
     } else {
       return '$variable as $type';
