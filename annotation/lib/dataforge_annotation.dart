@@ -13,7 +13,7 @@ export 'package:collection/collection.dart';
 class DataforgeInit {
   /// Initialize Dataforge with global configuration.
   ///
-  /// [onError] is called whenever a type conversion error occurs during copyWith.
+  /// [onCopyWithError] is called whenever a type conversion error occurs during copyWith.
   /// This helps developers identify and debug type mismatch issues.
   ///
   /// Example:
@@ -25,8 +25,8 @@ class DataforgeInit {
   ///       print('Error: $error');
   ///     },
   static void init({
-    DataforgeCopyWithErrorCallback? onError,
+    DataforgeCopyWithErrorCallback? onCopyWithError,
   }) {
-    DataforgeConfig.copyWithErrorCallback = onError;
+    DataforgeConfig.copyWithErrorCallback = onCopyWithError;
   }
 }

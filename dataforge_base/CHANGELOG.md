@@ -1,3 +1,7 @@
+## 0.6.1-dev.3
+### Changed
+- Compatibility update for `DataforgeInit.init`.
+
 ## 0.6.1-dev.2
 ### Changed
 - Refinement for `DataforgeInit` compatibility.

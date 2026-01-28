@@ -1,3 +1,7 @@
+## 0.6.1-dev.3
+### Changed
+- Renamed parameter `onError` to `onCopyWithError` in `DataforgeInit.init` for better clarity.
+
 ## 0.6.1-dev.2
 ### Changed
 - Changed `DataforgeInit` from an `extension` to a `class` to avoid potential compatibility issues and improve discoverability.
