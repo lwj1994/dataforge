@@ -1,3 +1,7 @@
+## 0.6.1-dev.2
+### Changed
+- Refinement for `DataforgeInit` compatibility.
+
 ## 0.6.1-dev.1
 ### Changed
 - Refined `copyWith` single-field update methods to use internal `call()` method, ensuring all fields are correctly preserved.

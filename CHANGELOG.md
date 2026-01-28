@@ -1,3 +1,7 @@
+## 0.6.1-dev.2
+### Changed
+- Changed `DataforgeInit` from an `extension` to a `class` to avoid potential compatibility issues and improve discoverability.
+
 ## 0.6.1-dev.1
 ### Changed
 - Refined `copyWith` single-field update methods to use internal `call()` method, ensuring all fields are correctly preserved.

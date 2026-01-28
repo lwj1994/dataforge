@@ -1,6 +1,5 @@
 // @author luwenjie on 20/04/2025 15:41:25
 
-import 'package:dataforge_annotation/dataforge_annotation.dart';
 import 'package:dataforge_annotation/src/config.dart';
 
 export 'src/annotation.dart';
@@ -10,8 +9,8 @@ export 'src/safe_type_converter.dart';
 
 export 'package:collection/collection.dart';
 
-/// Extension on [Dataforge] to provide initialization method.
-extension DataforgeInit on Dataforge {
+/// to provide initialization method.
+class DataforgeInit {
   /// Initialize Dataforge with global configuration.
   ///
   /// [onError] is called whenever a type conversion error occurs during copyWith.
