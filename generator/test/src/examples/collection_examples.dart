@@ -64,8 +64,8 @@ class _ListObjectExampleCopyWith<R> {
 
   @pragma('vm:prefer-inline')
   R users(List<SimpleUser> value) {
-    final res = ListObjectExample(users: value);
-    return (_then != null ? _then!(res) : res as R);
+    final res = call(users: value);
+    return res;
   }
 }
 ''')
@@ -144,9 +144,7 @@ class _ImageListModelCopyWith<R> {
     Object? watermarkImages = dataforgeUndefined,
   }) {
     final res = ImageListModel(
-      id: (id == dataforgeUndefined
-          ? _instance.id
-          : (id == null ? '' : id as String)),
+      id: SafeCasteUtil.copyWithCast<String>(id, 'id', _instance.id),
       watermarkImages: (watermarkImages == dataforgeUndefined
           ? _instance.watermarkImages
           : (watermarkImages as List).cast<ImageBean>()),
@@ -156,17 +154,14 @@ class _ImageListModelCopyWith<R> {
 
   @pragma('vm:prefer-inline')
   R id(String value) {
-    final res = ImageListModel(
-      id: value,
-      watermarkImages: _instance.watermarkImages,
-    );
-    return (_then != null ? _then!(res) : res as R);
+    final res = call(id: value);
+    return res;
   }
 
   @pragma('vm:prefer-inline')
   R watermarkImages(List<ImageBean> value) {
-    final res = ImageListModel(id: _instance.id, watermarkImages: value);
-    return (_then != null ? _then!(res) : res as R);
+    final res = call(watermarkImages: value);
+    return res;
   }
 }
 ''')
@@ -238,8 +233,8 @@ class _RequiredListModelCopyWith<R> {
 
   @pragma('vm:prefer-inline')
   R users(List<SimpleUser> value) {
-    final res = RequiredListModel(users: value);
-    return (_then != null ? _then!(res) : res as R);
+    final res = call(users: value);
+    return res;
   }
 }
 ''')
@@ -359,46 +354,26 @@ class _ListPrimitiveExampleCopyWith<R> {
 
   @pragma('vm:prefer-inline')
   R names(List<String> value) {
-    final res = ListPrimitiveExample(
-      names: value,
-      numbers: _instance.numbers,
-      values: _instance.values,
-      flags: _instance.flags,
-    );
-    return (_then != null ? _then!(res) : res as R);
+    final res = call(names: value);
+    return res;
   }
 
   @pragma('vm:prefer-inline')
   R numbers(List<int> value) {
-    final res = ListPrimitiveExample(
-      names: _instance.names,
-      numbers: value,
-      values: _instance.values,
-      flags: _instance.flags,
-    );
-    return (_then != null ? _then!(res) : res as R);
+    final res = call(numbers: value);
+    return res;
   }
 
   @pragma('vm:prefer-inline')
   R values(List<double> value) {
-    final res = ListPrimitiveExample(
-      names: _instance.names,
-      numbers: _instance.numbers,
-      values: value,
-      flags: _instance.flags,
-    );
-    return (_then != null ? _then!(res) : res as R);
+    final res = call(values: value);
+    return res;
   }
 
   @pragma('vm:prefer-inline')
   R flags(List<bool> value) {
-    final res = ListPrimitiveExample(
-      names: _instance.names,
-      numbers: _instance.numbers,
-      values: _instance.values,
-      flags: value,
-    );
-    return (_then != null ? _then!(res) : res as R);
+    final res = call(flags: value);
+    return res;
   }
 }
 ''')
@@ -496,20 +471,14 @@ class _NullableListExampleCopyWith<R> {
 
   @pragma('vm:prefer-inline')
   R nullableNames(List<String>? value) {
-    final res = NullableListExample(
-      nullableNames: value,
-      nullableNumbers: _instance.nullableNumbers,
-    );
-    return (_then != null ? _then!(res) : res as R);
+    final res = call(nullableNames: value);
+    return res;
   }
 
   @pragma('vm:prefer-inline')
   R nullableNumbers(List<int>? value) {
-    final res = NullableListExample(
-      nullableNames: _instance.nullableNames,
-      nullableNumbers: value,
-    );
-    return (_then != null ? _then!(res) : res as R);
+    final res = call(nullableNumbers: value);
+    return res;
   }
 }
 ''')
@@ -616,32 +585,20 @@ class _MapStringExampleCopyWith<R> {
 
   @pragma('vm:prefer-inline')
   R stringMap(Map<String, String> value) {
-    final res = MapStringExample(
-      stringMap: value,
-      intMap: _instance.intMap,
-      dynamicMap: _instance.dynamicMap,
-    );
-    return (_then != null ? _then!(res) : res as R);
+    final res = call(stringMap: value);
+    return res;
   }
 
   @pragma('vm:prefer-inline')
   R intMap(Map<String, int> value) {
-    final res = MapStringExample(
-      stringMap: _instance.stringMap,
-      intMap: value,
-      dynamicMap: _instance.dynamicMap,
-    );
-    return (_then != null ? _then!(res) : res as R);
+    final res = call(intMap: value);
+    return res;
   }
 
   @pragma('vm:prefer-inline')
   R dynamicMap(Map<String, dynamic> value) {
-    final res = MapStringExample(
-      stringMap: _instance.stringMap,
-      intMap: _instance.intMap,
-      dynamicMap: value,
-    );
-    return (_then != null ? _then!(res) : res as R);
+    final res = call(dynamicMap: value);
+    return res;
   }
 }
 ''')
@@ -721,8 +678,8 @@ class _MapObjectExampleCopyWith<R> {
 
   @pragma('vm:prefer-inline')
   R userMap(Map<String, SimpleUser> value) {
-    final res = MapObjectExample(userMap: value);
-    return (_then != null ? _then!(res) : res as R);
+    final res = call(userMap: value);
+    return res;
   }
 }
 ''')

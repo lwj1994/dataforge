@@ -47,43 +47,33 @@ class _ProductCopyWith<R> {
     Object? name = dataforgeUndefined,
   }) {
     final res = Product(
-      id: (id == dataforgeUndefined
-          ? _instance.id
-          : (id == null ? '' : id as String)),
-      secret: (secret == dataforgeUndefined
-          ? _instance.secret
-          : (secret == null ? '' : secret as String)),
-      name: (name == dataforgeUndefined
-          ? _instance.name
-          : (name == null ? '' : name as String)),
+      id: SafeCasteUtil.copyWithCast<String>(id, 'id', _instance.id),
+      secret: SafeCasteUtil.copyWithCast<String>(
+        secret,
+        'secret',
+        _instance.secret,
+      ),
+      name: SafeCasteUtil.copyWithCast<String>(name, 'name', _instance.name),
     );
     return (_then != null ? _then!(res) : res as R);
   }
 
   @pragma('vm:prefer-inline')
   R id(String value) {
-    final res = Product(
-      id: value,
-      secret: _instance.secret,
-      name: _instance.name,
-    );
-    return (_then != null ? _then!(res) : res as R);
+    final res = call(id: value);
+    return res;
   }
 
   @pragma('vm:prefer-inline')
   R secret(String value) {
-    final res = Product(id: _instance.id, secret: value, name: _instance.name);
-    return (_then != null ? _then!(res) : res as R);
+    final res = call(secret: value);
+    return res;
   }
 
   @pragma('vm:prefer-inline')
   R name(String value) {
-    final res = Product(
-      id: _instance.id,
-      secret: _instance.secret,
-      name: value,
-    );
-    return (_then != null ? _then!(res) : res as R);
+    final res = call(name: value);
+    return res;
   }
 }
 ''')
@@ -201,18 +191,18 @@ class _AlternateNamesTestCopyWith<R> {
     Object? tags = dataforgeUndefined,
   }) {
     final res = AlternateNamesTest(
-      name: (name == dataforgeUndefined
-          ? _instance.name
-          : (name == null ? '' : name as String)),
-      age: (age == dataforgeUndefined
-          ? _instance.age
-          : (age == null ? 0 : age as int)),
-      email: (email == dataforgeUndefined
-          ? _instance.email
-          : (email == null ? '' : email as String)),
-      isActive: (isActive == dataforgeUndefined
-          ? _instance.isActive
-          : (isActive == null ? false : isActive as bool)),
+      name: SafeCasteUtil.copyWithCast<String>(name, 'name', _instance.name),
+      age: SafeCasteUtil.copyWithCast<int>(age, 'age', _instance.age),
+      email: SafeCasteUtil.copyWithCast<String>(
+        email,
+        'email',
+        _instance.email,
+      ),
+      isActive: SafeCasteUtil.copyWithCast<bool>(
+        isActive,
+        'isActive',
+        _instance.isActive,
+      ),
       tags: (tags == dataforgeUndefined
           ? _instance.tags
           : (tags as List).cast<String>()),
@@ -222,62 +212,32 @@ class _AlternateNamesTestCopyWith<R> {
 
   @pragma('vm:prefer-inline')
   R name(String value) {
-    final res = AlternateNamesTest(
-      name: value,
-      age: _instance.age,
-      email: _instance.email,
-      isActive: _instance.isActive,
-      tags: _instance.tags,
-    );
-    return (_then != null ? _then!(res) : res as R);
+    final res = call(name: value);
+    return res;
   }
 
   @pragma('vm:prefer-inline')
   R age(int value) {
-    final res = AlternateNamesTest(
-      name: _instance.name,
-      age: value,
-      email: _instance.email,
-      isActive: _instance.isActive,
-      tags: _instance.tags,
-    );
-    return (_then != null ? _then!(res) : res as R);
+    final res = call(age: value);
+    return res;
   }
 
   @pragma('vm:prefer-inline')
   R email(String value) {
-    final res = AlternateNamesTest(
-      name: _instance.name,
-      age: _instance.age,
-      email: value,
-      isActive: _instance.isActive,
-      tags: _instance.tags,
-    );
-    return (_then != null ? _then!(res) : res as R);
+    final res = call(email: value);
+    return res;
   }
 
   @pragma('vm:prefer-inline')
   R isActive(bool value) {
-    final res = AlternateNamesTest(
-      name: _instance.name,
-      age: _instance.age,
-      email: _instance.email,
-      isActive: value,
-      tags: _instance.tags,
-    );
-    return (_then != null ? _then!(res) : res as R);
+    final res = call(isActive: value);
+    return res;
   }
 
   @pragma('vm:prefer-inline')
   R tags(List<String> value) {
-    final res = AlternateNamesTest(
-      name: _instance.name,
-      age: _instance.age,
-      email: _instance.email,
-      isActive: _instance.isActive,
-      tags: value,
-    );
-    return (_then != null ? _then!(res) : res as R);
+    final res = call(tags: value);
+    return res;
   }
 }
 ''')
@@ -383,83 +343,51 @@ class _CustomReadValueCopyWith<R> {
     Object? enabled = dataforgeUndefined,
   }) {
     final res = CustomReadValue(
-      id: (id == dataforgeUndefined
-          ? _instance.id
-          : (id == null ? '' : id as String)),
-      name: (name == dataforgeUndefined
-          ? _instance.name
-          : (name == null ? '' : name as String)),
-      title: (title == dataforgeUndefined
-          ? _instance.title
-          : (title == null ? '' : title as String)),
-      count: (count == dataforgeUndefined
-          ? _instance.count
-          : (count == null ? 0 : count as int)),
-      enabled: (enabled == dataforgeUndefined
-          ? _instance.enabled
-          : (enabled == null ? false : enabled as bool)),
+      id: SafeCasteUtil.copyWithCast<String>(id, 'id', _instance.id),
+      name: SafeCasteUtil.copyWithCast<String>(name, 'name', _instance.name),
+      title: SafeCasteUtil.copyWithCast<String>(
+        title,
+        'title',
+        _instance.title,
+      ),
+      count: SafeCasteUtil.copyWithCast<int>(count, 'count', _instance.count),
+      enabled: SafeCasteUtil.copyWithCast<bool>(
+        enabled,
+        'enabled',
+        _instance.enabled,
+      ),
     );
     return (_then != null ? _then!(res) : res as R);
   }
 
   @pragma('vm:prefer-inline')
   R id(String value) {
-    final res = CustomReadValue(
-      id: value,
-      name: _instance.name,
-      title: _instance.title,
-      count: _instance.count,
-      enabled: _instance.enabled,
-    );
-    return (_then != null ? _then!(res) : res as R);
+    final res = call(id: value);
+    return res;
   }
 
   @pragma('vm:prefer-inline')
   R name(String value) {
-    final res = CustomReadValue(
-      id: _instance.id,
-      name: value,
-      title: _instance.title,
-      count: _instance.count,
-      enabled: _instance.enabled,
-    );
-    return (_then != null ? _then!(res) : res as R);
+    final res = call(name: value);
+    return res;
   }
 
   @pragma('vm:prefer-inline')
   R title(String value) {
-    final res = CustomReadValue(
-      id: _instance.id,
-      name: _instance.name,
-      title: value,
-      count: _instance.count,
-      enabled: _instance.enabled,
-    );
-    return (_then != null ? _then!(res) : res as R);
+    final res = call(title: value);
+    return res;
   }
 
   @pragma('vm:prefer-inline')
   R count(int value) {
-    final res = CustomReadValue(
-      id: _instance.id,
-      name: _instance.name,
-      title: _instance.title,
-      count: value,
-      enabled: _instance.enabled,
-    );
-    return (_then != null ? _then!(res) : res as R);
+    final res = call(count: value);
+    return res;
   }
 
   @pragma('vm:prefer-inline')
   R enabled(bool value) {
-    final res = CustomReadValue(
-      id: _instance.id,
-      name: _instance.name,
-      title: _instance.title,
-      count: _instance.count,
-      enabled: value,
-    );
-    return (_then != null ? _then!(res) : res as R);
+    final res = call(enabled: value);
+    return res;
   }
 }
 ''')
@@ -536,45 +464,37 @@ class _IncludeIfNullExampleCopyWith<R> {
     Object? count = dataforgeUndefined,
   }) {
     final res = IncludeIfNullExample(
-      name: (name == dataforgeUndefined
-          ? _instance.name
-          : (name == null ? '' : name as String)),
-      description: (description == dataforgeUndefined
-          ? _instance.description
-          : description as String?),
-      count: (count == dataforgeUndefined ? _instance.count : count as int?),
+      name: SafeCasteUtil.copyWithCast<String>(name, 'name', _instance.name),
+      description: SafeCasteUtil.copyWithCastNullable<String>(
+        description,
+        'description',
+        _instance.description,
+      ),
+      count: SafeCasteUtil.copyWithCastNullable<int>(
+        count,
+        'count',
+        _instance.count,
+      ),
     );
     return (_then != null ? _then!(res) : res as R);
   }
 
   @pragma('vm:prefer-inline')
   R name(String value) {
-    final res = IncludeIfNullExample(
-      name: value,
-      description: _instance.description,
-      count: _instance.count,
-    );
-    return (_then != null ? _then!(res) : res as R);
+    final res = call(name: value);
+    return res;
   }
 
   @pragma('vm:prefer-inline')
   R description(String? value) {
-    final res = IncludeIfNullExample(
-      name: _instance.name,
-      description: value,
-      count: _instance.count,
-    );
-    return (_then != null ? _then!(res) : res as R);
+    final res = call(description: value);
+    return res;
   }
 
   @pragma('vm:prefer-inline')
   R count(int? value) {
-    final res = IncludeIfNullExample(
-      name: _instance.name,
-      description: _instance.description,
-      count: value,
-    );
-    return (_then != null ? _then!(res) : res as R);
+    final res = call(count: value);
+    return res;
   }
 }
 ''')

@@ -1,3 +1,7 @@
+## 0.6.1-dev.1
+### Changed
+- Refined `copyWith` single-field update methods to use internal `call()` method, ensuring all fields are correctly preserved.
+
 ## 0.6.1-dev.0
 ### Added
 - **Error Callback API**: New `DataforgeConfig` and `DataforgeInit.init()` for registering error callbacks

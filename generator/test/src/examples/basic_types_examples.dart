@@ -47,26 +47,22 @@ class _BasicUserCopyWith<R> {
     Object? age = dataforgeUndefined,
   }) {
     final res = BasicUser(
-      name: (name == dataforgeUndefined
-          ? _instance.name
-          : (name == null ? '' : name as String)),
-      age: (age == dataforgeUndefined
-          ? _instance.age
-          : (age == null ? 0 : age as int)),
+      name: SafeCasteUtil.copyWithCast<String>(name, 'name', _instance.name),
+      age: SafeCasteUtil.copyWithCast<int>(age, 'age', _instance.age),
     );
     return (_then != null ? _then!(res) : res as R);
   }
 
   @pragma('vm:prefer-inline')
   R name(String value) {
-    final res = BasicUser(name: value, age: _instance.age);
-    return (_then != null ? _then!(res) : res as R);
+    final res = call(name: value);
+    return res;
   }
 
   @pragma('vm:prefer-inline')
   R age(int value) {
-    final res = BasicUser(name: _instance.name, age: value);
-    return (_then != null ? _then!(res) : res as R);
+    final res = call(age: value);
+    return res;
   }
 }
 ''')
@@ -134,47 +130,41 @@ class _DefaultValuesCopyWith<R> {
     Object? boolValue = dataforgeUndefined,
   }) {
     final res = DefaultValues(
-      intValue: (intValue == dataforgeUndefined
-          ? _instance.intValue
-          : (intValue == null ? 0 : intValue as int)),
-      stringValue: (stringValue == dataforgeUndefined
-          ? _instance.stringValue
-          : (stringValue == null ? '' : stringValue as String)),
-      boolValue: (boolValue == dataforgeUndefined
-          ? _instance.boolValue
-          : (boolValue == null ? false : boolValue as bool)),
+      intValue: SafeCasteUtil.copyWithCast<int>(
+        intValue,
+        'intValue',
+        _instance.intValue,
+      ),
+      stringValue: SafeCasteUtil.copyWithCast<String>(
+        stringValue,
+        'stringValue',
+        _instance.stringValue,
+      ),
+      boolValue: SafeCasteUtil.copyWithCast<bool>(
+        boolValue,
+        'boolValue',
+        _instance.boolValue,
+      ),
     );
     return (_then != null ? _then!(res) : res as R);
   }
 
   @pragma('vm:prefer-inline')
   R intValue(int value) {
-    final res = DefaultValues(
-      intValue: value,
-      stringValue: _instance.stringValue,
-      boolValue: _instance.boolValue,
-    );
-    return (_then != null ? _then!(res) : res as R);
+    final res = call(intValue: value);
+    return res;
   }
 
   @pragma('vm:prefer-inline')
   R stringValue(String value) {
-    final res = DefaultValues(
-      intValue: _instance.intValue,
-      stringValue: value,
-      boolValue: _instance.boolValue,
-    );
-    return (_then != null ? _then!(res) : res as R);
+    final res = call(stringValue: value);
+    return res;
   }
 
   @pragma('vm:prefer-inline')
   R boolValue(bool value) {
-    final res = DefaultValues(
-      intValue: _instance.intValue,
-      stringValue: _instance.stringValue,
-      boolValue: value,
-    );
-    return (_then != null ? _then!(res) : res as R);
+    final res = call(boolValue: value);
+    return res;
   }
 }
 ''')
@@ -231,17 +221,15 @@ class _PrefixedExampleCopyWith<R> {
   @pragma('vm:prefer-inline')
   R call({Object? name = df.dataforgeUndefined}) {
     final res = PrefixedExample(
-      name: (name == df.dataforgeUndefined
-          ? _instance.name
-          : (name == null ? '' : name as String)),
+      name: df.SafeCasteUtil.copyWithCast<String>(name, 'name', _instance.name),
     );
     return (_then != null ? _then!(res) : res as R);
   }
 
   @pragma('vm:prefer-inline')
   R name(String value) {
-    final res = PrefixedExample(name: value);
-    return (_then != null ? _then!(res) : res as R);
+    final res = call(name: value);
+    return res;
   }
 }
 ''')
@@ -297,29 +285,30 @@ class _DoubleExampleCopyWith<R> {
     Object? optionalValue = dataforgeUndefined,
   }) {
     final res = DoubleExample(
-      value: (value == dataforgeUndefined
-          ? _instance.value
-          : (value == null ? 0.0 : (value as num).toDouble())),
-      optionalValue: (optionalValue == dataforgeUndefined
-          ? _instance.optionalValue
-          : (optionalValue as num?)?.toDouble()),
+      value: SafeCasteUtil.copyWithCast<double>(
+        value,
+        'value',
+        _instance.value,
+      ),
+      optionalValue: SafeCasteUtil.copyWithCastNullable<double>(
+        optionalValue,
+        'optionalValue',
+        _instance.optionalValue,
+      ),
     );
     return (_then != null ? _then!(res) : res as R);
   }
 
   @pragma('vm:prefer-inline')
   R value(double value) {
-    final res = DoubleExample(
-      value: value,
-      optionalValue: _instance.optionalValue,
-    );
-    return (_then != null ? _then!(res) : res as R);
+    final res = call(value: value);
+    return res;
   }
 
   @pragma('vm:prefer-inline')
   R optionalValue(double? value) {
-    final res = DoubleExample(value: _instance.value, optionalValue: value);
-    return (_then != null ? _then!(res) : res as R);
+    final res = call(optionalValue: value);
+    return res;
   }
 }
 ''')
@@ -376,27 +365,26 @@ class _NumExampleCopyWith<R> {
     Object? optionalValue = dataforgeUndefined,
   }) {
     final res = NumExample(
-      value: (value == dataforgeUndefined ? _instance.value : value as num),
-      optionalValue: (optionalValue == dataforgeUndefined
-          ? _instance.optionalValue
-          : optionalValue as num?),
+      value: SafeCasteUtil.copyWithCast<num>(value, 'value', _instance.value),
+      optionalValue: SafeCasteUtil.copyWithCastNullable<num>(
+        optionalValue,
+        'optionalValue',
+        _instance.optionalValue,
+      ),
     );
     return (_then != null ? _then!(res) : res as R);
   }
 
   @pragma('vm:prefer-inline')
   R value(num value) {
-    final res = NumExample(
-      value: value,
-      optionalValue: _instance.optionalValue,
-    );
-    return (_then != null ? _then!(res) : res as R);
+    final res = call(value: value);
+    return res;
   }
 
   @pragma('vm:prefer-inline')
   R optionalValue(num? value) {
-    final res = NumExample(value: _instance.value, optionalValue: value);
-    return (_then != null ? _then!(res) : res as R);
+    final res = call(optionalValue: value);
+    return res;
   }
 }
 ''')

@@ -34,7 +34,8 @@ class DataforgeLogger {
   }
 
   /// Logs an error message
-  static void error(String message, [Object? exception, StackTrace? stackTrace]) {
+  static void error(String message,
+      [Object? exception, StackTrace? stackTrace]) {
     _log(LogLevel.error, message);
     if (exception != null) {
       _log(LogLevel.error, 'Exception: $exception');

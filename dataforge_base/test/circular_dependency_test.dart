@@ -229,7 +229,8 @@ void main() {
 
       expect(warning, contains('⚠️  Circular dependency detected!'));
       expect(warning, contains('Cycle 1: User → Post → User'));
-      expect(warning, contains('Cycle 2: Company → Employee → Department → Company'));
+      expect(warning,
+          contains('Cycle 2: Company → Employee → Department → Company'));
       expect(warning, contains('@JsonKey(ignore: true)'));
     });
   });

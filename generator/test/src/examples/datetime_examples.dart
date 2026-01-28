@@ -41,17 +41,19 @@ class _DateTimeExampleCopyWith<R> {
   @pragma('vm:prefer-inline')
   R call({Object? dateTime = dataforgeUndefined}) {
     final res = DateTimeExample(
-      dateTime: (dateTime == dataforgeUndefined
-          ? _instance.dateTime
-          : dateTime as DateTime?),
+      dateTime: SafeCasteUtil.copyWithCastNullable<DateTime>(
+        dateTime,
+        'dateTime',
+        _instance.dateTime,
+      ),
     );
     return (_then != null ? _then!(res) : res as R);
   }
 
   @pragma('vm:prefer-inline')
   R dateTime(DateTime? value) {
-    final res = DateTimeExample(dateTime: value);
-    return (_then != null ? _then!(res) : res as R);
+    final res = call(dateTime: value);
+    return res;
   }
 }
 ''')
@@ -114,32 +116,30 @@ class _RequiredDateTimeExampleCopyWith<R> {
     Object? updatedAt = dataforgeUndefined,
   }) {
     final res = RequiredDateTimeExample(
-      createdAt: (createdAt == dataforgeUndefined
-          ? _instance.createdAt
-          : createdAt as DateTime),
-      updatedAt: (updatedAt == dataforgeUndefined
-          ? _instance.updatedAt
-          : updatedAt as DateTime),
+      createdAt: SafeCasteUtil.copyWithCast<DateTime>(
+        createdAt,
+        'createdAt',
+        _instance.createdAt,
+      ),
+      updatedAt: SafeCasteUtil.copyWithCast<DateTime>(
+        updatedAt,
+        'updatedAt',
+        _instance.updatedAt,
+      ),
     );
     return (_then != null ? _then!(res) : res as R);
   }
 
   @pragma('vm:prefer-inline')
   R createdAt(DateTime value) {
-    final res = RequiredDateTimeExample(
-      createdAt: value,
-      updatedAt: _instance.updatedAt,
-    );
-    return (_then != null ? _then!(res) : res as R);
+    final res = call(createdAt: value);
+    return res;
   }
 
   @pragma('vm:prefer-inline')
   R updatedAt(DateTime value) {
-    final res = RequiredDateTimeExample(
-      createdAt: _instance.createdAt,
-      updatedAt: value,
-    );
-    return (_then != null ? _then!(res) : res as R);
+    final res = call(updatedAt: value);
+    return res;
   }
 }
 ''')
@@ -215,8 +215,8 @@ class _ListDateTimeExampleCopyWith<R> {
 
   @pragma('vm:prefer-inline')
   R timestamps(List<DateTime> value) {
-    final res = ListDateTimeExample(timestamps: value);
-    return (_then != null ? _then!(res) : res as R);
+    final res = call(timestamps: value);
+    return res;
   }
 }
 ''')
@@ -291,17 +291,19 @@ class _CustomDateTimeConverterExampleCopyWith<R> {
   @pragma('vm:prefer-inline')
   R call({Object? customDateTime = dataforgeUndefined}) {
     final res = CustomDateTimeConverterExample(
-      customDateTime: (customDateTime == dataforgeUndefined
-          ? _instance.customDateTime
-          : customDateTime as DateTime?),
+      customDateTime: SafeCasteUtil.copyWithCastNullable<DateTime>(
+        customDateTime,
+        'customDateTime',
+        _instance.customDateTime,
+      ),
     );
     return (_then != null ? _then!(res) : res as R);
   }
 
   @pragma('vm:prefer-inline')
   R customDateTime(DateTime? value) {
-    final res = CustomDateTimeConverterExample(customDateTime: value);
-    return (_then != null ? _then!(res) : res as R);
+    final res = call(customDateTime: value);
+    return res;
   }
 }
 ''')
@@ -356,17 +358,19 @@ class _DateTimeWithDefaultExampleCopyWith<R> {
   @pragma('vm:prefer-inline')
   R call({Object? createdAt = dataforgeUndefined}) {
     final res = DateTimeWithDefaultExample(
-      createdAt: (createdAt == dataforgeUndefined
-          ? _instance.createdAt
-          : createdAt as DateTime),
+      createdAt: SafeCasteUtil.copyWithCast<DateTime>(
+        createdAt,
+        'createdAt',
+        _instance.createdAt,
+      ),
     );
     return (_then != null ? _then!(res) : res as R);
   }
 
   @pragma('vm:prefer-inline')
   R createdAt(DateTime value) {
-    final res = DateTimeWithDefaultExample(createdAt: value);
-    return (_then != null ? _then!(res) : res as R);
+    final res = call(createdAt: value);
+    return res;
   }
 }
 ''')

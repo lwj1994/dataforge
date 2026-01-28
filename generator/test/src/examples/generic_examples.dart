@@ -39,15 +39,15 @@ class _GenericResultCopyWith<T, R> {
   @pragma('vm:prefer-inline')
   R call({Object? data = dataforgeUndefined}) {
     final res = GenericResult<T>(
-      data: (data == dataforgeUndefined ? _instance.data : data as T?),
+      data: SafeCasteUtil.copyWithCastNullable<T>(data, 'data', _instance.data),
     );
     return (_then != null ? _then!(res) : res as R);
   }
 
   @pragma('vm:prefer-inline')
   R data(T? value) {
-    final res = GenericResult<T>(data: value);
-    return (_then != null ? _then!(res) : res as R);
+    final res = call(data: value);
+    return res;
   }
 }
 ''')
@@ -99,28 +99,22 @@ class _MultiGenericExampleCopyWith<T, U, R> {
     Object? second = dataforgeUndefined,
   }) {
     final res = MultiGenericExample<T, U>(
-      first: (first == dataforgeUndefined ? _instance.first : first as T),
-      second: (second == dataforgeUndefined ? _instance.second : second as U),
+      first: SafeCasteUtil.copyWithCast<T>(first, 'first', _instance.first),
+      second: SafeCasteUtil.copyWithCast<U>(second, 'second', _instance.second),
     );
     return (_then != null ? _then!(res) : res as R);
   }
 
   @pragma('vm:prefer-inline')
   R first(T value) {
-    final res = MultiGenericExample<T, U>(
-      first: value,
-      second: _instance.second,
-    );
-    return (_then != null ? _then!(res) : res as R);
+    final res = call(first: value);
+    return res;
   }
 
   @pragma('vm:prefer-inline')
   R second(U value) {
-    final res = MultiGenericExample<T, U>(
-      first: _instance.first,
-      second: value,
-    );
-    return (_then != null ? _then!(res) : res as R);
+    final res = call(second: value);
+    return res;
   }
 }
 ''')

@@ -74,26 +74,26 @@ class _NestedDefaultValuesCopyWith<R> {
     Object? nested = dataforgeUndefined,
   }) {
     final res = NestedDefaultValues(
-      name: (name == dataforgeUndefined
-          ? _instance.name
-          : (name == null ? '' : name as String)),
-      nested: (nested == dataforgeUndefined
-          ? _instance.nested
-          : nested as InnerDefaultValues),
+      name: SafeCasteUtil.copyWithCast<String>(name, 'name', _instance.name),
+      nested: SafeCasteUtil.copyWithCast<InnerDefaultValues>(
+        nested,
+        'nested',
+        _instance.nested,
+      ),
     );
     return (_then != null ? _then!(res) : res as R);
   }
 
   @pragma('vm:prefer-inline')
   R name(String value) {
-    final res = NestedDefaultValues(name: value, nested: _instance.nested);
-    return (_then != null ? _then!(res) : res as R);
+    final res = call(name: value);
+    return res;
   }
 
   @pragma('vm:prefer-inline')
   R nested(InnerDefaultValues value) {
-    final res = NestedDefaultValues(name: _instance.name, nested: value);
-    return (_then != null ? _then!(res) : res as R);
+    final res = call(nested: value);
+    return res;
   }
 
   @pragma('vm:prefer-inline')
@@ -156,24 +156,22 @@ class _ChainedExampleCopyWith<R> {
   @pragma('vm:prefer-inline')
   R call({Object? id = dataforgeUndefined, Object? user = dataforgeUndefined}) {
     final res = ChainedExample(
-      id: (id == dataforgeUndefined
-          ? _instance.id
-          : (id == null ? '' : id as String)),
-      user: (user == dataforgeUndefined ? _instance.user : user as InnerUser),
+      id: SafeCasteUtil.copyWithCast<String>(id, 'id', _instance.id),
+      user: SafeCasteUtil.copyWithCast<InnerUser>(user, 'user', _instance.user),
     );
     return (_then != null ? _then!(res) : res as R);
   }
 
   @pragma('vm:prefer-inline')
   R id(String value) {
-    final res = ChainedExample(id: value, user: _instance.user);
-    return (_then != null ? _then!(res) : res as R);
+    final res = call(id: value);
+    return res;
   }
 
   @pragma('vm:prefer-inline')
   R user(InnerUser value) {
-    final res = ChainedExample(id: _instance.id, user: value);
-    return (_then != null ? _then!(res) : res as R);
+    final res = call(user: value);
+    return res;
   }
 
   @pragma('vm:prefer-inline')
@@ -237,32 +235,26 @@ class _NullableNestedExampleCopyWith<R> {
     Object? optionalUser = dataforgeUndefined,
   }) {
     final res = NullableNestedExample(
-      name: (name == dataforgeUndefined
-          ? _instance.name
-          : (name == null ? '' : name as String)),
-      optionalUser: (optionalUser == dataforgeUndefined
-          ? _instance.optionalUser
-          : optionalUser as InnerUser?),
+      name: SafeCasteUtil.copyWithCast<String>(name, 'name', _instance.name),
+      optionalUser: SafeCasteUtil.copyWithCastNullable<InnerUser>(
+        optionalUser,
+        'optionalUser',
+        _instance.optionalUser,
+      ),
     );
     return (_then != null ? _then!(res) : res as R);
   }
 
   @pragma('vm:prefer-inline')
   R name(String value) {
-    final res = NullableNestedExample(
-      name: value,
-      optionalUser: _instance.optionalUser,
-    );
-    return (_then != null ? _then!(res) : res as R);
+    final res = call(name: value);
+    return res;
   }
 
   @pragma('vm:prefer-inline')
   R optionalUser(InnerUser? value) {
-    final res = NullableNestedExample(
-      name: _instance.name,
-      optionalUser: value,
-    );
-    return (_then != null ? _then!(res) : res as R);
+    final res = call(optionalUser: value);
+    return res;
   }
 
   @pragma('vm:prefer-inline')
@@ -345,26 +337,26 @@ class _MultiLevelNestedExampleCopyWith<R> {
     Object? person = dataforgeUndefined,
   }) {
     final res = MultiLevelNestedExample(
-      id: (id == dataforgeUndefined
-          ? _instance.id
-          : (id == null ? '' : id as String)),
-      person: (person == dataforgeUndefined
-          ? _instance.person
-          : person as Person),
+      id: SafeCasteUtil.copyWithCast<String>(id, 'id', _instance.id),
+      person: SafeCasteUtil.copyWithCast<Person>(
+        person,
+        'person',
+        _instance.person,
+      ),
     );
     return (_then != null ? _then!(res) : res as R);
   }
 
   @pragma('vm:prefer-inline')
   R id(String value) {
-    final res = MultiLevelNestedExample(id: value, person: _instance.person);
-    return (_then != null ? _then!(res) : res as R);
+    final res = call(id: value);
+    return res;
   }
 
   @pragma('vm:prefer-inline')
   R person(Person value) {
-    final res = MultiLevelNestedExample(id: _instance.id, person: value);
-    return (_then != null ? _then!(res) : res as R);
+    final res = call(person: value);
+    return res;
   }
 
   @pragma('vm:prefer-inline')
@@ -428,26 +420,26 @@ class _DeepRootExampleCopyWith<R> {
   @pragma('vm:prefer-inline')
   R call({Object? id = dataforgeUndefined, Object? root = dataforgeUndefined}) {
     final res = DeepRootExample(
-      id: (id == dataforgeUndefined
-          ? _instance.id
-          : (id == null ? '' : id as String)),
-      root: (root == dataforgeUndefined
-          ? _instance.root
-          : root as NestedDefaultValues),
+      id: SafeCasteUtil.copyWithCast<String>(id, 'id', _instance.id),
+      root: SafeCasteUtil.copyWithCast<NestedDefaultValues>(
+        root,
+        'root',
+        _instance.root,
+      ),
     );
     return (_then != null ? _then!(res) : res as R);
   }
 
   @pragma('vm:prefer-inline')
   R id(String value) {
-    final res = DeepRootExample(id: value, root: _instance.root);
-    return (_then != null ? _then!(res) : res as R);
+    final res = call(id: value);
+    return res;
   }
 
   @pragma('vm:prefer-inline')
   R root(NestedDefaultValues value) {
-    final res = DeepRootExample(id: _instance.id, root: value);
-    return (_then != null ? _then!(res) : res as R);
+    final res = call(root: value);
+    return res;
   }
 
   @pragma('vm:prefer-inline')
@@ -505,17 +497,19 @@ class _SuperDeepRootCopyWith<R> {
   @pragma('vm:prefer-inline')
   R call({Object? root = dataforgeUndefined}) {
     final res = SuperDeepRoot(
-      root: (root == dataforgeUndefined
-          ? _instance.root
-          : root as DeepRootExample),
+      root: SafeCasteUtil.copyWithCast<DeepRootExample>(
+        root,
+        'root',
+        _instance.root,
+      ),
     );
     return (_then != null ? _then!(res) : res as R);
   }
 
   @pragma('vm:prefer-inline')
   R root(DeepRootExample value) {
-    final res = SuperDeepRoot(root: value);
-    return (_then != null ? _then!(res) : res as R);
+    final res = call(root: value);
+    return res;
   }
 
   @pragma('vm:prefer-inline')

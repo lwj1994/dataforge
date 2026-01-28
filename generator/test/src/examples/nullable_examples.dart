@@ -66,64 +66,52 @@ class _NullableFieldsExampleCopyWith<R> {
     Object? nullableBool = dataforgeUndefined,
   }) {
     final res = NullableFieldsExample(
-      nullableString: (nullableString == dataforgeUndefined
-          ? _instance.nullableString
-          : nullableString as String?),
-      nullableInt: (nullableInt == dataforgeUndefined
-          ? _instance.nullableInt
-          : nullableInt as int?),
-      nullableDouble: (nullableDouble == dataforgeUndefined
-          ? _instance.nullableDouble
-          : (nullableDouble as num?)?.toDouble()),
-      nullableBool: (nullableBool == dataforgeUndefined
-          ? _instance.nullableBool
-          : nullableBool as bool?),
+      nullableString: SafeCasteUtil.copyWithCastNullable<String>(
+        nullableString,
+        'nullableString',
+        _instance.nullableString,
+      ),
+      nullableInt: SafeCasteUtil.copyWithCastNullable<int>(
+        nullableInt,
+        'nullableInt',
+        _instance.nullableInt,
+      ),
+      nullableDouble: SafeCasteUtil.copyWithCastNullable<double>(
+        nullableDouble,
+        'nullableDouble',
+        _instance.nullableDouble,
+      ),
+      nullableBool: SafeCasteUtil.copyWithCastNullable<bool>(
+        nullableBool,
+        'nullableBool',
+        _instance.nullableBool,
+      ),
     );
     return (_then != null ? _then!(res) : res as R);
   }
 
   @pragma('vm:prefer-inline')
   R nullableString(String? value) {
-    final res = NullableFieldsExample(
-      nullableString: value,
-      nullableInt: _instance.nullableInt,
-      nullableDouble: _instance.nullableDouble,
-      nullableBool: _instance.nullableBool,
-    );
-    return (_then != null ? _then!(res) : res as R);
+    final res = call(nullableString: value);
+    return res;
   }
 
   @pragma('vm:prefer-inline')
   R nullableInt(int? value) {
-    final res = NullableFieldsExample(
-      nullableString: _instance.nullableString,
-      nullableInt: value,
-      nullableDouble: _instance.nullableDouble,
-      nullableBool: _instance.nullableBool,
-    );
-    return (_then != null ? _then!(res) : res as R);
+    final res = call(nullableInt: value);
+    return res;
   }
 
   @pragma('vm:prefer-inline')
   R nullableDouble(double? value) {
-    final res = NullableFieldsExample(
-      nullableString: _instance.nullableString,
-      nullableInt: _instance.nullableInt,
-      nullableDouble: value,
-      nullableBool: _instance.nullableBool,
-    );
-    return (_then != null ? _then!(res) : res as R);
+    final res = call(nullableDouble: value);
+    return res;
   }
 
   @pragma('vm:prefer-inline')
   R nullableBool(bool? value) {
-    final res = NullableFieldsExample(
-      nullableString: _instance.nullableString,
-      nullableInt: _instance.nullableInt,
-      nullableDouble: _instance.nullableDouble,
-      nullableBool: value,
-    );
-    return (_then != null ? _then!(res) : res as R);
+    final res = call(nullableBool: value);
+    return res;
   }
 }
 ''')
@@ -189,32 +177,30 @@ class _RequiredNullableExampleCopyWith<R> {
     Object? nullableAge = dataforgeUndefined,
   }) {
     final res = RequiredNullableExample(
-      nullableName: (nullableName == dataforgeUndefined
-          ? _instance.nullableName
-          : nullableName as String?),
-      nullableAge: (nullableAge == dataforgeUndefined
-          ? _instance.nullableAge
-          : nullableAge as int?),
+      nullableName: SafeCasteUtil.copyWithCastNullable<String>(
+        nullableName,
+        'nullableName',
+        _instance.nullableName,
+      ),
+      nullableAge: SafeCasteUtil.copyWithCastNullable<int>(
+        nullableAge,
+        'nullableAge',
+        _instance.nullableAge,
+      ),
     );
     return (_then != null ? _then!(res) : res as R);
   }
 
   @pragma('vm:prefer-inline')
   R nullableName(String? value) {
-    final res = RequiredNullableExample(
-      nullableName: value,
-      nullableAge: _instance.nullableAge,
-    );
-    return (_then != null ? _then!(res) : res as R);
+    final res = call(nullableName: value);
+    return res;
   }
 
   @pragma('vm:prefer-inline')
   R nullableAge(int? value) {
-    final res = RequiredNullableExample(
-      nullableName: _instance.nullableName,
-      nullableAge: value,
-    );
-    return (_then != null ? _then!(res) : res as R);
+    final res = call(nullableAge: value);
+    return res;
   }
 }
 ''')
@@ -275,22 +261,30 @@ class _NullableWithDefaultExampleCopyWith<R> {
     Object? count = dataforgeUndefined,
   }) {
     final res = NullableWithDefaultExample(
-      name: (name == dataforgeUndefined ? _instance.name : name as String?),
-      count: (count == dataforgeUndefined ? _instance.count : count as int?),
+      name: SafeCasteUtil.copyWithCastNullable<String>(
+        name,
+        'name',
+        _instance.name,
+      ),
+      count: SafeCasteUtil.copyWithCastNullable<int>(
+        count,
+        'count',
+        _instance.count,
+      ),
     );
     return (_then != null ? _then!(res) : res as R);
   }
 
   @pragma('vm:prefer-inline')
   R name(String? value) {
-    final res = NullableWithDefaultExample(name: value, count: _instance.count);
-    return (_then != null ? _then!(res) : res as R);
+    final res = call(name: value);
+    return res;
   }
 
   @pragma('vm:prefer-inline')
   R count(int? value) {
-    final res = NullableWithDefaultExample(name: _instance.name, count: value);
-    return (_then != null ? _then!(res) : res as R);
+    final res = call(count: value);
+    return res;
   }
 }
 ''')

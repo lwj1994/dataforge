@@ -2,22 +2,20 @@
 ///
 /// Use [Dataforge.init] to configure error handling and other global settings.
 class DataforgeConfig {
-  static DataforgeErrorCallback? errorCallback;
-
+  static DataforgeCopyWithErrorCallback? copyWithErrorCallback;
 
   /// Internal method to report an error.
-  static void reportError(
+  static void reportCopyWithError(
     String fieldName,
     String expectedType,
     Object? actualValue,
     Object error,
     StackTrace stackTrace,
   ) {
-    errorCallback?.call(
+    copyWithErrorCallback?.call(
         fieldName, expectedType, actualValue, error, stackTrace);
   }
 }
-
 
 /// Callback type for handling errors during copyWith type conversion.
 ///
@@ -26,7 +24,7 @@ class DataforgeConfig {
 /// [actualValue] is the actual value that was passed.
 /// [error] is the error that occurred during conversion.
 /// [stackTrace] is the stack trace of the error.
-typedef DataforgeErrorCallback = void Function(
+typedef DataforgeCopyWithErrorCallback = void Function(
   String fieldName,
   String expectedType,
   Object? actualValue,

@@ -1,3 +1,4 @@
+import 'package:dataforge_annotation/src/annotation.dart';
 import 'package:dataforge_annotation/src/config.dart';
 import 'package:dataforge_annotation/src/converter.dart';
 
@@ -132,7 +133,7 @@ class SafeCasteUtil {
 
   /// 用于 copyWith 方法的安全类型转换
   ///
-  /// 当类型转换失败时，会通过 [DataforgeConfig.reportError] 报告错误，
+  /// 当类型转换失败时，会通过 [DataforgeConfig.reportCopyWithError] 报告错误，
   /// 并返回 [defaultValue] 作为兜底值。
   ///
   /// [value] 要转换的值
@@ -143,44 +144,39 @@ class SafeCasteUtil {
     String fieldName,
     T defaultValue,
   ) {
-    if (value == null) return defaultValue;
-    try {
-      return value as T;
-    } catch (e, s) {
-      DataforgeConfig.reportError(
-        fieldName,
-        T.toString(),
-        value,
-        e,
-        s,
-      );
-      return defaultValue;
-    }
+    final res = copyWithCastNullable(value, fieldName, defaultValue);
+    if (res == null) return defaultValue;
+    return res;
   }
 
   /// 用于 copyWith 方法的可空类型安全转换
   ///
-  /// 当类型转换失败时，会通过 [DataforgeConfig.reportError] 报告错误，
+  /// 当类型转换失败时，会通过 [DataforgeConfig.reportCopyWithError] 报告错误，
   /// 并返回 null。
   ///
   /// [value] 要转换的值
   /// [fieldName] 字段名称，用于错误报告
   static T? copyWithCastNullable<T>(
     Object? value,
-    String fieldName,
-  ) {
+    String fieldName, [
+    T? originalValue,
+  ]) {
+    if (value == dataforgeUndefined) return originalValue;
     if (value == null) return null;
     try {
+      if (value is num && T == double) {
+        return value.toDouble() as T;
+      }
       return value as T;
     } catch (e, s) {
-      DataforgeConfig.reportError(
+      DataforgeConfig.reportCopyWithError(
         fieldName,
         T.toString(),
         value,
         e,
         s,
       );
-      return null;
+      return originalValue;
     }
   }
 }

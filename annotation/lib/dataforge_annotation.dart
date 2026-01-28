@@ -5,7 +5,7 @@ import 'package:dataforge_annotation/src/config.dart';
 
 export 'src/annotation.dart';
 export 'src/converter.dart';
-export 'src/config.dart' show DataforgeErrorCallback;
+export 'src/config.dart' show DataforgeCopyWithErrorCallback;
 export 'src/safe_type_converter.dart';
 
 export 'package:collection/collection.dart';
@@ -26,8 +26,8 @@ extension DataforgeInit on Dataforge {
   ///       print('Error: $error');
   ///     },
   static void init({
-    DataforgeErrorCallback? onError,
+    DataforgeCopyWithErrorCallback? onError,
   }) {
-    DataforgeConfig.errorCallback = onError;
+    DataforgeConfig.copyWithErrorCallback = onError;
   }
 }

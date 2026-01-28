@@ -74,7 +74,8 @@ class BaseParser {
         return meta.annotations;
       } catch (_) {}
     } catch (e) {
-      DataforgeLogger.warning('Error accessing metadata for ${element.name}: $e');
+      DataforgeLogger.warning(
+          'Error accessing metadata for ${element.name}: $e');
     }
     return [];
   }

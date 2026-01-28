@@ -39,26 +39,22 @@ class _NoFromJsonExampleCopyWith<R> {
     Object? age = dataforgeUndefined,
   }) {
     final res = NoFromJsonExample(
-      name: (name == dataforgeUndefined
-          ? _instance.name
-          : (name == null ? '' : name as String)),
-      age: (age == dataforgeUndefined
-          ? _instance.age
-          : (age == null ? 0 : age as int)),
+      name: SafeCasteUtil.copyWithCast<String>(name, 'name', _instance.name),
+      age: SafeCasteUtil.copyWithCast<int>(age, 'age', _instance.age),
     );
     return (_then != null ? _then!(res) : res as R);
   }
 
   @pragma('vm:prefer-inline')
   R name(String value) {
-    final res = NoFromJsonExample(name: value, age: _instance.age);
-    return (_then != null ? _then!(res) : res as R);
+    final res = call(name: value);
+    return res;
   }
 
   @pragma('vm:prefer-inline')
   R age(int value) {
-    final res = NoFromJsonExample(name: _instance.name, age: value);
-    return (_then != null ? _then!(res) : res as R);
+    final res = call(age: value);
+    return res;
   }
 }
 ''')
@@ -111,26 +107,22 @@ class _NoToJsonExampleCopyWith<R> {
     Object? age = dataforgeUndefined,
   }) {
     final res = NoToJsonExample(
-      name: (name == dataforgeUndefined
-          ? _instance.name
-          : (name == null ? '' : name as String)),
-      age: (age == dataforgeUndefined
-          ? _instance.age
-          : (age == null ? 0 : age as int)),
+      name: SafeCasteUtil.copyWithCast<String>(name, 'name', _instance.name),
+      age: SafeCasteUtil.copyWithCast<int>(age, 'age', _instance.age),
     );
     return (_then != null ? _then!(res) : res as R);
   }
 
   @pragma('vm:prefer-inline')
   R name(String value) {
-    final res = NoToJsonExample(name: value, age: _instance.age);
-    return (_then != null ? _then!(res) : res as R);
+    final res = call(name: value);
+    return res;
   }
 
   @pragma('vm:prefer-inline')
   R age(int value) {
-    final res = NoToJsonExample(name: _instance.name, age: value);
-    return (_then != null ? _then!(res) : res as R);
+    final res = call(age: value);
+    return res;
   }
 }
 ''')
@@ -176,26 +168,22 @@ class _NoJsonExampleCopyWith<R> {
     Object? age = dataforgeUndefined,
   }) {
     final res = NoJsonExample(
-      name: (name == dataforgeUndefined
-          ? _instance.name
-          : (name == null ? '' : name as String)),
-      age: (age == dataforgeUndefined
-          ? _instance.age
-          : (age == null ? 0 : age as int)),
+      name: SafeCasteUtil.copyWithCast<String>(name, 'name', _instance.name),
+      age: SafeCasteUtil.copyWithCast<int>(age, 'age', _instance.age),
     );
     return (_then != null ? _then!(res) : res as R);
   }
 
   @pragma('vm:prefer-inline')
   R name(String value) {
-    final res = NoJsonExample(name: value, age: _instance.age);
-    return (_then != null ? _then!(res) : res as R);
+    final res = call(name: value);
+    return res;
   }
 
   @pragma('vm:prefer-inline')
   R age(int value) {
-    final res = NoJsonExample(name: _instance.name, age: value);
-    return (_then != null ? _then!(res) : res as R);
+    final res = call(age: value);
+    return res;
   }
 }
 ''')
@@ -293,17 +281,19 @@ class _CustomMixinNameCopyWith<R> {
   @pragma('vm:prefer-inline')
   R call({Object? value = dataforgeUndefined}) {
     final res = CustomMixinName(
-      value: (value == dataforgeUndefined
-          ? _instance.value
-          : (value == null ? '' : value as String)),
+      value: SafeCasteUtil.copyWithCast<String>(
+        value,
+        'value',
+        _instance.value,
+      ),
     );
     return (_then != null ? _then!(res) : res as R);
   }
 
   @pragma('vm:prefer-inline')
   R value(String value) {
-    final res = CustomMixinName(value: value);
-    return (_then != null ? _then!(res) : res as R);
+    final res = call(value: value);
+    return res;
   }
 }
 ''')

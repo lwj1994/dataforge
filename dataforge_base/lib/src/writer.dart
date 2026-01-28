@@ -161,7 +161,11 @@ class GeneratorWriter {
   /// For non-nullable primitive types (String, int, double, bool), this method
   /// provides fallback default values when null is passed, instead of directly
   /// casting which would cause runtime errors.
-  String _buildTypeCastExpression(String variable, String type) {
+  ///
+  /// For custom types, this method uses SafeCasteUtil.copyWithCast to catch
+  /// type conversion errors and report them via DataforgeConfig.reportError.
+  String _buildTypeCastExpression(
+      String variable, String type, String fieldName, ClassInfo? clazz) {
     final cleanType = type.replaceAll('?', '').trim();
     final isNullable = type.endsWith('?');
 
@@ -180,36 +184,43 @@ class GeneratorWriter {
         return '($variable as Map).cast<$innerTypes>()';
       }
     } else if (cleanType == 'double') {
-      // Special handling for double to allow int values (e.g. 1) to be passed
+      final prefix = clazz != null ? _getPrefix(clazz) : '';
       if (isNullable) {
-        return '($variable as num?)?.toDouble()';
+        return '${prefix}SafeCasteUtil.copyWithCastNullable<double>($variable, \'$fieldName\', _instance.$fieldName)';
       } else {
-        // First check null, then cast - provide default value 0.0 when null
-        return '($variable == null ? 0.0 : ($variable as num).toDouble())';
+        return '${prefix}SafeCasteUtil.copyWithCast<double>($variable, \'$fieldName\', _instance.$fieldName)';
       }
     } else if (cleanType == 'int') {
+      final prefix = clazz != null ? _getPrefix(clazz) : '';
       if (isNullable) {
-        return '$variable as $type';
+        return '${prefix}SafeCasteUtil.copyWithCastNullable<int>($variable, \'$fieldName\', _instance.$fieldName)';
       } else {
-        // First check null, then cast - provide default value 0 when null
-        return '($variable == null ? 0 : $variable as int)';
+        return '${prefix}SafeCasteUtil.copyWithCast<int>($variable, \'$fieldName\', _instance.$fieldName)';
       }
     } else if (cleanType == 'String') {
+      final prefix = clazz != null ? _getPrefix(clazz) : '';
       if (isNullable) {
-        return '$variable as $type';
+        return '${prefix}SafeCasteUtil.copyWithCastNullable<String>($variable, \'$fieldName\', _instance.$fieldName)';
       } else {
-        // First check null, then cast - provide default value '' when null
-        return "($variable == null ? '' : $variable as String)";
+        return "${prefix}SafeCasteUtil.copyWithCast<String>($variable, '$fieldName', _instance.$fieldName)";
       }
     } else if (cleanType == 'bool') {
+      final prefix = clazz != null ? _getPrefix(clazz) : '';
       if (isNullable) {
-        return '$variable as $type';
+        return '${prefix}SafeCasteUtil.copyWithCastNullable<bool>($variable, \'$fieldName\', _instance.$fieldName)';
       } else {
-        // First check null, then cast - provide default value false when null
-        return '($variable == null ? false : $variable as bool)';
+        return '${prefix}SafeCasteUtil.copyWithCast<bool>($variable, \'$fieldName\', _instance.$fieldName)';
       }
     } else {
-      return '$variable as $type';
+      // For custom types, use SafeCasteUtil.copyWithCast to catch and report errors
+      final prefix = clazz != null ? _getPrefix(clazz) : '';
+      if (isNullable) {
+        return '${prefix}SafeCasteUtil.copyWithCastNullable<$cleanType>($variable, \'$fieldName\', _instance.$fieldName)';
+      } else {
+        // For non-nullable custom types, use copyWithCast and provide fallback
+        // We use _instance.$fieldName as the default value to return if casting fails
+        return '${prefix}SafeCasteUtil.copyWithCast<$cleanType>($variable, \'$fieldName\', _instance.$fieldName)';
+      }
     }
   }
 
@@ -246,30 +257,30 @@ class GeneratorWriter {
     buffer.writeln('    final res = ${clazz.name}$genericParams(');
     for (final field in validFields) {
       // Use sentinel check to distinguish null from omitted
-      final castExpr = _buildTypeCastExpression(field.name, field.type);
-      buffer.writeln(
-        '      ${field.name}: (${field.name} == ${_getPrefix(clazz)}dataforgeUndefined ? _instance.${field.name} : $castExpr),',
-      );
+      final castExpr =
+          _buildTypeCastExpression(field.name, field.type, field.name, clazz);
+      if (castExpr.contains('SafeCasteUtil')) {
+        buffer.writeln(
+          '      ${field.name}: $castExpr,',
+        );
+      } else {
+        buffer.writeln(
+          '      ${field.name}: (${field.name} == ${_getPrefix(clazz)}dataforgeUndefined ? _instance.${field.name} : $castExpr),',
+        );
+      }
     }
     buffer.writeln('    );');
     buffer.writeln('    return (_then != null ? _then!(res) : res as R);');
     buffer.writeln('  }');
     buffer.writeln();
-
     // Generate single-field update methods
     for (final field in validFields) {
       buffer.writeln("  @pragma('vm:prefer-inline')");
       buffer.writeln('  R ${field.name}(${field.type} value) {');
-      buffer.writeln('    final res = ${clazz.name}$genericParams(');
-      for (final f in validFields) {
-        if (f.name == field.name) {
-          buffer.writeln('      ${f.name}: value,');
-        } else {
-          buffer.writeln('      ${f.name}: _instance.${f.name},');
-        }
-      }
+      buffer.writeln('    final res = call(');
+      buffer.writeln('      ${field.name}: value,');
       buffer.writeln('    );');
-      buffer.writeln('    return (_then != null ? _then!(res) : res as R);');
+      buffer.writeln('    return res;');
       buffer.writeln('  }');
       buffer.writeln();
     }

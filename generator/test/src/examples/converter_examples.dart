@@ -58,15 +58,15 @@ class _GenericContainerCopyWith<T, R> {
   @pragma('vm:prefer-inline')
   R call({Object? data = dataforgeUndefined}) {
     final res = GenericContainer<T>(
-      data: (data == dataforgeUndefined ? _instance.data : data as T),
+      data: SafeCasteUtil.copyWithCast<T>(data, 'data', _instance.data),
     );
     return (_then != null ? _then!(res) : res as R);
   }
 
   @pragma('vm:prefer-inline')
   R data(T value) {
-    final res = GenericContainer<T>(data: value);
-    return (_then != null ? _then!(res) : res as R);
+    final res = call(data: value);
+    return res;
   }
 }
 ''')
@@ -171,64 +171,44 @@ class _CustomFunctionsExampleCopyWith<R> {
     Object? regularField = dataforgeUndefined,
   }) {
     final res = CustomFunctionsExample(
-      name: (name == dataforgeUndefined
-          ? _instance.name
-          : (name == null ? '' : name as String)),
-      count: (count == dataforgeUndefined
-          ? _instance.count
-          : (count == null ? 0 : count as int)),
-      optionalValue: (optionalValue == dataforgeUndefined
-          ? _instance.optionalValue
-          : optionalValue as String?),
-      regularField: (regularField == dataforgeUndefined
-          ? _instance.regularField
-          : (regularField == null ? '' : regularField as String)),
+      name: SafeCasteUtil.copyWithCast<String>(name, 'name', _instance.name),
+      count: SafeCasteUtil.copyWithCast<int>(count, 'count', _instance.count),
+      optionalValue: SafeCasteUtil.copyWithCastNullable<String>(
+        optionalValue,
+        'optionalValue',
+        _instance.optionalValue,
+      ),
+      regularField: SafeCasteUtil.copyWithCast<String>(
+        regularField,
+        'regularField',
+        _instance.regularField,
+      ),
     );
     return (_then != null ? _then!(res) : res as R);
   }
 
   @pragma('vm:prefer-inline')
   R name(String value) {
-    final res = CustomFunctionsExample(
-      name: value,
-      count: _instance.count,
-      optionalValue: _instance.optionalValue,
-      regularField: _instance.regularField,
-    );
-    return (_then != null ? _then!(res) : res as R);
+    final res = call(name: value);
+    return res;
   }
 
   @pragma('vm:prefer-inline')
   R count(int value) {
-    final res = CustomFunctionsExample(
-      name: _instance.name,
-      count: value,
-      optionalValue: _instance.optionalValue,
-      regularField: _instance.regularField,
-    );
-    return (_then != null ? _then!(res) : res as R);
+    final res = call(count: value);
+    return res;
   }
 
   @pragma('vm:prefer-inline')
   R optionalValue(String? value) {
-    final res = CustomFunctionsExample(
-      name: _instance.name,
-      count: _instance.count,
-      optionalValue: value,
-      regularField: _instance.regularField,
-    );
-    return (_then != null ? _then!(res) : res as R);
+    final res = call(optionalValue: value);
+    return res;
   }
 
   @pragma('vm:prefer-inline')
   R regularField(String value) {
-    final res = CustomFunctionsExample(
-      name: _instance.name,
-      count: _instance.count,
-      optionalValue: _instance.optionalValue,
-      regularField: value,
-    );
-    return (_then != null ? _then!(res) : res as R);
+    final res = call(regularField: value);
+    return res;
   }
 }
 ''')
@@ -316,17 +296,15 @@ class _ReadValueWithFromJsonExampleCopyWith<R> {
   @pragma('vm:prefer-inline')
   R call({Object? name = dataforgeUndefined}) {
     final res = ReadValueWithFromJsonExample(
-      name: (name == dataforgeUndefined
-          ? _instance.name
-          : (name == null ? '' : name as String)),
+      name: SafeCasteUtil.copyWithCast<String>(name, 'name', _instance.name),
     );
     return (_then != null ? _then!(res) : res as R);
   }
 
   @pragma('vm:prefer-inline')
   R name(String value) {
-    final res = ReadValueWithFromJsonExample(name: value);
-    return (_then != null ? _then!(res) : res as R);
+    final res = call(name: value);
+    return res;
   }
 }
 ''')

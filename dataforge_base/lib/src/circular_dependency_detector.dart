@@ -165,11 +165,15 @@ class CircularDependencyDetector {
     }
 
     buffer.writeln();
-    buffer.writeln('This may cause issues if your JSON data contains circular references.');
+    buffer.writeln(
+        'This may cause issues if your JSON data contains circular references.');
     buffer.writeln('Consider one of the following solutions:');
-    buffer.writeln('  1. Use @JsonKey(ignore: true) on one side of the relationship');
-    buffer.writeln('  2. Use ID references instead of direct object references');
-    buffer.writeln('  3. Ensure your JSON data does not contain circular references');
+    buffer.writeln(
+        '  1. Use @JsonKey(ignore: true) on one side of the relationship');
+    buffer
+        .writeln('  2. Use ID references instead of direct object references');
+    buffer.writeln(
+        '  3. Ensure your JSON data does not contain circular references');
 
     return buffer.toString();
   }

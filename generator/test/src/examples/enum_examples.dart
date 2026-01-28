@@ -49,17 +49,19 @@ class _EnumTypesCopyWith<R> {
   @pragma('vm:prefer-inline')
   R call({Object? status = dataforgeUndefined}) {
     final res = EnumTypes(
-      status: (status == dataforgeUndefined
-          ? _instance.status
-          : status as Status),
+      status: SafeCasteUtil.copyWithCast<Status>(
+        status,
+        'status',
+        _instance.status,
+      ),
     );
     return (_then != null ? _then!(res) : res as R);
   }
 
   @pragma('vm:prefer-inline')
   R status(Status value) {
-    final res = EnumTypes(status: value);
-    return (_then != null ? _then!(res) : res as R);
+    final res = call(status: value);
+    return res;
   }
 }
 ''')
@@ -135,8 +137,8 @@ class _EnumListModelCopyWith<R> {
 
   @pragma('vm:prefer-inline')
   R statuses(List<Status> value) {
-    final res = EnumListModel(statuses: value);
-    return (_then != null ? _then!(res) : res as R);
+    final res = call(statuses: value);
+    return res;
   }
 }
 ''')
@@ -199,29 +201,30 @@ class _NullableEnumExampleCopyWith<R> {
     Object? priority = dataforgeUndefined,
   }) {
     final res = NullableEnumExample(
-      status: (status == dataforgeUndefined
-          ? _instance.status
-          : status as Status?),
-      priority: (priority == dataforgeUndefined
-          ? _instance.priority
-          : priority as Priority?),
+      status: SafeCasteUtil.copyWithCastNullable<Status>(
+        status,
+        'status',
+        _instance.status,
+      ),
+      priority: SafeCasteUtil.copyWithCastNullable<Priority>(
+        priority,
+        'priority',
+        _instance.priority,
+      ),
     );
     return (_then != null ? _then!(res) : res as R);
   }
 
   @pragma('vm:prefer-inline')
   R status(Status? value) {
-    final res = NullableEnumExample(
-      status: value,
-      priority: _instance.priority,
-    );
-    return (_then != null ? _then!(res) : res as R);
+    final res = call(status: value);
+    return res;
   }
 
   @pragma('vm:prefer-inline')
   R priority(Priority? value) {
-    final res = NullableEnumExample(status: _instance.status, priority: value);
-    return (_then != null ? _then!(res) : res as R);
+    final res = call(priority: value);
+    return res;
   }
 }
 ''')
@@ -293,32 +296,30 @@ class _EnumWithDefaultExampleCopyWith<R> {
     Object? priority = dataforgeUndefined,
   }) {
     final res = EnumWithDefaultExample(
-      status: (status == dataforgeUndefined
-          ? _instance.status
-          : status as Status),
-      priority: (priority == dataforgeUndefined
-          ? _instance.priority
-          : priority as Priority),
+      status: SafeCasteUtil.copyWithCast<Status>(
+        status,
+        'status',
+        _instance.status,
+      ),
+      priority: SafeCasteUtil.copyWithCast<Priority>(
+        priority,
+        'priority',
+        _instance.priority,
+      ),
     );
     return (_then != null ? _then!(res) : res as R);
   }
 
   @pragma('vm:prefer-inline')
   R status(Status value) {
-    final res = EnumWithDefaultExample(
-      status: value,
-      priority: _instance.priority,
-    );
-    return (_then != null ? _then!(res) : res as R);
+    final res = call(status: value);
+    return res;
   }
 
   @pragma('vm:prefer-inline')
   R priority(Priority value) {
-    final res = EnumWithDefaultExample(
-      status: _instance.status,
-      priority: value,
-    );
-    return (_then != null ? _then!(res) : res as R);
+    final res = call(priority: value);
+    return res;
   }
 }
 ''')
@@ -421,12 +422,16 @@ class _MultipleEnumsExampleCopyWith<R> {
     Object? statusHistory = dataforgeUndefined,
   }) {
     final res = MultipleEnumsExample(
-      status: (status == dataforgeUndefined
-          ? _instance.status
-          : status as Status),
-      priority: (priority == dataforgeUndefined
-          ? _instance.priority
-          : priority as Priority),
+      status: SafeCasteUtil.copyWithCast<Status>(
+        status,
+        'status',
+        _instance.status,
+      ),
+      priority: SafeCasteUtil.copyWithCast<Priority>(
+        priority,
+        'priority',
+        _instance.priority,
+      ),
       statusHistory: (statusHistory == dataforgeUndefined
           ? _instance.statusHistory
           : (statusHistory as List).cast<Status>()),
@@ -436,32 +441,20 @@ class _MultipleEnumsExampleCopyWith<R> {
 
   @pragma('vm:prefer-inline')
   R status(Status value) {
-    final res = MultipleEnumsExample(
-      status: value,
-      priority: _instance.priority,
-      statusHistory: _instance.statusHistory,
-    );
-    return (_then != null ? _then!(res) : res as R);
+    final res = call(status: value);
+    return res;
   }
 
   @pragma('vm:prefer-inline')
   R priority(Priority value) {
-    final res = MultipleEnumsExample(
-      status: _instance.status,
-      priority: value,
-      statusHistory: _instance.statusHistory,
-    );
-    return (_then != null ? _then!(res) : res as R);
+    final res = call(priority: value);
+    return res;
   }
 
   @pragma('vm:prefer-inline')
   R statusHistory(List<Status> value) {
-    final res = MultipleEnumsExample(
-      status: _instance.status,
-      priority: _instance.priority,
-      statusHistory: value,
-    );
-    return (_then != null ? _then!(res) : res as R);
+    final res = call(statusHistory: value);
+    return res;
   }
 }
 ''')
