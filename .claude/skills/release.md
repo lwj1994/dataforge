@@ -104,11 +104,22 @@ cd cli && dart test && cd ..
 ...
 ```
 
-### 步骤 4: 创建 Git Tag 并推送
+### 步骤 4: 提交变更并创建 Git Tag
+
+提交所有版本号和 CHANGELOG 的变更：
 
 ```bash
-git add .
+git add annotation/pubspec.yaml annotation/CHANGELOG.md
+git add dataforge_base/pubspec.yaml dataforge_base/CHANGELOG.md
+git add generator/pubspec.yaml generator/CHANGELOG.md
+git add cli/pubspec.yaml cli/CHANGELOG.md
+git add CHANGELOG.md
 git commit -m "release: version {version}"
+```
+
+创建 tag 并推送到远程：
+
+```bash
 git tag v{version}
 git push origin main
 git push origin v{version}
