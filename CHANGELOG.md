@@ -1,28 +1,16 @@
-## 0.6.1-dev.3
-### Changed
-- Renamed parameter `onError` to `onCopyWithError` in `DataforgeInit.init` for better clarity.
-
-## 0.6.1-dev.2
-### Changed
-- Changed `DataforgeInit` from an `extension` to a `class` to avoid potential compatibility issues and improve discoverability.
-
-## 0.6.1-dev.1
-### Changed
-- Refined `copyWith` single-field update methods to use internal `call()` method, ensuring all fields are correctly preserved.
-
-## 0.6.1-dev.0
+## 0.6.1
 ### Added
 - **Error Callback API**: New `DataforgeConfig` and `DataforgeInit.init()` for registering error callbacks
   - Allows developers to capture and handle type conversion errors in `copyWith`
   - `SafeCasteUtil.copyWithCast` and `SafeCasteUtil.copyWithCastNullable` for safe type conversion with error reporting
 
+### Changed
+- **Initialization API Refinement**: `DataforgeInit` is now a class instead of an extension for better compatibility and discoverability.
+- **Renamed Parameters**: Parameter `onError` renamed to `onCopyWithError` in `DataforgeInit.init` for clarity.
+- **Internal Optimization**: Refined `copyWith` single-field update methods to use internal `call()` method, ensuring all fields are correctly preserved.
+
 ### Fixed
-- **copyWith Null Handling**: Improved null handling for non-nullable primitive types
-  - `String`: uses `''` as default when null is passed
-  - `int`: uses `0` as default when null is passed
-  - `double`: uses `0.0` as default when null is passed
-  - `bool`: uses `false` as default when null is passed
-  - Prevents runtime `TypeError` when null is incorrectly passed to non-nullable fields
+- **copyWith Null Safety**: Improved null handling for non-nullable primitive types (String, int, double, bool) by providing safe defaults when null is incorrectly passed.
 
 ## 0.6.0
 ### Added
