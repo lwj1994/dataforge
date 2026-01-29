@@ -19,11 +19,14 @@ class DataforgeInit {
   /// Example:
   /// ```dart
   /// void main() {
-  ///   Dataforge.init(
-  ///     onError: (fieldName, expectedType, actualValue, error, stackTrace) {
+  ///   DataforgeInit.init(
+  ///     onCopyWithError: (fieldName, expectedType, actualValue, error, stackTrace) {
   ///       print('Error in field "$fieldName": expected $expectedType, got ${actualValue.runtimeType}');
   ///       print('Error: $error');
   ///     },
+  ///   );
+  /// }
+  /// ```
   static void init({
     DataforgeCopyWithErrorCallback? onCopyWithError,
   }) {

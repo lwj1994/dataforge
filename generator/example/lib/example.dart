@@ -222,3 +222,43 @@ class ListExample with _ListExample {
   @override
   final String nickname;
 }
+
+void main() {
+  // 1. Initialize Dataforge with a custom error callback
+  print('--- Initializing Dataforge ---');
+  DataforgeInit.init(
+    onCopyWithError: (fieldName, expectedType, actualValue, error, stackTrace) {
+      print('!!! Dataforge Error Caught !!!');
+      print('Field: $fieldName');
+      print('Expected Type: $expectedType');
+      print('Actual Value: $actualValue (${actualValue.runtimeType})');
+      print('Error detail: $error');
+      print('Stack Trace:\n$stackTrace');
+      print('-----------------------------');
+    },
+  );
+
+  final product = Product(
+    id: 'prod_123',
+    productName: 'Gaming Mouse',
+    unitPrice: 59.9,
+  );
+
+  print('Original Product: $product');
+
+  // 2. Try to trigger a type error by passing a String to a double field via dynamic/Object?
+  print('\nAttempting invalid copyWith (unitPrice: "invalid")...');
+
+  final updatedProduct = product.copyWith(
+    unitPrice: 'not a double' as dynamic,
+  );
+
+  print('Updated Product (should fallback to original): $updatedProduct');
+
+  if (updatedProduct.unitPrice == product.unitPrice) {
+    print(
+        '\nSUCCESS: Error was caught and value safely fell back to original.');
+  } else {
+    print('\nFAILURE: Value did not fallback correctly.');
+  }
+}
