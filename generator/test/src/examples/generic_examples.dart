@@ -6,7 +6,7 @@ mixin _GenericResult<T> {
   abstract final T? data;
   @pragma('vm:prefer-inline')
   GenericResultCopyWith<T, GenericResult<T>> get copyWith =>
-      GenericResultCopyWith<T, GenericResult<T>>._(this);
+      GenericResultCopyWith<T, GenericResult<T>>(this);
 
   @override
   bool operator ==(Object other) {
@@ -63,7 +63,7 @@ mixin _MultiGenericExample<T, U> {
   abstract final U second;
   @pragma('vm:prefer-inline')
   MultiGenericExampleCopyWith<T, U, MultiGenericExample<T, U>> get copyWith =>
-      MultiGenericExampleCopyWith<T, U, MultiGenericExample<T, U>>._(this);
+      MultiGenericExampleCopyWith<T, U, MultiGenericExample<T, U>>(this);
 
   @override
   bool operator ==(Object other) {

@@ -220,8 +220,7 @@ mixin _NullableWithDefaultExample {
   abstract final String? name;
   abstract final int? count;
   @pragma('vm:prefer-inline')
-  NullableWithDefaultExampleCopyWith<NullableWithDefaultExample>
-  get copyWith =>
+  NullableWithDefaultExampleCopyWith<NullableWithDefaultExample> get copyWith =>
       NullableWithDefaultExampleCopyWith<NullableWithDefaultExample>(this);
 
   @override

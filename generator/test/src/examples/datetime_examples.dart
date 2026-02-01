@@ -319,8 +319,7 @@ class CustomDateTimeConverterExample {
 mixin _DateTimeWithDefaultExample {
   abstract final DateTime createdAt;
   @pragma('vm:prefer-inline')
-  DateTimeWithDefaultExampleCopyWith<DateTimeWithDefaultExample>
-  get copyWith =>
+  DateTimeWithDefaultExampleCopyWith<DateTimeWithDefaultExample> get copyWith =>
       DateTimeWithDefaultExampleCopyWith<DateTimeWithDefaultExample>(this);
 
   @override

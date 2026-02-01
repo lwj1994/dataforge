@@ -1,3 +1,7 @@
+## 0.6.3
+### Maintenance
+- Fix internal tests to match generated code.
+
 ## 0.6.2
 ### Changed
 - Make generated `copyWith` implementation classes public (e.g., `_ClassNameCopyWith` -> `ClassNameCopyWith`).

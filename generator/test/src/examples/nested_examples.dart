@@ -98,10 +98,7 @@ class NestedDefaultValuesCopyWith<R> {
 
   @pragma('vm:prefer-inline')
   InnerDefaultValuesCopyWith<R> get $nested =>
-      InnerDefaultValuesCopyWith<R>(
-        _instance.nested,
-        (v) => call(nested: v),
-      );
+      InnerDefaultValuesCopyWith<R>(_instance.nested, (v) => call(nested: v));
 }
 ''')
 @Dataforge()

@@ -23,7 +23,7 @@ mixin _GenericContainer<T> {
   abstract final T data;
   @pragma('vm:prefer-inline')
   GenericContainerCopyWith<T, GenericContainer<T>> get copyWith =>
-      GenericContainerCopyWith<T, GenericContainer<T>>._(this);
+      GenericContainerCopyWith<T, GenericContainer<T>>(this);
 
   @override
   bool operator ==(Object other) {
@@ -259,9 +259,7 @@ mixin _ReadValueWithFromJsonExample {
   @pragma('vm:prefer-inline')
   ReadValueWithFromJsonExampleCopyWith<ReadValueWithFromJsonExample>
   get copyWith =>
-      ReadValueWithFromJsonExampleCopyWith<ReadValueWithFromJsonExample>(
-        this,
-      );
+      ReadValueWithFromJsonExampleCopyWith<ReadValueWithFromJsonExample>(this);
 
   @override
   bool operator ==(Object other) {
