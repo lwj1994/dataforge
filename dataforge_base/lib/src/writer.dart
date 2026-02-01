@@ -126,7 +126,7 @@ class GeneratorWriter {
           : genericParams.replaceFirst('>', ', ${clazz.name}$genericParams>');
       buffer.writeln("  @pragma('vm:prefer-inline')");
       buffer.writeln(
-        '  ${clazz.mixinName}CopyWith$genericArgs get copyWith => ${clazz.mixinName}CopyWith$genericArgs._(this);',
+        '  ${clazz.name}CopyWith$genericArgs get copyWith => ${clazz.name}CopyWith$genericArgs(this);',
       );
     } else {
       // Traditional copyWith style
@@ -231,7 +231,7 @@ class GeneratorWriter {
     String genericParams,
     List<FieldInfo> validFields,
   ) {
-    final copyWithClassName = '${clazz.mixinName}CopyWith';
+    final copyWithClassName = '${clazz.name}CopyWith';
     final returnType = 'R';
     final genericParamsWithR = genericParams.isEmpty
         ? '<$returnType>'
@@ -242,7 +242,7 @@ class GeneratorWriter {
     buffer.writeln(
       '  final $returnType Function(${clazz.name}$genericParams)? _then;',
     );
-    buffer.writeln('  $copyWithClassName._(this._instance, [this._then]);');
+    buffer.writeln('  $copyWithClassName(this._instance, [this._then]);');
 
     buffer.writeln();
     buffer.writeln("  @pragma('vm:prefer-inline')");
@@ -297,7 +297,7 @@ class GeneratorWriter {
             ? type.substring(type.indexOf('<') + 1, type.lastIndexOf('>'))
             : '';
 
-        final nestedCopyWithName = '${nestedClass.mixinName}CopyWith';
+        final nestedCopyWithName = '${nestedClass.name}CopyWith';
         final nestedGenericArgs = genericPart.isEmpty ? 'R' : '$genericPart, R';
         final nestedType = '$nestedCopyWithName<$nestedGenericArgs>';
 
@@ -308,12 +308,12 @@ class GeneratorWriter {
           );
           buffer.writeln('      ? null');
           buffer.writeln(
-            '      : $nestedType._(_instance.${field.name}!, (v) => call(${field.name}: v));',
+            '      : $nestedType(_instance.${field.name}!, (v) => call(${field.name}: v));',
           );
         } else {
           buffer.writeln("  @pragma('vm:prefer-inline')");
           buffer.writeln(
-            '  $nestedType get \$${field.name} => $nestedType._(_instance.${field.name}, (v) => call(${field.name}: v));',
+            '  $nestedType get \$${field.name} => $nestedType(_instance.${field.name}, (v) => call(${field.name}: v));',
           );
         }
         buffer.writeln();

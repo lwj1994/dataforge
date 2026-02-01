@@ -7,8 +7,8 @@ mixin _BasicUser {
   abstract final String name;
   abstract final int age;
   @pragma('vm:prefer-inline')
-  _BasicUserCopyWith<BasicUser> get copyWith =>
-      _BasicUserCopyWith<BasicUser>._(this);
+  BasicUserCopyWith<BasicUser> get copyWith =>
+      BasicUserCopyWith<BasicUser>(this);
 
   @override
   bool operator ==(Object other) {
@@ -36,10 +36,10 @@ mixin _BasicUser {
   }
 }
 
-class _BasicUserCopyWith<R> {
+class BasicUserCopyWith<R> {
   final _BasicUser _instance;
   final R Function(BasicUser)? _then;
-  _BasicUserCopyWith._(this._instance, [this._then]);
+  BasicUserCopyWith(this._instance, [this._then]);
 
   @pragma('vm:prefer-inline')
   R call({
@@ -79,8 +79,8 @@ mixin _DefaultValues {
   abstract final String stringValue;
   abstract final bool boolValue;
   @pragma('vm:prefer-inline')
-  _DefaultValuesCopyWith<DefaultValues> get copyWith =>
-      _DefaultValuesCopyWith<DefaultValues>._(this);
+  DefaultValuesCopyWith<DefaultValues> get copyWith =>
+      DefaultValuesCopyWith<DefaultValues>(this);
 
   @override
   bool operator ==(Object other) {
@@ -118,10 +118,10 @@ mixin _DefaultValues {
   }
 }
 
-class _DefaultValuesCopyWith<R> {
+class DefaultValuesCopyWith<R> {
   final _DefaultValues _instance;
   final R Function(DefaultValues)? _then;
-  _DefaultValuesCopyWith._(this._instance, [this._then]);
+  DefaultValuesCopyWith(this._instance, [this._then]);
 
   @pragma('vm:prefer-inline')
   R call({
@@ -185,8 +185,8 @@ class DefaultValues {
 mixin _PrefixedExample {
   abstract final String name;
   @pragma('vm:prefer-inline')
-  _PrefixedExampleCopyWith<PrefixedExample> get copyWith =>
-      _PrefixedExampleCopyWith<PrefixedExample>._(this);
+  PrefixedExampleCopyWith<PrefixedExample> get copyWith =>
+      PrefixedExampleCopyWith<PrefixedExample>(this);
 
   @override
   bool operator ==(Object other) {
@@ -213,10 +213,10 @@ mixin _PrefixedExample {
   }
 }
 
-class _PrefixedExampleCopyWith<R> {
+class PrefixedExampleCopyWith<R> {
   final _PrefixedExample _instance;
   final R Function(PrefixedExample)? _then;
-  _PrefixedExampleCopyWith._(this._instance, [this._then]);
+  PrefixedExampleCopyWith(this._instance, [this._then]);
 
   @pragma('vm:prefer-inline')
   R call({Object? name = df.dataforgeUndefined}) {
@@ -244,8 +244,8 @@ mixin _DoubleExample {
   abstract final double value;
   abstract final double? optionalValue;
   @pragma('vm:prefer-inline')
-  _DoubleExampleCopyWith<DoubleExample> get copyWith =>
-      _DoubleExampleCopyWith<DoubleExample>._(this);
+  DoubleExampleCopyWith<DoubleExample> get copyWith =>
+      DoubleExampleCopyWith<DoubleExample>(this);
 
   @override
   bool operator ==(Object other) {
@@ -274,10 +274,10 @@ mixin _DoubleExample {
   }
 }
 
-class _DoubleExampleCopyWith<R> {
+class DoubleExampleCopyWith<R> {
   final _DoubleExample _instance;
   final R Function(DoubleExample)? _then;
-  _DoubleExampleCopyWith._(this._instance, [this._then]);
+  DoubleExampleCopyWith(this._instance, [this._then]);
 
   @pragma('vm:prefer-inline')
   R call({
@@ -324,8 +324,8 @@ mixin _NumExample {
   abstract final num value;
   abstract final num? optionalValue;
   @pragma('vm:prefer-inline')
-  _NumExampleCopyWith<NumExample> get copyWith =>
-      _NumExampleCopyWith<NumExample>._(this);
+  NumExampleCopyWith<NumExample> get copyWith =>
+      NumExampleCopyWith<NumExample>(this);
 
   @override
   bool operator ==(Object other) {
@@ -354,10 +354,10 @@ mixin _NumExample {
   }
 }
 
-class _NumExampleCopyWith<R> {
+class NumExampleCopyWith<R> {
   final _NumExample _instance;
   final R Function(NumExample)? _then;
-  _NumExampleCopyWith._(this._instance, [this._then]);
+  NumExampleCopyWith(this._instance, [this._then]);
 
   @pragma('vm:prefer-inline')
   R call({

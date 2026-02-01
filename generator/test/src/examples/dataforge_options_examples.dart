@@ -6,8 +6,8 @@ mixin _NoFromJsonExample {
   abstract final String name;
   abstract final int age;
   @pragma('vm:prefer-inline')
-  _NoFromJsonExampleCopyWith<NoFromJsonExample> get copyWith =>
-      _NoFromJsonExampleCopyWith<NoFromJsonExample>._(this);
+  NoFromJsonExampleCopyWith<NoFromJsonExample> get copyWith =>
+      NoFromJsonExampleCopyWith<NoFromJsonExample>(this);
 
   @override
   bool operator ==(Object other) {
@@ -28,10 +28,10 @@ mixin _NoFromJsonExample {
   }
 }
 
-class _NoFromJsonExampleCopyWith<R> {
+class NoFromJsonExampleCopyWith<R> {
   final _NoFromJsonExample _instance;
   final R Function(NoFromJsonExample)? _then;
-  _NoFromJsonExampleCopyWith._(this._instance, [this._then]);
+  NoFromJsonExampleCopyWith(this._instance, [this._then]);
 
   @pragma('vm:prefer-inline')
   R call({
@@ -71,8 +71,8 @@ mixin _NoToJsonExample {
   abstract final String name;
   abstract final int age;
   @pragma('vm:prefer-inline')
-  _NoToJsonExampleCopyWith<NoToJsonExample> get copyWith =>
-      _NoToJsonExampleCopyWith<NoToJsonExample>._(this);
+  NoToJsonExampleCopyWith<NoToJsonExample> get copyWith =>
+      NoToJsonExampleCopyWith<NoToJsonExample>(this);
 
   @override
   bool operator ==(Object other) {
@@ -96,10 +96,10 @@ mixin _NoToJsonExample {
   }
 }
 
-class _NoToJsonExampleCopyWith<R> {
+class NoToJsonExampleCopyWith<R> {
   final _NoToJsonExample _instance;
   final R Function(NoToJsonExample)? _then;
-  _NoToJsonExampleCopyWith._(this._instance, [this._then]);
+  NoToJsonExampleCopyWith(this._instance, [this._then]);
 
   @pragma('vm:prefer-inline')
   R call({
@@ -139,8 +139,8 @@ mixin _NoJsonExample {
   abstract final String name;
   abstract final int age;
   @pragma('vm:prefer-inline')
-  _NoJsonExampleCopyWith<NoJsonExample> get copyWith =>
-      _NoJsonExampleCopyWith<NoJsonExample>._(this);
+  NoJsonExampleCopyWith<NoJsonExample> get copyWith =>
+      NoJsonExampleCopyWith<NoJsonExample>(this);
 
   @override
   bool operator ==(Object other) {
@@ -157,10 +157,10 @@ mixin _NoJsonExample {
   String toString() => 'NoJsonExample(name: $name, age: $age)';
 }
 
-class _NoJsonExampleCopyWith<R> {
+class NoJsonExampleCopyWith<R> {
   final _NoJsonExample _instance;
   final R Function(NoJsonExample)? _then;
-  _NoJsonExampleCopyWith._(this._instance, [this._then]);
+  NoJsonExampleCopyWith(this._instance, [this._then]);
 
   @pragma('vm:prefer-inline')
   R call({
@@ -245,8 +245,8 @@ class NoCopyWithChainExample {
 mixin _CustomMixinName {
   abstract final String value;
   @pragma('vm:prefer-inline')
-  _CustomMixinNameCopyWith<CustomMixinName> get copyWith =>
-      _CustomMixinNameCopyWith<CustomMixinName>._(this);
+  CustomMixinNameCopyWith<CustomMixinName> get copyWith =>
+      CustomMixinNameCopyWith<CustomMixinName>(this);
 
   @override
   bool operator ==(Object other) {
@@ -273,10 +273,10 @@ mixin _CustomMixinName {
   }
 }
 
-class _CustomMixinNameCopyWith<R> {
+class CustomMixinNameCopyWith<R> {
   final _CustomMixinName _instance;
   final R Function(CustomMixinName)? _then;
-  _CustomMixinNameCopyWith._(this._instance, [this._then]);
+  CustomMixinNameCopyWith(this._instance, [this._then]);
 
   @pragma('vm:prefer-inline')
   R call({Object? value = dataforgeUndefined}) {

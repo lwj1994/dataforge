@@ -8,8 +8,8 @@ mixin _NullableFieldsExample {
   abstract final double? nullableDouble;
   abstract final bool? nullableBool;
   @pragma('vm:prefer-inline')
-  _NullableFieldsExampleCopyWith<NullableFieldsExample> get copyWith =>
-      _NullableFieldsExampleCopyWith<NullableFieldsExample>._(this);
+  NullableFieldsExampleCopyWith<NullableFieldsExample> get copyWith =>
+      NullableFieldsExampleCopyWith<NullableFieldsExample>(this);
 
   @override
   bool operator ==(Object other) {
@@ -53,10 +53,10 @@ mixin _NullableFieldsExample {
   }
 }
 
-class _NullableFieldsExampleCopyWith<R> {
+class NullableFieldsExampleCopyWith<R> {
   final _NullableFieldsExample _instance;
   final R Function(NullableFieldsExample)? _then;
-  _NullableFieldsExampleCopyWith._(this._instance, [this._then]);
+  NullableFieldsExampleCopyWith(this._instance, [this._then]);
 
   @pragma('vm:prefer-inline')
   R call({
@@ -135,8 +135,8 @@ mixin _RequiredNullableExample {
   abstract final String? nullableName;
   abstract final int? nullableAge;
   @pragma('vm:prefer-inline')
-  _RequiredNullableExampleCopyWith<RequiredNullableExample> get copyWith =>
-      _RequiredNullableExampleCopyWith<RequiredNullableExample>._(this);
+  RequiredNullableExampleCopyWith<RequiredNullableExample> get copyWith =>
+      RequiredNullableExampleCopyWith<RequiredNullableExample>(this);
 
   @override
   bool operator ==(Object other) {
@@ -166,10 +166,10 @@ mixin _RequiredNullableExample {
   }
 }
 
-class _RequiredNullableExampleCopyWith<R> {
+class RequiredNullableExampleCopyWith<R> {
   final _RequiredNullableExample _instance;
   final R Function(RequiredNullableExample)? _then;
-  _RequiredNullableExampleCopyWith._(this._instance, [this._then]);
+  RequiredNullableExampleCopyWith(this._instance, [this._then]);
 
   @pragma('vm:prefer-inline')
   R call({
@@ -220,9 +220,9 @@ mixin _NullableWithDefaultExample {
   abstract final String? name;
   abstract final int? count;
   @pragma('vm:prefer-inline')
-  _NullableWithDefaultExampleCopyWith<NullableWithDefaultExample>
+  NullableWithDefaultExampleCopyWith<NullableWithDefaultExample>
   get copyWith =>
-      _NullableWithDefaultExampleCopyWith<NullableWithDefaultExample>._(this);
+      NullableWithDefaultExampleCopyWith<NullableWithDefaultExample>(this);
 
   @override
   bool operator ==(Object other) {
@@ -250,10 +250,10 @@ mixin _NullableWithDefaultExample {
   }
 }
 
-class _NullableWithDefaultExampleCopyWith<R> {
+class NullableWithDefaultExampleCopyWith<R> {
   final _NullableWithDefaultExample _instance;
   final R Function(NullableWithDefaultExample)? _then;
-  _NullableWithDefaultExampleCopyWith._(this._instance, [this._then]);
+  NullableWithDefaultExampleCopyWith(this._instance, [this._then]);
 
   @pragma('vm:prefer-inline')
   R call({

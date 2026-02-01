@@ -1,3 +1,8 @@
+## 0.6.2
+### Changed
+- Make generated `copyWith` implementation classes public (e.g., `_ClassNameCopyWith` -> `ClassNameCopyWith`).
+- Make `copyWith` class constructors public to allow instantiation across files for nested `copyWith` support.
+
 ## 0.6.1
 ### Added
 - **Error Callback API**: New `DataforgeConfig` and `DataforgeInit.init()` for registering error callbacks

@@ -7,7 +7,7 @@ mixin _Product {
   abstract final String secret;
   abstract final String name;
   @pragma('vm:prefer-inline')
-  _ProductCopyWith<Product> get copyWith => _ProductCopyWith<Product>._(this);
+  ProductCopyWith<Product> get copyWith => ProductCopyWith<Product>(this);
 
   @override
   bool operator ==(Object other) {
@@ -35,10 +35,10 @@ mixin _Product {
   }
 }
 
-class _ProductCopyWith<R> {
+class ProductCopyWith<R> {
   final _Product _instance;
   final R Function(Product)? _then;
-  _ProductCopyWith._(this._instance, [this._then]);
+  ProductCopyWith(this._instance, [this._then]);
 
   @pragma('vm:prefer-inline')
   R call({
@@ -98,8 +98,8 @@ mixin _AlternateNamesTest {
   abstract final bool isActive;
   abstract final List<String> tags;
   @pragma('vm:prefer-inline')
-  _AlternateNamesTestCopyWith<AlternateNamesTest> get copyWith =>
-      _AlternateNamesTestCopyWith<AlternateNamesTest>._(this);
+  AlternateNamesTestCopyWith<AlternateNamesTest> get copyWith =>
+      AlternateNamesTestCopyWith<AlternateNamesTest>(this);
 
   @override
   bool operator ==(Object other) {
@@ -177,10 +177,10 @@ mixin _AlternateNamesTest {
   }
 }
 
-class _AlternateNamesTestCopyWith<R> {
+class AlternateNamesTestCopyWith<R> {
   final _AlternateNamesTest _instance;
   final R Function(AlternateNamesTest)? _then;
-  _AlternateNamesTestCopyWith._(this._instance, [this._then]);
+  AlternateNamesTestCopyWith(this._instance, [this._then]);
 
   @pragma('vm:prefer-inline')
   R call({
@@ -274,8 +274,8 @@ mixin _CustomReadValue {
   abstract final int count;
   abstract final bool enabled;
   @pragma('vm:prefer-inline')
-  _CustomReadValueCopyWith<CustomReadValue> get copyWith =>
-      _CustomReadValueCopyWith<CustomReadValue>._(this);
+  CustomReadValueCopyWith<CustomReadValue> get copyWith =>
+      CustomReadValueCopyWith<CustomReadValue>(this);
 
   @override
   bool operator ==(Object other) {
@@ -329,10 +329,10 @@ mixin _CustomReadValue {
   }
 }
 
-class _CustomReadValueCopyWith<R> {
+class CustomReadValueCopyWith<R> {
   final _CustomReadValue _instance;
   final R Function(CustomReadValue)? _then;
-  _CustomReadValueCopyWith._(this._instance, [this._then]);
+  CustomReadValueCopyWith(this._instance, [this._then]);
 
   @pragma('vm:prefer-inline')
   R call({
@@ -419,8 +419,8 @@ mixin _IncludeIfNullExample {
   abstract final String? description;
   abstract final int? count;
   @pragma('vm:prefer-inline')
-  _IncludeIfNullExampleCopyWith<IncludeIfNullExample> get copyWith =>
-      _IncludeIfNullExampleCopyWith<IncludeIfNullExample>._(this);
+  IncludeIfNullExampleCopyWith<IncludeIfNullExample> get copyWith =>
+      IncludeIfNullExampleCopyWith<IncludeIfNullExample>(this);
 
   @override
   bool operator ==(Object other) {
@@ -452,10 +452,10 @@ mixin _IncludeIfNullExample {
   }
 }
 
-class _IncludeIfNullExampleCopyWith<R> {
+class IncludeIfNullExampleCopyWith<R> {
   final _IncludeIfNullExample _instance;
   final R Function(IncludeIfNullExample)? _then;
-  _IncludeIfNullExampleCopyWith._(this._instance, [this._then]);
+  IncludeIfNullExampleCopyWith(this._instance, [this._then]);
 
   @pragma('vm:prefer-inline')
   R call({

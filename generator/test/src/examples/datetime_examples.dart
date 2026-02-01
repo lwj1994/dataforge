@@ -5,8 +5,8 @@ import 'package:source_gen_test/annotations.dart';
 mixin _DateTimeExample {
   abstract final DateTime? dateTime;
   @pragma('vm:prefer-inline')
-  _DateTimeExampleCopyWith<DateTimeExample> get copyWith =>
-      _DateTimeExampleCopyWith<DateTimeExample>._(this);
+  DateTimeExampleCopyWith<DateTimeExample> get copyWith =>
+      DateTimeExampleCopyWith<DateTimeExample>(this);
 
   @override
   bool operator ==(Object other) {
@@ -33,10 +33,10 @@ mixin _DateTimeExample {
   }
 }
 
-class _DateTimeExampleCopyWith<R> {
+class DateTimeExampleCopyWith<R> {
   final _DateTimeExample _instance;
   final R Function(DateTimeExample)? _then;
-  _DateTimeExampleCopyWith._(this._instance, [this._then]);
+  DateTimeExampleCopyWith(this._instance, [this._then]);
 
   @pragma('vm:prefer-inline')
   R call({Object? dateTime = dataforgeUndefined}) {
@@ -68,8 +68,8 @@ mixin _RequiredDateTimeExample {
   abstract final DateTime createdAt;
   abstract final DateTime updatedAt;
   @pragma('vm:prefer-inline')
-  _RequiredDateTimeExampleCopyWith<RequiredDateTimeExample> get copyWith =>
-      _RequiredDateTimeExampleCopyWith<RequiredDateTimeExample>._(this);
+  RequiredDateTimeExampleCopyWith<RequiredDateTimeExample> get copyWith =>
+      RequiredDateTimeExampleCopyWith<RequiredDateTimeExample>(this);
 
   @override
   bool operator ==(Object other) {
@@ -105,10 +105,10 @@ mixin _RequiredDateTimeExample {
   }
 }
 
-class _RequiredDateTimeExampleCopyWith<R> {
+class RequiredDateTimeExampleCopyWith<R> {
   final _RequiredDateTimeExample _instance;
   final R Function(RequiredDateTimeExample)? _then;
-  _RequiredDateTimeExampleCopyWith._(this._instance, [this._then]);
+  RequiredDateTimeExampleCopyWith(this._instance, [this._then]);
 
   @pragma('vm:prefer-inline')
   R call({
@@ -158,8 +158,8 @@ class RequiredDateTimeExample {
 mixin _ListDateTimeExample {
   abstract final List<DateTime> timestamps;
   @pragma('vm:prefer-inline')
-  _ListDateTimeExampleCopyWith<ListDateTimeExample> get copyWith =>
-      _ListDateTimeExampleCopyWith<ListDateTimeExample>._(this);
+  ListDateTimeExampleCopyWith<ListDateTimeExample> get copyWith =>
+      ListDateTimeExampleCopyWith<ListDateTimeExample>(this);
 
   @override
   bool operator ==(Object other) {
@@ -198,10 +198,10 @@ mixin _ListDateTimeExample {
   }
 }
 
-class _ListDateTimeExampleCopyWith<R> {
+class ListDateTimeExampleCopyWith<R> {
   final _ListDateTimeExample _instance;
   final R Function(ListDateTimeExample)? _then;
-  _ListDateTimeExampleCopyWith._(this._instance, [this._then]);
+  ListDateTimeExampleCopyWith(this._instance, [this._then]);
 
   @pragma('vm:prefer-inline')
   R call({Object? timestamps = dataforgeUndefined}) {
@@ -247,9 +247,9 @@ class CustomDateTimeConverter extends JsonTypeConverter<DateTime, String> {
 mixin _CustomDateTimeConverterExample {
   abstract final DateTime? customDateTime;
   @pragma('vm:prefer-inline')
-  _CustomDateTimeConverterExampleCopyWith<CustomDateTimeConverterExample>
+  CustomDateTimeConverterExampleCopyWith<CustomDateTimeConverterExample>
   get copyWith =>
-      _CustomDateTimeConverterExampleCopyWith<CustomDateTimeConverterExample>._(
+      CustomDateTimeConverterExampleCopyWith<CustomDateTimeConverterExample>(
         this,
       );
 
@@ -283,10 +283,10 @@ mixin _CustomDateTimeConverterExample {
   }
 }
 
-class _CustomDateTimeConverterExampleCopyWith<R> {
+class CustomDateTimeConverterExampleCopyWith<R> {
   final _CustomDateTimeConverterExample _instance;
   final R Function(CustomDateTimeConverterExample)? _then;
-  _CustomDateTimeConverterExampleCopyWith._(this._instance, [this._then]);
+  CustomDateTimeConverterExampleCopyWith(this._instance, [this._then]);
 
   @pragma('vm:prefer-inline')
   R call({Object? customDateTime = dataforgeUndefined}) {
@@ -319,9 +319,9 @@ class CustomDateTimeConverterExample {
 mixin _DateTimeWithDefaultExample {
   abstract final DateTime createdAt;
   @pragma('vm:prefer-inline')
-  _DateTimeWithDefaultExampleCopyWith<DateTimeWithDefaultExample>
+  DateTimeWithDefaultExampleCopyWith<DateTimeWithDefaultExample>
   get copyWith =>
-      _DateTimeWithDefaultExampleCopyWith<DateTimeWithDefaultExample>._(this);
+      DateTimeWithDefaultExampleCopyWith<DateTimeWithDefaultExample>(this);
 
   @override
   bool operator ==(Object other) {
@@ -350,10 +350,10 @@ mixin _DateTimeWithDefaultExample {
   }
 }
 
-class _DateTimeWithDefaultExampleCopyWith<R> {
+class DateTimeWithDefaultExampleCopyWith<R> {
   final _DateTimeWithDefaultExample _instance;
   final R Function(DateTimeWithDefaultExample)? _then;
-  _DateTimeWithDefaultExampleCopyWith._(this._instance, [this._then]);
+  DateTimeWithDefaultExampleCopyWith(this._instance, [this._then]);
 
   @pragma('vm:prefer-inline')
   R call({Object? createdAt = dataforgeUndefined}) {

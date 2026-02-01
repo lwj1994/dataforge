@@ -9,8 +9,8 @@ enum Priority { low, medium, high, critical }
 mixin _EnumTypes {
   abstract final Status status;
   @pragma('vm:prefer-inline')
-  _EnumTypesCopyWith<EnumTypes> get copyWith =>
-      _EnumTypesCopyWith<EnumTypes>._(this);
+  EnumTypesCopyWith<EnumTypes> get copyWith =>
+      EnumTypesCopyWith<EnumTypes>(this);
 
   @override
   bool operator ==(Object other) {
@@ -41,10 +41,10 @@ mixin _EnumTypes {
   }
 }
 
-class _EnumTypesCopyWith<R> {
+class EnumTypesCopyWith<R> {
   final _EnumTypes _instance;
   final R Function(EnumTypes)? _then;
-  _EnumTypesCopyWith._(this._instance, [this._then]);
+  EnumTypesCopyWith(this._instance, [this._then]);
 
   @pragma('vm:prefer-inline')
   R call({Object? status = dataforgeUndefined}) {
@@ -75,8 +75,8 @@ class EnumTypes {
 mixin _EnumListModel {
   abstract final List<Status> statuses;
   @pragma('vm:prefer-inline')
-  _EnumListModelCopyWith<EnumListModel> get copyWith =>
-      _EnumListModelCopyWith<EnumListModel>._(this);
+  EnumListModelCopyWith<EnumListModel> get copyWith =>
+      EnumListModelCopyWith<EnumListModel>(this);
 
   @override
   bool operator ==(Object other) {
@@ -120,10 +120,10 @@ mixin _EnumListModel {
   }
 }
 
-class _EnumListModelCopyWith<R> {
+class EnumListModelCopyWith<R> {
   final _EnumListModel _instance;
   final R Function(EnumListModel)? _then;
-  _EnumListModelCopyWith._(this._instance, [this._then]);
+  EnumListModelCopyWith(this._instance, [this._then]);
 
   @pragma('vm:prefer-inline')
   R call({Object? statuses = dataforgeUndefined}) {
@@ -153,8 +153,8 @@ mixin _NullableEnumExample {
   abstract final Status? status;
   abstract final Priority? priority;
   @pragma('vm:prefer-inline')
-  _NullableEnumExampleCopyWith<NullableEnumExample> get copyWith =>
-      _NullableEnumExampleCopyWith<NullableEnumExample>._(this);
+  NullableEnumExampleCopyWith<NullableEnumExample> get copyWith =>
+      NullableEnumExampleCopyWith<NullableEnumExample>(this);
 
   @override
   bool operator ==(Object other) {
@@ -190,10 +190,10 @@ mixin _NullableEnumExample {
   }
 }
 
-class _NullableEnumExampleCopyWith<R> {
+class NullableEnumExampleCopyWith<R> {
   final _NullableEnumExample _instance;
   final R Function(NullableEnumExample)? _then;
-  _NullableEnumExampleCopyWith._(this._instance, [this._then]);
+  NullableEnumExampleCopyWith(this._instance, [this._then]);
 
   @pragma('vm:prefer-inline')
   R call({
@@ -244,8 +244,8 @@ mixin _EnumWithDefaultExample {
   abstract final Status status;
   abstract final Priority priority;
   @pragma('vm:prefer-inline')
-  _EnumWithDefaultExampleCopyWith<EnumWithDefaultExample> get copyWith =>
-      _EnumWithDefaultExampleCopyWith<EnumWithDefaultExample>._(this);
+  EnumWithDefaultExampleCopyWith<EnumWithDefaultExample> get copyWith =>
+      EnumWithDefaultExampleCopyWith<EnumWithDefaultExample>(this);
 
   @override
   bool operator ==(Object other) {
@@ -285,10 +285,10 @@ mixin _EnumWithDefaultExample {
   }
 }
 
-class _EnumWithDefaultExampleCopyWith<R> {
+class EnumWithDefaultExampleCopyWith<R> {
   final _EnumWithDefaultExample _instance;
   final R Function(EnumWithDefaultExample)? _then;
-  _EnumWithDefaultExampleCopyWith._(this._instance, [this._then]);
+  EnumWithDefaultExampleCopyWith(this._instance, [this._then]);
 
   @pragma('vm:prefer-inline')
   R call({
@@ -340,8 +340,8 @@ mixin _MultipleEnumsExample {
   abstract final Priority priority;
   abstract final List<Status> statusHistory;
   @pragma('vm:prefer-inline')
-  _MultipleEnumsExampleCopyWith<MultipleEnumsExample> get copyWith =>
-      _MultipleEnumsExampleCopyWith<MultipleEnumsExample>._(this);
+  MultipleEnumsExampleCopyWith<MultipleEnumsExample> get copyWith =>
+      MultipleEnumsExampleCopyWith<MultipleEnumsExample>(this);
 
   @override
   bool operator ==(Object other) {
@@ -410,10 +410,10 @@ mixin _MultipleEnumsExample {
   }
 }
 
-class _MultipleEnumsExampleCopyWith<R> {
+class MultipleEnumsExampleCopyWith<R> {
   final _MultipleEnumsExample _instance;
   final R Function(MultipleEnumsExample)? _then;
-  _MultipleEnumsExampleCopyWith._(this._instance, [this._then]);
+  MultipleEnumsExampleCopyWith(this._instance, [this._then]);
 
   @pragma('vm:prefer-inline')
   R call({

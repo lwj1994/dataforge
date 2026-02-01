@@ -13,8 +13,8 @@ class SimpleUser {
 mixin _ListObjectExample {
   abstract final List<SimpleUser> users;
   @pragma('vm:prefer-inline')
-  _ListObjectExampleCopyWith<ListObjectExample> get copyWith =>
-      _ListObjectExampleCopyWith<ListObjectExample>._(this);
+  ListObjectExampleCopyWith<ListObjectExample> get copyWith =>
+      ListObjectExampleCopyWith<ListObjectExample>(this);
 
   @override
   bool operator ==(Object other) {
@@ -47,10 +47,10 @@ mixin _ListObjectExample {
   }
 }
 
-class _ListObjectExampleCopyWith<R> {
+class ListObjectExampleCopyWith<R> {
   final _ListObjectExample _instance;
   final R Function(ListObjectExample)? _then;
-  _ListObjectExampleCopyWith._(this._instance, [this._then]);
+  ListObjectExampleCopyWith(this._instance, [this._then]);
 
   @pragma('vm:prefer-inline')
   R call({Object? users = dataforgeUndefined}) {
@@ -86,8 +86,8 @@ mixin _ImageListModel {
   abstract final String id;
   abstract final List<ImageBean> watermarkImages;
   @pragma('vm:prefer-inline')
-  _ImageListModelCopyWith<ImageListModel> get copyWith =>
-      _ImageListModelCopyWith<ImageListModel>._(this);
+  ImageListModelCopyWith<ImageListModel> get copyWith =>
+      ImageListModelCopyWith<ImageListModel>(this);
 
   @override
   bool operator ==(Object other) {
@@ -133,10 +133,10 @@ mixin _ImageListModel {
   }
 }
 
-class _ImageListModelCopyWith<R> {
+class ImageListModelCopyWith<R> {
   final _ImageListModel _instance;
   final R Function(ImageListModel)? _then;
-  _ImageListModelCopyWith._(this._instance, [this._then]);
+  ImageListModelCopyWith(this._instance, [this._then]);
 
   @pragma('vm:prefer-inline')
   R call({
@@ -182,8 +182,8 @@ class ImageListModel {
 mixin _RequiredListModel {
   abstract final List<SimpleUser> users;
   @pragma('vm:prefer-inline')
-  _RequiredListModelCopyWith<RequiredListModel> get copyWith =>
-      _RequiredListModelCopyWith<RequiredListModel>._(this);
+  RequiredListModelCopyWith<RequiredListModel> get copyWith =>
+      RequiredListModelCopyWith<RequiredListModel>(this);
 
   @override
   bool operator ==(Object other) {
@@ -216,10 +216,10 @@ mixin _RequiredListModel {
   }
 }
 
-class _RequiredListModelCopyWith<R> {
+class RequiredListModelCopyWith<R> {
   final _RequiredListModel _instance;
   final R Function(RequiredListModel)? _then;
-  _RequiredListModelCopyWith._(this._instance, [this._then]);
+  RequiredListModelCopyWith(this._instance, [this._then]);
 
   @pragma('vm:prefer-inline')
   R call({Object? users = dataforgeUndefined}) {
@@ -251,8 +251,8 @@ mixin _ListPrimitiveExample {
   abstract final List<double> values;
   abstract final List<bool> flags;
   @pragma('vm:prefer-inline')
-  _ListPrimitiveExampleCopyWith<ListPrimitiveExample> get copyWith =>
-      _ListPrimitiveExampleCopyWith<ListPrimitiveExample>._(this);
+  ListPrimitiveExampleCopyWith<ListPrimitiveExample> get copyWith =>
+      ListPrimitiveExampleCopyWith<ListPrimitiveExample>(this);
 
   @override
   bool operator ==(Object other) {
@@ -323,10 +323,10 @@ mixin _ListPrimitiveExample {
   }
 }
 
-class _ListPrimitiveExampleCopyWith<R> {
+class ListPrimitiveExampleCopyWith<R> {
   final _ListPrimitiveExample _instance;
   final R Function(ListPrimitiveExample)? _then;
-  _ListPrimitiveExampleCopyWith._(this._instance, [this._then]);
+  ListPrimitiveExampleCopyWith(this._instance, [this._then]);
 
   @pragma('vm:prefer-inline')
   R call({
@@ -397,8 +397,8 @@ mixin _NullableListExample {
   abstract final List<String>? nullableNames;
   abstract final List<int>? nullableNumbers;
   @pragma('vm:prefer-inline')
-  _NullableListExampleCopyWith<NullableListExample> get copyWith =>
-      _NullableListExampleCopyWith<NullableListExample>._(this);
+  NullableListExampleCopyWith<NullableListExample> get copyWith =>
+      NullableListExampleCopyWith<NullableListExample>(this);
 
   @override
   bool operator ==(Object other) {
@@ -448,10 +448,10 @@ mixin _NullableListExample {
   }
 }
 
-class _NullableListExampleCopyWith<R> {
+class NullableListExampleCopyWith<R> {
   final _NullableListExample _instance;
   final R Function(NullableListExample)? _then;
-  _NullableListExampleCopyWith._(this._instance, [this._then]);
+  NullableListExampleCopyWith(this._instance, [this._then]);
 
   @pragma('vm:prefer-inline')
   R call({
@@ -499,8 +499,8 @@ mixin _MapStringExample {
   abstract final Map<String, int> intMap;
   abstract final Map<String, dynamic> dynamicMap;
   @pragma('vm:prefer-inline')
-  _MapStringExampleCopyWith<MapStringExample> get copyWith =>
-      _MapStringExampleCopyWith<MapStringExample>._(this);
+  MapStringExampleCopyWith<MapStringExample> get copyWith =>
+      MapStringExampleCopyWith<MapStringExample>(this);
 
   @override
   bool operator ==(Object other) {
@@ -558,10 +558,10 @@ mixin _MapStringExample {
   }
 }
 
-class _MapStringExampleCopyWith<R> {
+class MapStringExampleCopyWith<R> {
   final _MapStringExample _instance;
   final R Function(MapStringExample)? _then;
-  _MapStringExampleCopyWith._(this._instance, [this._then]);
+  MapStringExampleCopyWith(this._instance, [this._then]);
 
   @pragma('vm:prefer-inline')
   R call({
@@ -619,8 +619,8 @@ class MapStringExample {
 mixin _MapObjectExample {
   abstract final Map<String, SimpleUser> userMap;
   @pragma('vm:prefer-inline')
-  _MapObjectExampleCopyWith<MapObjectExample> get copyWith =>
-      _MapObjectExampleCopyWith<MapObjectExample>._(this);
+  MapObjectExampleCopyWith<MapObjectExample> get copyWith =>
+      MapObjectExampleCopyWith<MapObjectExample>(this);
 
   @override
   bool operator ==(Object other) {
@@ -661,10 +661,10 @@ mixin _MapObjectExample {
   }
 }
 
-class _MapObjectExampleCopyWith<R> {
+class MapObjectExampleCopyWith<R> {
   final _MapObjectExample _instance;
   final R Function(MapObjectExample)? _then;
-  _MapObjectExampleCopyWith._(this._instance, [this._then]);
+  MapObjectExampleCopyWith(this._instance, [this._then]);
 
   @pragma('vm:prefer-inline')
   R call({Object? userMap = dataforgeUndefined}) {

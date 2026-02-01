@@ -5,8 +5,8 @@ import 'package:source_gen_test/annotations.dart';
 mixin _GenericResult<T> {
   abstract final T? data;
   @pragma('vm:prefer-inline')
-  _GenericResultCopyWith<T, GenericResult<T>> get copyWith =>
-      _GenericResultCopyWith<T, GenericResult<T>>._(this);
+  GenericResultCopyWith<T, GenericResult<T>> get copyWith =>
+      GenericResultCopyWith<T, GenericResult<T>>._(this);
 
   @override
   bool operator ==(Object other) {
@@ -31,10 +31,10 @@ mixin _GenericResult<T> {
   }
 }
 
-class _GenericResultCopyWith<T, R> {
+class GenericResultCopyWith<T, R> {
   final _GenericResult<T> _instance;
   final R Function(GenericResult<T>)? _then;
-  _GenericResultCopyWith._(this._instance, [this._then]);
+  GenericResultCopyWith(this._instance, [this._then]);
 
   @pragma('vm:prefer-inline')
   R call({Object? data = dataforgeUndefined}) {
@@ -62,8 +62,8 @@ mixin _MultiGenericExample<T, U> {
   abstract final T first;
   abstract final U second;
   @pragma('vm:prefer-inline')
-  _MultiGenericExampleCopyWith<T, U, MultiGenericExample<T, U>> get copyWith =>
-      _MultiGenericExampleCopyWith<T, U, MultiGenericExample<T, U>>._(this);
+  MultiGenericExampleCopyWith<T, U, MultiGenericExample<T, U>> get copyWith =>
+      MultiGenericExampleCopyWith<T, U, MultiGenericExample<T, U>>._(this);
 
   @override
   bool operator ==(Object other) {
@@ -88,10 +88,10 @@ mixin _MultiGenericExample<T, U> {
   }
 }
 
-class _MultiGenericExampleCopyWith<T, U, R> {
+class MultiGenericExampleCopyWith<T, U, R> {
   final _MultiGenericExample<T, U> _instance;
   final R Function(MultiGenericExample<T, U>)? _then;
-  _MultiGenericExampleCopyWith._(this._instance, [this._then]);
+  MultiGenericExampleCopyWith(this._instance, [this._then]);
 
   @pragma('vm:prefer-inline')
   R call({

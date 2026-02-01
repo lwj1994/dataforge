@@ -22,8 +22,8 @@ class GenericConverter<T> extends JsonTypeConverter<T, Object?> {
 mixin _GenericContainer<T> {
   abstract final T data;
   @pragma('vm:prefer-inline')
-  _GenericContainerCopyWith<T, GenericContainer<T>> get copyWith =>
-      _GenericContainerCopyWith<T, GenericContainer<T>>._(this);
+  GenericContainerCopyWith<T, GenericContainer<T>> get copyWith =>
+      GenericContainerCopyWith<T, GenericContainer<T>>._(this);
 
   @override
   bool operator ==(Object other) {
@@ -50,10 +50,10 @@ mixin _GenericContainer<T> {
   }
 }
 
-class _GenericContainerCopyWith<T, R> {
+class GenericContainerCopyWith<T, R> {
   final _GenericContainer<T> _instance;
   final R Function(GenericContainer<T>)? _then;
-  _GenericContainerCopyWith._(this._instance, [this._then]);
+  GenericContainerCopyWith(this._instance, [this._then]);
 
   @pragma('vm:prefer-inline')
   R call({Object? data = dataforgeUndefined}) {
@@ -110,8 +110,8 @@ mixin _CustomFunctionsExample {
   abstract final String? optionalValue;
   abstract final String regularField;
   @pragma('vm:prefer-inline')
-  _CustomFunctionsExampleCopyWith<CustomFunctionsExample> get copyWith =>
-      _CustomFunctionsExampleCopyWith<CustomFunctionsExample>._(this);
+  CustomFunctionsExampleCopyWith<CustomFunctionsExample> get copyWith =>
+      CustomFunctionsExampleCopyWith<CustomFunctionsExample>(this);
 
   @override
   bool operator ==(Object other) {
@@ -158,10 +158,10 @@ mixin _CustomFunctionsExample {
   }
 }
 
-class _CustomFunctionsExampleCopyWith<R> {
+class CustomFunctionsExampleCopyWith<R> {
   final _CustomFunctionsExample _instance;
   final R Function(CustomFunctionsExample)? _then;
-  _CustomFunctionsExampleCopyWith._(this._instance, [this._then]);
+  CustomFunctionsExampleCopyWith(this._instance, [this._then]);
 
   @pragma('vm:prefer-inline')
   R call({
@@ -257,9 +257,9 @@ String readValueWithFromJson(dynamic value) {
 mixin _ReadValueWithFromJsonExample {
   abstract final String name;
   @pragma('vm:prefer-inline')
-  _ReadValueWithFromJsonExampleCopyWith<ReadValueWithFromJsonExample>
+  ReadValueWithFromJsonExampleCopyWith<ReadValueWithFromJsonExample>
   get copyWith =>
-      _ReadValueWithFromJsonExampleCopyWith<ReadValueWithFromJsonExample>._(
+      ReadValueWithFromJsonExampleCopyWith<ReadValueWithFromJsonExample>(
         this,
       );
 
@@ -288,10 +288,10 @@ mixin _ReadValueWithFromJsonExample {
   }
 }
 
-class _ReadValueWithFromJsonExampleCopyWith<R> {
+class ReadValueWithFromJsonExampleCopyWith<R> {
   final _ReadValueWithFromJsonExample _instance;
   final R Function(ReadValueWithFromJsonExample)? _then;
-  _ReadValueWithFromJsonExampleCopyWith._(this._instance, [this._then]);
+  ReadValueWithFromJsonExampleCopyWith(this._instance, [this._then]);
 
   @pragma('vm:prefer-inline')
   R call({Object? name = dataforgeUndefined}) {

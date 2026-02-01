@@ -27,8 +27,8 @@ mixin _NestedDefaultValues {
   abstract final String name;
   abstract final InnerDefaultValues nested;
   @pragma('vm:prefer-inline')
-  _NestedDefaultValuesCopyWith<NestedDefaultValues> get copyWith =>
-      _NestedDefaultValuesCopyWith<NestedDefaultValues>._(this);
+  NestedDefaultValuesCopyWith<NestedDefaultValues> get copyWith =>
+      NestedDefaultValuesCopyWith<NestedDefaultValues>(this);
 
   @override
   bool operator ==(Object other) {
@@ -63,10 +63,10 @@ mixin _NestedDefaultValues {
   }
 }
 
-class _NestedDefaultValuesCopyWith<R> {
+class NestedDefaultValuesCopyWith<R> {
   final _NestedDefaultValues _instance;
   final R Function(NestedDefaultValues)? _then;
-  _NestedDefaultValuesCopyWith._(this._instance, [this._then]);
+  NestedDefaultValuesCopyWith(this._instance, [this._then]);
 
   @pragma('vm:prefer-inline')
   R call({
@@ -97,8 +97,8 @@ class _NestedDefaultValuesCopyWith<R> {
   }
 
   @pragma('vm:prefer-inline')
-  _InnerDefaultValuesCopyWith<R> get $nested =>
-      _InnerDefaultValuesCopyWith<R>._(
+  InnerDefaultValuesCopyWith<R> get $nested =>
+      InnerDefaultValuesCopyWith<R>(
         _instance.nested,
         (v) => call(nested: v),
       );
@@ -119,8 +119,8 @@ mixin _ChainedExample {
   abstract final String id;
   abstract final InnerUser user;
   @pragma('vm:prefer-inline')
-  _ChainedExampleCopyWith<ChainedExample> get copyWith =>
-      _ChainedExampleCopyWith<ChainedExample>._(this);
+  ChainedExampleCopyWith<ChainedExample> get copyWith =>
+      ChainedExampleCopyWith<ChainedExample>(this);
 
   @override
   bool operator ==(Object other) {
@@ -148,10 +148,10 @@ mixin _ChainedExample {
   }
 }
 
-class _ChainedExampleCopyWith<R> {
+class ChainedExampleCopyWith<R> {
   final _ChainedExample _instance;
   final R Function(ChainedExample)? _then;
-  _ChainedExampleCopyWith._(this._instance, [this._then]);
+  ChainedExampleCopyWith(this._instance, [this._then]);
 
   @pragma('vm:prefer-inline')
   R call({Object? id = dataforgeUndefined, Object? user = dataforgeUndefined}) {
@@ -175,8 +175,8 @@ class _ChainedExampleCopyWith<R> {
   }
 
   @pragma('vm:prefer-inline')
-  _InnerUserCopyWith<R> get $user =>
-      _InnerUserCopyWith<R>._(_instance.user, (v) => call(user: v));
+  InnerUserCopyWith<R> get $user =>
+      InnerUserCopyWith<R>(_instance.user, (v) => call(user: v));
 }
 ''')
 @Dataforge(deepCopyWith: true)
@@ -191,8 +191,8 @@ mixin _NullableNestedExample {
   abstract final String name;
   abstract final InnerUser? optionalUser;
   @pragma('vm:prefer-inline')
-  _NullableNestedExampleCopyWith<NullableNestedExample> get copyWith =>
-      _NullableNestedExampleCopyWith<NullableNestedExample>._(this);
+  NullableNestedExampleCopyWith<NullableNestedExample> get copyWith =>
+      NullableNestedExampleCopyWith<NullableNestedExample>(this);
 
   @override
   bool operator ==(Object other) {
@@ -224,10 +224,10 @@ mixin _NullableNestedExample {
   }
 }
 
-class _NullableNestedExampleCopyWith<R> {
+class NullableNestedExampleCopyWith<R> {
   final _NullableNestedExample _instance;
   final R Function(NullableNestedExample)? _then;
-  _NullableNestedExampleCopyWith._(this._instance, [this._then]);
+  NullableNestedExampleCopyWith(this._instance, [this._then]);
 
   @pragma('vm:prefer-inline')
   R call({
@@ -258,9 +258,9 @@ class _NullableNestedExampleCopyWith<R> {
   }
 
   @pragma('vm:prefer-inline')
-  _InnerUserCopyWith<R>? get $optionalUser => _instance.optionalUser == null
+  InnerUserCopyWith<R>? get $optionalUser => _instance.optionalUser == null
       ? null
-      : _InnerUserCopyWith<R>._(
+      : InnerUserCopyWith<R>(
           _instance.optionalUser!,
           (v) => call(optionalUser: v),
         );
@@ -297,8 +297,8 @@ mixin _MultiLevelNestedExample {
   abstract final String id;
   abstract final Person person;
   @pragma('vm:prefer-inline')
-  _MultiLevelNestedExampleCopyWith<MultiLevelNestedExample> get copyWith =>
-      _MultiLevelNestedExampleCopyWith<MultiLevelNestedExample>._(this);
+  MultiLevelNestedExampleCopyWith<MultiLevelNestedExample> get copyWith =>
+      MultiLevelNestedExampleCopyWith<MultiLevelNestedExample>(this);
 
   @override
   bool operator ==(Object other) {
@@ -326,10 +326,10 @@ mixin _MultiLevelNestedExample {
   }
 }
 
-class _MultiLevelNestedExampleCopyWith<R> {
+class MultiLevelNestedExampleCopyWith<R> {
   final _MultiLevelNestedExample _instance;
   final R Function(MultiLevelNestedExample)? _then;
-  _MultiLevelNestedExampleCopyWith._(this._instance, [this._then]);
+  MultiLevelNestedExampleCopyWith(this._instance, [this._then]);
 
   @pragma('vm:prefer-inline')
   R call({
@@ -360,8 +360,8 @@ class _MultiLevelNestedExampleCopyWith<R> {
   }
 
   @pragma('vm:prefer-inline')
-  _PersonCopyWith<R> get $person =>
-      _PersonCopyWith<R>._(_instance.person, (v) => call(person: v));
+  PersonCopyWith<R> get $person =>
+      PersonCopyWith<R>(_instance.person, (v) => call(person: v));
 }
 ''')
 @Dataforge(deepCopyWith: true)
@@ -380,8 +380,8 @@ mixin _DeepRootExample {
   abstract final String id;
   abstract final NestedDefaultValues root;
   @pragma('vm:prefer-inline')
-  _DeepRootExampleCopyWith<DeepRootExample> get copyWith =>
-      _DeepRootExampleCopyWith<DeepRootExample>._(this);
+  DeepRootExampleCopyWith<DeepRootExample> get copyWith =>
+      DeepRootExampleCopyWith<DeepRootExample>(this);
 
   @override
   bool operator ==(Object other) {
@@ -412,10 +412,10 @@ mixin _DeepRootExample {
   }
 }
 
-class _DeepRootExampleCopyWith<R> {
+class DeepRootExampleCopyWith<R> {
   final _DeepRootExample _instance;
   final R Function(DeepRootExample)? _then;
-  _DeepRootExampleCopyWith._(this._instance, [this._then]);
+  DeepRootExampleCopyWith(this._instance, [this._then]);
 
   @pragma('vm:prefer-inline')
   R call({Object? id = dataforgeUndefined, Object? root = dataforgeUndefined}) {
@@ -443,8 +443,8 @@ class _DeepRootExampleCopyWith<R> {
   }
 
   @pragma('vm:prefer-inline')
-  _NestedDefaultValuesCopyWith<R> get $root =>
-      _NestedDefaultValuesCopyWith<R>._(_instance.root, (v) => call(root: v));
+  NestedDefaultValuesCopyWith<R> get $root =>
+      NestedDefaultValuesCopyWith<R>(_instance.root, (v) => call(root: v));
 }
 ''')
 @Dataforge()
@@ -458,8 +458,8 @@ class DeepRootExample {
 mixin _SuperDeepRoot {
   abstract final DeepRootExample root;
   @pragma('vm:prefer-inline')
-  _SuperDeepRootCopyWith<SuperDeepRoot> get copyWith =>
-      _SuperDeepRootCopyWith<SuperDeepRoot>._(this);
+  SuperDeepRootCopyWith<SuperDeepRoot> get copyWith =>
+      SuperDeepRootCopyWith<SuperDeepRoot>(this);
 
   @override
   bool operator ==(Object other) {
@@ -489,10 +489,10 @@ mixin _SuperDeepRoot {
   }
 }
 
-class _SuperDeepRootCopyWith<R> {
+class SuperDeepRootCopyWith<R> {
   final _SuperDeepRoot _instance;
   final R Function(SuperDeepRoot)? _then;
-  _SuperDeepRootCopyWith._(this._instance, [this._then]);
+  SuperDeepRootCopyWith(this._instance, [this._then]);
 
   @pragma('vm:prefer-inline')
   R call({Object? root = dataforgeUndefined}) {
@@ -513,8 +513,8 @@ class _SuperDeepRootCopyWith<R> {
   }
 
   @pragma('vm:prefer-inline')
-  _DeepRootExampleCopyWith<R> get $root =>
-      _DeepRootExampleCopyWith<R>._(_instance.root, (v) => call(root: v));
+  DeepRootExampleCopyWith<R> get $root =>
+      DeepRootExampleCopyWith<R>(_instance.root, (v) => call(root: v));
 }
 ''')
 @Dataforge()
