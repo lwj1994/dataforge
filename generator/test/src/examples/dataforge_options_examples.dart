@@ -31,6 +31,7 @@ mixin _NoFromJsonExample {
 class NoFromJsonExampleCopyWith<R> {
   final _NoFromJsonExample _instance;
   final R Function(NoFromJsonExample)? _then;
+  // ignore: library_private_types_in_public_api
   NoFromJsonExampleCopyWith(this._instance, [this._then]);
 
   @pragma('vm:prefer-inline')
@@ -99,6 +100,7 @@ mixin _NoToJsonExample {
 class NoToJsonExampleCopyWith<R> {
   final _NoToJsonExample _instance;
   final R Function(NoToJsonExample)? _then;
+  // ignore: library_private_types_in_public_api
   NoToJsonExampleCopyWith(this._instance, [this._then]);
 
   @pragma('vm:prefer-inline')
@@ -160,6 +162,7 @@ mixin _NoJsonExample {
 class NoJsonExampleCopyWith<R> {
   final _NoJsonExample _instance;
   final R Function(NoJsonExample)? _then;
+  // ignore: library_private_types_in_public_api
   NoJsonExampleCopyWith(this._instance, [this._then]);
 
   @pragma('vm:prefer-inline')
@@ -276,6 +279,7 @@ mixin _CustomMixinName {
 class CustomMixinNameCopyWith<R> {
   final _CustomMixinName _instance;
   final R Function(CustomMixinName)? _then;
+  // ignore: library_private_types_in_public_api
   CustomMixinNameCopyWith(this._instance, [this._then]);
 
   @pragma('vm:prefer-inline')

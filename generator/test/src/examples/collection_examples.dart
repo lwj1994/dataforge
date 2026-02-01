@@ -50,6 +50,7 @@ mixin _ListObjectExample {
 class ListObjectExampleCopyWith<R> {
   final _ListObjectExample _instance;
   final R Function(ListObjectExample)? _then;
+  // ignore: library_private_types_in_public_api
   ListObjectExampleCopyWith(this._instance, [this._then]);
 
   @pragma('vm:prefer-inline')
@@ -136,6 +137,7 @@ mixin _ImageListModel {
 class ImageListModelCopyWith<R> {
   final _ImageListModel _instance;
   final R Function(ImageListModel)? _then;
+  // ignore: library_private_types_in_public_api
   ImageListModelCopyWith(this._instance, [this._then]);
 
   @pragma('vm:prefer-inline')
@@ -219,6 +221,7 @@ mixin _RequiredListModel {
 class RequiredListModelCopyWith<R> {
   final _RequiredListModel _instance;
   final R Function(RequiredListModel)? _then;
+  // ignore: library_private_types_in_public_api
   RequiredListModelCopyWith(this._instance, [this._then]);
 
   @pragma('vm:prefer-inline')
@@ -326,6 +329,7 @@ mixin _ListPrimitiveExample {
 class ListPrimitiveExampleCopyWith<R> {
   final _ListPrimitiveExample _instance;
   final R Function(ListPrimitiveExample)? _then;
+  // ignore: library_private_types_in_public_api
   ListPrimitiveExampleCopyWith(this._instance, [this._then]);
 
   @pragma('vm:prefer-inline')
@@ -451,6 +455,7 @@ mixin _NullableListExample {
 class NullableListExampleCopyWith<R> {
   final _NullableListExample _instance;
   final R Function(NullableListExample)? _then;
+  // ignore: library_private_types_in_public_api
   NullableListExampleCopyWith(this._instance, [this._then]);
 
   @pragma('vm:prefer-inline')
@@ -561,6 +566,7 @@ mixin _MapStringExample {
 class MapStringExampleCopyWith<R> {
   final _MapStringExample _instance;
   final R Function(MapStringExample)? _then;
+  // ignore: library_private_types_in_public_api
   MapStringExampleCopyWith(this._instance, [this._then]);
 
   @pragma('vm:prefer-inline')
@@ -664,6 +670,7 @@ mixin _MapObjectExample {
 class MapObjectExampleCopyWith<R> {
   final _MapObjectExample _instance;
   final R Function(MapObjectExample)? _then;
+  // ignore: library_private_types_in_public_api
   MapObjectExampleCopyWith(this._instance, [this._then]);
 
   @pragma('vm:prefer-inline')

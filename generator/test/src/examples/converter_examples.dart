@@ -53,6 +53,7 @@ mixin _GenericContainer<T> {
 class GenericContainerCopyWith<T, R> {
   final _GenericContainer<T> _instance;
   final R Function(GenericContainer<T>)? _then;
+  // ignore: library_private_types_in_public_api
   GenericContainerCopyWith(this._instance, [this._then]);
 
   @pragma('vm:prefer-inline')
@@ -161,6 +162,7 @@ mixin _CustomFunctionsExample {
 class CustomFunctionsExampleCopyWith<R> {
   final _CustomFunctionsExample _instance;
   final R Function(CustomFunctionsExample)? _then;
+  // ignore: library_private_types_in_public_api
   CustomFunctionsExampleCopyWith(this._instance, [this._then]);
 
   @pragma('vm:prefer-inline')
@@ -289,6 +291,7 @@ mixin _ReadValueWithFromJsonExample {
 class ReadValueWithFromJsonExampleCopyWith<R> {
   final _ReadValueWithFromJsonExample _instance;
   final R Function(ReadValueWithFromJsonExample)? _then;
+  // ignore: library_private_types_in_public_api
   ReadValueWithFromJsonExampleCopyWith(this._instance, [this._then]);
 
   @pragma('vm:prefer-inline')

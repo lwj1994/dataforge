@@ -1,3 +1,7 @@
+## 0.6.4
+### Changed
+- Add `// ignore: library_private_types_in_public_api` to generated `CopyWith` classes.
+
 ## 0.6.3
 ### Maintenance
 - Synchronize versions.

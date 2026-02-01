@@ -36,6 +36,7 @@ mixin _DateTimeExample {
 class DateTimeExampleCopyWith<R> {
   final _DateTimeExample _instance;
   final R Function(DateTimeExample)? _then;
+  // ignore: library_private_types_in_public_api
   DateTimeExampleCopyWith(this._instance, [this._then]);
 
   @pragma('vm:prefer-inline')
@@ -108,6 +109,7 @@ mixin _RequiredDateTimeExample {
 class RequiredDateTimeExampleCopyWith<R> {
   final _RequiredDateTimeExample _instance;
   final R Function(RequiredDateTimeExample)? _then;
+  // ignore: library_private_types_in_public_api
   RequiredDateTimeExampleCopyWith(this._instance, [this._then]);
 
   @pragma('vm:prefer-inline')
@@ -201,6 +203,7 @@ mixin _ListDateTimeExample {
 class ListDateTimeExampleCopyWith<R> {
   final _ListDateTimeExample _instance;
   final R Function(ListDateTimeExample)? _then;
+  // ignore: library_private_types_in_public_api
   ListDateTimeExampleCopyWith(this._instance, [this._then]);
 
   @pragma('vm:prefer-inline')
@@ -286,6 +289,7 @@ mixin _CustomDateTimeConverterExample {
 class CustomDateTimeConverterExampleCopyWith<R> {
   final _CustomDateTimeConverterExample _instance;
   final R Function(CustomDateTimeConverterExample)? _then;
+  // ignore: library_private_types_in_public_api
   CustomDateTimeConverterExampleCopyWith(this._instance, [this._then]);
 
   @pragma('vm:prefer-inline')
@@ -352,6 +356,7 @@ mixin _DateTimeWithDefaultExample {
 class DateTimeWithDefaultExampleCopyWith<R> {
   final _DateTimeWithDefaultExample _instance;
   final R Function(DateTimeWithDefaultExample)? _then;
+  // ignore: library_private_types_in_public_api
   DateTimeWithDefaultExampleCopyWith(this._instance, [this._then]);
 
   @pragma('vm:prefer-inline')

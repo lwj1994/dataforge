@@ -39,6 +39,7 @@ mixin _BasicUser {
 class BasicUserCopyWith<R> {
   final _BasicUser _instance;
   final R Function(BasicUser)? _then;
+  // ignore: library_private_types_in_public_api
   BasicUserCopyWith(this._instance, [this._then]);
 
   @pragma('vm:prefer-inline')
@@ -121,6 +122,7 @@ mixin _DefaultValues {
 class DefaultValuesCopyWith<R> {
   final _DefaultValues _instance;
   final R Function(DefaultValues)? _then;
+  // ignore: library_private_types_in_public_api
   DefaultValuesCopyWith(this._instance, [this._then]);
 
   @pragma('vm:prefer-inline')
@@ -216,6 +218,7 @@ mixin _PrefixedExample {
 class PrefixedExampleCopyWith<R> {
   final _PrefixedExample _instance;
   final R Function(PrefixedExample)? _then;
+  // ignore: library_private_types_in_public_api
   PrefixedExampleCopyWith(this._instance, [this._then]);
 
   @pragma('vm:prefer-inline')
@@ -277,6 +280,7 @@ mixin _DoubleExample {
 class DoubleExampleCopyWith<R> {
   final _DoubleExample _instance;
   final R Function(DoubleExample)? _then;
+  // ignore: library_private_types_in_public_api
   DoubleExampleCopyWith(this._instance, [this._then]);
 
   @pragma('vm:prefer-inline')
@@ -357,6 +361,7 @@ mixin _NumExample {
 class NumExampleCopyWith<R> {
   final _NumExample _instance;
   final R Function(NumExample)? _then;
+  // ignore: library_private_types_in_public_api
   NumExampleCopyWith(this._instance, [this._then]);
 
   @pragma('vm:prefer-inline')

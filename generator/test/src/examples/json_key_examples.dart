@@ -38,6 +38,7 @@ mixin _Product {
 class ProductCopyWith<R> {
   final _Product _instance;
   final R Function(Product)? _then;
+  // ignore: library_private_types_in_public_api
   ProductCopyWith(this._instance, [this._then]);
 
   @pragma('vm:prefer-inline')
@@ -180,6 +181,7 @@ mixin _AlternateNamesTest {
 class AlternateNamesTestCopyWith<R> {
   final _AlternateNamesTest _instance;
   final R Function(AlternateNamesTest)? _then;
+  // ignore: library_private_types_in_public_api
   AlternateNamesTestCopyWith(this._instance, [this._then]);
 
   @pragma('vm:prefer-inline')
@@ -332,6 +334,7 @@ mixin _CustomReadValue {
 class CustomReadValueCopyWith<R> {
   final _CustomReadValue _instance;
   final R Function(CustomReadValue)? _then;
+  // ignore: library_private_types_in_public_api
   CustomReadValueCopyWith(this._instance, [this._then]);
 
   @pragma('vm:prefer-inline')
@@ -455,6 +458,7 @@ mixin _IncludeIfNullExample {
 class IncludeIfNullExampleCopyWith<R> {
   final _IncludeIfNullExample _instance;
   final R Function(IncludeIfNullExample)? _then;
+  // ignore: library_private_types_in_public_api
   IncludeIfNullExampleCopyWith(this._instance, [this._then]);
 
   @pragma('vm:prefer-inline')

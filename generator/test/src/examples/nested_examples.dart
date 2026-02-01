@@ -66,6 +66,7 @@ mixin _NestedDefaultValues {
 class NestedDefaultValuesCopyWith<R> {
   final _NestedDefaultValues _instance;
   final R Function(NestedDefaultValues)? _then;
+  // ignore: library_private_types_in_public_api
   NestedDefaultValuesCopyWith(this._instance, [this._then]);
 
   @pragma('vm:prefer-inline')
@@ -148,6 +149,7 @@ mixin _ChainedExample {
 class ChainedExampleCopyWith<R> {
   final _ChainedExample _instance;
   final R Function(ChainedExample)? _then;
+  // ignore: library_private_types_in_public_api
   ChainedExampleCopyWith(this._instance, [this._then]);
 
   @pragma('vm:prefer-inline')
@@ -224,6 +226,7 @@ mixin _NullableNestedExample {
 class NullableNestedExampleCopyWith<R> {
   final _NullableNestedExample _instance;
   final R Function(NullableNestedExample)? _then;
+  // ignore: library_private_types_in_public_api
   NullableNestedExampleCopyWith(this._instance, [this._then]);
 
   @pragma('vm:prefer-inline')
@@ -326,6 +329,7 @@ mixin _MultiLevelNestedExample {
 class MultiLevelNestedExampleCopyWith<R> {
   final _MultiLevelNestedExample _instance;
   final R Function(MultiLevelNestedExample)? _then;
+  // ignore: library_private_types_in_public_api
   MultiLevelNestedExampleCopyWith(this._instance, [this._then]);
 
   @pragma('vm:prefer-inline')
@@ -412,6 +416,7 @@ mixin _DeepRootExample {
 class DeepRootExampleCopyWith<R> {
   final _DeepRootExample _instance;
   final R Function(DeepRootExample)? _then;
+  // ignore: library_private_types_in_public_api
   DeepRootExampleCopyWith(this._instance, [this._then]);
 
   @pragma('vm:prefer-inline')
@@ -489,6 +494,7 @@ mixin _SuperDeepRoot {
 class SuperDeepRootCopyWith<R> {
   final _SuperDeepRoot _instance;
   final R Function(SuperDeepRoot)? _then;
+  // ignore: library_private_types_in_public_api
   SuperDeepRootCopyWith(this._instance, [this._then]);
 
   @pragma('vm:prefer-inline')

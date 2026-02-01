@@ -1,3 +1,7 @@
+## 0.6.4
+### Maintenance
+- Synchronize versions.
+
 ## 0.6.3
 ### Maintenance
 - Synchronize versions.

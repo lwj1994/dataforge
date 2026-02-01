@@ -44,6 +44,7 @@ mixin _EnumTypes {
 class EnumTypesCopyWith<R> {
   final _EnumTypes _instance;
   final R Function(EnumTypes)? _then;
+  // ignore: library_private_types_in_public_api
   EnumTypesCopyWith(this._instance, [this._then]);
 
   @pragma('vm:prefer-inline')
@@ -123,6 +124,7 @@ mixin _EnumListModel {
 class EnumListModelCopyWith<R> {
   final _EnumListModel _instance;
   final R Function(EnumListModel)? _then;
+  // ignore: library_private_types_in_public_api
   EnumListModelCopyWith(this._instance, [this._then]);
 
   @pragma('vm:prefer-inline')
@@ -193,6 +195,7 @@ mixin _NullableEnumExample {
 class NullableEnumExampleCopyWith<R> {
   final _NullableEnumExample _instance;
   final R Function(NullableEnumExample)? _then;
+  // ignore: library_private_types_in_public_api
   NullableEnumExampleCopyWith(this._instance, [this._then]);
 
   @pragma('vm:prefer-inline')
@@ -288,6 +291,7 @@ mixin _EnumWithDefaultExample {
 class EnumWithDefaultExampleCopyWith<R> {
   final _EnumWithDefaultExample _instance;
   final R Function(EnumWithDefaultExample)? _then;
+  // ignore: library_private_types_in_public_api
   EnumWithDefaultExampleCopyWith(this._instance, [this._then]);
 
   @pragma('vm:prefer-inline')
@@ -413,6 +417,7 @@ mixin _MultipleEnumsExample {
 class MultipleEnumsExampleCopyWith<R> {
   final _MultipleEnumsExample _instance;
   final R Function(MultipleEnumsExample)? _then;
+  // ignore: library_private_types_in_public_api
   MultipleEnumsExampleCopyWith(this._instance, [this._then]);
 
   @pragma('vm:prefer-inline')

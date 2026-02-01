@@ -56,6 +56,7 @@ mixin _NullableFieldsExample {
 class NullableFieldsExampleCopyWith<R> {
   final _NullableFieldsExample _instance;
   final R Function(NullableFieldsExample)? _then;
+  // ignore: library_private_types_in_public_api
   NullableFieldsExampleCopyWith(this._instance, [this._then]);
 
   @pragma('vm:prefer-inline')
@@ -169,6 +170,7 @@ mixin _RequiredNullableExample {
 class RequiredNullableExampleCopyWith<R> {
   final _RequiredNullableExample _instance;
   final R Function(RequiredNullableExample)? _then;
+  // ignore: library_private_types_in_public_api
   RequiredNullableExampleCopyWith(this._instance, [this._then]);
 
   @pragma('vm:prefer-inline')
@@ -252,6 +254,7 @@ mixin _NullableWithDefaultExample {
 class NullableWithDefaultExampleCopyWith<R> {
   final _NullableWithDefaultExample _instance;
   final R Function(NullableWithDefaultExample)? _then;
+  // ignore: library_private_types_in_public_api
   NullableWithDefaultExampleCopyWith(this._instance, [this._then]);
 
   @pragma('vm:prefer-inline')

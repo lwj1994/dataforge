@@ -34,6 +34,7 @@ mixin _GenericResult<T> {
 class GenericResultCopyWith<T, R> {
   final _GenericResult<T> _instance;
   final R Function(GenericResult<T>)? _then;
+  // ignore: library_private_types_in_public_api
   GenericResultCopyWith(this._instance, [this._then]);
 
   @pragma('vm:prefer-inline')
@@ -91,6 +92,7 @@ mixin _MultiGenericExample<T, U> {
 class MultiGenericExampleCopyWith<T, U, R> {
   final _MultiGenericExample<T, U> _instance;
   final R Function(MultiGenericExample<T, U>)? _then;
+  // ignore: library_private_types_in_public_api
   MultiGenericExampleCopyWith(this._instance, [this._then]);
 
   @pragma('vm:prefer-inline')

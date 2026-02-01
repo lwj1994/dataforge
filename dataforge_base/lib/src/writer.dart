@@ -242,6 +242,7 @@ class GeneratorWriter {
     buffer.writeln(
       '  final $returnType Function(${clazz.name}$genericParams)? _then;',
     );
+    buffer.writeln('  // ignore: library_private_types_in_public_api');
     buffer.writeln('  $copyWithClassName(this._instance, [this._then]);');
 
     buffer.writeln();
