@@ -1,3 +1,6 @@
+## 0.7.0-dev.0
+- Bump version to 0.7.0-dev.0.
+
 ## 0.6.4
 ### Changed
 - Add `// ignore: library_private_types_in_public_api` to generated `CopyWith` classes.
