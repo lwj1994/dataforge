@@ -13,3 +13,11 @@ Build powerful, immutable data models in Dart/Flutter.
 
 - [**Dataforge Generator**](./generator/README.md) - Code generator documentation.
 - [**Dataforge Annotation**](./annotation/README.md) - Annotation documentation.
+
+## AI Skill
+
+Install the `dataforge` skill:
+
+```bash
+npx skills add https://github.com/lwj1994/dataforge --skill dataforge
+```
