@@ -1,6 +1,6 @@
 # Dataforge README Index
 
-本目录采用“复制文件”方式保存仓库内 README 快照，不使用软链接。
+本目录采用“软链接”方式引用仓库内现有 README，避免重复维护。
 
 ## Files
 
@@ -14,4 +14,4 @@
 
 ## Refresh
 
-当上游 README 更新后，用 `cp` 重新覆盖本目录对应文件。
+当上游 README 路径变更时，重新建立对应软链接（`ln -sfn`）。

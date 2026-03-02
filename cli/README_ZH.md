@@ -1,6 +1,6 @@
 # Dart Dataforge 数据锻造厂
 
-[![Pub Version](https://img.shields.io/pub/v/dataforge)](https://pub.dev/packages/dataforge)
+[![Pub Version](https://img.shields.io/pub/v/dataforge_cli)](https://pub.dev/packages/dataforge_cli)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 高性能的 Dart 数据类生成器，比 `build_runner` **快数倍**。自动生成完美的数据类，包含 `copyWith`、`==`、`hashCode`、`toJson`、`fromJson` 等方法。
@@ -31,7 +31,7 @@ dependencies:
 ### 2. 安装 CLI 工具
 
 ```bash
-dart pub global activate --source git https://github.com/lwj1994/dataforge
+dart pub global activate dataforge_cli
 ```
 
 ## 🚀 快速开始

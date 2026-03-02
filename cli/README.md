@@ -1,6 +1,6 @@
 # Dart Dataforge
 
-[![Pub Version](https://img.shields.io/pub/v/dataforge)](https://pub.dev/packages/dataforge)
+[![Pub Version](https://img.shields.io/pub/v/dataforge_cli)](https://pub.dev/packages/dataforge_cli)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 A high-performance Dart data class generator that's **multiple times faster** than `build_runner`. Generate perfect data classes with `copyWith`, `==`, `hashCode`, `toJson`, `fromJson`, and more.
@@ -27,7 +27,7 @@ dependencies:
 ### 2. Install CLI Tool
 
 ```bash
-dart pub global activate dataforge
+dart pub global activate dataforge_cli
 ```
 
 ## 🚀 Quick Start
