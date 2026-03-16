@@ -121,8 +121,7 @@ class DefaultEnumConverter<T extends Enum>
       return values.firstWhere(
         (e) => e.name == json,
       );
-    } catch (e) {
-      //
+    } on StateError {
       return null;
     }
   }
