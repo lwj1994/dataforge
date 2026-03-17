@@ -12,12 +12,12 @@ class EchoApiResponse<T>
   @JsonKey(name: 'message')
   final String message;
 
-  @JsonKey(name: "data", fromJson: jsonToObject)
+  @JsonKey(name: 'data', fromJson: jsonToObject)
   final T? data;
 
   const EchoApiResponse({
-    this.code = "22",
-    this.message = "",
+    this.code = '22',
+    this.message = '',
     this.data,
   });
 

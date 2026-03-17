@@ -22,7 +22,7 @@ class CustomTypeReadValueTest with _CustomTypeReadValueTest {
   static Object? _readTradeInfo(Map<dynamic, dynamic> map, String key) {
     final value = map[key];
     if (value != null) {
-      if (value["status"] == "SOLD_OUT") {
+      if (value['status'] == 'SOLD_OUT') {
         return null;
       }
     }
@@ -32,7 +32,7 @@ class CustomTypeReadValueTest with _CustomTypeReadValueTest {
   /// Custom readValue method that returns UserInfo (custom type)
   static Object? _readUserInfo(Map<dynamic, dynamic> map, String key) {
     // Return a map with required fields 'name' and 'age'
-    final value = map[key] ?? map["user"] ?? {'name': '', 'age': 0};
+    final value = map[key] ?? map['user'] ?? {'name': '', 'age': 0};
     return value;
   }
 

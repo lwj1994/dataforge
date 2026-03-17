@@ -1,0 +1,115 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  analyze:
+    name: Analyze
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dart-lang/setup-dart@v1
+        with:
+          sdk: stable
+
+      - name: Install dependencies (annotation)
+        working-directory: annotation
+        run: dart pub get
+
+      - name: Install dependencies (dataforge_base)
+        working-directory: dataforge_base
+        run: dart pub get
+
+      - name: Install dependencies (cli)
+        working-directory: cli
+        run: dart pub get
+
+      - name: Install dependencies (generator)
+        working-directory: generator
+        run: dart pub get
+
+      - name: Analyze annotation
+        working-directory: annotation
+        run: dart analyze --fatal-infos
+
+      - name: Analyze dataforge_base
+        working-directory: dataforge_base
+        run: dart analyze --fatal-infos
+
+      - name: Analyze cli
+        working-directory: cli
+        run: dart analyze --fatal-infos
+
+      - name: Analyze generator
+        working-directory: generator
+        run: dart analyze --fatal-infos
+
+  format:
+    name: Format
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dart-lang/setup-dart@v1
+        with:
+          sdk: stable
+
+      - name: Check format (annotation)
+        working-directory: annotation
+        run: dart format --set-exit-if-changed .
+
+      - name: Check format (dataforge_base)
+        working-directory: dataforge_base
+        run: dart format --set-exit-if-changed .
+
+      - name: Check format (cli)
+        working-directory: cli
+        run: dart format --set-exit-if-changed .
+
+      - name: Check format (generator)
+        working-directory: generator
+        run: dart format --set-exit-if-changed .
+
+  test:
+    name: Test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dart-lang/setup-dart@v1
+        with:
+          sdk: stable
+
+      - name: Install dependencies (annotation)
+        working-directory: annotation
+        run: dart pub get
+
+      - name: Install dependencies (dataforge_base)
+        working-directory: dataforge_base
+        run: dart pub get
+
+      - name: Install dependencies (cli)
+        working-directory: cli
+        run: dart pub get
+
+      - name: Install dependencies (generator)
+        working-directory: generator
+        run: dart pub get
+
+      - name: Test annotation
+        working-directory: annotation
+        run: dart test
+
+      - name: Test dataforge_base
+        working-directory: dataforge_base
+        run: dart test
+
+      - name: Test cli
+        working-directory: cli
+        run: dart test
+
+      - name: Test generator
+        working-directory: generator
+        run: dart test

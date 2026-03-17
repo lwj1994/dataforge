@@ -72,10 +72,14 @@ class BaseParser {
       }
       try {
         return meta.annotations;
-      } catch (_) {}
+      } catch (_) {
+        // Annotations property not available
+      }
     } catch (e) {
       DataforgeLogger.warning(
-          'Error accessing metadata for ${element.name}: $e');
+        'Error accessing metadata for "${element.name}": $e. '
+        'This may affect @JsonKey or @Dataforge annotation processing.',
+      );
     }
     return [];
   }
@@ -96,7 +100,8 @@ class BaseParser {
             }
           }
         } catch (e) {
-          // Ignore source extraction errors
+          // Source extraction failed - prefix will be null
+          // This is non-critical and only affects qualified imports
         }
         return _AnnotationResult(obj!, prefix: prefix);
       }
@@ -238,7 +243,10 @@ class BaseParser {
             }
           }
         } catch (e) {
-          DataforgeLogger.warning('Error parsing constructor params: $e');
+          DataforgeLogger.warning(
+            'Error parsing constructor parameters for "${element.name}": $e. '
+            'Default values and required status may not be detected correctly.',
+          );
         }
       }
     }
@@ -277,12 +285,8 @@ class BaseParser {
       final fieldType = field.type;
       final typeStr = fieldType.getDisplayString();
       if (typeStr.contains('<')) {
-        final innerName = typeStr
-            .substring(typeStr.indexOf('<') + 1, typeStr.lastIndexOf('>'))
-            .split(',')
-            .last // handle Map key,value
-            .replaceAll('?', '')
-            .trim();
+        final innerName =
+            _extractLastTypeArgument(typeStr).replaceAll('?', '').trim();
 
         if (_libraryEnums.contains(innerName)) {
           isInnerEnum = true;
@@ -395,11 +399,7 @@ class BaseParser {
       readValue: readValueFunc,
       ignore: obj.getField('ignore')?.toBoolValue() ?? false,
       converter: (obj.getField('converter')?.isNull == false)
-          ? obj
-                  .getField('converter')
-                  ?.type
-                  ?.getDisplayString(withNullability: false) ??
-              ''
+          ? obj.getField('converter')?.type?.getDisplayString() ?? ''
           : '',
       includeIfNull: obj.getField('includeIfNull')?.toBoolValue(),
       fromJson: fromJsonFunc,
@@ -418,6 +418,83 @@ class BaseParser {
       }
     }
     return func.name ?? '';
+  }
+
+  String _extractLastTypeArgument(String type) {
+    final genericStart = type.indexOf('<');
+    final genericEnd = type.lastIndexOf('>');
+    if (genericStart == -1 || genericEnd == -1 || genericEnd <= genericStart) {
+      return type;
+    }
+
+    final typeArguments = type.substring(genericStart + 1, genericEnd);
+    final parts = _splitTopLevelTypeArguments(typeArguments);
+    return parts.isEmpty ? typeArguments : parts.last;
+  }
+
+  List<String> _splitTopLevelTypeArguments(String typeArguments) {
+    final parts = <String>[];
+    var current = StringBuffer();
+    int genericDepth = 0;
+    int parenDepth = 0;
+    int braceDepth = 0;
+    int bracketDepth = 0;
+
+    for (final char in typeArguments.split('')) {
+      switch (char) {
+        case '<':
+          genericDepth++;
+          current.write(char);
+          break;
+        case '>':
+          genericDepth--;
+          current.write(char);
+          break;
+        case '(':
+          parenDepth++;
+          current.write(char);
+          break;
+        case ')':
+          parenDepth--;
+          current.write(char);
+          break;
+        case '{':
+          braceDepth++;
+          current.write(char);
+          break;
+        case '}':
+          braceDepth--;
+          current.write(char);
+          break;
+        case '[':
+          bracketDepth++;
+          current.write(char);
+          break;
+        case ']':
+          bracketDepth--;
+          current.write(char);
+          break;
+        case ',':
+          if (genericDepth == 0 &&
+              parenDepth == 0 &&
+              braceDepth == 0 &&
+              bracketDepth == 0) {
+            parts.add(current.toString().trim());
+            current = StringBuffer();
+          } else {
+            current.write(char);
+          }
+          break;
+        default:
+          current.write(char);
+      }
+    }
+
+    if (current.length > 0) {
+      parts.add(current.toString().trim());
+    }
+
+    return parts;
   }
 }
 

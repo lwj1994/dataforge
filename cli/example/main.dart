@@ -178,7 +178,7 @@ void main() {
 
   // 1. Basic usage
   print('1. Basic usage:');
-  final user = User(
+  final user = const User(
     name: 'John Doe',
     age: 30,
     email: 'john@example.com',

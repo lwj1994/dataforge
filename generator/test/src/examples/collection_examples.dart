@@ -698,3 +698,159 @@ class MapObjectExample {
     this.userMap = const {},
   });
 }
+
+enum SimpleStatus { active, inactive }
+
+@ShouldGenerate(r'''
+mixin _SetPrimitiveExample {
+  abstract final Set<String> tags;
+  @pragma('vm:prefer-inline')
+  SetPrimitiveExampleCopyWith<SetPrimitiveExample> get copyWith =>
+      SetPrimitiveExampleCopyWith<SetPrimitiveExample>(this);
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+    if (other is! SetPrimitiveExample) return false;
+
+    if (!const DeepCollectionEquality().equals(tags, other.tags)) {
+      return false;
+    }
+    return true;
+  }
+
+  @override
+  int get hashCode =>
+      Object.hashAll([const DeepCollectionEquality().hash(tags)]);
+
+  @override
+  String toString() => 'SetPrimitiveExample(tags: $tags)';
+
+  Map<String, dynamic> toJson() {
+    return {'tags': tags.toList()};
+  }
+
+  static SetPrimitiveExample fromJson(Map<String, dynamic> json) {
+    return SetPrimitiveExample(
+      tags: (SafeCasteUtil.readRequiredValue<List<dynamic>>(
+        json,
+        'tags',
+      ).map((e) => (SafeCasteUtil.safeCast<String>(e) ?? '')).toSet()),
+    );
+  }
+}
+
+class SetPrimitiveExampleCopyWith<R> {
+  final _SetPrimitiveExample _instance;
+  final R Function(SetPrimitiveExample)? _then;
+  // ignore: library_private_types_in_public_api
+  SetPrimitiveExampleCopyWith(this._instance, [this._then]);
+
+  @pragma('vm:prefer-inline')
+  R call({Object? tags = dataforgeUndefined}) {
+    final res = SetPrimitiveExample(
+      tags: SafeCasteUtil.copyWithCast<Set<String>>(
+        tags,
+        'tags',
+        _instance.tags,
+      ),
+    );
+    return (_then != null ? _then!(res) : res as R);
+  }
+
+  @pragma('vm:prefer-inline')
+  R tags(Set<String> value) {
+    final res = call(tags: value);
+    return res;
+  }
+}
+''')
+@Dataforge()
+class SetPrimitiveExample {
+  final Set<String> tags;
+
+  SetPrimitiveExample({required this.tags});
+}
+
+@ShouldGenerate(r'''
+mixin _SetEnumExample {
+  abstract final Set<SimpleStatus> statuses;
+  @pragma('vm:prefer-inline')
+  SetEnumExampleCopyWith<SetEnumExample> get copyWith =>
+      SetEnumExampleCopyWith<SetEnumExample>(this);
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+    if (other is! SetEnumExample) return false;
+
+    if (!const DeepCollectionEquality().equals(statuses, other.statuses)) {
+      return false;
+    }
+    return true;
+  }
+
+  @override
+  int get hashCode =>
+      Object.hashAll([const DeepCollectionEquality().hash(statuses)]);
+
+  @override
+  String toString() => 'SetEnumExample(statuses: $statuses)';
+
+  Map<String, dynamic> toJson() {
+    return {
+      'statuses': statuses
+          .map(
+            (e) => const DefaultEnumConverter<SimpleStatus>(
+              SimpleStatus.values,
+            ).toJson(e),
+          )
+          .toList(),
+    };
+  }
+
+  static SetEnumExample fromJson(Map<String, dynamic> json) {
+    return SetEnumExample(
+      statuses:
+          (SafeCasteUtil.readRequiredValue<List<dynamic>>(json, 'statuses')
+              .map(
+                (e) => (SimpleStatus.values.firstWhere(
+                  (ev) => ev.name == e.toString(),
+                )),
+              )
+              .toSet()),
+    );
+  }
+}
+
+class SetEnumExampleCopyWith<R> {
+  final _SetEnumExample _instance;
+  final R Function(SetEnumExample)? _then;
+  // ignore: library_private_types_in_public_api
+  SetEnumExampleCopyWith(this._instance, [this._then]);
+
+  @pragma('vm:prefer-inline')
+  R call({Object? statuses = dataforgeUndefined}) {
+    final res = SetEnumExample(
+      statuses: SafeCasteUtil.copyWithCast<Set<SimpleStatus>>(
+        statuses,
+        'statuses',
+        _instance.statuses,
+      ),
+    );
+    return (_then != null ? _then!(res) : res as R);
+  }
+
+  @pragma('vm:prefer-inline')
+  R statuses(Set<SimpleStatus> value) {
+    final res = call(statuses: value);
+    return res;
+  }
+}
+''')
+@Dataforge()
+class SetEnumExample {
+  final Set<SimpleStatus> statuses;
+
+  SetEnumExample({required this.statuses});
+}

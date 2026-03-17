@@ -5,6 +5,7 @@
 library dataforge_base;
 
 export 'src/circular_dependency_detector.dart';
+export 'src/exceptions.dart';
 export 'src/logger.dart';
 export 'src/model.dart';
 export 'src/parser.dart';

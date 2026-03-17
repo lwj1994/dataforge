@@ -13,7 +13,7 @@ void main() {
 
     test('Traditional nested replacement works', () {
       final user = NestedDefaultValues();
-      final newNested = InnerDefaultValues(intValue: 100);
+      final newNested = const InnerDefaultValues(intValue: 100);
 
       final updated = user.copyWith(nested: newNested);
 
@@ -52,7 +52,7 @@ void main() {
         id: '1',
         root: NestedDefaultValues(
           name: 'root_name',
-          nested: InnerDefaultValues(intValue: 10),
+          nested: const InnerDefaultValues(intValue: 10),
         ),
       );
 
@@ -71,7 +71,7 @@ void main() {
           id: 'root-1',
           root: NestedDefaultValues(
             name: 'level-2',
-            nested: InnerDefaultValues(intValue: 100),
+            nested: const InnerDefaultValues(intValue: 100),
           ),
         ),
       );

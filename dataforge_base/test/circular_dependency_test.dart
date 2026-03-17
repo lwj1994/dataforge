@@ -12,7 +12,7 @@ void main() {
     });
 
     test('detects simple circular dependency (A -> B -> A)', () {
-      final classA = ClassInfo(
+      final classA = const ClassInfo(
         name: 'User',
         mixinName: '_\$UserMixin',
         fields: [
@@ -28,7 +28,7 @@ void main() {
         ],
       );
 
-      final classB = ClassInfo(
+      final classB = const ClassInfo(
         name: 'Post',
         mixinName: '_\$PostMixin',
         fields: [
@@ -53,7 +53,7 @@ void main() {
     });
 
     test('detects self-referencing class (A -> A)', () {
-      final classA = ClassInfo(
+      final classA = const ClassInfo(
         name: 'TreeNode',
         mixinName: '_\$TreeNodeMixin',
         fields: [
@@ -77,7 +77,7 @@ void main() {
     });
 
     test('detects longer cycle (A -> B -> C -> A)', () {
-      final classA = ClassInfo(
+      final classA = const ClassInfo(
         name: 'Company',
         mixinName: '_\$CompanyMixin',
         fields: [
@@ -93,7 +93,7 @@ void main() {
         ],
       );
 
-      final classB = ClassInfo(
+      final classB = const ClassInfo(
         name: 'Employee',
         mixinName: '_\$EmployeeMixin',
         fields: [
@@ -109,7 +109,7 @@ void main() {
         ],
       );
 
-      final classC = ClassInfo(
+      final classC = const ClassInfo(
         name: 'Department',
         mixinName: '_\$DepartmentMixin',
         fields: [
@@ -135,7 +135,7 @@ void main() {
     });
 
     test('no cycles detected in acyclic graph', () {
-      final classA = ClassInfo(
+      final classA = const ClassInfo(
         name: 'User',
         mixinName: '_\$UserMixin',
         fields: [
@@ -150,7 +150,7 @@ void main() {
         ],
       );
 
-      final classB = ClassInfo(
+      final classB = const ClassInfo(
         name: 'Post',
         mixinName: '_\$PostMixin',
         fields: [
@@ -173,7 +173,7 @@ void main() {
     });
 
     test('ignores @JsonKey(ignore: true) fields', () {
-      final classA = ClassInfo(
+      final classA = const ClassInfo(
         name: 'User',
         mixinName: '_\$UserMixin',
         fields: [
@@ -195,7 +195,7 @@ void main() {
         ],
       );
 
-      final classB = ClassInfo(
+      final classB = const ClassInfo(
         name: 'Post',
         mixinName: '_\$PostMixin',
         fields: [

@@ -8,19 +8,19 @@ class AlternateNamesTest with _AlternateNamesTest {
   final String name;
 
   @override
-  @JsonKey(name: "user_age", alternateNames: ["age", "years"])
+  @JsonKey(name: 'user_age', alternateNames: ['age', 'years'])
   final int age;
 
   @override
-  @JsonKey(alternateNames: ["email_address", "mail", "e_mail"])
+  @JsonKey(alternateNames: ['email_address', 'mail', 'e_mail'])
   final String email;
 
   @override
-  @JsonKey(name: "is_active", alternateNames: ["active", "enabled"])
+  @JsonKey(name: 'is_active', alternateNames: ['active', 'enabled'])
   final bool isActive;
 
   @override
-  @JsonKey(alternateNames: ["tags_list", "labels"])
+  @JsonKey(alternateNames: ['tags_list', 'labels'])
   final List<String> tags;
 
   const AlternateNamesTest({

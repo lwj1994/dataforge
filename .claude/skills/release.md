@@ -59,6 +59,14 @@ cd cli && dart test && cd ..
 - `generator/pubspec.yaml` - 第 3 行 `version: {version}`
 - `cli/pubspec.yaml` - 第 3 行 `version: {version}`
 
+同时更新 `generator` 和 `cli` 对 `annotation` 和 `dataforge_base` 的依赖版本：
+- `generator/pubspec.yaml`:
+  - `dataforge_annotation: ^{version}`
+  - `dataforge_base: ^{version}`
+- `cli/pubspec.yaml`:
+  - `dataforge_annotation: ^{version}`
+  - `dataforge_base: ^{version}`
+
 #### 3.2 更新 CHANGELOG.md
 
 在每个包的 CHANGELOG.md 文件顶部添加新版本条目：
