@@ -6,7 +6,7 @@ void main() {
     late NestedObjects testObject;
 
     setUp(() {
-      testObject = NestedObjects(
+      testObject = const NestedObjects(
         homeAddress: Address(
           street: 'Home Street',
           city: 'Home City',

@@ -13,38 +13,38 @@ extension StringExtension on String {
   }
 
   bool isMap() {
-    final index = indexOf("<");
+    final index = indexOf('<');
     if (index == -1) return false;
     final p = substring(0, index);
-    return p.endsWith("Map");
+    return p.endsWith('Map');
   }
 
   bool isSet() {
-    final index = indexOf("<");
+    final index = indexOf('<');
     if (index == -1) return false;
     final p = substring(0, index);
-    return p.endsWith("Set");
+    return p.endsWith('Set');
   }
 
   bool isList() {
-    final index = indexOf("<");
+    final index = indexOf('<');
     if (index == -1) return false;
     final p = substring(0, index);
-    return p.endsWith("List");
+    return p.endsWith('List');
   }
 
   bool isQueue() {
-    final index = indexOf("<");
+    final index = indexOf('<');
     if (index == -1) return false;
     final p = substring(0, index);
-    return p.endsWith("Queue");
+    return p.endsWith('Queue');
   }
 
   bool isIterable() {
-    final index = indexOf("<");
+    final index = indexOf('<');
     if (index == -1) return false;
     final p = substring(0, index);
-    return p.endsWith("Iterable");
+    return p.endsWith('Iterable');
   }
 
   bool isCollection() {

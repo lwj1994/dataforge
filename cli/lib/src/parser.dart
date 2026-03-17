@@ -53,7 +53,7 @@ class Parser {
   /// Returns `null` if file doesn't contain relevant annotations or parsing fails
   ParseResult? parseDartFile() {
     final file = File(path);
-    if (path.endsWith(".data.dart")) return null;
+    if (path.endsWith('.data.dart')) return null;
 
     if (!file.existsSync()) {
       print('Error: File does not exist: $path');
@@ -156,7 +156,7 @@ class Parser {
         bool? includeFromJson;
         bool? includeToJson;
         bool? deepCopyWith;
-        String mixinName = "";
+        String mixinName = '';
         final arguments = meta.arguments?.arguments ?? [];
 
         for (var value in arguments) {
@@ -165,42 +165,42 @@ class Parser {
             final expressionSource = value.expression.toSource();
 
             switch (name) {
-              case "fromMap":
+              case 'fromMap':
                 // Legacy support: fromMap controls both includeFromJson/toJson
                 // Global config no longer overrides these; default to true
-                if (expressionSource == "null") {
+                if (expressionSource == 'null') {
                   fromMap = true;
                 } else {
-                  fromMap = expressionSource == "true";
+                  fromMap = expressionSource == 'true';
                 }
                 break;
-              case "includeFromJson":
+              case 'includeFromJson':
                 // If null, default to true regardless of global config
-                if (expressionSource == "null") {
+                if (expressionSource == 'null') {
                   includeFromJson = true;
                 } else {
-                  includeFromJson = expressionSource == "true";
+                  includeFromJson = expressionSource == 'true';
                 }
                 break;
-              case "includeToJson":
+              case 'includeToJson':
                 // If null, default to true regardless of global config
-                if (expressionSource == "null") {
+                if (expressionSource == 'null') {
                   includeToJson = true;
                 } else {
-                  includeToJson = expressionSource == "true";
+                  includeToJson = expressionSource == 'true';
                 }
                 break;
-              case "deepCopyWith":
+              case 'deepCopyWith':
                 // If null, default to true (matches annotation default)
-                if (expressionSource == "null") {
+                if (expressionSource == 'null') {
                   deepCopyWith = true;
                 } else {
-                  deepCopyWith = expressionSource == "true";
+                  deepCopyWith = expressionSource == 'true';
                 }
                 break;
-              case "name":
+              case 'name':
                 mixinName =
-                    expressionSource.replaceAll('"', "").replaceAll("'", "");
+                    expressionSource.replaceAll('"', '').replaceAll("'", '');
                 break;
               // fromMapName and toMapName are no longer supported
               // Methods are now fixed as 'fromJson' and 'toJson'
@@ -268,9 +268,6 @@ class Parser {
             }
           }
         }
-        print(
-            'Required params for ${declaration.name.lexeme}: $requiredParams');
-
         // Parse fields
         for (final member in declaration.members) {
           if (member is FieldDeclaration && !member.isStatic) {
@@ -282,29 +279,29 @@ class Parser {
             // Parse JsonKey annotation and @ignore annotation
             for (var annotation in member.metadata) {
               final annotationName = annotation.name.name;
-              final cleanName = annotationName.contains(".")
-                  ? annotationName.split(".").last
+              final cleanName = annotationName.contains('.')
+                  ? annotationName.split('.').last
                   : annotationName;
 
               // Handle @ignore annotation
-              if (cleanName == "ignore") {
-                jsonKeyInfo = JsonKeyInfo(
-                  name: "",
-                  readValue: "",
+              if (cleanName == 'ignore') {
+                jsonKeyInfo = const JsonKeyInfo(
+                  name: '',
+                  readValue: '',
                   ignore: true,
                   alternateNames: [],
-                  converter: "",
+                  converter: '',
                   includeIfNull: null,
                 );
               }
               // Handle @JsonKey annotation
-              else if (cleanName == "JsonKey") {
-                jsonKeyInfo = JsonKeyInfo(
-                  name: "",
-                  readValue: "",
+              else if (cleanName == 'JsonKey') {
+                jsonKeyInfo = const JsonKeyInfo(
+                  name: '',
+                  readValue: '',
                   ignore: false,
                   alternateNames: [],
-                  converter: "",
+                  converter: '',
                   includeIfNull: null,
                 );
 
@@ -316,14 +313,14 @@ class Parser {
                     final expressionSource = element.expression.toSource();
 
                     switch (paramName) {
-                      case "name":
+                      case 'name':
                         jsonKeyInfo = jsonKeyInfo!.copyWith(
                           name: expressionSource
-                              .replaceAll('"', "")
-                              .replaceAll("'", ""),
+                              .replaceAll('"', '')
+                              .replaceAll("'", ''),
                         );
                         break;
-                      case "readValue":
+                      case 'readValue':
                         String readValue = expressionSource;
                         if (_isStaticMethod(declaration, readValue)) {
                           readValue = '${declaration.name.lexeme}.$readValue';
@@ -332,12 +329,12 @@ class Parser {
                           readValue: readValue,
                         );
                         break;
-                      case "ignore":
+                      case 'ignore':
                         jsonKeyInfo = jsonKeyInfo!.copyWith(
-                          ignore: expressionSource == "true",
+                          ignore: expressionSource == 'true',
                         );
                         break;
-                      case "alternateNames":
+                      case 'alternateNames':
                         try {
                           // Safer parsing of alternateNames
                           final cleanSource = expressionSource.replaceAll(
@@ -345,7 +342,7 @@ class Parser {
                           final names = cleanSource
                               .split(',')
                               .where((e) => e.isNotEmpty)
-                              .map((e) => e.replaceAll("'", ""))
+                              .map((e) => e.replaceAll("'", ''))
                               .toList();
 
                           jsonKeyInfo = jsonKeyInfo!.copyWith(
@@ -357,7 +354,7 @@ class Parser {
                         }
                         break;
 
-                      case "converter":
+                      case 'converter':
                         String converter = expressionSource;
                         // Remove leading const
                         converter =
@@ -372,12 +369,12 @@ class Parser {
                         );
                         break;
 
-                      case "includeIfNull":
+                      case 'includeIfNull':
                         jsonKeyInfo = jsonKeyInfo!.copyWith(
-                          includeIfNull: expressionSource == "true",
+                          includeIfNull: expressionSource == 'true',
                         );
                         break;
-                      case "fromJson":
+                      case 'fromJson':
                         String fromJson = expressionSource;
                         if (_isStaticMethod(declaration, fromJson)) {
                           fromJson = '${declaration.name.lexeme}.$fromJson';
@@ -386,7 +383,7 @@ class Parser {
                           fromJson: fromJson,
                         );
                         break;
-                      case "toJson":
+                      case 'toJson':
                         String toJson = expressionSource;
                         if (_isStaticMethod(declaration, toJson)) {
                           toJson = '${declaration.name.lexeme}.$toJson';
@@ -436,7 +433,7 @@ class Parser {
                     isFunction: isFunction,
                     jsonKey: jsonKeyInfo,
                     isRecord: isRecord,
-                    defaultValue: defaultValueMap[name] ?? "",
+                    defaultValue: defaultValueMap[name] ?? '',
                     isDateTime: isDateTime,
                     isRequired: requiredParams.contains(name),
                     isInnerEnum: _isInnerEnum(type),
@@ -507,12 +504,7 @@ class Parser {
   /// Determine whether an inner type is a Dataforge object
   bool _isInnerDataforge(String type) {
     if (!type.contains('<')) return false;
-    final inner = type
-        .substring(type.indexOf('<') + 1, type.lastIndexOf('>'))
-        .split(',')
-        .last
-        .replaceAll('?', '')
-        .trim();
+    final inner = _extractLastTypeArgument(type).replaceAll('?', '').trim();
     // Default primitives that are definitely not Dataforge
     const primitives = {
       'String',
@@ -525,6 +517,83 @@ class Parser {
     };
     if (inner.startsWith('List<') || inner.startsWith('Map<')) return false;
     return !primitives.contains(inner);
+  }
+
+  String _extractLastTypeArgument(String type) {
+    final genericStart = type.indexOf('<');
+    final genericEnd = type.lastIndexOf('>');
+    if (genericStart == -1 || genericEnd == -1 || genericEnd <= genericStart) {
+      return type;
+    }
+
+    final typeArguments = type.substring(genericStart + 1, genericEnd);
+    final parts = _splitTopLevelTypeArguments(typeArguments);
+    return parts.isEmpty ? typeArguments : parts.last;
+  }
+
+  List<String> _splitTopLevelTypeArguments(String typeArguments) {
+    final parts = <String>[];
+    var current = StringBuffer();
+    int genericDepth = 0;
+    int parenDepth = 0;
+    int braceDepth = 0;
+    int bracketDepth = 0;
+
+    for (final char in typeArguments.split('')) {
+      switch (char) {
+        case '<':
+          genericDepth++;
+          current.write(char);
+          break;
+        case '>':
+          genericDepth--;
+          current.write(char);
+          break;
+        case '(':
+          parenDepth++;
+          current.write(char);
+          break;
+        case ')':
+          parenDepth--;
+          current.write(char);
+          break;
+        case '{':
+          braceDepth++;
+          current.write(char);
+          break;
+        case '}':
+          braceDepth--;
+          current.write(char);
+          break;
+        case '[':
+          bracketDepth++;
+          current.write(char);
+          break;
+        case ']':
+          bracketDepth--;
+          current.write(char);
+          break;
+        case ',':
+          if (genericDepth == 0 &&
+              parenDepth == 0 &&
+              braceDepth == 0 &&
+              bracketDepth == 0) {
+            parts.add(current.toString().trim());
+            current = StringBuffer();
+          } else {
+            current.write(char);
+          }
+          break;
+        default:
+          current.write(char);
+      }
+    }
+
+    if (current.length > 0) {
+      parts.add(current.toString().trim());
+    }
+
+    return parts;
   }
 
   bool _isStaticMethod(CompilationUnitMember member, String methodName) {

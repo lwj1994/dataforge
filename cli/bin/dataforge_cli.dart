@@ -5,16 +5,16 @@ import 'package:dataforge_cli/dataforge_cli.dart';
 Future<void> main(List<String> args) async {
   final parser = ArgParser();
 
-  parser.addOption("path", defaultsTo: "");
-  parser.addFlag("format", defaultsTo: false, help: "Format generated code");
-  parser.addFlag("debug",
-      abbr: "d", defaultsTo: false, help: "Enable debug logging");
-  parser.addFlag("help",
-      abbr: "h", defaultsTo: false, help: "Show help information");
+  parser.addOption('path', defaultsTo: '');
+  parser.addFlag('format', defaultsTo: false, help: 'Format generated code');
+  parser.addFlag('debug',
+      abbr: 'd', defaultsTo: false, help: 'Enable debug logging');
+  parser.addFlag('help',
+      abbr: 'h', defaultsTo: false, help: 'Show help information');
 
   final res = parser.parse(args);
 
-  if (res.flag("help")) {
+  if (res.flag('help')) {
     print('DataForge - Dart data class generator\n');
     print('Usage: dataforge [path] [options]\n');
     print('Arguments:');
@@ -27,12 +27,12 @@ Future<void> main(List<String> args) async {
   }
 
   // Handle positional arguments (path can be passed as first argument)
-  String path = res.option("path") ?? "";
+  String path = res.option('path') ?? '';
   if (path.isEmpty && res.rest.isNotEmpty) {
     path = res.rest.first;
   }
-  bool shouldFormat = res.flag("format");
-  bool debugMode = res.flag("debug");
+  bool shouldFormat = res.flag('format');
+  bool debugMode = res.flag('debug');
   List<String> generatedFiles = [];
 
   if (debugMode) {

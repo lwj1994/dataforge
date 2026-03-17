@@ -139,16 +139,82 @@ class CircularDependencyDetector {
   ///   "List<User>?" -> "User"
   String? _extractGenericType(String type) {
     final cleanType = type.replaceAll('?', '').trim();
-    final match = RegExp(r'<([^>]+)>').firstMatch(cleanType);
-    if (match != null) {
-      final inner = match.group(1)!;
-      // For Map<K, V>, return V (the value type)
-      if (inner.contains(',')) {
-        return inner.split(',').last.trim();
+    final genericStart = cleanType.indexOf('<');
+    final genericEnd = cleanType.lastIndexOf('>');
+    if (genericStart != -1 && genericEnd != -1 && genericEnd > genericStart) {
+      final inner = cleanType.substring(genericStart + 1, genericEnd);
+      final parts = _splitTopLevelTypeArguments(inner);
+      if (parts.isNotEmpty) {
+        return parts.last.trim();
       }
       return inner.trim();
     }
     return null;
+  }
+
+  List<String> _splitTopLevelTypeArguments(String typeArguments) {
+    final parts = <String>[];
+    var current = StringBuffer();
+    int genericDepth = 0;
+    int parenDepth = 0;
+    int braceDepth = 0;
+    int bracketDepth = 0;
+
+    for (final char in typeArguments.split('')) {
+      switch (char) {
+        case '<':
+          genericDepth++;
+          current.write(char);
+          break;
+        case '>':
+          genericDepth--;
+          current.write(char);
+          break;
+        case '(':
+          parenDepth++;
+          current.write(char);
+          break;
+        case ')':
+          parenDepth--;
+          current.write(char);
+          break;
+        case '{':
+          braceDepth++;
+          current.write(char);
+          break;
+        case '}':
+          braceDepth--;
+          current.write(char);
+          break;
+        case '[':
+          bracketDepth++;
+          current.write(char);
+          break;
+        case ']':
+          bracketDepth--;
+          current.write(char);
+          break;
+        case ',':
+          if (genericDepth == 0 &&
+              parenDepth == 0 &&
+              braceDepth == 0 &&
+              bracketDepth == 0) {
+            parts.add(current.toString().trim());
+            current = StringBuffer();
+          } else {
+            current.write(char);
+          }
+          break;
+        default:
+          current.write(char);
+      }
+    }
+
+    if (current.length > 0) {
+      parts.add(current.toString().trim());
+    }
+
+    return parts;
   }
 
   /// Generates a user-friendly warning message for detected cycles

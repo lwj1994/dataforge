@@ -68,12 +68,12 @@ void main() {
   print('Ignore field validation examples:');
 
   // Example 1: nullable ignored field
-  final example1 = ValidExample1(name: 'John', password: 'secret123');
+  final example1 = const ValidExample1(name: 'John', password: 'secret123');
   final json1 = example1.toJson();
   print('Example 1 JSON: $json1'); // password not included
 
   // Example 2: ignored field with default value
-  final example2 = ValidExample2(name: 'Jane');
+  final example2 = const ValidExample2(name: 'Jane');
   final json2 = example2.toJson();
   print('Example 2 JSON: $json2'); // secret not included
   print('Example 2 secret: ${example2.secret}'); // but accessible in code

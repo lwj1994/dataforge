@@ -66,7 +66,7 @@ class SafeCasteUtil {
 
       // 8. DateTime 转换 (支持时间戳和 ISO-8601 字符串)
       if (<DateTime>[] is List<T>) {
-        return DefaultDateTimeConverter().fromJson(value) as T?;
+        return const DefaultDateTimeConverter().fromJson(value) as T?;
       }
       return null;
     } catch (e) {
@@ -85,10 +85,13 @@ class SafeCasteUtil {
 
   /// 从 Map 中读取必填值，转换失败或缺失则抛出异常
   static T readRequiredValue<T>(Map<String, dynamic> map, String key) {
-    final value = safeCast<T>(map[key]);
+    final rawValue = map[key];
+    final value = safeCast<T>(rawValue);
     if (value == null) {
+      final actualType = rawValue?.runtimeType ?? 'null';
       throw ArgumentError(
-          'Key "$key" is required and must be of type $T. Found: ${map[key]}');
+        'Required field "$key" must be of type $T, but received $actualType.',
+      );
     }
     return value;
   }
@@ -98,8 +101,13 @@ class SafeCasteUtil {
     T Function(Map<String, dynamic>) factory,
   ) {
     final res = readObject(value, factory);
-    if (res == null)
-      throw Exception("Required object of type $T is missing or invalid.");
+    if (res == null) {
+      final actualType = value?.runtimeType ?? 'null';
+      throw ArgumentError(
+        'Required object of type $T is missing or invalid. '
+        'Expected: Map<String, dynamic>, received: $actualType.',
+      );
+    }
     return res;
   }
 

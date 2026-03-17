@@ -13,7 +13,7 @@ class Dataforge {
   final bool deepCopyWith;
 
   const Dataforge({
-    this.name = "",
+    this.name = '',
     @Deprecated('Use includeFromJson and includeToJson instead') this.fromMap,
     this.includeFromJson,
     this.includeToJson,
@@ -69,7 +69,7 @@ class JsonKey {
   final Function? toJson;
 
   const JsonKey({
-    this.name = "",
+    this.name = '',
     this.alternateNames = const [],
     this.readValue,
     this.ignore = false,
