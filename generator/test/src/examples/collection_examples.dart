@@ -814,9 +814,12 @@ mixin _SetEnumExample {
       statuses:
           (SafeCasteUtil.readRequiredValue<List<dynamic>>(json, 'statuses')
               .map(
-                (e) => (SimpleStatus.values.firstWhere(
-                  (ev) => ev.name == e.toString(),
-                )),
+                (e) => (e is SimpleStatus
+                    ? e
+                    : (const DefaultEnumConverter<SimpleStatus>(
+                            SimpleStatus.values,
+                          ).fromJson(SafeCasteUtil.safeCast<String>(e)) ??
+                          SimpleStatus.values.first)),
               )
               .toSet()),
     );

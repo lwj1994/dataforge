@@ -443,7 +443,11 @@ mixin _IncludeIfNullExample {
       'IncludeIfNullExample(name: $name, description: $description, count: $count)';
 
   Map<String, dynamic> toJson() {
-    return {'name': name, 'description': description, 'count': count};
+    return {
+      'name': name,
+      'description': description,
+      if (count != null) 'count': count,
+    };
   }
 
   static IncludeIfNullExample fromJson(Map<String, dynamic> json) {

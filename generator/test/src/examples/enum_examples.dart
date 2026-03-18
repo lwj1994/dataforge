@@ -112,8 +112,12 @@ mixin _EnumListModel {
       statuses:
           (((SafeCasteUtil.safeCast<List<dynamic>>(json['statuses'])
               ?.map(
-                (e) =>
-                    (Status.values.firstWhere((ev) => ev.name == e.toString())),
+                (e) => (e is Status
+                    ? e
+                    : (const DefaultEnumConverter<Status>(
+                            Status.values,
+                          ).fromJson(SafeCasteUtil.safeCast<String>(e)) ??
+                          Status.values.first)),
               )
               .toList())) ??
           (const [])),
@@ -405,8 +409,12 @@ mixin _MultipleEnumsExample {
       statusHistory:
           (((SafeCasteUtil.safeCast<List<dynamic>>(json['statusHistory'])
               ?.map(
-                (e) =>
-                    (Status.values.firstWhere((ev) => ev.name == e.toString())),
+                (e) => (e is Status
+                    ? e
+                    : (const DefaultEnumConverter<Status>(
+                            Status.values,
+                          ).fromJson(SafeCasteUtil.safeCast<String>(e)) ??
+                          Status.values.first)),
               )
               .toList())) ??
           (const [])),

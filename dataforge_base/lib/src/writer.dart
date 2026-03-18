@@ -211,12 +211,12 @@ class GeneratorWriter {
     buffer.writeln("  @pragma('vm:prefer-inline')");
     buffer.writeln('  ${clazz.name}$genericParams copyWith({');
     for (final field in validFields) {
-      _writeParameter(buffer, field);
+      _writeParameter(buffer, field, clazz);
     }
     buffer.writeln('  }) {');
     buffer.writeln('    return ${clazz.name}(');
     for (final field in validFields) {
-      _writeAssignment(buffer, field, 'this');
+      _writeAssignment(buffer, field, 'this', clazz);
     }
     buffer.writeln('    );');
     buffer.writeln('  }');
@@ -231,7 +231,12 @@ class GeneratorWriter {
   /// For custom types, this method uses SafeCasteUtil.copyWithCast to catch
   /// type conversion errors and report them via DataforgeConfig.reportError.
   String _buildTypeCastExpression(
-      String variable, String type, String fieldName, ClassInfo? clazz) {
+    String variable,
+    String type,
+    String fieldName,
+    ClassInfo? clazz, {
+    String instanceReference = '_instance',
+  }) {
     final cleanType = type.replaceAll('?', '').trim();
     final isNullable = type.endsWith('?');
 
@@ -252,40 +257,40 @@ class GeneratorWriter {
     } else if (cleanType == 'double') {
       final prefix = clazz != null ? _getPrefix(clazz) : '';
       if (isNullable) {
-        return '${prefix}SafeCasteUtil.copyWithCastNullable<double>($variable, \'$fieldName\', _instance.$fieldName)';
+        return '${prefix}SafeCasteUtil.copyWithCastNullable<double>($variable, \'$fieldName\', $instanceReference.$fieldName)';
       } else {
-        return '${prefix}SafeCasteUtil.copyWithCast<double>($variable, \'$fieldName\', _instance.$fieldName)';
+        return '${prefix}SafeCasteUtil.copyWithCast<double>($variable, \'$fieldName\', $instanceReference.$fieldName)';
       }
     } else if (cleanType == 'int') {
       final prefix = clazz != null ? _getPrefix(clazz) : '';
       if (isNullable) {
-        return '${prefix}SafeCasteUtil.copyWithCastNullable<int>($variable, \'$fieldName\', _instance.$fieldName)';
+        return '${prefix}SafeCasteUtil.copyWithCastNullable<int>($variable, \'$fieldName\', $instanceReference.$fieldName)';
       } else {
-        return '${prefix}SafeCasteUtil.copyWithCast<int>($variable, \'$fieldName\', _instance.$fieldName)';
+        return '${prefix}SafeCasteUtil.copyWithCast<int>($variable, \'$fieldName\', $instanceReference.$fieldName)';
       }
     } else if (cleanType == 'String') {
       final prefix = clazz != null ? _getPrefix(clazz) : '';
       if (isNullable) {
-        return '${prefix}SafeCasteUtil.copyWithCastNullable<String>($variable, \'$fieldName\', _instance.$fieldName)';
+        return '${prefix}SafeCasteUtil.copyWithCastNullable<String>($variable, \'$fieldName\', $instanceReference.$fieldName)';
       } else {
-        return "${prefix}SafeCasteUtil.copyWithCast<String>($variable, '$fieldName', _instance.$fieldName)";
+        return "${prefix}SafeCasteUtil.copyWithCast<String>($variable, '$fieldName', $instanceReference.$fieldName)";
       }
     } else if (cleanType == 'bool') {
       final prefix = clazz != null ? _getPrefix(clazz) : '';
       if (isNullable) {
-        return '${prefix}SafeCasteUtil.copyWithCastNullable<bool>($variable, \'$fieldName\', _instance.$fieldName)';
+        return '${prefix}SafeCasteUtil.copyWithCastNullable<bool>($variable, \'$fieldName\', $instanceReference.$fieldName)';
       } else {
-        return '${prefix}SafeCasteUtil.copyWithCast<bool>($variable, \'$fieldName\', _instance.$fieldName)';
+        return '${prefix}SafeCasteUtil.copyWithCast<bool>($variable, \'$fieldName\', $instanceReference.$fieldName)';
       }
     } else {
       // For custom types, use SafeCasteUtil.copyWithCast to catch and report errors
       final prefix = clazz != null ? _getPrefix(clazz) : '';
       if (isNullable) {
-        return '${prefix}SafeCasteUtil.copyWithCastNullable<$cleanType>($variable, \'$fieldName\', _instance.$fieldName)';
+        return '${prefix}SafeCasteUtil.copyWithCastNullable<$cleanType>($variable, \'$fieldName\', $instanceReference.$fieldName)';
       } else {
         // For non-nullable custom types, use copyWithCast and provide fallback
         // We use _instance.$fieldName as the default value to return if casting fails
-        return '${prefix}SafeCasteUtil.copyWithCast<$cleanType>($variable, \'$fieldName\', _instance.$fieldName)';
+        return '${prefix}SafeCasteUtil.copyWithCast<$cleanType>($variable, \'$fieldName\', $instanceReference.$fieldName)';
       }
     }
   }
@@ -396,12 +401,37 @@ class GeneratorWriter {
     return result.classes.firstWhereOrNull((c) => c.name == baseName);
   }
 
-  void _writeParameter(StringBuffer buffer, FieldInfo field) {
-    final type = field.type.endsWith('?') ? field.type : '${field.type}?';
-    buffer.writeln('    $type ${field.name},');
+  void _writeParameter(StringBuffer buffer, FieldInfo field, ClassInfo clazz) {
+    if (field.type.endsWith('?')) {
+      buffer.writeln(
+        '    Object? ${field.name} = ${_getPrefix(clazz)}dataforgeUndefined,',
+      );
+      return;
+    }
+
+    buffer.writeln('    ${field.type}? ${field.name},');
   }
 
-  void _writeAssignment(StringBuffer buffer, FieldInfo field, String instance) {
+  void _writeAssignment(
+    StringBuffer buffer,
+    FieldInfo field,
+    String instance,
+    ClassInfo clazz,
+  ) {
+    if (field.type.endsWith('?')) {
+      final castExpression = _buildTypeCastExpression(
+        field.name,
+        field.type,
+        field.name,
+        clazz,
+        instanceReference: instance,
+      );
+      buffer.writeln(
+        '      ${field.name}: (${field.name} == ${_getPrefix(clazz)}dataforgeUndefined ? $instance.${field.name} : $castExpression),',
+      );
+      return;
+    }
+
     buffer.writeln(
       '      ${field.name}: (${field.name} ?? $instance.${field.name}),',
     );
@@ -508,6 +538,25 @@ class GeneratorWriter {
     buffer.writeln();
   }
 
+  String _buildEnumValueExpression(
+    ClassInfo clazz,
+    String enumType,
+    String valueExpression, {
+    required bool isNullable,
+  }) {
+    final prefix = _getPrefix(clazz);
+    final converter =
+        'const ${prefix}DefaultEnumConverter<$enumType>($enumType.values)';
+    final safeString =
+        '${prefix}SafeCasteUtil.safeCast<String>($valueExpression)';
+
+    if (isNullable) {
+      return '($valueExpression is $enumType ? $valueExpression : $converter.fromJson($safeString))';
+    }
+
+    return '($valueExpression is $enumType ? $valueExpression : ($converter.fromJson($safeString) ?? $enumType.values.first))';
+  }
+
   void _buildToJson(
     StringBuffer buffer,
     ClassInfo clazz,
@@ -608,7 +657,12 @@ class GeneratorWriter {
         valueAccess = field.name;
       }
 
-      buffer.writeln('      \'$jsonKey\': $valueAccess,');
+      if (jsonKeyInfo?.includeIfNull == false && isNullable) {
+        buffer.writeln(
+            "      if (${field.name} != null) '$jsonKey': $valueAccess,");
+      } else {
+        buffer.writeln('      \'$jsonKey\': $valueAccess,');
+      }
     }
 
     buffer.writeln('    };');
@@ -732,18 +786,29 @@ class GeneratorWriter {
               '($conversion ?? DateTime.fromMillisecondsSinceEpoch(0))';
         }
       } else if (field.isEnum) {
-        String stringValueExpr;
-        if (jsonKeyInfo == null ||
-            (jsonKeyInfo.readValue.isEmpty &&
-                jsonKeyInfo.alternateNames.isEmpty)) {
-          stringValueExpr =
-              "${_getPrefix(clazz)}SafeCasteUtil.readValue<String>(json, '$jsonKey')";
+        if (jsonKeyInfo != null && jsonKeyInfo.readValue.isNotEmpty) {
+          final enumValueConversion = _buildEnumValueExpression(
+            clazz,
+            cleanType,
+            'v',
+            isNullable: isNullable,
+          );
+          conversion =
+              '((dynamic v) => $enumValueConversion)($valueExpression)';
         } else {
-          stringValueExpr =
-              '${_getPrefix(clazz)}SafeCasteUtil.safeCast<String>($valueExpression)';
+          String stringValueExpr;
+          if (jsonKeyInfo == null ||
+              (jsonKeyInfo.readValue.isEmpty &&
+                  jsonKeyInfo.alternateNames.isEmpty)) {
+            stringValueExpr =
+                "${_getPrefix(clazz)}SafeCasteUtil.readValue<String>(json, '$jsonKey')";
+          } else {
+            stringValueExpr =
+                '${_getPrefix(clazz)}SafeCasteUtil.safeCast<String>($valueExpression)';
+          }
+          conversion =
+              '${_getPrefix(clazz)}DefaultEnumConverter($cleanType.values).fromJson($stringValueExpr)';
         }
-        conversion =
-            '${_getPrefix(clazz)}DefaultEnumConverter($cleanType.values).fromJson($stringValueExpr)';
         if (field.defaultValue.isNotEmpty) {
           conversion = '(($conversion) ?? (${field.defaultValue}))';
         } else if (!isNullable) {
@@ -849,14 +914,13 @@ class GeneratorWriter {
                 : '($listExpr.cast<$innerType>())');
           }
         } else if (field.isInnerEnum) {
-          String mapLogic;
-          if (innerType.endsWith('?')) {
-            mapLogic =
-                '.map((e) => ( e == null ? null : $innerTypeClean.values.firstWhere((ev) => ev.name == e.toString()) )).toList()';
-          } else {
-            mapLogic =
-                '.map((e) => ($innerTypeClean.values.firstWhere((ev) => ev.name == e.toString()))).toList()';
-          }
+          final elementConversion = _buildEnumValueExpression(
+            clazz,
+            innerTypeClean,
+            'e',
+            isNullable: innerType.endsWith('?'),
+          );
+          final mapLogic = '.map((e) => $elementConversion).toList()';
           conversion = (isListExprNullable
               ? '(($listExpr?$mapLogic))'
               : '($listExpr$mapLogic)');
@@ -974,14 +1038,13 @@ class GeneratorWriter {
                 : '($setExpr.cast<$innerType>().toSet())');
           }
         } else if (field.isInnerEnum) {
-          String mapLogic;
-          if (innerType.endsWith('?')) {
-            mapLogic =
-                '.map((e) => (e == null ? null : $innerTypeClean.values.firstWhere((ev) => ev.name == e.toString()))).toSet()';
-          } else {
-            mapLogic =
-                '.map((e) => ($innerTypeClean.values.firstWhere((ev) => ev.name == e.toString()))).toSet()';
-          }
+          final elementConversion = _buildEnumValueExpression(
+            clazz,
+            innerTypeClean,
+            'e',
+            isNullable: innerType.endsWith('?'),
+          );
+          final mapLogic = '.map((e) => $elementConversion).toSet()';
           conversion = (isSetExprNullable
               ? '(($setExpr?$mapLogic))'
               : '($setExpr$mapLogic)');
@@ -1081,9 +1144,14 @@ class GeneratorWriter {
                 '${_getPrefix(clazz)}SafeCasteUtil.safeCast<Map<String, dynamic>>($valueExpression)';
           }
 
-          final safeCastExpr = innerType.endsWith('?')
-              ? '.map((k, v) => MapEntry(k.toString(), (v == null ? null : $innerTypeClean.values.firstWhere((ev) => ev.name == v.toString()))))'
-              : '.map((k, v) => MapEntry(k.toString(), ($innerTypeClean.values.firstWhere((ev) => ev.name == v.toString()))))';
+          final valueConversion = _buildEnumValueExpression(
+            clazz,
+            innerTypeClean,
+            'v',
+            isNullable: innerType.endsWith('?'),
+          );
+          final safeCastExpr =
+              '.map((k, v) => MapEntry(k.toString(), $valueConversion))';
 
           conversion = (isMapExprNullable
               ? '($mapExpr?$safeCastExpr)'
