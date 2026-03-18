@@ -450,7 +450,61 @@ void main() {
         final output = writer.generate();
 
         expect(output, contains('abstract final String? nickname;'));
-        expect(output, contains('String? nickname,'));
+        expect(output, contains('Object? nickname = dataforgeUndefined,'));
+        expect(
+          output,
+          contains(
+            "nickname: (nickname == dataforgeUndefined ? this.nickname : SafeCasteUtil.copyWithCastNullable<String>(nickname, 'nickname', this.nickname)),",
+          ),
+        );
+      });
+
+      test('omits null values from toJson when includeIfNull is false', () {
+        final result = ParseResult(
+          '',
+          'test',
+          [
+            const ClassInfo(
+              name: 'User',
+              mixinName: '_\$User',
+              fields: [
+                FieldInfo(
+                  name: 'name',
+                  type: 'String',
+                  isFinal: true,
+                  isFunction: false,
+                  isRecord: false,
+                  defaultValue: '',
+                ),
+                FieldInfo(
+                  name: 'nickname',
+                  type: 'String?',
+                  isFinal: true,
+                  isFunction: false,
+                  isRecord: false,
+                  defaultValue: '',
+                  jsonKey: JsonKeyInfo(
+                    name: '',
+                    alternateNames: [],
+                    readValue: '',
+                    ignore: false,
+                    converter: '',
+                    includeIfNull: false,
+                  ),
+                ),
+              ],
+              includeToJson: true,
+              deepCopyWith: false,
+            ),
+          ],
+          [],
+        );
+
+        final writer = GeneratorWriter(result);
+        final output = writer.generate();
+
+        expect(output, contains("'name': name,"));
+        expect(output, contains("if (nickname != null) 'nickname': nickname,"));
       });
 
       test('handles generic parameters', () {
@@ -650,6 +704,111 @@ void main() {
             contains(
                 "SafeCasteUtil.readRequiredValue<List<dynamic>>(json, 'tags')"));
         expect(output, contains('.toSet()'));
+      });
+
+      test('uses enum converters for enum collections instead of firstWhere',
+          () {
+        final result = ParseResult(
+          '',
+          'test',
+          [
+            const ClassInfo(
+              name: 'User',
+              mixinName: '_\$User',
+              fields: [
+                FieldInfo(
+                  name: 'statuses',
+                  type: 'List<Status>',
+                  isFinal: true,
+                  isFunction: false,
+                  isRecord: false,
+                  defaultValue: '',
+                  isInnerEnum: true,
+                ),
+                FieldInfo(
+                  name: 'statusSet',
+                  type: 'Set<Status>',
+                  isFinal: true,
+                  isFunction: false,
+                  isRecord: false,
+                  defaultValue: '',
+                  isInnerEnum: true,
+                  isRequired: true,
+                ),
+                FieldInfo(
+                  name: 'statusMap',
+                  type: 'Map<String, Status>',
+                  isFinal: true,
+                  isFunction: false,
+                  isRecord: false,
+                  defaultValue: '',
+                  isInnerEnum: true,
+                ),
+              ],
+              deepCopyWith: false,
+            ),
+          ],
+          [],
+        );
+
+        final writer = GeneratorWriter(result);
+        final output = writer.generate();
+
+        expect(output, isNot(contains('firstWhere((ev) => ev.name ==')));
+        expect(
+          output,
+          contains(
+            'e is Status ? e : (const DefaultEnumConverter<Status>(Status.values).fromJson(SafeCasteUtil.safeCast<String>(e)) ?? Status.values.first)',
+          ),
+        );
+        expect(
+          output,
+          contains(
+            'v is Status ? v : (const DefaultEnumConverter<Status>(Status.values).fromJson(SafeCasteUtil.safeCast<String>(v)) ?? Status.values.first)',
+          ),
+        );
+      });
+
+      test('accepts enum instances returned by readValue for enum fields', () {
+        final result = ParseResult(
+          '',
+          'test',
+          [
+            const ClassInfo(
+              name: 'User',
+              mixinName: '_\$User',
+              fields: [
+                FieldInfo(
+                  name: 'status',
+                  type: 'Status?',
+                  isFinal: true,
+                  isFunction: false,
+                  isRecord: false,
+                  defaultValue: '',
+                  isEnum: true,
+                  jsonKey: JsonKeyInfo(
+                    name: '',
+                    alternateNames: [],
+                    readValue: 'readStatus',
+                    ignore: false,
+                  ),
+                ),
+              ],
+              deepCopyWith: false,
+            ),
+          ],
+          [],
+        );
+
+        final writer = GeneratorWriter(result);
+        final output = writer.generate();
+
+        expect(
+          output,
+          contains(
+            "status: ((dynamic v) => (v is Status ? v : const DefaultEnumConverter<Status>(Status.values).fromJson(SafeCasteUtil.safeCast<String>(v))))(readStatus(json, 'status'))",
+          ),
+        );
       });
 
       test('uses JsonKey name for JSON keys', () {

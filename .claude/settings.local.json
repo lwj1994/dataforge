@@ -10,7 +10,10 @@
       "Bash(git commit:*)",
       "Bash(git tag:*)",
       "Bash(git push:*)",
-      "Bash(dart pub publish:*)"
+      "Bash(dart pub publish:*)",
+      "Bash(tree:*)",
+      "Bash(grep:*)",
+      "Bash(find /Volumes/mac-ext-ssd/document/GitHub/dataforge -type f -name \"pubspec.yaml\" -exec sh -c 'echo \"\"=== {} ===\"\"; grep -A5 \"\"dev_dependencies:\"\" \"\"$1\"\"' _ {} ;)"
     ]
   }
 }
