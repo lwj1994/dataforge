@@ -5,6 +5,7 @@ import 'circular_dependency_detector.dart';
 import 'exceptions.dart';
 import 'logger.dart';
 import 'model.dart';
+import 'type_utils.dart';
 
 /// Code writer for generating data class code
 ///
@@ -22,70 +23,8 @@ class GeneratorWriter {
   String _getPrefix(ClassInfo clazz) =>
       clazz.dataforgePrefix != null ? '${clazz.dataforgePrefix}.' : '';
 
-  List<String> _splitTopLevelTypeArguments(String typeArguments) {
-    final parts = <String>[];
-    var current = StringBuffer();
-    int genericDepth = 0;
-    int parenDepth = 0;
-    int braceDepth = 0;
-    int bracketDepth = 0;
-
-    for (final char in typeArguments.split('')) {
-      switch (char) {
-        case '<':
-          genericDepth++;
-          current.write(char);
-          break;
-        case '>':
-          genericDepth--;
-          current.write(char);
-          break;
-        case '(':
-          parenDepth++;
-          current.write(char);
-          break;
-        case ')':
-          parenDepth--;
-          current.write(char);
-          break;
-        case '{':
-          braceDepth++;
-          current.write(char);
-          break;
-        case '}':
-          braceDepth--;
-          current.write(char);
-          break;
-        case '[':
-          bracketDepth++;
-          current.write(char);
-          break;
-        case ']':
-          bracketDepth--;
-          current.write(char);
-          break;
-        case ',':
-          if (genericDepth == 0 &&
-              parenDepth == 0 &&
-              braceDepth == 0 &&
-              bracketDepth == 0) {
-            parts.add(current.toString().trim());
-            current = StringBuffer();
-          } else {
-            current.write(char);
-          }
-          break;
-        default:
-          current.write(char);
-      }
-    }
-
-    if (current.length > 0) {
-      parts.add(current.toString().trim());
-    }
-
-    return parts;
-  }
+  List<String> _splitTopLevelTypeArguments(String typeArguments) =>
+      TypeUtils.splitTopLevelTypeArguments(typeArguments);
 
   /// Generate the complete code output
   String generate() {
@@ -224,12 +163,9 @@ class GeneratorWriter {
 
   /// Build a type cast expression for copyWith method
   ///
-  /// For non-nullable primitive types (String, int, double, bool), this method
-  /// provides fallback default values when null is passed, instead of directly
-  /// casting which would cause runtime errors.
-  ///
-  /// For custom types, this method uses SafeCasteUtil.copyWithCast to catch
-  /// type conversion errors and report them via DataforgeConfig.reportError.
+  /// All types use SafeCasteUtil.copyWithCast/copyWithCastNullable for safe
+  /// casting with error reporting via DataforgeConfig.reportCopyWithError.
+  /// List and Map types use direct .cast<>() operations instead.
   String _buildTypeCastExpression(
     String variable,
     String type,
@@ -437,7 +373,7 @@ class GeneratorWriter {
     );
   }
 
-  /// Check if a field type is a collection type (List or Map)
+  /// Check if a field type is a collection type (List, Set, or Map)
   bool _isCollectionType(String type) {
     final cleanType = type.replaceAll('?', '').trim();
     return cleanType.startsWith('List<') ||
@@ -768,7 +704,7 @@ class GeneratorWriter {
           conversion = '($conversion ?? $defaultValue)';
         }
       } else if (field.isDateTime || cleanType == 'DateTime') {
-        // DateTime 是基本类型，统一使用 readValue + 兜底值，不使用 readRequiredValue
+        // DateTime is treated as a basic type: always use readValue with a fallback default, never readRequiredValue
         if (jsonKeyInfo == null ||
             (jsonKeyInfo.readValue.isEmpty &&
                 jsonKeyInfo.alternateNames.isEmpty)) {
@@ -836,7 +772,7 @@ class GeneratorWriter {
             (jsonKeyInfo.readValue.isEmpty &&
                 jsonKeyInfo.alternateNames.isEmpty)) {
           if (field.isInnerDataforge) {
-            // readObjectList 内部已处理类型转换，无需外层 safeCast
+            // readObjectList handles type conversion internally, no outer safeCast needed
             listExpr = "json['$jsonKey']";
             isListExprNullable = true;
           } else if (field.isInnerEnum) {
@@ -855,7 +791,7 @@ class GeneratorWriter {
           }
         } else {
           if (field.isInnerDataforge) {
-            // readObjectList 内部已处理类型转换，无需外层 safeCast
+            // readObjectList handles type conversion internally, no outer safeCast needed
             listExpr = valueExpression;
           } else {
             final safeCastType =

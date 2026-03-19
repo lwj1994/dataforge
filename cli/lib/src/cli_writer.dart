@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:dataforge_base/src/model.dart';
+import 'package:dataforge_base/src/type_utils.dart';
 import 'package:dataforge_base/src/writer.dart';
 
 class CliWriter {
@@ -231,82 +232,11 @@ class CliWriter {
     return buffer.toString();
   }
 
-  String _extractLastTypeArgument(String type) {
-    final genericStart = type.indexOf('<');
-    final genericEnd = type.lastIndexOf('>');
-    if (genericStart == -1 || genericEnd == -1 || genericEnd <= genericStart) {
-      return type;
-    }
+  String _extractLastTypeArgument(String type) =>
+      TypeUtils.extractLastTypeArgument(type);
 
-    final typeArguments = type.substring(genericStart + 1, genericEnd);
-    final parts = _splitTopLevelTypeArguments(typeArguments);
-    return parts.isEmpty ? typeArguments : parts.last;
-  }
-
-  List<String> _splitTopLevelTypeArguments(String typeArguments) {
-    final parts = <String>[];
-    var current = StringBuffer();
-    int genericDepth = 0;
-    int parenDepth = 0;
-    int braceDepth = 0;
-    int bracketDepth = 0;
-
-    for (final char in typeArguments.split('')) {
-      switch (char) {
-        case '<':
-          genericDepth++;
-          current.write(char);
-          break;
-        case '>':
-          genericDepth--;
-          current.write(char);
-          break;
-        case '(':
-          parenDepth++;
-          current.write(char);
-          break;
-        case ')':
-          parenDepth--;
-          current.write(char);
-          break;
-        case '{':
-          braceDepth++;
-          current.write(char);
-          break;
-        case '}':
-          braceDepth--;
-          current.write(char);
-          break;
-        case '[':
-          bracketDepth++;
-          current.write(char);
-          break;
-        case ']':
-          bracketDepth--;
-          current.write(char);
-          break;
-        case ',':
-          if (genericDepth == 0 &&
-              parenDepth == 0 &&
-              braceDepth == 0 &&
-              bracketDepth == 0) {
-            parts.add(current.toString().trim());
-            current = StringBuffer();
-          } else {
-            current.write(char);
-          }
-          break;
-        default:
-          current.write(char);
-      }
-    }
-
-    if (current.length > 0) {
-      parts.add(current.toString().trim());
-    }
-
-    return parts;
-  }
+  List<String> _splitTopLevelTypeArguments(String typeArguments) =>
+      TypeUtils.splitTopLevelTypeArguments(typeArguments);
 
   /// Process original files asynchronously
   Future<void> _processOriginalFilesAsync() async {

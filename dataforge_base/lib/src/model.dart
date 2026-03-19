@@ -14,7 +14,7 @@ class ImportInfo {
     this.isDeferred = false,
     this.showCombinators = const [],
     this.hideCombinators = const [],
-  });
+  }) : assert(uri != '', 'ImportInfo.uri must not be empty');
 
   @override
   String toString() {
@@ -67,13 +67,34 @@ class ParseResult {
   String toString() {
     return 'ParseResult{outputPath: $outputPath, partOf: $partOf, classes: $classes, imports: $imports}';
   }
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+    return other is ParseResult &&
+        other.outputPath == outputPath &&
+        other.partOf == partOf &&
+        const DeepCollectionEquality().equals(other.classes, classes) &&
+        const DeepCollectionEquality().equals(other.imports, imports) &&
+        other.primaryClassName == primaryClassName;
+  }
+
+  @override
+  int get hashCode => Object.hashAll([
+        outputPath,
+        partOf,
+        const DeepCollectionEquality().hash(classes),
+        const DeepCollectionEquality().hash(imports),
+        primaryClassName,
+      ]);
 }
 
 class GenericParameter {
   final String name;
   final String? bound;
 
-  const GenericParameter(this.name, [this.bound]);
+  const GenericParameter(this.name, [this.bound])
+      : assert(name != '', 'GenericParameter.name must not be empty');
 
   @override
   String toString() => bound != null ? '$name extends $bound' : name;
@@ -109,7 +130,8 @@ class ClassInfo {
     this.genericParameters = const [],
     this.deepCopyWith = true,
     this.dataforgePrefix,
-  });
+  })  : assert(name != '', 'ClassInfo.name must not be empty'),
+        assert(mixinName != '', 'ClassInfo.mixinName must not be empty');
 
   ClassInfo copyWith({
     String? name,
@@ -241,7 +263,12 @@ class FieldInfo {
     this.isRequired = false,
     this.isInnerEnum = false,
     this.isInnerDataforge = false,
-  });
+  })  : assert(name != '', 'FieldInfo.name must not be empty'),
+        assert(type != '', 'FieldInfo.type must not be empty'),
+        assert(!(isEnum && isDataforge),
+            'FieldInfo cannot be both enum and dataforge'),
+        assert(!(isInnerEnum && isInnerDataforge),
+            'FieldInfo cannot have both innerEnum and innerDataforge');
 
   FieldInfo copyWith({
     String? name,

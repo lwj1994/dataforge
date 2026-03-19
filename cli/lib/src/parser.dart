@@ -7,12 +7,13 @@ import 'package:collection/collection.dart';
 import 'package:path/path.dart' as p;
 
 import 'package:dataforge_base/src/model.dart';
+import 'package:dataforge_base/src/type_utils.dart';
 
-/// Parse Dart files and extract DataClass annotation information
+/// Parse Dart files and extract Dataforge annotation information
 ///
 /// This class is responsible for:
 /// - Parsing Dart source code AST
-/// - Extracting @DataClass and @JsonKey annotations
+/// - Extracting @Dataforge (and legacy @DataClass) and @JsonKey annotations
 /// - Building class information models
 ///
 /// Usage example:
@@ -78,7 +79,6 @@ class Parser {
       return null;
     }
 
-    // Parsing file silently
     final classes = <ClassInfo>[];
     final imports = <ImportInfo>[];
     final unit = parseRes.unit;
@@ -150,7 +150,6 @@ class Parser {
 
         final fields = <FieldInfo>[];
         final defaultValueMap = <String, String>{};
-        // Found class silently
 
         bool? fromMap;
         bool? includeFromJson;
@@ -202,13 +201,9 @@ class Parser {
                 mixinName =
                     expressionSource.replaceAll('"', '').replaceAll("'", '');
                 break;
-              // fromMapName and toMapName are no longer supported
-              // Methods are now fixed as 'fromJson' and 'toJson'
             }
           }
         }
-
-        // Method names are now fixed as 'fromJson' and 'toJson'
 
         // Parse default values and required status of constructor parameters
         final requiredParams = <String>{};
@@ -498,7 +493,7 @@ class Parser {
 
   /// Determine whether an inner type is an enum
   bool _isInnerEnum(String type) {
-    return false; // Will be refined in CliWriter
+    return false; // Always false here; enum detection is handled by CliWriter at code generation time
   }
 
   /// Determine whether an inner type is a Dataforge object
@@ -519,82 +514,11 @@ class Parser {
     return !primitives.contains(inner);
   }
 
-  String _extractLastTypeArgument(String type) {
-    final genericStart = type.indexOf('<');
-    final genericEnd = type.lastIndexOf('>');
-    if (genericStart == -1 || genericEnd == -1 || genericEnd <= genericStart) {
-      return type;
-    }
+  String _extractLastTypeArgument(String type) =>
+      TypeUtils.extractLastTypeArgument(type);
 
-    final typeArguments = type.substring(genericStart + 1, genericEnd);
-    final parts = _splitTopLevelTypeArguments(typeArguments);
-    return parts.isEmpty ? typeArguments : parts.last;
-  }
-
-  List<String> _splitTopLevelTypeArguments(String typeArguments) {
-    final parts = <String>[];
-    var current = StringBuffer();
-    int genericDepth = 0;
-    int parenDepth = 0;
-    int braceDepth = 0;
-    int bracketDepth = 0;
-
-    for (final char in typeArguments.split('')) {
-      switch (char) {
-        case '<':
-          genericDepth++;
-          current.write(char);
-          break;
-        case '>':
-          genericDepth--;
-          current.write(char);
-          break;
-        case '(':
-          parenDepth++;
-          current.write(char);
-          break;
-        case ')':
-          parenDepth--;
-          current.write(char);
-          break;
-        case '{':
-          braceDepth++;
-          current.write(char);
-          break;
-        case '}':
-          braceDepth--;
-          current.write(char);
-          break;
-        case '[':
-          bracketDepth++;
-          current.write(char);
-          break;
-        case ']':
-          bracketDepth--;
-          current.write(char);
-          break;
-        case ',':
-          if (genericDepth == 0 &&
-              parenDepth == 0 &&
-              braceDepth == 0 &&
-              bracketDepth == 0) {
-            parts.add(current.toString().trim());
-            current = StringBuffer();
-          } else {
-            current.write(char);
-          }
-          break;
-        default:
-          current.write(char);
-      }
-    }
-
-    if (current.length > 0) {
-      parts.add(current.toString().trim());
-    }
-
-    return parts;
-  }
+  List<String> _splitTopLevelTypeArguments(String typeArguments) =>
+      TypeUtils.splitTopLevelTypeArguments(typeArguments);
 
   bool _isStaticMethod(CompilationUnitMember member, String methodName) {
     if (member is! ClassDeclaration && member is! MixinDeclaration) {

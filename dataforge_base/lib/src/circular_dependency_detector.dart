@@ -2,6 +2,7 @@
 // Circular dependency detection for Dataforge classes
 
 import 'model.dart';
+import 'type_utils.dart';
 
 /// Detects circular dependencies between Dataforge classes
 class CircularDependencyDetector {
@@ -152,70 +153,8 @@ class CircularDependencyDetector {
     return null;
   }
 
-  List<String> _splitTopLevelTypeArguments(String typeArguments) {
-    final parts = <String>[];
-    var current = StringBuffer();
-    int genericDepth = 0;
-    int parenDepth = 0;
-    int braceDepth = 0;
-    int bracketDepth = 0;
-
-    for (final char in typeArguments.split('')) {
-      switch (char) {
-        case '<':
-          genericDepth++;
-          current.write(char);
-          break;
-        case '>':
-          genericDepth--;
-          current.write(char);
-          break;
-        case '(':
-          parenDepth++;
-          current.write(char);
-          break;
-        case ')':
-          parenDepth--;
-          current.write(char);
-          break;
-        case '{':
-          braceDepth++;
-          current.write(char);
-          break;
-        case '}':
-          braceDepth--;
-          current.write(char);
-          break;
-        case '[':
-          bracketDepth++;
-          current.write(char);
-          break;
-        case ']':
-          bracketDepth--;
-          current.write(char);
-          break;
-        case ',':
-          if (genericDepth == 0 &&
-              parenDepth == 0 &&
-              braceDepth == 0 &&
-              bracketDepth == 0) {
-            parts.add(current.toString().trim());
-            current = StringBuffer();
-          } else {
-            current.write(char);
-          }
-          break;
-        default:
-          current.write(char);
-      }
-    }
-
-    if (current.length > 0) {
-      parts.add(current.toString().trim());
-    }
-
-    return parts;
-  }
+  List<String> _splitTopLevelTypeArguments(String typeArguments) =>
+      TypeUtils.splitTopLevelTypeArguments(typeArguments);
 
   /// Generates a user-friendly warning message for detected cycles
   static String formatCycleWarning(List<List<String>> cycles) {

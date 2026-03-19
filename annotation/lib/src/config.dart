@@ -1,6 +1,6 @@
 /// Global configuration for Dataforge.
 ///
-/// Use [Dataforge.init] to configure error handling and other global settings.
+/// Set [copyWithErrorCallback] to handle type conversion errors in copyWith.
 class DataforgeConfig {
   static DataforgeCopyWithErrorCallback? copyWithErrorCallback;
 
