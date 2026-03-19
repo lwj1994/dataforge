@@ -188,4 +188,100 @@ class SafeCasteUtil {
       return originalValue;
     }
   }
+
+  /// Safely cast a copyWith input to a typed List.
+  static List<T> copyWithCastList<T>(
+    Object? value,
+    String fieldName,
+    List<T> defaultValue,
+  ) {
+    final res = copyWithCastNullableList<T>(value, fieldName, defaultValue);
+    return res ?? defaultValue;
+  }
+
+  /// Safely cast a nullable copyWith input to a typed List.
+  static List<T>? copyWithCastNullableList<T>(
+    Object? value,
+    String fieldName, [
+    List<T>? originalValue,
+  ]) {
+    if (value == dataforgeUndefined) return originalValue;
+    if (value == null) return null;
+    try {
+      return (value as List).cast<T>();
+    } catch (e, s) {
+      DataforgeConfig.reportCopyWithError(
+        fieldName,
+        'List<$T>',
+        value,
+        e,
+        s,
+      );
+      return originalValue;
+    }
+  }
+
+  /// Safely cast a copyWith input to a typed Set.
+  static Set<T> copyWithCastSet<T>(
+    Object? value,
+    String fieldName,
+    Set<T> defaultValue,
+  ) {
+    final res = copyWithCastNullableSet<T>(value, fieldName, defaultValue);
+    return res ?? defaultValue;
+  }
+
+  /// Safely cast a nullable copyWith input to a typed Set.
+  static Set<T>? copyWithCastNullableSet<T>(
+    Object? value,
+    String fieldName, [
+    Set<T>? originalValue,
+  ]) {
+    if (value == dataforgeUndefined) return originalValue;
+    if (value == null) return null;
+    try {
+      return (value as Set).cast<T>();
+    } catch (e, s) {
+      DataforgeConfig.reportCopyWithError(
+        fieldName,
+        'Set<$T>',
+        value,
+        e,
+        s,
+      );
+      return originalValue;
+    }
+  }
+
+  /// Safely cast a copyWith input to a typed Map.
+  static Map<K, V> copyWithCastMap<K, V>(
+    Object? value,
+    String fieldName,
+    Map<K, V> defaultValue,
+  ) {
+    final res = copyWithCastNullableMap<K, V>(value, fieldName, defaultValue);
+    return res ?? defaultValue;
+  }
+
+  /// Safely cast a nullable copyWith input to a typed Map.
+  static Map<K, V>? copyWithCastNullableMap<K, V>(
+    Object? value,
+    String fieldName, [
+    Map<K, V>? originalValue,
+  ]) {
+    if (value == dataforgeUndefined) return originalValue;
+    if (value == null) return null;
+    try {
+      return (value as Map).cast<K, V>();
+    } catch (e, s) {
+      DataforgeConfig.reportCopyWithError(
+        fieldName,
+        'Map<$K, $V>',
+        value,
+        e,
+        s,
+      );
+      return originalValue;
+    }
+  }
 }

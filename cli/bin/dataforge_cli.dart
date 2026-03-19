@@ -50,38 +50,50 @@ Future<void> main(List<String> args) async {
   // Show loading indicator
   print('🔨 Generating code');
 
-  if (path.isEmpty) {
-    if (debugMode) {
-      print(
-          '\n[DEBUG] ${DateTime.now()}: Path is empty, generating for lib and test directories');
-      print('[DEBUG] ${DateTime.now()}: Starting generate(\'lib\')');
-    }
-    final libFiles = await generate('lib', debugMode: debugMode);
-    if (debugMode) {
-      print(
-          '[DEBUG] ${DateTime.now()}: generate(\'lib\') completed, found ${libFiles.length} files');
-    }
-    generatedFiles.addAll(libFiles);
+  try {
+    if (path.isEmpty) {
+      if (debugMode) {
+        print(
+            '\n[DEBUG] ${DateTime.now()}: Path is empty, generating for lib and test directories');
+      }
 
-    if (debugMode) {
-      print('[DEBUG] ${DateTime.now()}: Starting generate(\'test\')');
+      for (final defaultPath in const ['lib', 'test']) {
+        if (!Directory(defaultPath).existsSync()) {
+          if (debugMode) {
+            print(
+                '[DEBUG] ${DateTime.now()}: Skipping missing default path: $defaultPath');
+          }
+          continue;
+        }
+
+        if (debugMode) {
+          print('[DEBUG] ${DateTime.now()}: Starting generate(\'$defaultPath\')');
+        }
+        final files = await generate(defaultPath, debugMode: debugMode);
+        if (debugMode) {
+          print(
+              '[DEBUG] ${DateTime.now()}: generate(\'$defaultPath\') completed, found ${files.length} files');
+        }
+        generatedFiles.addAll(files);
+      }
+    } else {
+      if (debugMode) {
+        print('\n[DEBUG] ${DateTime.now()}: Starting generate(\'$path\')');
+      }
+      final pathFiles = await generate(path, debugMode: debugMode);
+      if (debugMode) {
+        print(
+            '[DEBUG] ${DateTime.now()}: generate(\'$path\') completed, found ${pathFiles.length} files');
+      }
+      generatedFiles.addAll(pathFiles);
     }
-    final testFiles = await generate('test', debugMode: debugMode);
+  } catch (e, s) {
+    exitCode = 1;
+    stderr.writeln('\n❌ Generation failed: $e');
     if (debugMode) {
-      print(
-          '[DEBUG] ${DateTime.now()}: generate(\'test\') completed, found ${testFiles.length} files');
+      stderr.writeln(s);
     }
-    generatedFiles.addAll(testFiles);
-  } else {
-    if (debugMode) {
-      print('\n[DEBUG] ${DateTime.now()}: Starting generate(\'$path\')');
-    }
-    final pathFiles = await generate(path, debugMode: debugMode);
-    if (debugMode) {
-      print(
-          '[DEBUG] ${DateTime.now()}: generate(\'$path\') completed, found ${pathFiles.length} files');
-    }
-    generatedFiles.addAll(pathFiles);
+    return;
   }
 
   if (debugMode) {

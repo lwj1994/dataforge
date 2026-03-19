@@ -15,17 +15,22 @@ Future<List<String>> generate(String path, {bool debugMode = false}) async {
 
   // Convert relative path to absolute path to ensure consistent behavior
   // regardless of the working directory from which the command is run
-  final absolutePath =
-      p.isAbsolute(path) ? path : p.join(Directory.current.path, path);
+  final absolutePath = p.normalize(p.absolute(path));
   if (debugMode) {
     print('[DEBUG] ${DateTime.now()}: Resolved absolute path: "$absolutePath"');
   }
 
   final generatedFiles = <String>[];
   final entity = FileSystemEntity.typeSync(absolutePath);
+  if (entity == FileSystemEntityType.notFound) {
+    throw FileSystemException('Path does not exist', absolutePath);
+  }
+
   final isDirectory = entity == FileSystemEntityType.directory;
+  final projectRoot = _inferProjectRoot(absolutePath, entity);
   if (debugMode) {
     print('[DEBUG] ${DateTime.now()}: Path is directory: $isDirectory');
+    print('[DEBUG] ${DateTime.now()}: Inferred project root: $projectRoot');
   }
 
   if (isDirectory) {
@@ -78,7 +83,11 @@ Future<List<String>> generate(String path, {bool debugMode = false}) async {
     // Process files in parallel with controlled concurrency
     final maxConcurrency = Platform.numberOfProcessors;
     final processedResults = await _processFilesInParallel(
-        candidateFiles, absolutePath, maxConcurrency, debugMode);
+      candidateFiles,
+      projectRoot,
+      maxConcurrency,
+      debugMode,
+    );
 
     // Collect results
     int processedCount = 0;
@@ -115,9 +124,7 @@ Future<List<String>> generate(String path, {bool debugMode = false}) async {
     }
 
     // Skip certain special directories and files
-    if (_shouldSkipFile(absolutePath,
-        basePath:
-            absolutePath.contains('/') ? p.dirname(absolutePath) : null)) {
+    if (_shouldSkipFile(absolutePath)) {
       if (debugMode) {
         print(
             '[DEBUG] ${DateTime.now()}: Skipping file due to filter: $absolutePath');
@@ -150,7 +157,7 @@ Future<List<String>> generate(String path, {bool debugMode = false}) async {
 
     final parseTime = parseEndTime.difference(parseStartTime).inMilliseconds;
     if (parseRes == null) {
-      return generatedFiles;
+      throw StateError('Failed to parse Dataforge file: $absolutePath');
     }
 
     if (debugMode) {
@@ -159,15 +166,18 @@ Future<List<String>> generate(String path, {bool debugMode = false}) async {
     }
 
     final writeStartTime = DateTime.now();
-    final writer = CliWriter(parseRes,
-        projectRoot: p.dirname(absolutePath), debugMode: debugMode);
+    final writer = CliWriter(
+      parseRes,
+      projectRoot: projectRoot,
+      debugMode: debugMode,
+    );
     final generatedFile = await writer.writeCodeAsync();
     final writeEndTime = DateTime.now();
 
     final writeTime = writeEndTime.difference(writeStartTime).inMilliseconds;
     final totalTime = writeTime + parseTime;
     print(
-        '✅ Generated ${p.relative(generatedFile, from: p.dirname(absolutePath))} in ${totalTime}ms (parse: ${parseTime}ms, write: ${writeTime}ms)');
+        '✅ Generated ${p.relative(generatedFile, from: projectRoot)} in ${totalTime}ms (parse: ${parseTime}ms, write: ${writeTime}ms)');
 
     if (generatedFile.isNotEmpty) {
       generatedFiles.add(generatedFile);
@@ -221,7 +231,7 @@ List<String> _scanDirectory(String path,
           }
 
           // Skip certain special files
-          if (_shouldSkipFile(filePath, basePath: path)) {
+          if (_shouldSkipFile(filePath)) {
             continue;
           }
 
@@ -282,29 +292,63 @@ bool _hasDataforgeAnnotations(String filePath) {
     // Read file content efficiently
     final content = file.readAsStringSync();
 
-    // Quick string search for annotations - support both @Dataforge and @Dataforge()
-    return content.contains('@Dataforge') ||
-        content.contains('@dataforge') ||
-        content.contains('@DataClass') ||
-        content.contains('dataforge_annotation');
+    final annotationPattern = RegExp(
+      r'@\w+\.(?:Dataforge|dataforge|DataClass|dataClass)\b|@(?:Dataforge|dataforge|DataClass|dataClass)\b',
+    );
+    return annotationPattern.hasMatch(content);
   } catch (e) {
     // If we can't read the file, skip it
     return false;
   }
 }
 
-/// Determine whether a file should be skipped
-bool _shouldSkipFile(String filePath, {String? basePath}) {
-  // Skip files in excluded directories (this is a backup check)
-  if (filePath.contains('/.dart_tool/') ||
-      filePath.contains('/.git/') ||
-      filePath.contains('/build/') ||
-      filePath.contains('/.idea/') ||
-      filePath.contains('/.pub-cache/') ||
-      filePath.contains('/node_modules/')) {
-    return true;
+String _inferProjectRoot(String absolutePath, FileSystemEntityType entity) {
+  final startDir = entity == FileSystemEntityType.directory
+      ? absolutePath
+      : p.dirname(absolutePath);
+
+  String current = startDir;
+  while (true) {
+    if (File(p.join(current, 'pubspec.yaml')).existsSync()) {
+      return current;
+    }
+
+    final parent = p.dirname(current);
+    if (parent == current) {
+      break;
+    }
+    current = parent;
   }
-  return false;
+
+  current = startDir;
+  while (true) {
+    final parent = p.dirname(current);
+    if (parent == current) {
+      break;
+    }
+
+    final baseName = p.basename(current);
+    if (baseName == 'lib' || baseName == 'test') {
+      return parent;
+    }
+    current = parent;
+  }
+
+  return startDir;
+}
+
+/// Determine whether a file should be skipped
+bool _shouldSkipFile(String filePath) {
+  const skipDirs = {
+    '.dart_tool',
+    '.git',
+    'build',
+    '.idea',
+    '.pub-cache',
+    'node_modules',
+  };
+  final segments = p.split(p.normalize(filePath));
+  return segments.any(skipDirs.contains);
 }
 
 /// Process files in parallel with controlled concurrency
@@ -342,11 +386,12 @@ Future<List<String>> _processFilesInParallel(
     }
 
     // Process files in current batch concurrently
-    final batchFutures =
-        batch.map((filePath) => _processFile(filePath, projectRoot, debugMode));
+    final batchResults = await Future.wait(
+      batch.map((filePath) => _processFile(filePath, projectRoot, debugMode)),
+    );
 
     int batchSuccessCount = 0;
-    await for (final result in Stream.fromFutures(batchFutures)) {
+    for (final result in batchResults) {
       if (result.isNotEmpty) {
         results.add(result);
         batchSuccessCount++;
@@ -368,45 +413,34 @@ Future<List<String>> _processFilesInParallel(
 /// Process a single file and return the generated file path
 Future<String> _processFile(
     String filePath, String projectRoot, bool debugMode) async {
-  try {
-    final fileStartTime = DateTime.now();
+  final fileStartTime = DateTime.now();
 
-    if (debugMode) {
-      print(
-          '[DEBUG] ${DateTime.now()}: Processing file: ${p.basename(filePath)}');
-    }
-
-    // Parse the file
-    final parseStartTime = DateTime.now();
-    final parser = Parser(filePath);
-    final parseRes = parser.parseDartFile();
-    final parseEndTime = DateTime.now();
-
-    final parseTime = parseEndTime.difference(parseStartTime).inMilliseconds;
-    if (parseRes == null) {
-      return '';
-    }
-
-    // Generate code
-    final writeStartTime = DateTime.now();
-    final writer =
-        CliWriter(parseRes, projectRoot: projectRoot, debugMode: debugMode);
-    final generatedFile = await writer.writeCodeAsync();
-    final writeEndTime = DateTime.now();
-
-    final fileEndTime = DateTime.now();
-
-    final writeTime = writeEndTime.difference(writeStartTime).inMilliseconds;
-    final totalTime = fileEndTime.difference(fileStartTime).inMilliseconds;
-    print(
-        '✅ Generated ${p.relative(generatedFile, from: projectRoot)} in ${totalTime}ms (parse: ${parseTime}ms, write: ${writeTime}ms)');
-
-    return generatedFile;
-  } catch (e, s) {
-    print('❌ Error processing ${p.relative(filePath, from: projectRoot)}: $e');
-    if (debugMode) {
-      print(s);
-    }
-    return '';
+  if (debugMode) {
+    print('[DEBUG] ${DateTime.now()}: Processing file: ${p.basename(filePath)}');
   }
+
+  final parseStartTime = DateTime.now();
+  final parser = Parser(filePath);
+  final parseRes = parser.parseDartFile();
+  final parseEndTime = DateTime.now();
+
+  final parseTime = parseEndTime.difference(parseStartTime).inMilliseconds;
+  if (parseRes == null) {
+    throw StateError('Failed to parse Dataforge file: $filePath');
+  }
+
+  final writeStartTime = DateTime.now();
+  final writer =
+      CliWriter(parseRes, projectRoot: projectRoot, debugMode: debugMode);
+  final generatedFile = await writer.writeCodeAsync();
+  final writeEndTime = DateTime.now();
+
+  final fileEndTime = DateTime.now();
+
+  final writeTime = writeEndTime.difference(writeStartTime).inMilliseconds;
+  final totalTime = fileEndTime.difference(fileStartTime).inMilliseconds;
+  print(
+      '✅ Generated ${p.relative(generatedFile, from: projectRoot)} in ${totalTime}ms (parse: ${parseTime}ms, write: ${writeTime}ms)');
+
+  return generatedFile;
 }

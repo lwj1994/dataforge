@@ -1,8 +1,11 @@
 import 'dart:io';
 
+import 'package:analyzer/dart/analysis/utilities.dart';
+import 'package:analyzer/dart/ast/ast.dart';
 import 'package:dataforge_base/src/model.dart';
 import 'package:dataforge_base/src/type_utils.dart';
 import 'package:dataforge_base/src/writer.dart';
+import 'package:path/path.dart' as p;
 
 class CliWriter {
   static const String _generatedFileIgnoreLine =
@@ -14,18 +17,24 @@ class CliWriter {
   final bool debugMode;
   final String? _dataforgeAnnotationPrefix;
   late final Set<String> _allEnumTypes;
+  late final Set<String> _allJsonModelTypes;
 
   CliWriter(this.result, {this.projectRoot, this.debugMode = false})
       : _dataforgeAnnotationPrefix = _getDataforgeAnnotationPrefix(result) {
-    _allEnumTypes = _scanAllEnumTypes();
+    final scannedTypes = _scanProjectTypes();
+    _allEnumTypes = scannedTypes.enums;
+    _allJsonModelTypes = scannedTypes.jsonModels;
   }
 
-  /// Scan all Dart files once at init to build a complete set of enum type names.
-  Set<String> _scanAllEnumTypes() {
+  /// Scan project Dart files once at init to build type metadata caches.
+  _ScannedTypes _scanProjectTypes() {
     final enumTypes = <String>{};
+    final jsonModelTypes = <String>{};
     final searchDir =
         projectRoot != null ? Directory(projectRoot!) : Directory.current;
-    if (!searchDir.existsSync()) return enumTypes;
+    if (!searchDir.existsSync()) {
+      return _ScannedTypes(enumTypes, jsonModelTypes);
+    }
 
     final dartFiles = searchDir
         .listSync(recursive: true)
@@ -34,17 +43,43 @@ class CliWriter {
             file.path.endsWith('.dart') && !file.path.endsWith('.data.dart'))
         .toList();
 
-    final enumPattern = RegExp(r'enum\s+(\w+)\s*\{');
     for (final file in dartFiles) {
       try {
         final content = file.readAsStringSync();
-        for (final match in enumPattern.allMatches(content)) {
-          final name = match.group(1);
-          if (name != null) enumTypes.add(name);
+        final parseResult = parseString(content: content, path: file.path);
+        if (parseResult.errors.isNotEmpty) {
+          continue;
+        }
+
+        for (final declaration in parseResult.unit.declarations) {
+          if (declaration is EnumDeclaration) {
+            enumTypes.add(declaration.name.lexeme);
+          } else if (declaration is ClassDeclaration) {
+            final className = declaration.name.lexeme;
+            final hasDataforgeAnnotation = declaration.metadata.any((annotation) {
+              final name = annotation.name.name;
+              return _isDataClassAnnotation(name);
+            });
+            final hasFromJsonFactory = declaration.members.any((member) {
+              if (member is ConstructorDeclaration) {
+                return member.factoryKeyword != null &&
+                    member.name?.lexeme == 'fromJson';
+              }
+              if (member is MethodDeclaration) {
+                return member.isStatic && member.name.lexeme == 'fromJson';
+              }
+              return false;
+            });
+
+            if (hasDataforgeAnnotation || hasFromJsonFactory) {
+              jsonModelTypes.add(className);
+            }
+          }
         }
       } catch (_) {}
     }
-    return enumTypes;
+
+    return _ScannedTypes(enumTypes, jsonModelTypes);
   }
 
   Future<String> writeCodeAsync() async {
@@ -69,8 +104,7 @@ class CliWriter {
 
         bool isDataforge = field.isDataforge;
         if (!isDataforge) {
-          // Heuristic: if it looks like a custom class (has fromJson), treat as Dataforge
-          isDataforge = _hasFromJsonMethod(field.type);
+          isDataforge = _isJsonModelType(cleanType);
         }
 
         bool isInnerEnum = field.isInnerEnum;
@@ -90,7 +124,7 @@ class CliWriter {
                 field.type.startsWith('Map<'))) {
           final innerType =
               _extractLastTypeArgument(field.type).replaceAll('?', '').trim();
-          isInnerDataforge = _hasFromJsonMethod(innerType);
+          isInnerDataforge = _isJsonModelType(innerType);
         }
 
         updatedFields.add(field.copyWith(
@@ -121,7 +155,8 @@ class CliWriter {
     buffer.writeln(result.partOf);
     buffer.writeln();
 
-    buffer.write(generator.generate());
+    final generatedContent = generator.generate();
+    buffer.write(generatedContent);
 
     final fileWriteStartTime = DateTime.now();
 
@@ -135,7 +170,9 @@ class CliWriter {
           '[PERF] $fileWriteEndTime: File write completed in ${fileWriteEndTime.difference(fileWriteStartTime).inMilliseconds}ms');
     }
 
-    await _processOriginalFilesAsync();
+    await _processOriginalFilesAsync(
+      requiresCollectionImport: generatedContent.contains('DeepCollectionEquality'),
+    );
 
     return result.outputPath;
   }
@@ -158,18 +195,17 @@ class CliWriter {
     return _allEnumTypes.contains(cleanType);
   }
 
-  /// Check if a type has a fromJson method (heuristic: assume custom classes do)
-  bool _hasFromJsonMethod(String type) {
+  bool _isDataClassAnnotation(String name) {
+    final cleanName = name.contains('.') ? name.split('.').last : name;
+    return cleanName == 'DataClass' ||
+        cleanName == 'dataClass' ||
+        cleanName == 'Dataforge' ||
+        cleanName == 'dataforge';
+  }
+
+  bool _isJsonModelType(String type) {
     final cleanType = _removeGenericParameters(type.replaceAll('?', ''));
-    if (TypeUtils.primitiveTypes.contains(cleanType)) return false;
-    if (cleanType == 'List' ||
-        cleanType == 'Set' ||
-        cleanType == 'Map' ||
-        cleanType.startsWith('List<') ||
-        cleanType.startsWith('Set<') ||
-        cleanType.startsWith('Map<')) return false;
-    // Assume other types (custom classes) have fromJson
-    return true;
+    return _allJsonModelTypes.contains(cleanType);
   }
 
   /// Remove generic parameters from a type string, handling nested generics correctly
@@ -200,16 +236,24 @@ class CliWriter {
       TypeUtils.extractLastTypeArgument(type);
 
   /// Process original files asynchronously
-  Future<void> _processOriginalFilesAsync() async {
+  Future<void> _processOriginalFilesAsync({
+    required bool requiresCollectionImport,
+  }) async {
     // Infer original file path from output path
     final originalFilePath =
         result.outputPath.replaceAll('.data.dart', '.dart');
 
-    await _batchProcessOriginalFileAsync(originalFilePath);
+    await _batchProcessOriginalFileAsync(
+      originalFilePath,
+      requiresCollectionImport: requiresCollectionImport,
+    );
   }
 
   /// Batch process all file modifications in a single read-write operation (async)
-  Future<void> _batchProcessOriginalFileAsync(String filePath) async {
+  Future<void> _batchProcessOriginalFileAsync(
+    String filePath, {
+    required bool requiresCollectionImport,
+  }) async {
     try {
       final file = File(filePath);
       if (!await file.exists()) return;
@@ -218,10 +262,10 @@ class CliWriter {
       final lines = content.split('\n');
       bool modified = false;
 
-      final dataFileName = result.outputPath.split('/').last;
+      final dataFileName = p.basename(result.outputPath);
 
       // Step 1: Add collection import if needed
-      if (!_hasCollectionImport(lines)) {
+      if (requiresCollectionImport && !_hasCollectionImport(lines)) {
         _insertCollectionImport(lines);
         modified = true;
       }
@@ -266,25 +310,11 @@ class CliWriter {
 
   /// Insert collection import into lines
   void _insertCollectionImport(List<String> lines) {
-    // Find the last import statement that ends with semicolon
-    int lastImportIndex = -1;
-
-    for (int i = 0; i < lines.length; i++) {
-      final line = lines[i].trim();
-      // Check if line starts with import and ends with semicolon
-      if (line.startsWith('import ') && line.endsWith(';')) {
-        lastImportIndex = i;
-      }
-    }
-
-    // Insert collection import after the last import
-    if (lastImportIndex >= 0) {
-      lines.insert(
-          lastImportIndex + 1, "import 'package:collection/collection.dart';");
-    } else {
-      // If no imports found, insert at the beginning
-      lines.insert(0, "import 'package:collection/collection.dart';");
-    }
+    final insertIndex = _findImportInsertIndex(lines);
+    lines.insert(
+      insertIndex,
+      "import 'package:collection/collection.dart';",
+    );
   }
 
   /// Check if part declaration exists in lines
@@ -300,45 +330,8 @@ class CliWriter {
 
   /// Insert part declaration into lines
   void _insertPartDeclaration(List<String> lines, String dataFileName) {
-    // Find the position to insert part declaration (after imports)
-    int insertIndex = 0;
-    bool foundImports = false;
-
-    for (int i = 0; i < lines.length; i++) {
-      final line = lines[i].trim();
-
-      // Skip empty lines and comments at the beginning
-      if (line.isEmpty || line.startsWith('//') || line.startsWith('/*')) {
-        continue;
-      }
-
-      // If it's an import or export, mark that we found imports
-      if (line.startsWith('import ') || line.startsWith('export ')) {
-        foundImports = true;
-        insertIndex = i + 1;
-      } else if (foundImports &&
-          !line.startsWith('import ') &&
-          !line.startsWith('export ')) {
-        // We've passed all imports, this is where we insert
-        break;
-      } else if (!foundImports) {
-        // No imports found, insert at the beginning (after initial comments)
-        insertIndex = i;
-        break;
-      }
-    }
-
-    // Insert part declaration
     final partDeclaration = "part '$dataFileName';";
-
-    // Add empty line before part if there are imports
-    if (foundImports &&
-        insertIndex > 0 &&
-        lines[insertIndex - 1].trim().isNotEmpty) {
-      lines.insert(insertIndex, '');
-      insertIndex++;
-    }
-
+    int insertIndex = _findPartInsertIndex(lines);
     lines.insert(insertIndex, partDeclaration);
 
     // Add empty line after part if the next line is not empty
@@ -351,75 +344,125 @@ class CliWriter {
   /// Add with clause to class in lines, returns true if modified
   bool _addWithClauseToLines(List<String> lines, String className) {
     for (int i = 0; i < lines.length; i++) {
-      final line = lines[i];
-
       // Find class declaration line
       final classPattern =
           RegExp(r'\bclass\s+' + RegExp.escape(className) + r'\b');
-      if (classPattern.hasMatch(line) && !line.contains('mixin')) {
-        String genericPart = '';
-        final genericStartIndex = line.indexOf('<');
-
-        // Check for presence of generics and that it's part of the class name
-        final classDefRegex =
-            RegExp('^\\s*(abstract\\s+)?class\\s+$className\\s*<');
-        if (genericStartIndex != -1 && classDefRegex.hasMatch(line)) {
-          int depth = 0;
-          int genericEndIndex = -1;
-          for (int j = genericStartIndex; j < line.length; j++) {
-            if (line[j] == '<') {
-              depth++;
-            } else if (line[j] == '>') {
-              depth--;
-              if (depth == 0) {
-                genericEndIndex = j;
-                break;
-              }
-            }
-          }
-          if (genericEndIndex != -1) {
-            genericPart =
-                line.substring(genericStartIndex, genericEndIndex + 1);
-          }
+      if (classPattern.hasMatch(lines[i]) && !lines[i].contains('mixin')) {
+        int endIndex = i;
+        while (endIndex < lines.length && !lines[endIndex].contains('{')) {
+          endIndex++;
+        }
+        if (endIndex >= lines.length) {
+          return false;
         }
 
+        final indent = RegExp(r'^\s*').firstMatch(lines[i])!.group(0)!;
+        final header = lines.sublist(i, endIndex + 1).join('\n');
+        final normalizedHeader = header.replaceAll(RegExp(r'\s+'), ' ').trim();
+        final genericPart = _extractGenericPart(normalizedHeader, className);
         final mixinName = '_$className$genericPart';
-        final trimmedLine = line.trim();
-
-        // Check if already has the correct with clause
-        final mixinPattern = RegExp('\\b${RegExp.escape(mixinName)}\\b');
-        if (mixinPattern.hasMatch(trimmedLine)) {
-          return false; // Already has the correct with clause
+        if (normalizedHeader.contains(mixinName)) {
+          return false;
         }
 
-        // Check if has any with clause
-        if (trimmedLine.contains(' with ')) {
-          // Has existing with clause, add our mixin
-          final withIndex = line.indexOf(' with ');
-          final openBraceIndex = line.indexOf('{');
-
-          if (openBraceIndex > withIndex) {
-            // Insert before the opening brace
-            final beforeBrace = line.substring(0, openBraceIndex).trim();
-            final afterBrace = line.substring(openBraceIndex);
-            lines[i] = '$beforeBrace, $mixinName $afterBrace';
-            return true;
+        String updatedHeader = normalizedHeader;
+        if (updatedHeader.contains(' with ')) {
+          if (updatedHeader.contains(' implements ')) {
+            updatedHeader = updatedHeader.replaceFirst(
+              ' implements ',
+              ', $mixinName implements ',
+            );
+          } else {
+            updatedHeader = updatedHeader.replaceFirst('{', ', $mixinName {');
           }
+        } else if (updatedHeader.contains(' implements ')) {
+          updatedHeader = updatedHeader.replaceFirst(
+            ' implements ',
+            ' with $mixinName implements ',
+          );
         } else {
-          // No existing with clause, add one
-          final openBraceIndex = line.indexOf('{');
-
-          if (openBraceIndex != -1) {
-            final beforeBrace = line.substring(0, openBraceIndex).trim();
-            final afterBrace = line.substring(openBraceIndex);
-            lines[i] = '$beforeBrace with $mixinName $afterBrace';
-            return true;
-          }
+          updatedHeader = updatedHeader.replaceFirst('{', ' with $mixinName {');
         }
-        break;
+
+        lines.replaceRange(
+          i,
+          endIndex + 1,
+          <String>['$indent$updatedHeader'],
+        );
+        return true;
       }
     }
     return false;
+  }
+
+  int _findImportInsertIndex(List<String> lines) {
+    int insertIndex = 0;
+    for (int i = 0; i < lines.length; i++) {
+      final trimmed = lines[i].trim();
+      if (trimmed.isEmpty || trimmed.startsWith('//') || trimmed.startsWith('/*')) {
+        continue;
+      }
+      if (trimmed.startsWith('library ')) {
+        insertIndex = i + 1;
+        continue;
+      }
+      if (trimmed.startsWith('import ') || trimmed.startsWith('export ')) {
+        insertIndex = i + 1;
+        continue;
+      }
+      if (trimmed.startsWith('part ') && !trimmed.startsWith('part of ')) {
+        return i;
+      }
+      break;
+    }
+    return insertIndex;
+  }
+
+  int _findPartInsertIndex(List<String> lines) {
+    int insertIndex = 0;
+    for (int i = 0; i < lines.length; i++) {
+      final trimmed = lines[i].trim();
+      if (trimmed.isEmpty || trimmed.startsWith('//') || trimmed.startsWith('/*')) {
+        continue;
+      }
+      if (trimmed.startsWith('library ') ||
+          trimmed.startsWith('import ') ||
+          trimmed.startsWith('export ') ||
+          (trimmed.startsWith('part ') && !trimmed.startsWith('part of '))) {
+        insertIndex = i + 1;
+        continue;
+      }
+      break;
+    }
+    return insertIndex;
+  }
+
+  String _extractGenericPart(String header, String className) {
+    final classToken = 'class $className';
+    final classIndex = header.indexOf(classToken);
+    if (classIndex == -1) return '';
+
+    int index = classIndex + classToken.length;
+    while (index < header.length && header[index].trim().isEmpty) {
+      index++;
+    }
+    if (index >= header.length || header[index] != '<') {
+      return '';
+    }
+
+    int depth = 0;
+    for (int i = index; i < header.length; i++) {
+      final char = header[i];
+      if (char == '<') {
+        depth++;
+      } else if (char == '>') {
+        depth--;
+        if (depth == 0) {
+          return header.substring(index, i + 1);
+        }
+      }
+    }
+    return '';
   }
 
   /// Check if fromJson method exists in lines
@@ -473,4 +516,11 @@ class CliWriter {
     }
     return false;
   }
+}
+
+class _ScannedTypes {
+  final Set<String> enums;
+  final Set<String> jsonModels;
+
+  const _ScannedTypes(this.enums, this.jsonModels);
 }

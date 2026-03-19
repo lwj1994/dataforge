@@ -7,7 +7,6 @@ import 'package:collection/collection.dart';
 import 'package:path/path.dart' as p;
 
 import 'package:dataforge_base/src/model.dart';
-import 'package:dataforge_base/src/type_utils.dart';
 
 /// Parse Dart files and extract Dataforge annotation information
 ///
@@ -251,6 +250,13 @@ class Parser {
                 isRequired = true;
               }
 
+              if (!isRequired &&
+                  parameter is! DefaultFormalParameter &&
+                  (effectiveParam is FieldFormalParameter ||
+                      effectiveParam is SimpleFormalParameter)) {
+                isRequired = true;
+              }
+
               if (effectiveParam is FieldFormalParameter) {
                 paramName = effectiveParam.name.lexeme;
               } else if (effectiveParam is SimpleFormalParameter) {
@@ -350,17 +356,8 @@ class Parser {
                         break;
 
                       case 'converter':
-                        String converter = expressionSource;
-                        // Remove leading const
-                        converter =
-                            converter.replaceAll(RegExp(r'^const\s+'), '');
-                        // Remove trailing () if present (heuristic for default constructor)
-                        if (converter.endsWith('()')) {
-                          converter =
-                              converter.substring(0, converter.length - 2);
-                        }
                         jsonKeyInfo = jsonKeyInfo!.copyWith(
-                          converter: converter,
+                          converter: expressionSource.trim(),
                         );
                         break;
 
@@ -498,14 +495,8 @@ class Parser {
 
   /// Determine whether an inner type is a Dataforge object
   bool _isInnerDataforge(String type) {
-    if (!type.contains('<')) return false;
-    final inner = _extractLastTypeArgument(type).replaceAll('?', '').trim();
-    if (inner.startsWith('List<') || inner.startsWith('Map<')) return false;
-    return !TypeUtils.primitiveTypes.contains(inner);
+    return false;
   }
-
-  String _extractLastTypeArgument(String type) =>
-      TypeUtils.extractLastTypeArgument(type);
 
   bool _isStaticMethod(CompilationUnitMember member, String methodName) {
     if (member is! ClassDeclaration && member is! MixinDeclaration) {

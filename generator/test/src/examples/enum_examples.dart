@@ -33,10 +33,12 @@ mixin _EnumTypes {
   static EnumTypes fromJson(Map<String, dynamic> json) {
     return EnumTypes(
       status:
-          (DefaultEnumConverter(
+          ((DefaultEnumConverter(
             Status.values,
-          ).fromJson(SafeCasteUtil.readValue<String>(json, 'status')) ??
-          Status.values.first),
+          ).fromJson(SafeCasteUtil.readValue<String>(json, 'status'))) ??
+          (throw ArgumentError(
+            'Required field "status" (type: Status) is missing or invalid.',
+          ))),
     );
   }
 }
@@ -114,10 +116,12 @@ mixin _EnumListModel {
               ?.map(
                 (e) => (e is Status
                     ? e
-                    : (const DefaultEnumConverter<Status>(
+                    : ((const DefaultEnumConverter<Status>(
                             Status.values,
-                          ).fromJson(SafeCasteUtil.safeCast<String>(e)) ??
-                          Status.values.first)),
+                          ).fromJson(SafeCasteUtil.safeCast<String>(e))) ??
+                          (throw ArgumentError(
+                            'Required field "statuses" (type: Status) is missing or invalid.',
+                          )))),
               )
               .toList())) ??
           (const [])),
@@ -134,9 +138,11 @@ class EnumListModelCopyWith<R> {
   @pragma('vm:prefer-inline')
   R call({Object? statuses = dataforgeUndefined}) {
     final res = EnumListModel(
-      statuses: (statuses == dataforgeUndefined
-          ? _instance.statuses
-          : (statuses as List).cast<Status>()),
+      statuses: SafeCasteUtil.copyWithCastList<Status>(
+        statuses,
+        'statuses',
+        _instance.statuses,
+      ),
     );
     return (_then != null ? _then!(res) : res as R);
   }
@@ -397,24 +403,30 @@ mixin _MultipleEnumsExample {
   static MultipleEnumsExample fromJson(Map<String, dynamic> json) {
     return MultipleEnumsExample(
       status:
-          (DefaultEnumConverter(
+          ((DefaultEnumConverter(
             Status.values,
-          ).fromJson(SafeCasteUtil.readValue<String>(json, 'status')) ??
-          Status.values.first),
+          ).fromJson(SafeCasteUtil.readValue<String>(json, 'status'))) ??
+          (throw ArgumentError(
+            'Required field "status" (type: Status) is missing or invalid.',
+          ))),
       priority:
-          (DefaultEnumConverter(
+          ((DefaultEnumConverter(
             Priority.values,
-          ).fromJson(SafeCasteUtil.readValue<String>(json, 'priority')) ??
-          Priority.values.first),
+          ).fromJson(SafeCasteUtil.readValue<String>(json, 'priority'))) ??
+          (throw ArgumentError(
+            'Required field "priority" (type: Priority) is missing or invalid.',
+          ))),
       statusHistory:
           (((SafeCasteUtil.safeCast<List<dynamic>>(json['statusHistory'])
               ?.map(
                 (e) => (e is Status
                     ? e
-                    : (const DefaultEnumConverter<Status>(
+                    : ((const DefaultEnumConverter<Status>(
                             Status.values,
-                          ).fromJson(SafeCasteUtil.safeCast<String>(e)) ??
-                          Status.values.first)),
+                          ).fromJson(SafeCasteUtil.safeCast<String>(e))) ??
+                          (throw ArgumentError(
+                            'Required field "statusHistory" (type: Status) is missing or invalid.',
+                          )))),
               )
               .toList())) ??
           (const [])),
@@ -445,9 +457,11 @@ class MultipleEnumsExampleCopyWith<R> {
         'priority',
         _instance.priority,
       ),
-      statusHistory: (statusHistory == dataforgeUndefined
-          ? _instance.statusHistory
-          : (statusHistory as List).cast<Status>()),
+      statusHistory: SafeCasteUtil.copyWithCastList<Status>(
+        statusHistory,
+        'statusHistory',
+        _instance.statusHistory,
+      ),
     );
     return (_then != null ? _then!(res) : res as R);
   }

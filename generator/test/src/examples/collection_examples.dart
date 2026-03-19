@@ -35,7 +35,7 @@ mixin _ListObjectExample {
   String toString() => 'ListObjectExample(users: $users)';
 
   Map<String, dynamic> toJson() {
-    return {'users': users};
+    return {'users': users.map((e) => e.toJson()).toList()};
   }
 
   static ListObjectExample fromJson(Map<String, dynamic> json) {
@@ -56,9 +56,11 @@ class ListObjectExampleCopyWith<R> {
   @pragma('vm:prefer-inline')
   R call({Object? users = dataforgeUndefined}) {
     final res = ListObjectExample(
-      users: (users == dataforgeUndefined
-          ? _instance.users
-          : (users as List).cast<SimpleUser>()),
+      users: SafeCasteUtil.copyWithCastList<SimpleUser>(
+        users,
+        'users',
+        _instance.users,
+      ),
     );
     return (_then != null ? _then!(res) : res as R);
   }
@@ -118,7 +120,10 @@ mixin _ImageListModel {
       'ImageListModel(id: $id, watermarkImages: $watermarkImages)';
 
   Map<String, dynamic> toJson() {
-    return {'id': id, 'watermarkImages': watermarkImages};
+    return {
+      'id': id,
+      'watermarkImages': watermarkImages.map((e) => e.toJson()).toList(),
+    };
   }
 
   static ImageListModel fromJson(Map<String, dynamic> json) {
@@ -147,9 +152,11 @@ class ImageListModelCopyWith<R> {
   }) {
     final res = ImageListModel(
       id: SafeCasteUtil.copyWithCast<String>(id, 'id', _instance.id),
-      watermarkImages: (watermarkImages == dataforgeUndefined
-          ? _instance.watermarkImages
-          : (watermarkImages as List).cast<ImageBean>()),
+      watermarkImages: SafeCasteUtil.copyWithCastList<ImageBean>(
+        watermarkImages,
+        'watermarkImages',
+        _instance.watermarkImages,
+      ),
     );
     return (_then != null ? _then!(res) : res as R);
   }
@@ -206,7 +213,7 @@ mixin _RequiredListModel {
   String toString() => 'RequiredListModel(users: $users)';
 
   Map<String, dynamic> toJson() {
-    return {'users': users};
+    return {'users': users.map((e) => e.toJson()).toList()};
   }
 
   static RequiredListModel fromJson(Map<String, dynamic> json) {
@@ -227,9 +234,11 @@ class RequiredListModelCopyWith<R> {
   @pragma('vm:prefer-inline')
   R call({Object? users = dataforgeUndefined}) {
     final res = RequiredListModel(
-      users: (users == dataforgeUndefined
-          ? _instance.users
-          : (users as List).cast<SimpleUser>()),
+      users: SafeCasteUtil.copyWithCastList<SimpleUser>(
+        users,
+        'users',
+        _instance.users,
+      ),
     );
     return (_then != null ? _then!(res) : res as R);
   }
@@ -340,18 +349,26 @@ class ListPrimitiveExampleCopyWith<R> {
     Object? flags = dataforgeUndefined,
   }) {
     final res = ListPrimitiveExample(
-      names: (names == dataforgeUndefined
-          ? _instance.names
-          : (names as List).cast<String>()),
-      numbers: (numbers == dataforgeUndefined
-          ? _instance.numbers
-          : (numbers as List).cast<int>()),
-      values: (values == dataforgeUndefined
-          ? _instance.values
-          : (values as List).cast<double>()),
-      flags: (flags == dataforgeUndefined
-          ? _instance.flags
-          : (flags as List).cast<bool>()),
+      names: SafeCasteUtil.copyWithCastList<String>(
+        names,
+        'names',
+        _instance.names,
+      ),
+      numbers: SafeCasteUtil.copyWithCastList<int>(
+        numbers,
+        'numbers',
+        _instance.numbers,
+      ),
+      values: SafeCasteUtil.copyWithCastList<double>(
+        values,
+        'values',
+        _instance.values,
+      ),
+      flags: SafeCasteUtil.copyWithCastList<bool>(
+        flags,
+        'flags',
+        _instance.flags,
+      ),
     );
     return (_then != null ? _then!(res) : res as R);
   }
@@ -464,12 +481,16 @@ class NullableListExampleCopyWith<R> {
     Object? nullableNumbers = dataforgeUndefined,
   }) {
     final res = NullableListExample(
-      nullableNames: (nullableNames == dataforgeUndefined
-          ? _instance.nullableNames
-          : (nullableNames as List?)?.cast<String>()),
-      nullableNumbers: (nullableNumbers == dataforgeUndefined
-          ? _instance.nullableNumbers
-          : (nullableNumbers as List?)?.cast<int>()),
+      nullableNames: SafeCasteUtil.copyWithCastNullableList<String>(
+        nullableNames,
+        'nullableNames',
+        _instance.nullableNames,
+      ),
+      nullableNumbers: SafeCasteUtil.copyWithCastNullableList<int>(
+        nullableNumbers,
+        'nullableNumbers',
+        _instance.nullableNumbers,
+      ),
     );
     return (_then != null ? _then!(res) : res as R);
   }
@@ -576,15 +597,21 @@ class MapStringExampleCopyWith<R> {
     Object? dynamicMap = dataforgeUndefined,
   }) {
     final res = MapStringExample(
-      stringMap: (stringMap == dataforgeUndefined
-          ? _instance.stringMap
-          : (stringMap as Map).cast<String, String>()),
-      intMap: (intMap == dataforgeUndefined
-          ? _instance.intMap
-          : (intMap as Map).cast<String, int>()),
-      dynamicMap: (dynamicMap == dataforgeUndefined
-          ? _instance.dynamicMap
-          : (dynamicMap as Map).cast<String, dynamic>()),
+      stringMap: SafeCasteUtil.copyWithCastMap<String, String>(
+        stringMap,
+        'stringMap',
+        _instance.stringMap,
+      ),
+      intMap: SafeCasteUtil.copyWithCastMap<String, int>(
+        intMap,
+        'intMap',
+        _instance.intMap,
+      ),
+      dynamicMap: SafeCasteUtil.copyWithCastMap<String, dynamic>(
+        dynamicMap,
+        'dynamicMap',
+        _instance.dynamicMap,
+      ),
     );
     return (_then != null ? _then!(res) : res as R);
   }
@@ -647,7 +674,7 @@ mixin _MapObjectExample {
   String toString() => 'MapObjectExample(userMap: $userMap)';
 
   Map<String, dynamic> toJson() {
-    return {'userMap': userMap};
+    return {'userMap': userMap.map((k, v) => MapEntry(k, v.toJson()))};
   }
 
   static MapObjectExample fromJson(Map<String, dynamic> json) {
@@ -676,9 +703,11 @@ class MapObjectExampleCopyWith<R> {
   @pragma('vm:prefer-inline')
   R call({Object? userMap = dataforgeUndefined}) {
     final res = MapObjectExample(
-      userMap: (userMap == dataforgeUndefined
-          ? _instance.userMap
-          : (userMap as Map).cast<String, SimpleUser>()),
+      userMap: SafeCasteUtil.copyWithCastMap<String, SimpleUser>(
+        userMap,
+        'userMap',
+        _instance.userMap,
+      ),
     );
     return (_then != null ? _then!(res) : res as R);
   }
@@ -749,11 +778,7 @@ class SetPrimitiveExampleCopyWith<R> {
   @pragma('vm:prefer-inline')
   R call({Object? tags = dataforgeUndefined}) {
     final res = SetPrimitiveExample(
-      tags: SafeCasteUtil.copyWithCast<Set<String>>(
-        tags,
-        'tags',
-        _instance.tags,
-      ),
+      tags: SafeCasteUtil.copyWithCastSet<String>(tags, 'tags', _instance.tags),
     );
     return (_then != null ? _then!(res) : res as R);
   }
@@ -811,17 +836,18 @@ mixin _SetEnumExample {
 
   static SetEnumExample fromJson(Map<String, dynamic> json) {
     return SetEnumExample(
-      statuses:
-          (SafeCasteUtil.readRequiredValue<List<dynamic>>(json, 'statuses')
-              .map(
-                (e) => (e is SimpleStatus
-                    ? e
-                    : (const DefaultEnumConverter<SimpleStatus>(
-                            SimpleStatus.values,
-                          ).fromJson(SafeCasteUtil.safeCast<String>(e)) ??
-                          SimpleStatus.values.first)),
-              )
-              .toSet()),
+      statuses: (SafeCasteUtil.readRequiredValue<List<dynamic>>(json, 'statuses')
+          .map(
+            (e) => (e is SimpleStatus
+                ? e
+                : ((const DefaultEnumConverter<SimpleStatus>(
+                        SimpleStatus.values,
+                      ).fromJson(SafeCasteUtil.safeCast<String>(e))) ??
+                      (throw ArgumentError(
+                        'Required field "statuses" (type: SimpleStatus) is missing or invalid.',
+                      )))),
+          )
+          .toSet()),
     );
   }
 }
@@ -835,7 +861,7 @@ class SetEnumExampleCopyWith<R> {
   @pragma('vm:prefer-inline')
   R call({Object? statuses = dataforgeUndefined}) {
     final res = SetEnumExample(
-      statuses: SafeCasteUtil.copyWithCast<Set<SimpleStatus>>(
+      statuses: SafeCasteUtil.copyWithCastSet<SimpleStatus>(
         statuses,
         'statuses',
         _instance.statuses,

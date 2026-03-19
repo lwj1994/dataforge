@@ -758,13 +758,277 @@ void main() {
         expect(
           output,
           contains(
-            'e is Status ? e : (const DefaultEnumConverter<Status>(Status.values).fromJson(SafeCasteUtil.safeCast<String>(e)) ?? Status.values.first)',
+            'const DefaultEnumConverter<Status>(Status.values).fromJson(SafeCasteUtil.safeCast<String>(e))',
           ),
         );
         expect(
           output,
           contains(
-            'v is Status ? v : (const DefaultEnumConverter<Status>(Status.values).fromJson(SafeCasteUtil.safeCast<String>(v)) ?? Status.values.first)',
+            'throw ArgumentError(\'Required field "statuses" (type: Status) is missing or invalid.\')',
+          ),
+        );
+        expect(
+          output,
+          contains(
+            'const DefaultEnumConverter<Status>(Status.values).fromJson(SafeCasteUtil.safeCast<String>(v))',
+          ),
+        );
+      });
+
+      test('serializes nested dataforge objects and collections via toJson', () {
+        final result = ParseResult(
+          '',
+          'test',
+          [
+            const ClassInfo(
+              name: 'Wrapper',
+              mixinName: '_\$Wrapper',
+              fields: [
+                FieldInfo(
+                  name: 'user',
+                  type: 'User',
+                  isFinal: true,
+                  isFunction: false,
+                  isRecord: false,
+                  defaultValue: '',
+                  isDataforge: true,
+                ),
+                FieldInfo(
+                  name: 'users',
+                  type: 'List<User>',
+                  isFinal: true,
+                  isFunction: false,
+                  isRecord: false,
+                  defaultValue: '',
+                  isInnerDataforge: true,
+                ),
+                FieldInfo(
+                  name: 'userMap',
+                  type: 'Map<String, User>',
+                  isFinal: true,
+                  isFunction: false,
+                  isRecord: false,
+                  defaultValue: '',
+                  isInnerDataforge: true,
+                ),
+              ],
+              includeToJson: true,
+              deepCopyWith: false,
+            ),
+          ],
+          [],
+        );
+
+        final writer = GeneratorWriter(result);
+        final output = writer.generate();
+
+        expect(output, contains("'user': user.toJson(),"));
+        expect(output, contains("'users': users.map((e) => e.toJson()).toList(),"));
+        expect(
+          output,
+          contains("'userMap': userMap.map((k, v) => MapEntry(k, v.toJson())),"),
+        );
+      });
+
+      test('uses safe collection casts in copyWith helpers', () {
+        final result = ParseResult(
+          '',
+          'test',
+          [
+            const ClassInfo(
+              name: 'Collections',
+              mixinName: '_\$Collections',
+              fields: [
+                FieldInfo(
+                  name: 'tags',
+                  type: 'List<String>',
+                  isFinal: true,
+                  isFunction: false,
+                  isRecord: false,
+                  defaultValue: '',
+                ),
+                FieldInfo(
+                  name: 'statuses',
+                  type: 'Set<int>',
+                  isFinal: true,
+                  isFunction: false,
+                  isRecord: false,
+                  defaultValue: '',
+                ),
+                FieldInfo(
+                  name: 'metadata',
+                  type: 'Map<String, bool>',
+                  isFinal: true,
+                  isFunction: false,
+                  isRecord: false,
+                  defaultValue: '',
+                ),
+              ],
+              deepCopyWith: true,
+            ),
+          ],
+          [],
+        );
+
+        final writer = GeneratorWriter(result);
+        final output = writer.generate();
+
+        expect(
+          output,
+          contains(
+            "SafeCasteUtil.copyWithCastList<String>(tags, 'tags', _instance.tags)",
+          ),
+        );
+        expect(
+          output,
+          contains(
+            "SafeCasteUtil.copyWithCastSet<int>(statuses, 'statuses', _instance.statuses)",
+          ),
+        );
+        expect(
+          output,
+          contains(
+            "SafeCasteUtil.copyWithCastMap<String, bool>(metadata, 'metadata', _instance.metadata)",
+          ),
+        );
+      });
+
+      test('serializes DateTime collections and fails instead of epoch fallback',
+          () {
+        final result = ParseResult(
+          '',
+          'test',
+          [
+            const ClassInfo(
+              name: 'AuditLog',
+              mixinName: '_\$AuditLog',
+              fields: [
+                FieldInfo(
+                  name: 'timestamps',
+                  type: 'List<DateTime>',
+                  isFinal: true,
+                  isFunction: false,
+                  isRecord: false,
+                  defaultValue: '',
+                ),
+                FieldInfo(
+                  name: 'createdAt',
+                  type: 'DateTime',
+                  isFinal: true,
+                  isFunction: false,
+                  isRecord: false,
+                  defaultValue: '',
+                  isDateTime: true,
+                  isRequired: true,
+                ),
+              ],
+              includeFromJson: true,
+              includeToJson: true,
+              deepCopyWith: false,
+            ),
+          ],
+          [],
+        );
+
+        final writer = GeneratorWriter(result);
+        final output = writer.generate();
+
+        expect(
+          output,
+          contains(
+            "'timestamps': timestamps.map((e) => const DefaultDateTimeConverter().toJson(e)).toList(),",
+          ),
+        );
+        expect(output, contains("SafeCasteUtil.readRequiredValue<DateTime>(json, 'createdAt')"));
+        expect(output, isNot(contains('DateTime.fromMillisecondsSinceEpoch(0)')));
+        expect(
+          output,
+          contains(
+            'throw ArgumentError(\'Required field "timestamps" (type: DateTime) is missing or invalid. in collection field "timestamps"\')',
+          ),
+        );
+      });
+
+      test('preserves raw converter object references', () {
+        final result = ParseResult(
+          '',
+          'test',
+          [
+            const ClassInfo(
+              name: 'Event',
+              mixinName: '_\$Event',
+              fields: [
+                FieldInfo(
+                  name: 'value',
+                  type: 'String',
+                  isFinal: true,
+                  isFunction: false,
+                  isRecord: false,
+                  defaultValue: '',
+                  jsonKey: JsonKeyInfo(
+                    name: '',
+                    alternateNames: [],
+                    readValue: '',
+                    ignore: false,
+                    converter: 'helpers.userConverter',
+                  ),
+                ),
+              ],
+              includeFromJson: true,
+              includeToJson: true,
+              deepCopyWith: false,
+            ),
+          ],
+          [],
+        );
+
+        final writer = GeneratorWriter(result);
+        final output = writer.generate();
+
+        expect(output, contains('(helpers.userConverter).toJson(value)'));
+        expect(
+          output,
+          contains("(helpers.userConverter).fromJson(json['value'])"),
+        );
+        expect(output, isNot(contains('const helpers.userConverter()')));
+      });
+
+      test('requires non-null enum fields instead of defaulting to first value',
+          () {
+        final result = ParseResult(
+          '',
+          'test',
+          [
+            const ClassInfo(
+              name: 'User',
+              mixinName: '_\$User',
+              fields: [
+                FieldInfo(
+                  name: 'status',
+                  type: 'Status',
+                  isFinal: true,
+                  isFunction: false,
+                  isRecord: false,
+                  defaultValue: '',
+                  isEnum: true,
+                  isRequired: true,
+                ),
+              ],
+              includeFromJson: true,
+              deepCopyWith: false,
+            ),
+          ],
+          [],
+        );
+
+        final writer = GeneratorWriter(result);
+        final output = writer.generate();
+
+        expect(output, isNot(contains('Status.values.first')));
+        expect(
+          output,
+          contains(
+            'throw ArgumentError(\'Required field "status" (type: Status) is missing or invalid.\')',
           ),
         );
       });

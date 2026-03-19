@@ -165,7 +165,6 @@ class GeneratorWriter {
   ///
   /// All types use SafeCasteUtil.copyWithCast/copyWithCastNullable for safe
   /// casting with error reporting via DataforgeConfig.reportCopyWithError.
-  /// List and Map types use direct .cast<>() operations instead.
   String _buildTypeCastExpression(
     String variable,
     String type,
@@ -179,16 +178,26 @@ class GeneratorWriter {
     if (cleanType.startsWith('List<')) {
       final innerType = cleanType.substring(5, cleanType.length - 1);
       if (isNullable) {
-        return '($variable as List?)?.cast<$innerType>()';
+        return '${_getPrefix(clazz!)}SafeCasteUtil.copyWithCastNullableList<$innerType>($variable, \'$fieldName\', $instanceReference.$fieldName)';
       } else {
-        return '($variable as List).cast<$innerType>()';
+        return '${_getPrefix(clazz!)}SafeCasteUtil.copyWithCastList<$innerType>($variable, \'$fieldName\', $instanceReference.$fieldName)';
+      }
+    } else if (cleanType.startsWith('Set<')) {
+      final innerType = cleanType.substring(4, cleanType.length - 1);
+      if (isNullable) {
+        return '${_getPrefix(clazz!)}SafeCasteUtil.copyWithCastNullableSet<$innerType>($variable, \'$fieldName\', $instanceReference.$fieldName)';
+      } else {
+        return '${_getPrefix(clazz!)}SafeCasteUtil.copyWithCastSet<$innerType>($variable, \'$fieldName\', $instanceReference.$fieldName)';
       }
     } else if (cleanType.startsWith('Map<')) {
       final innerTypes = cleanType.substring(4, cleanType.length - 1);
+      final parts = _splitTopLevelTypeArguments(innerTypes);
+      final keyType = parts.first.trim();
+      final valueType = parts.last.trim();
       if (isNullable) {
-        return '($variable as Map?)?.cast<$innerTypes>()';
+        return '${_getPrefix(clazz!)}SafeCasteUtil.copyWithCastNullableMap<$keyType, $valueType>($variable, \'$fieldName\', $instanceReference.$fieldName)';
       } else {
-        return '($variable as Map).cast<$innerTypes>()';
+        return '${_getPrefix(clazz!)}SafeCasteUtil.copyWithCastMap<$keyType, $valueType>($variable, \'$fieldName\', $instanceReference.$fieldName)';
       }
     } else if (cleanType == 'double') {
       final prefix = clazz != null ? _getPrefix(clazz) : '';
@@ -474,8 +483,58 @@ class GeneratorWriter {
     buffer.writeln();
   }
 
+  String _buildConverterReference(String converterExpression) {
+    final trimmed = converterExpression.trim();
+    if (trimmed.isEmpty) return trimmed;
+
+    final simpleTypePattern =
+        RegExp(r'^[A-Za-z_]\w*(?:\.\w+)*(?:<[^<>]+>)?$');
+    final lastSegment = trimmed.split('.').last;
+    final startsWithTypeName =
+        lastSegment.isNotEmpty && RegExp(r'^[A-Z]').hasMatch(lastSegment);
+    if (simpleTypePattern.hasMatch(trimmed) && startsWithTypeName) {
+      return 'const $trimmed()';
+    }
+    return trimmed;
+  }
+
+  String _buildConverterCall(
+    String converterExpression,
+    String methodName,
+    String argument,
+  ) {
+    final converterRef = _buildConverterReference(converterExpression);
+    return '($converterRef).$methodName($argument)';
+  }
+
+  String _buildMissingValueError(
+    FieldInfo field,
+    String expectedType, {
+    String? detail,
+  }) {
+    final suffix = detail == null ? '' : ' $detail';
+    return 'throw ArgumentError(\'Required field "${field.name}" (type: $expectedType) is missing or invalid.$suffix\')';
+  }
+
+  String _buildRequiredExpression(
+    String expression,
+    FieldInfo field,
+    String expectedType, {
+    String? detail,
+  }) {
+    return '(($expression) ?? (${_buildMissingValueError(field, expectedType, detail: detail)}))';
+  }
+
+  String _buildNestedToJsonExpression(String expression, bool isNullable) {
+    if (isNullable) {
+      return '($expression?.toJson())';
+    }
+    return '$expression.toJson()';
+  }
+
   String _buildEnumValueExpression(
     ClassInfo clazz,
+    FieldInfo field,
     String enumType,
     String valueExpression, {
     required bool isNullable,
@@ -490,7 +549,7 @@ class GeneratorWriter {
       return '($valueExpression is $enumType ? $valueExpression : $converter.fromJson($safeString))';
     }
 
-    return '($valueExpression is $enumType ? $valueExpression : ($converter.fromJson($safeString) ?? $enumType.values.first))';
+    return '($valueExpression is $enumType ? $valueExpression : ${_buildRequiredExpression('$converter.fromJson($safeString)', field, enumType)})';
   }
 
   void _buildToJson(
@@ -526,7 +585,11 @@ class GeneratorWriter {
       }
       // Priority 2: Custom converter
       else if (customConverter != null && customConverter.isNotEmpty) {
-        valueAccess = 'const $customConverter().toJson(${field.name})';
+        valueAccess = _buildConverterCall(
+          customConverter,
+          'toJson',
+          field.name,
+        );
       }
       // Priority 3: Auto-matched converters (DateTime, Enum)
       else if (field.isDateTime || cleanType == 'DateTime') {
@@ -535,16 +598,33 @@ class GeneratorWriter {
       } else if (field.isEnum) {
         valueAccess =
             '${_getPrefix(clazz)}DefaultEnumConverter($cleanType.values).toJson(${field.name})';
-      } else if (cleanType.startsWith('List<') && field.isInnerEnum) {
-        // Handle List<Enum>
+      } else if (field.isDataforge) {
+        valueAccess = _buildNestedToJsonExpression(field.name, isNullable);
+      } else if (cleanType.startsWith('List<')) {
         final innerType = cleanType.substring(5, cleanType.length - 1);
         final innerTypeClean = innerType.replaceAll('?', '').trim();
-        final mapLogic =
-            '(e) => const ${_getPrefix(clazz)}DefaultEnumConverter<$innerTypeClean>($innerTypeClean.values).toJson(e)';
-        if (isNullable) {
-          valueAccess = '${field.name}?.map($mapLogic).toList()';
+
+        if (field.isInnerDataforge) {
+          final mapLogic = innerType.endsWith('?')
+              ? '(e) => e?.toJson()'
+              : '(e) => e.toJson()';
+          valueAccess = isNullable
+              ? '${field.name}?.map($mapLogic).toList()'
+              : '${field.name}.map($mapLogic).toList()';
+        } else if (innerTypeClean == 'DateTime') {
+          final mapLogic =
+              '(e) => const ${_getPrefix(clazz)}DefaultDateTimeConverter().toJson(e)';
+          valueAccess = isNullable
+              ? '${field.name}?.map($mapLogic).toList()'
+              : '${field.name}.map($mapLogic).toList()';
+        } else if (field.isInnerEnum) {
+          final mapLogic =
+              '(e) => const ${_getPrefix(clazz)}DefaultEnumConverter<$innerTypeClean>($innerTypeClean.values).toJson(e)';
+          valueAccess = isNullable
+              ? '${field.name}?.map($mapLogic).toList()'
+              : '${field.name}.map($mapLogic).toList()';
         } else {
-          valueAccess = '${field.name}.map($mapLogic).toList()';
+          valueAccess = field.name;
         }
       } else if (cleanType.startsWith('Set<')) {
         final innerType = cleanType.substring(4, cleanType.length - 1);
@@ -553,6 +633,15 @@ class GeneratorWriter {
         if (field.isInnerEnum) {
           final mapLogic =
               '(e) => const ${_getPrefix(clazz)}DefaultEnumConverter<$innerTypeClean>($innerTypeClean.values).toJson(e)';
+          if (isNullable) {
+            valueAccess = '${field.name}?.map($mapLogic).toList()';
+          } else {
+            valueAccess = '${field.name}.map($mapLogic).toList()';
+          }
+        } else if (field.isInnerDataforge) {
+          final mapLogic = innerType.endsWith('?')
+              ? '(e) => e?.toJson()'
+              : '(e) => e.toJson()';
           if (isNullable) {
             valueAccess = '${field.name}?.map($mapLogic).toList()';
           } else {
@@ -573,19 +662,44 @@ class GeneratorWriter {
             valueAccess = '${field.name}.toList()';
           }
         }
-      } else if (cleanType.startsWith('Map<') && field.isInnerEnum) {
-        // Handle Map<String, Enum>
+      } else if (cleanType.startsWith('Map<')) {
         final mapTypeParts = _splitTopLevelTypeArguments(
           cleanType.substring(4, cleanType.length - 1),
         );
+        final keyType = mapTypeParts.first.trim();
         final innerType = mapTypeParts.last;
         final innerTypeClean = innerType.replaceAll('?', '').trim();
-        final mapLogic =
-            '(k, e) => MapEntry(k, const ${_getPrefix(clazz)}DefaultEnumConverter<$innerTypeClean>($innerTypeClean.values).toJson(e))';
-        if (isNullable) {
-          valueAccess = '${field.name}?.map($mapLogic)';
+
+        if (keyType == 'String' &&
+            field.isInnerEnum &&
+            innerTypeClean.isNotEmpty) {
+          final mapLogic =
+              '(k, e) => MapEntry(k, const ${_getPrefix(clazz)}DefaultEnumConverter<$innerTypeClean>($innerTypeClean.values).toJson(e))';
+          if (isNullable) {
+            valueAccess = '${field.name}?.map($mapLogic)';
+          } else {
+            valueAccess = '${field.name}.map($mapLogic)';
+          }
+        } else if (keyType == 'String' && field.isInnerDataforge) {
+          final mapLogic = innerType.endsWith('?')
+              ? '(k, v) => MapEntry(k, v?.toJson())'
+              : '(k, v) => MapEntry(k, v.toJson())';
+          if (isNullable) {
+            valueAccess = '${field.name}?.map($mapLogic)';
+          } else {
+            valueAccess = '${field.name}.map($mapLogic)';
+          }
+        } else if (keyType == 'String' && innerTypeClean == 'DateTime') {
+          final mapLogic = innerType.endsWith('?')
+              ? '(k, v) => MapEntry(k, v == null ? null : const ${_getPrefix(clazz)}DefaultDateTimeConverter().toJson(v))'
+              : '(k, v) => MapEntry(k, const ${_getPrefix(clazz)}DefaultDateTimeConverter().toJson(v))';
+          if (isNullable) {
+            valueAccess = '${field.name}?.map($mapLogic)';
+          } else {
+            valueAccess = '${field.name}.map($mapLogic)';
+          }
         } else {
-          valueAccess = '${field.name}.map($mapLogic)';
+          valueAccess = field.name;
         }
       }
       // Priority 4: Default (direct access)
@@ -665,9 +779,13 @@ class GeneratorWriter {
               ? '(v == null ? null :'
               : "(v == null ? throw ArgumentError('Required field \"${field.name}\" (type: $cleanType) is null. Check that the JSON contains this field with a non-null value.') :";
           conversion =
-              '((dynamic v) => $nullHandler (v is $cleanType ? v : const $customConverter().fromJson(v))))($valueExpression)';
+              '((dynamic v) => $nullHandler (v is $cleanType ? v : ${_buildConverterCall(customConverter, 'fromJson', 'v')})))($valueExpression)';
         } else {
-          conversion = 'const $customConverter().fromJson($valueExpression)';
+          conversion = _buildConverterCall(
+            customConverter,
+            'fromJson',
+            valueExpression,
+          );
         }
 
         if (!isNullable) {
@@ -704,12 +822,18 @@ class GeneratorWriter {
           conversion = '($conversion ?? $defaultValue)';
         }
       } else if (field.isDateTime || cleanType == 'DateTime') {
-        // DateTime is treated as a basic type: always use readValue with a fallback default, never readRequiredValue
+        bool usedRequired = false;
         if (jsonKeyInfo == null ||
             (jsonKeyInfo.readValue.isEmpty &&
                 jsonKeyInfo.alternateNames.isEmpty)) {
-          conversion =
-              "${_getPrefix(clazz)}SafeCasteUtil.readValue<DateTime>(json, '$jsonKey')";
+          if (field.isRequired && !isNullable && field.defaultValue.isEmpty) {
+            conversion =
+                "${_getPrefix(clazz)}SafeCasteUtil.readRequiredValue<DateTime>(json, '$jsonKey')";
+            usedRequired = true;
+          } else {
+            conversion =
+                "${_getPrefix(clazz)}SafeCasteUtil.readValue<DateTime>(json, '$jsonKey')";
+          }
         } else {
           conversion =
               '${_getPrefix(clazz)}SafeCasteUtil.safeCast<DateTime>($valueExpression)';
@@ -717,14 +841,14 @@ class GeneratorWriter {
 
         if (field.defaultValue.isNotEmpty) {
           conversion = '(($conversion) ?? (${field.defaultValue}))';
-        } else if (!isNullable) {
-          conversion =
-              '($conversion ?? DateTime.fromMillisecondsSinceEpoch(0))';
+        } else if (!isNullable && !usedRequired) {
+          conversion = _buildRequiredExpression(conversion, field, cleanType);
         }
       } else if (field.isEnum) {
         if (jsonKeyInfo != null && jsonKeyInfo.readValue.isNotEmpty) {
           final enumValueConversion = _buildEnumValueExpression(
             clazz,
+            field,
             cleanType,
             'v',
             isNullable: isNullable,
@@ -748,7 +872,7 @@ class GeneratorWriter {
         if (field.defaultValue.isNotEmpty) {
           conversion = '(($conversion) ?? (${field.defaultValue}))';
         } else if (!isNullable) {
-          conversion = '($conversion ?? $cleanType.values.first)';
+          conversion = _buildRequiredExpression(conversion, field, cleanType);
         }
       } else if (cleanType.startsWith('List<')) {
         final innerType = cleanType.substring(5, cleanType.length - 1);
@@ -814,6 +938,9 @@ class GeneratorWriter {
             if (innerType.endsWith('?')) {
               safeCastExpr =
                   '.map((e) => ${_getPrefix(clazz)}SafeCasteUtil.safeCast<$innerTypeClean>(e)).toList()';
+            } else if (innerTypeClean == 'DateTime') {
+              safeCastExpr =
+                  '.map((e) => ${_buildRequiredExpression('${_getPrefix(clazz)}SafeCasteUtil.safeCast<DateTime>(e)', field, innerTypeClean, detail: 'in collection field "${field.name}"')}).toList()';
             } else {
               String defaultValue;
               switch (innerTypeClean) {
@@ -832,9 +959,6 @@ class GeneratorWriter {
                 case 'num':
                   defaultValue = '0';
                   break;
-                case 'DateTime':
-                  defaultValue = 'DateTime.fromMillisecondsSinceEpoch(0)';
-                  break;
                 default:
                   defaultValue = 'null';
               }
@@ -852,6 +976,7 @@ class GeneratorWriter {
         } else if (field.isInnerEnum) {
           final elementConversion = _buildEnumValueExpression(
             clazz,
+            field,
             innerTypeClean,
             'e',
             isNullable: innerType.endsWith('?'),
@@ -938,6 +1063,9 @@ class GeneratorWriter {
             if (innerType.endsWith('?')) {
               safeCastExpr =
                   '.map((e) => ${_getPrefix(clazz)}SafeCasteUtil.safeCast<$innerTypeClean>(e)).toSet()';
+            } else if (innerTypeClean == 'DateTime') {
+              safeCastExpr =
+                  '.map((e) => ${_buildRequiredExpression('${_getPrefix(clazz)}SafeCasteUtil.safeCast<DateTime>(e)', field, innerTypeClean, detail: 'in collection field "${field.name}"')}).toSet()';
             } else {
               String defaultValue;
               switch (innerTypeClean) {
@@ -956,9 +1084,6 @@ class GeneratorWriter {
                 case 'num':
                   defaultValue = '0';
                   break;
-                case 'DateTime':
-                  defaultValue = 'DateTime.fromMillisecondsSinceEpoch(0)';
-                  break;
                 default:
                   defaultValue = 'null';
               }
@@ -976,6 +1101,7 @@ class GeneratorWriter {
         } else if (field.isInnerEnum) {
           final elementConversion = _buildEnumValueExpression(
             clazz,
+            field,
             innerTypeClean,
             'e',
             isNullable: innerType.endsWith('?'),
@@ -1056,7 +1182,7 @@ class GeneratorWriter {
 
           final safeCastExpr = innerType.endsWith('?')
               ? '.map((k, v) => MapEntry(k.toString(), ${_getPrefix(clazz)}SafeCasteUtil.safeCast<DateTime>(v)))'
-              : '.map((k, v) => MapEntry(k.toString(), (${_getPrefix(clazz)}SafeCasteUtil.safeCast<DateTime>(v) ?? DateTime.fromMillisecondsSinceEpoch(0))))';
+              : '.map((k, v) => MapEntry(k.toString(), ${_buildRequiredExpression('${_getPrefix(clazz)}SafeCasteUtil.safeCast<DateTime>(v)', field, innerTypeClean, detail: 'in map field "${field.name}"')}))';
 
           conversion = (isMapExprNullable
               ? '($mapExpr?$safeCastExpr)'
@@ -1082,6 +1208,7 @@ class GeneratorWriter {
 
           final valueConversion = _buildEnumValueExpression(
             clazz,
+            field,
             innerTypeClean,
             'v',
             isNullable: innerType.endsWith('?'),
