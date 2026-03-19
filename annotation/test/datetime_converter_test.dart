@@ -82,39 +82,24 @@ void main() {
         expect(result, isNull);
       });
 
-      test('throws FormatException for ambiguous timestamp (1 digit)', () {
-        expect(
-          () => converter.fromJson(1),
-          throwsFormatException,
-        );
+      test('returns null for ambiguous timestamp (1 digit)', () {
+        expect(converter.fromJson(1), isNull);
       });
 
-      test('throws FormatException for ambiguous timestamp (3 digits)', () {
-        expect(
-          () => converter.fromJson(123),
-          throwsFormatException,
-        );
+      test('returns null for ambiguous timestamp (3 digits)', () {
+        expect(converter.fromJson(123), isNull);
       });
 
-      test('throws FormatException for ambiguous timestamp (9 digits)', () {
-        expect(
-          () => converter.fromJson(123456789),
-          throwsFormatException,
-        );
+      test('returns null for ambiguous timestamp (9 digits)', () {
+        expect(converter.fromJson(123456789), isNull);
       });
 
-      test('throws FormatException for ambiguous timestamp (12 digits)', () {
-        expect(
-          () => converter.fromJson(123456789012),
-          throwsFormatException,
-        );
+      test('returns null for ambiguous timestamp (12 digits)', () {
+        expect(converter.fromJson(123456789012), isNull);
       });
 
-      test('throws FormatException for ambiguous timestamp (14+ digits)', () {
-        expect(
-          () => converter.fromJson(12345678901234),
-          throwsFormatException,
-        );
+      test('returns null for ambiguous timestamp (14+ digits)', () {
+        expect(converter.fromJson(12345678901234), isNull);
       });
     });
 

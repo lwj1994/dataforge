@@ -2,7 +2,7 @@
 
 // Extension for type detection
 extension StringExtension on String {
-  bool isDateTime() => this == 'DateTime' || startsWith('DateTime');
+  bool isDateTime() => this == 'DateTime' || this == 'DateTime?';
   bool isUri() => this == 'Uri';
   bool isDuration() => this == 'Duration';
   bool isBigInt() => this == 'BigInt';

@@ -77,15 +77,10 @@ class DefaultDateTimeConverter extends JsonTypeConverter<DateTime, Object> {
         return DateTime.fromMillisecondsSinceEpoch(int.parse(timestamp) * 1000);
       }
 
-      // Reject ambiguous timestamp lengths to prevent incorrect conversions
-      // Examples of problematic cases:
-      // - "123" could be seconds, milliseconds, or invalid
-      // - "12345678" could be partial timestamp or invalid
-      throw FormatException(
-        'Ambiguous timestamp length: $length digits. '
-        'Expected 10 digits (seconds) or 13 digits (milliseconds). '
-        'Received: $timestamp',
-      );
+      // Ambiguous timestamp lengths - return null instead of throwing
+      // to be consistent with the string parsing fallback behavior.
+      // Examples: "123" could be seconds or milliseconds, "12345678" is ambiguous.
+      return null;
     }
 
     // Try to parse as ISO 8601 or other standard date string format
@@ -117,13 +112,16 @@ class DefaultEnumConverter<T extends Enum>
   @override
   T? fromJson(String? json) {
     if (json == null) return null;
-    try {
-      return values.firstWhere(
-        (e) => e.name == json,
-      );
-    } on StateError {
-      return null;
+    // Exact match first
+    for (final e in values) {
+      if (e.name == json) return e;
     }
+    // Case-insensitive fallback
+    final lower = json.toLowerCase();
+    for (final e in values) {
+      if (e.name.toLowerCase() == lower) return e;
+    }
+    return null;
   }
 
   @override

@@ -28,40 +28,38 @@ class BaseParser {
         .toSet();
   }
 
-  /// Parse the class element and return parse result
+  /// Parse the class element and return parse result.
+  ///
+  /// Returns null only when no @Dataforge annotation is found.
+  /// Throws on unexpected errors so that build_runner can report them.
   ParseResult? parse() {
-    try {
-      // Find Dataforge annotation on the main class
-      final annotationResult = _findDataforgeAnnotation(classElement);
-      if (annotationResult == null) {
-        return null;
-      }
-
-      final className = classElement.name;
-      if (className != null) {
-        _processedClasses.add(className);
-      }
-
-      final classInfo = _parseClassInfo(
-        classElement,
-        annotationResult.object,
-        annotationResult.prefix,
-      );
-
-      final libraryName =
-          classElement.library.identifier.split('/').last.split('.').first;
-
-      return ParseResult(
-        '',
-        libraryName,
-        [classInfo, ..._extraClasses],
-        [],
-        primaryClassName: classElement.name,
-      );
-    } catch (e, stackTrace) {
-      DataforgeLogger.error('Error parsing class', e, stackTrace);
+    // Find Dataforge annotation on the main class
+    final annotationResult = _findDataforgeAnnotation(classElement);
+    if (annotationResult == null) {
       return null;
     }
+
+    final className = classElement.name;
+    if (className != null) {
+      _processedClasses.add(className);
+    }
+
+    final classInfo = _parseClassInfo(
+      classElement,
+      annotationResult.object,
+      annotationResult.prefix,
+    );
+
+    final libraryName =
+        classElement.library.identifier.split('/').last.split('.').first;
+
+    return ParseResult(
+      '',
+      libraryName,
+      [classInfo, ..._extraClasses],
+      [],
+      primaryClassName: classElement.name,
+    );
   }
 
   // Helper to extract annotations safely
@@ -423,9 +421,6 @@ class BaseParser {
 
   String _extractLastTypeArgument(String type) =>
       TypeUtils.extractLastTypeArgument(type);
-
-  List<String> _splitTopLevelTypeArguments(String typeArguments) =>
-      TypeUtils.splitTopLevelTypeArguments(typeArguments);
 }
 
 class _AnnotationResult {

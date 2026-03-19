@@ -197,7 +197,8 @@ class ClassInfo {
               )
               .toList() ??
           [],
-      deepCopyWith: map['deepCopyWith'] as bool? ?? false,
+      deepCopyWith: map['deepCopyWith'] as bool? ?? true,
+      dataforgePrefix: map['dataforgePrefix'] as String?,
     );
   }
 

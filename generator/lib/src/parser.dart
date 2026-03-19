@@ -7,11 +7,4 @@ import 'package:source_gen/source_gen.dart';
 class GeneratorParser extends BaseParser {
   GeneratorParser(ClassElement classElement, ConstantReader annotation)
       : super(classElement, annotation.objectValue);
-
-  @override
-  ParseResult? parse() {
-    // The base parser implementation now correctly handles single class parsing
-    // which aligns with GeneratorForAnnotation's expected behavior.
-    return super.parse();
-  }
 }

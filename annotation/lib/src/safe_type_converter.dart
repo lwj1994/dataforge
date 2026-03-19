@@ -5,6 +5,8 @@ import 'package:dataforge_annotation/src/converter.dart';
 /// 安全类型转换工具类
 /// 解决 Dart 泛型在运行时无法直接通过 T == type 判断的问题
 class SafeCasteUtil {
+  SafeCasteUtil._();
+
   /// 核心方法：将 dynamic 转换为指定的 T 类型
   static T? safeCast<T>(dynamic value) {
     if (value == null) return null;
@@ -12,67 +14,66 @@ class SafeCasteUtil {
     // 1. 快速匹配：如果类型已经符合，直接返回
     if (value is T) return value;
 
-    try {
-      // 2. Map 转换: 确保返回 Map<String, dynamic>
-      if (value is Map && <Map<String, dynamic>>[] is List<T>) {
+    // 2. Map 转换: 确保返回 Map<String, dynamic>
+    if (value is Map && <Map<String, dynamic>>[] is List<T>) {
+      try {
         return value.cast<String, dynamic>() as T;
+      } on TypeError {
+        return null;
       }
-
-      // 3. 基础列表转换: 支持 List<String>, List<int>, List<double>
-      if (value is List) {
-        if (<List<String>>[] is List<T>) {
-          return value.map((e) => e.toString()).toList() as T;
-        }
-        if (<List<int>>[] is List<T>) {
-          return value.map((e) => safeCast<int>(e)).whereType<int>().toList()
-              as T;
-        }
-        if (<List<double>>[] is List<T>) {
-          return value
-              .map((e) => safeCast<double>(e))
-              .whereType<double>()
-              .toList() as T;
-        }
-      }
-
-      // 4. String 转换
-      if (<String>[] is List<T>) {
-        if (value is Map || value is List) return null; // 过滤无意义的结构体转字符串
-        return value.toString() as T;
-      }
-
-      // 5. int 转换
-      if (<int>[] is List<T>) {
-        if (value is num) return value.toInt() as T;
-        if (value is String) return int.tryParse(value) as T?;
-      }
-
-      // 6. double 转换
-      if (<double>[] is List<T>) {
-        if (value is num) return value.toDouble() as T;
-        if (value is String) return double.tryParse(value) as T?;
-      }
-
-      // 7. bool 转换 (兼容 1/0, "true"/"false", "yes"/"no")
-      if (<bool>[] is List<T>) {
-        if (value is bool) return value as T;
-        if (value is String) {
-          final lower = value.toLowerCase();
-          if (['true', '1', 'yes', 'y'].contains(lower)) return true as T;
-          if (['false', '0', 'no', 'n'].contains(lower)) return false as T;
-        }
-        if (value is num) return (value != 0) as T;
-      }
-
-      // 8. DateTime 转换 (支持时间戳和 ISO-8601 字符串)
-      if (<DateTime>[] is List<T>) {
-        return const DefaultDateTimeConverter().fromJson(value) as T?;
-      }
-      return null;
-    } catch (e) {
-      // 开发环境下建议打印错误，生产环境保持静默
-      return null;
     }
+
+    // 3. 基础列表转换: 支持 List<String>, List<int>, List<double>
+    if (value is List) {
+      if (<List<String>>[] is List<T>) {
+        return value.map((e) => e.toString()).toList() as T;
+      }
+      if (<List<int>>[] is List<T>) {
+        return value.map((e) => safeCast<int>(e)).whereType<int>().toList()
+            as T;
+      }
+      if (<List<double>>[] is List<T>) {
+        return value
+            .map((e) => safeCast<double>(e))
+            .whereType<double>()
+            .toList() as T;
+      }
+    }
+
+    // 4. String 转换
+    if (<String>[] is List<T>) {
+      if (value is Map || value is List) return null; // 过滤无意义的结构体转字符串
+      return value.toString() as T;
+    }
+
+    // 5. int 转换
+    if (<int>[] is List<T>) {
+      if (value is num) return value.toInt() as T;
+      if (value is String) return int.tryParse(value) as T?;
+    }
+
+    // 6. double 转换
+    if (<double>[] is List<T>) {
+      if (value is num) return value.toDouble() as T;
+      if (value is String) return double.tryParse(value) as T?;
+    }
+
+    // 7. bool 转换 (兼容 1/0, "true"/"false", "yes"/"no")
+    if (<bool>[] is List<T>) {
+      if (value is bool) return value as T;
+      if (value is String) {
+        final lower = value.toLowerCase();
+        if (['true', '1', 'yes', 'y'].contains(lower)) return true as T;
+        if (['false', '0', 'no', 'n'].contains(lower)) return false as T;
+      }
+      if (value is num) return (value != 0) as T;
+    }
+
+    // 8. DateTime 转换 (支持时间戳和 ISO-8601 字符串)
+    if (<DateTime>[] is List<T>) {
+      return const DefaultDateTimeConverter().fromJson(value) as T?;
+    }
+    return null;
   }
 
   // --- Map 读取相关方法 ---
