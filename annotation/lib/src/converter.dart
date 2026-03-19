@@ -52,7 +52,7 @@ abstract class JsonTypeConverter<T, S> {
 /// - Ambiguous timestamp lengths (not 10 or 13 digits) will throw FormatException
 /// - Invalid date strings will return null instead of throwing
 /// - Null input always returns null
-class DefaultDateTimeConverter extends JsonTypeConverter<DateTime, String> {
+class DefaultDateTimeConverter extends JsonTypeConverter<DateTime, Object> {
   const DefaultDateTimeConverter();
 
   @override

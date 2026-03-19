@@ -1,6 +1,8 @@
 // @author luwenjie on 2026/01/23 16:00:00
 // Logging utility for Dataforge
 
+import 'dart:io';
+
 /// Log levels for categorizing messages
 enum LogLevel {
   debug,
@@ -47,7 +49,12 @@ class DataforgeLogger {
 
   static void _log(LogLevel level, String message) {
     final prefix = _getPrefix(level);
-    print('$prefix$message');
+    if (level == LogLevel.warning || level == LogLevel.error) {
+      // Use stderr for warnings and errors to avoid corrupting stdout output
+      stderr.writeln('$prefix$message');
+    } else {
+      stdout.writeln('$prefix$message');
+    }
   }
 
   static String _getPrefix(LogLevel level) {

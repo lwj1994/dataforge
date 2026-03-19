@@ -9,4 +9,5 @@ export 'src/exceptions.dart';
 export 'src/logger.dart';
 export 'src/model.dart';
 export 'src/parser.dart';
+export 'src/type_utils.dart';
 export 'src/writer.dart';
