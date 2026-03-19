@@ -80,10 +80,16 @@ class JsonKey {
   });
 }
 
+/// Private class to ensure the sentinel is truly unique and cannot collide
+/// with any user-provided value (unlike `const Object()` which is canonical).
+class _Undefined {
+  const _Undefined();
+}
+
 /// Sentinel value used by copyWith to distinguish between null and absent parameters.
 ///
 /// When a parameter is not provided to copyWith, it defaults to this sentinel value,
 /// allowing the method to differentiate between:
 /// - Parameter not provided (use current value)
 /// - Parameter explicitly set to null (update to null)
-const Object dataforgeUndefined = Object();
+const Object dataforgeUndefined = _Undefined();

@@ -16,6 +16,8 @@ enum LogLevel {
 /// Provides structured logging with different severity levels
 /// instead of using print() statements directly.
 class DataforgeLogger {
+  DataforgeLogger._();
+
   static bool debugEnabled = false;
 
   /// Logs a debug message (only shown when debugEnabled = true)

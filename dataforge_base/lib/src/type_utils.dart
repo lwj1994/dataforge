@@ -5,6 +5,23 @@
 class TypeUtils {
   TypeUtils._();
 
+  /// Common primitive and built-in types that do not need special
+  /// serialization handling (no fromJson/toJson, not enums, not Dataforge).
+  static const Set<String> primitiveTypes = {
+    'String',
+    'int',
+    'double',
+    'bool',
+    'num',
+    'dynamic',
+    'void',
+    'Object',
+    'DateTime',
+    'Duration',
+    'Uri',
+    'BigInt',
+  };
+
   /// Splits a type arguments string at top-level commas, respecting nested
   /// generics, parentheses, braces, and brackets.
   ///

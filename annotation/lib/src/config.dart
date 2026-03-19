@@ -1,8 +1,24 @@
 /// Global configuration for Dataforge.
 ///
 /// Set [copyWithErrorCallback] to handle type conversion errors in copyWith.
+/// By default, errors are logged to stderr so they are not silently swallowed.
 class DataforgeConfig {
-  static DataforgeCopyWithErrorCallback? copyWithErrorCallback;
+  DataforgeConfig._();
+
+  static DataforgeCopyWithErrorCallback copyWithErrorCallback =
+      _defaultCopyWithErrorCallback;
+
+  static void _defaultCopyWithErrorCallback(
+    String fieldName,
+    String expectedType,
+    Object? actualValue,
+    Object error,
+    StackTrace stackTrace,
+  ) {
+    // ignore: avoid_print
+    print('Dataforge copyWith error: field "$fieldName" expected $expectedType, '
+        'got ${actualValue.runtimeType} ($error)');
+  }
 
   /// Internal method to report an error.
   static void reportCopyWithError(
@@ -12,7 +28,7 @@ class DataforgeConfig {
     Object error,
     StackTrace stackTrace,
   ) {
-    copyWithErrorCallback?.call(
+    copyWithErrorCallback.call(
         fieldName, expectedType, actualValue, error, stackTrace);
   }
 }

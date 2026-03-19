@@ -23,16 +23,21 @@ void main() {
       expect(called, isTrue);
       expect(reportedField, equals('testField'));
 
-      // Reset after test
-      DataforgeConfig.copyWithErrorCallback = null;
+      // Reset after test - restore default callback
+      DataforgeInit.init(
+        onCopyWithError: (f, e, a, err, s) {},
+      );
     });
 
-    test('init with null should clear the callback', () {
-      DataforgeInit.init(onCopyWithError: (f, e, a, err, s) {});
-      expect(DataforgeConfig.copyWithErrorCallback, isNotNull);
+    test('init with null should keep existing callback', () {
+      final customCallback =
+          (String f, String e, Object? a, Object err, StackTrace s) {};
+      DataforgeInit.init(onCopyWithError: customCallback);
+      expect(DataforgeConfig.copyWithErrorCallback, equals(customCallback));
 
+      // Passing null should not change the callback
       DataforgeInit.init(onCopyWithError: null);
-      expect(DataforgeConfig.copyWithErrorCallback, isNull);
+      expect(DataforgeConfig.copyWithErrorCallback, equals(customCallback));
     });
   });
 }

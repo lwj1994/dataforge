@@ -13,10 +13,39 @@ class CliWriter {
   final String? projectRoot;
   final bool debugMode;
   final String? _dataforgeAnnotationPrefix;
-  final Set<String> _enumTypeCache = {};
+  late final Set<String> _allEnumTypes;
 
   CliWriter(this.result, {this.projectRoot, this.debugMode = false})
-      : _dataforgeAnnotationPrefix = _getDataforgeAnnotationPrefix(result);
+      : _dataforgeAnnotationPrefix = _getDataforgeAnnotationPrefix(result) {
+    _allEnumTypes = _scanAllEnumTypes();
+  }
+
+  /// Scan all Dart files once at init to build a complete set of enum type names.
+  Set<String> _scanAllEnumTypes() {
+    final enumTypes = <String>{};
+    final searchDir =
+        projectRoot != null ? Directory(projectRoot!) : Directory.current;
+    if (!searchDir.existsSync()) return enumTypes;
+
+    final dartFiles = searchDir
+        .listSync(recursive: true)
+        .whereType<File>()
+        .where((file) =>
+            file.path.endsWith('.dart') && !file.path.endsWith('.data.dart'))
+        .toList();
+
+    final enumPattern = RegExp(r'enum\s+(\w+)\s*\{');
+    for (final file in dartFiles) {
+      try {
+        final content = file.readAsStringSync();
+        for (final match in enumPattern.allMatches(content)) {
+          final name = match.group(1);
+          if (name != null) enumTypes.add(name);
+        }
+      } catch (_) {}
+    }
+    return enumTypes;
+  }
 
   Future<String> writeCodeAsync() async {
     final writeStartTime = DateTime.now();
@@ -123,81 +152,16 @@ class CliWriter {
     return null; // No prefix needed if no alias is used
   }
 
-  /// Check if a type is an enum by analyzing the source files
+  /// Check if a type is an enum using the pre-scanned enum type cache.
   bool _isEnumType(String type) {
-    // Remove nullable marker and generic parameters
     final cleanType = _removeGenericParameters(type.replaceAll('?', ''));
-    if (_enumTypeCache.contains(cleanType)) {
-      return true;
-    }
-
-    // Use project root if available, otherwise fall back to current directory
-    final searchDir =
-        projectRoot != null ? Directory(projectRoot!) : Directory.current;
-    if (!searchDir.existsSync()) {
-      return false;
-    }
-
-    // Check all Dart files in the search directory for enum definitions
-    // Optimized: Only search if not primitive
-    const primitives = {
-      'int',
-      'double',
-      'String',
-      'bool',
-      'num',
-      'dynamic',
-      'void',
-      'Object',
-      'DateTime',
-      'Duration',
-      'Uri'
-    };
-    if (primitives.contains(cleanType)) return false;
-
-    final dartFiles = searchDir
-        .listSync(recursive: true)
-        .whereType<File>()
-        .where((file) => file.path.endsWith('.dart'))
-        .toList();
-
-    for (final file in dartFiles) {
-      try {
-        final content = file.readAsStringSync();
-
-        // Look for enum definition
-        final enumPattern =
-            RegExp(r'enum\s+' + RegExp.escape(cleanType) + r'\s*\{');
-        if (enumPattern.hasMatch(content)) {
-          _enumTypeCache.add(cleanType);
-          return true;
-        }
-      } catch (e) {
-        // Ignore file read errors
-        continue;
-      }
-    }
-    return false;
+    return _allEnumTypes.contains(cleanType);
   }
 
   /// Check if a type has a fromJson method (heuristic: assume custom classes do)
   bool _hasFromJsonMethod(String type) {
-    // Primitive types don't have fromJson
-    const primitiveTypes = {
-      'String',
-      'int',
-      'double',
-      'bool',
-      'num',
-      'Object',
-      'dynamic',
-      'DateTime',
-      'Duration',
-      'Uri',
-      'BigInt'
-    };
     final cleanType = _removeGenericParameters(type.replaceAll('?', ''));
-    if (primitiveTypes.contains(cleanType)) return false;
+    if (TypeUtils.primitiveTypes.contains(cleanType)) return false;
     if (cleanType == 'List' ||
         cleanType == 'Set' ||
         cleanType == 'Map' ||
@@ -234,9 +198,6 @@ class CliWriter {
 
   String _extractLastTypeArgument(String type) =>
       TypeUtils.extractLastTypeArgument(type);
-
-  List<String> _splitTopLevelTypeArguments(String typeArguments) =>
-      TypeUtils.splitTopLevelTypeArguments(typeArguments);
 
   /// Process original files asynchronously
   Future<void> _processOriginalFilesAsync() async {

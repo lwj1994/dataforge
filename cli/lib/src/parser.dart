@@ -500,25 +500,12 @@ class Parser {
   bool _isInnerDataforge(String type) {
     if (!type.contains('<')) return false;
     final inner = _extractLastTypeArgument(type).replaceAll('?', '').trim();
-    // Default primitives that are definitely not Dataforge
-    const primitives = {
-      'String',
-      'int',
-      'double',
-      'bool',
-      'num',
-      'DateTime',
-      'dynamic'
-    };
     if (inner.startsWith('List<') || inner.startsWith('Map<')) return false;
-    return !primitives.contains(inner);
+    return !TypeUtils.primitiveTypes.contains(inner);
   }
 
   String _extractLastTypeArgument(String type) =>
       TypeUtils.extractLastTypeArgument(type);
-
-  List<String> _splitTopLevelTypeArguments(String typeArguments) =>
-      TypeUtils.splitTopLevelTypeArguments(typeArguments);
 
   bool _isStaticMethod(CompilationUnitMember member, String methodName) {
     if (member is! ClassDeclaration && member is! MixinDeclaration) {

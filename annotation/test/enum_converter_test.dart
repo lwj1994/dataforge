@@ -27,8 +27,12 @@ void main() {
 
       test('returns null for non-matching string', () {
         expect(converter.fromJson('invalid'), isNull);
-        expect(converter.fromJson('PENDING'), isNull);
-        expect(converter.fromJson('Pending'), isNull);
+      });
+
+      test('matches case-insensitively as fallback', () {
+        expect(converter.fromJson('PENDING'), equals(TestStatus.pending));
+        expect(converter.fromJson('Pending'), equals(TestStatus.pending));
+        expect(converter.fromJson('ACTIVE'), equals(TestStatus.active));
       });
 
       test('does not write to stdout for non-matching string', () {
@@ -100,10 +104,10 @@ void main() {
         expect(converter.fromJson(' pending '), isNull);
       });
 
-      test('is case-sensitive', () {
-        expect(converter.fromJson('PENDING'), isNull);
-        expect(converter.fromJson('Pending'), isNull);
-        expect(converter.fromJson('pEnDiNg'), isNull);
+      test('case-insensitive fallback matches mixed case', () {
+        expect(converter.fromJson('PENDING'), equals(TestStatus.pending));
+        expect(converter.fromJson('Pending'), equals(TestStatus.pending));
+        expect(converter.fromJson('pEnDiNg'), equals(TestStatus.pending));
       });
     });
   });

@@ -7,7 +7,7 @@ export 'src/converter.dart';
 export 'src/config.dart' show DataforgeCopyWithErrorCallback;
 export 'src/safe_type_converter.dart';
 
-export 'package:collection/collection.dart';
+export 'package:collection/collection.dart' show DeepCollectionEquality;
 
 /// to provide initialization method.
 class DataforgeInit {
@@ -30,6 +30,8 @@ class DataforgeInit {
   static void init({
     DataforgeCopyWithErrorCallback? onCopyWithError,
   }) {
-    DataforgeConfig.copyWithErrorCallback = onCopyWithError;
+    if (onCopyWithError != null) {
+      DataforgeConfig.copyWithErrorCallback = onCopyWithError;
+    }
   }
 }
