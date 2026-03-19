@@ -96,12 +96,8 @@ mixin _RequiredDateTimeExample {
 
   static RequiredDateTimeExample fromJson(Map<String, dynamic> json) {
     return RequiredDateTimeExample(
-      createdAt:
-          (SafeCasteUtil.readValue<DateTime>(json, 'createdAt') ??
-          DateTime.fromMillisecondsSinceEpoch(0)),
-      updatedAt:
-          (SafeCasteUtil.readValue<DateTime>(json, 'updatedAt') ??
-          DateTime.fromMillisecondsSinceEpoch(0)),
+      createdAt: SafeCasteUtil.readRequiredValue<DateTime>(json, 'createdAt'),
+      updatedAt: SafeCasteUtil.readRequiredValue<DateTime>(json, 'updatedAt'),
     );
   }
 }
@@ -182,7 +178,11 @@ mixin _ListDateTimeExample {
   String toString() => 'ListDateTimeExample(timestamps: $timestamps)';
 
   Map<String, dynamic> toJson() {
-    return {'timestamps': timestamps};
+    return {
+      'timestamps': timestamps
+          .map((e) => const DefaultDateTimeConverter().toJson(e))
+          .toList(),
+    };
   }
 
   static ListDateTimeExample fromJson(Map<String, dynamic> json) {
@@ -191,8 +191,10 @@ mixin _ListDateTimeExample {
           (((SafeCasteUtil.readValue<List<dynamic>>(json, 'timestamps')
               ?.map(
                 (e) =>
-                    (SafeCasteUtil.safeCast<DateTime>(e) ??
-                    DateTime.fromMillisecondsSinceEpoch(0)),
+                    ((SafeCasteUtil.safeCast<DateTime>(e)) ??
+                    (throw ArgumentError(
+                      'Required field "timestamps" (type: DateTime) is missing or invalid. in collection field "timestamps"',
+                    ))),
               )
               .toList())) ??
           (const [])),
@@ -209,9 +211,11 @@ class ListDateTimeExampleCopyWith<R> {
   @pragma('vm:prefer-inline')
   R call({Object? timestamps = dataforgeUndefined}) {
     final res = ListDateTimeExample(
-      timestamps: (timestamps == dataforgeUndefined
-          ? _instance.timestamps
-          : (timestamps as List).cast<DateTime>()),
+      timestamps: SafeCasteUtil.copyWithCastList<DateTime>(
+        timestamps,
+        'timestamps',
+        _instance.timestamps,
+      ),
     );
     return (_then != null ? _then!(res) : res as R);
   }
@@ -273,13 +277,13 @@ mixin _CustomDateTimeConverterExample {
 
   Map<String, dynamic> toJson() {
     return {
-      'customDateTime': const CustomDateTimeConverter().toJson(customDateTime),
+      'customDateTime': (CustomDateTimeConverter()).toJson(customDateTime),
     };
   }
 
   static CustomDateTimeConverterExample fromJson(Map<String, dynamic> json) {
     return CustomDateTimeConverterExample(
-      customDateTime: const CustomDateTimeConverter().fromJson(
+      customDateTime: (CustomDateTimeConverter()).fromJson(
         json['customDateTime'],
       ),
     );
@@ -346,9 +350,7 @@ mixin _DateTimeWithDefaultExample {
 
   static DateTimeWithDefaultExample fromJson(Map<String, dynamic> json) {
     return DateTimeWithDefaultExample(
-      createdAt:
-          (SafeCasteUtil.readValue<DateTime>(json, 'createdAt') ??
-          DateTime.fromMillisecondsSinceEpoch(0)),
+      createdAt: SafeCasteUtil.readRequiredValue<DateTime>(json, 'createdAt'),
     );
   }
 }

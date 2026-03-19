@@ -205,9 +205,11 @@ class AlternateNamesTestCopyWith<R> {
         'isActive',
         _instance.isActive,
       ),
-      tags: (tags == dataforgeUndefined
-          ? _instance.tags
-          : (tags as List).cast<String>()),
+      tags: SafeCasteUtil.copyWithCastList<String>(
+        tags,
+        'tags',
+        _instance.tags,
+      ),
     );
     return (_then != null ? _then!(res) : res as R);
   }

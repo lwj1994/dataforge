@@ -93,7 +93,8 @@ class BaseParser {
         try {
           if (metadata is ElementAnnotation) {
             final source = metadata.toSource();
-            final match = RegExp(r'@(\w+)\.Dataforge').firstMatch(source);
+            final match =
+                RegExp(r'@(\w+)\.(?:Dataforge|dataforge)\b').firstMatch(source);
             if (match != null) {
               prefix = match.group(1);
             }
@@ -322,7 +323,10 @@ class BaseParser {
         if (obj == null) continue;
 
         if (obj.type?.element?.name == 'JsonKey') {
-          jsonKeyInfo = _parseJsonKeyAnnotation(obj as DartObject);
+          jsonKeyInfo = _parseJsonKeyAnnotation(
+            obj as DartObject,
+            source: metadata is ElementAnnotation ? metadata.toSource() : null,
+          );
           break;
         }
       }
@@ -349,7 +353,9 @@ class BaseParser {
     return fields;
   }
 
-  JsonKeyInfo _parseJsonKeyAnnotation(DartObject obj) {
+  JsonKeyInfo _parseJsonKeyAnnotation(DartObject obj, {String? source}) {
+    final sourceArguments =
+        source == null ? const <String, String>{} : _parseNamedArguments(source);
     List<String> alternateNames = [];
     final altNamesField = obj.getField('alternateNames');
     if (altNamesField != null) {
@@ -368,7 +374,10 @@ class BaseParser {
     if (toJsonField != null && !toJsonField.isNull) {
       try {
         final func = toJsonField.toFunctionValue();
-        toJsonFunc = _getFunctionName(func);
+        toJsonFunc = _normalizeFunctionReference(
+          sourceArguments['toJson'],
+          func,
+        );
       } catch (_) {}
     }
 
@@ -378,7 +387,10 @@ class BaseParser {
     if (readValueField != null && !readValueField.isNull) {
       try {
         final func = readValueField.toFunctionValue();
-        readValueFunc = _getFunctionName(func);
+        readValueFunc = _normalizeFunctionReference(
+          sourceArguments['readValue'],
+          func,
+        );
       } catch (_) {}
     }
 
@@ -388,7 +400,10 @@ class BaseParser {
     if (fromJsonField != null && !fromJsonField.isNull) {
       try {
         final func = fromJsonField.toFunctionValue();
-        fromJsonFunc = _getFunctionName(func);
+        fromJsonFunc = _normalizeFunctionReference(
+          sourceArguments['fromJson'],
+          func,
+        );
       } catch (_) {}
     }
 
@@ -397,13 +412,125 @@ class BaseParser {
       alternateNames: alternateNames,
       readValue: readValueFunc,
       ignore: obj.getField('ignore')?.toBoolValue() ?? false,
-      converter: (obj.getField('converter')?.isNull == false)
-          ? obj.getField('converter')?.type?.getDisplayString() ?? ''
-          : '',
+      converter: sourceArguments['converter'] ??
+          ((obj.getField('converter')?.isNull == false)
+              ? obj.getField('converter')?.type?.getDisplayString() ?? ''
+              : ''),
       includeIfNull: obj.getField('includeIfNull')?.toBoolValue(),
       fromJson: fromJsonFunc,
       toJson: toJsonFunc,
     );
+  }
+
+  Map<String, String> _parseNamedArguments(String source) {
+    final start = source.indexOf('(');
+    final end = source.lastIndexOf(')');
+    if (start == -1 || end == -1 || end <= start) {
+      return const <String, String>{};
+    }
+
+    final argsSource = source.substring(start + 1, end);
+    final segments = <String>[];
+    final buffer = StringBuffer();
+    var parenDepth = 0;
+    var bracketDepth = 0;
+    var braceDepth = 0;
+    String? quote;
+    var escaped = false;
+
+    for (final rune in argsSource.runes) {
+      final char = String.fromCharCode(rune);
+      if (quote != null) {
+        buffer.write(char);
+        if (escaped) {
+          escaped = false;
+        } else if (char == r'\') {
+          escaped = true;
+        } else if (char == quote) {
+          quote = null;
+        }
+        continue;
+      }
+
+      switch (char) {
+        case '\'':
+        case '"':
+          quote = char;
+          buffer.write(char);
+          break;
+        case '(':
+          parenDepth++;
+          buffer.write(char);
+          break;
+        case ')':
+          parenDepth--;
+          buffer.write(char);
+          break;
+        case '[':
+          bracketDepth++;
+          buffer.write(char);
+          break;
+        case ']':
+          bracketDepth--;
+          buffer.write(char);
+          break;
+        case '{':
+          braceDepth++;
+          buffer.write(char);
+          break;
+        case '}':
+          braceDepth--;
+          buffer.write(char);
+          break;
+        case ',':
+          if (parenDepth == 0 && bracketDepth == 0 && braceDepth == 0) {
+            segments.add(buffer.toString().trim());
+            buffer.clear();
+          } else {
+            buffer.write(char);
+          }
+          break;
+        default:
+          buffer.write(char);
+      }
+    }
+
+    if (buffer.isNotEmpty) {
+      segments.add(buffer.toString().trim());
+    }
+
+    final result = <String, String>{};
+    for (final segment in segments) {
+      final colonIndex = segment.indexOf(':');
+      if (colonIndex == -1) continue;
+      final key = segment.substring(0, colonIndex).trim();
+      final value = segment.substring(colonIndex + 1).trim();
+      if (key.isNotEmpty && value.isNotEmpty) {
+        result[key] = value;
+      }
+    }
+
+    return result;
+  }
+
+  String _normalizeFunctionReference(
+    String? sourceReference,
+    ExecutableElement? func,
+  ) {
+    final reference = sourceReference?.trim();
+    if (reference != null && reference.isNotEmpty) {
+      if (reference.contains('.')) {
+        return reference;
+      }
+      if (func is MethodElement && func.isStatic) {
+        final className = func.enclosingElement?.name;
+        if (className != null && className.isNotEmpty) {
+          return '$className.$reference';
+        }
+      }
+      return reference;
+    }
+    return _getFunctionName(func);
   }
 
   String _getFunctionName(ExecutableElement? func) {

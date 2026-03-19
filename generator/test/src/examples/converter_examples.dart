@@ -40,12 +40,12 @@ mixin _GenericContainer<T> {
   String toString() => 'GenericContainer(data: $data)';
 
   Map<String, dynamic> toJson() {
-    return {'data': const GenericConverter<dynamic>().toJson(data)};
+    return {'data': (GenericConverter()).toJson(data)};
   }
 
   static GenericContainer<T> fromJson<T>(Map<String, dynamic> json) {
     return GenericContainer(
-      data: const GenericConverter<dynamic>().fromJson(json['data']) as T,
+      data: (GenericConverter()).fromJson(json['data']) as T,
     );
   }
 }

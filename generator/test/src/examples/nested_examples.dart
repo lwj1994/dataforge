@@ -45,7 +45,7 @@ mixin _NestedDefaultValues {
   String toString() => 'NestedDefaultValues(name: $name, nested: $nested)';
 
   Map<String, dynamic> toJson() {
-    return {'name': name, 'nested': nested};
+    return {'name': name, 'nested': nested.toJson()};
   }
 
   static NestedDefaultValues fromJson(Map<String, dynamic> json) {
@@ -135,7 +135,7 @@ mixin _ChainedExample {
   String toString() => 'ChainedExample(id: $id, user: $user)';
 
   Map<String, dynamic> toJson() {
-    return {'id': id, 'user': user};
+    return {'id': id, 'user': user.toJson()};
   }
 
   static ChainedExample fromJson(Map<String, dynamic> json) {
@@ -209,7 +209,7 @@ mixin _NullableNestedExample {
       'NullableNestedExample(name: $name, optionalUser: $optionalUser)';
 
   Map<String, dynamic> toJson() {
-    return {'name': name, 'optionalUser': optionalUser};
+    return {'name': name, 'optionalUser': (optionalUser?.toJson())};
   }
 
   static NullableNestedExample fromJson(Map<String, dynamic> json) {
@@ -315,7 +315,7 @@ mixin _MultiLevelNestedExample {
   String toString() => 'MultiLevelNestedExample(id: $id, person: $person)';
 
   Map<String, dynamic> toJson() {
-    return {'id': id, 'person': person};
+    return {'id': id, 'person': person.toJson()};
   }
 
   static MultiLevelNestedExample fromJson(Map<String, dynamic> json) {
@@ -399,7 +399,7 @@ mixin _DeepRootExample {
   String toString() => 'DeepRootExample(id: $id, root: $root)';
 
   Map<String, dynamic> toJson() {
-    return {'id': id, 'root': root};
+    return {'id': id, 'root': root.toJson()};
   }
 
   static DeepRootExample fromJson(Map<String, dynamic> json) {
@@ -478,7 +478,7 @@ mixin _SuperDeepRoot {
   String toString() => 'SuperDeepRoot(root: $root)';
 
   Map<String, dynamic> toJson() {
-    return {'root': root};
+    return {'root': root.toJson()};
   }
 
   static SuperDeepRoot fromJson(Map<String, dynamic> json) {
