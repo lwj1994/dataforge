@@ -277,13 +277,15 @@ mixin _CustomDateTimeConverterExample {
 
   Map<String, dynamic> toJson() {
     return {
-      'customDateTime': (CustomDateTimeConverter()).toJson(customDateTime),
+      'customDateTime': (const CustomDateTimeConverter()).toJson(
+        customDateTime,
+      ),
     };
   }
 
   static CustomDateTimeConverterExample fromJson(Map<String, dynamic> json) {
     return CustomDateTimeConverterExample(
-      customDateTime: (CustomDateTimeConverter()).fromJson(
+      customDateTime: (const CustomDateTimeConverter()).fromJson(
         json['customDateTime'],
       ),
     );

@@ -7,6 +7,7 @@ import 'package:collection/collection.dart';
 import 'package:path/path.dart' as p;
 
 import 'package:dataforge_base/src/model.dart';
+import 'package:dataforge_base/src/type_utils.dart';
 
 /// Parse Dart files and extract Dataforge annotation information
 ///
@@ -27,9 +28,6 @@ class Parser {
   /// Optional output directory
   final String? outputDirectory;
 
-  /// Cache for frequently used calculation results
-  final Map<String, bool> _annotationCache = {};
-
   /// Create parser instance
   ///
   /// [path] must be a valid Dart file path
@@ -37,15 +35,8 @@ class Parser {
   Parser(this.path, {this.outputDirectory});
 
   /// Check if it's a DataClass or Dataforge annotation
-  bool _isDataClassAnnotation(String name) {
-    return _annotationCache.putIfAbsent(name, () {
-      final cleanName = name.contains('.') ? name.split('.').last : name;
-      return cleanName == 'DataClass' ||
-          cleanName == 'dataClass' ||
-          cleanName == 'Dataforge' ||
-          cleanName == 'dataforge';
-    });
-  }
+  bool _isDataClassAnnotation(String name) =>
+      TypeUtils.isDataClassAnnotation(name);
 
   /// Parse Dart file and return parse result
   ///

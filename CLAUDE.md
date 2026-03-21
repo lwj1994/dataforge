@@ -61,7 +61,7 @@ dataforge lib/models --debug
 ## Architecture Notes
 
 - **Two code generation paths**: build_runner (generator package, uses `source_gen`) and standalone CLI (cli package, uses `analyzer` directly). Both share `BaseParser` and `Writer` from `dataforge_base`.
-- **CLI parallel processing**: Uses `Isolate`-based concurrency with `Platform.numberOfProcessors` workers. Pre-filters files for `@Dataforge` annotations before parsing.
+- **CLI parallel processing**: Uses async parallel processing via `Future.wait` with `Platform.numberOfProcessors` concurrent tasks. Pre-filters files for `@Dataforge` annotations before parsing.
 - **Type converters**: `SafeCasteUtil` handles lenient type coercion (String↔int, String↔bool with "yes"/"no"/"1"/"0" support). `DefaultDateTimeConverter` auto-detects 10-digit (seconds) vs 13-digit (milliseconds) timestamps vs ISO-8601 strings.
 
 ## Publishing

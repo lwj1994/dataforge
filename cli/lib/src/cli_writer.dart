@@ -2,15 +2,26 @@ import 'dart:io';
 
 import 'package:analyzer/dart/analysis/utilities.dart';
 import 'package:analyzer/dart/ast/ast.dart';
+import 'package:dataforge_base/src/logger.dart';
 import 'package:dataforge_base/src/model.dart';
 import 'package:dataforge_base/src/type_utils.dart';
 import 'package:dataforge_base/src/writer.dart';
 import 'package:path/path.dart' as p;
 
+const _skipDirNames = {
+  '.dart_tool', '.git', '.idea', '.vscode', 'build', '.pub-cache',
+  'node_modules', '.packages', 'coverage', 'doc', 'docs',
+  '.flutter-plugins', '.flutter-plugins-dependencies',
+  'ios', 'android', 'web', 'windows', 'macos', 'linux',
+};
+
 class CliWriter {
   static const String _generatedFileIgnoreLine =
       '// ignore_for_file: prefer_const_constructors, prefer_single_quotes, '
       'unnecessary_cast, unnecessary_non_null_assertion, unused_element';
+
+  /// Cache scanned types per project root to avoid re-scanning for each file.
+  static final Map<String, _ScannedTypes> _scannedTypesCache = {};
 
   final ParseResult result;
   final String? projectRoot;
@@ -21,10 +32,17 @@ class CliWriter {
 
   CliWriter(this.result, {this.projectRoot, this.debugMode = false})
       : _dataforgeAnnotationPrefix = _getDataforgeAnnotationPrefix(result) {
-    final scannedTypes = _scanProjectTypes();
+    final cacheKey = projectRoot ?? Directory.current.path;
+    final scannedTypes = _scannedTypesCache.putIfAbsent(
+      cacheKey,
+      () => _scanProjectTypes(),
+    );
     _allEnumTypes = scannedTypes.enums;
     _allJsonModelTypes = scannedTypes.jsonModels;
   }
+
+  /// Clear the scanned types cache (useful for testing or when project changes).
+  static void clearCache() => _scannedTypesCache.clear();
 
   /// Scan project Dart files once at init to build type metadata caches.
   _ScannedTypes _scanProjectTypes() {
@@ -39,8 +57,15 @@ class CliWriter {
     final dartFiles = searchDir
         .listSync(recursive: true)
         .whereType<File>()
-        .where((file) =>
-            file.path.endsWith('.dart') && !file.path.endsWith('.data.dart'))
+        .where((file) {
+          final path = file.path;
+          if (!path.endsWith('.dart') || path.endsWith('.data.dart')) {
+            return false;
+          }
+          // Apply the same skip filters as directory scanning
+          final segments = p.split(path);
+          return !segments.any(_skipDirNames.contains);
+        })
         .toList();
 
     for (final file in dartFiles) {
@@ -58,7 +83,7 @@ class CliWriter {
             final className = declaration.name.lexeme;
             final hasDataforgeAnnotation = declaration.metadata.any((annotation) {
               final name = annotation.name.name;
-              return _isDataClassAnnotation(name);
+              return TypeUtils.isDataClassAnnotation(name);
             });
             final hasFromJsonFactory = declaration.members.any((member) {
               if (member is ConstructorDeclaration) {
@@ -76,7 +101,9 @@ class CliWriter {
             }
           }
         }
-      } catch (_) {}
+      } catch (e) {
+        DataforgeLogger.warning('Failed to scan file ${file.path}: $e');
+      }
     }
 
     return _ScannedTypes(enumTypes, jsonModelTypes);
@@ -195,14 +222,6 @@ class CliWriter {
     return _allEnumTypes.contains(cleanType);
   }
 
-  bool _isDataClassAnnotation(String name) {
-    final cleanName = name.contains('.') ? name.split('.').last : name;
-    return cleanName == 'DataClass' ||
-        cleanName == 'dataClass' ||
-        cleanName == 'Dataforge' ||
-        cleanName == 'dataforge';
-  }
-
   bool _isJsonModelType(String type) {
     final cleanType = _removeGenericParameters(type.replaceAll('?', ''));
     return _allJsonModelTypes.contains(cleanType);
@@ -297,7 +316,7 @@ class CliWriter {
         await file.writeAsString(lines.join('\n'));
       }
     } catch (e) {
-      if (debugMode) print('Error in batch processing $filePath: $e');
+      DataforgeLogger.warning('Failed to update source file $filePath: $e');
     }
   }
 

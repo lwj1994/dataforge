@@ -487,12 +487,22 @@ class GeneratorWriter {
     final trimmed = converterExpression.trim();
     if (trimmed.isEmpty) return trimmed;
 
+    // Already has const prefix — use as-is
+    if (trimmed.startsWith('const ')) {
+      return trimmed;
+    }
+
+    // Strip trailing () if present so we can normalize to `const Type()`
+    final withoutParens = trimmed.endsWith('()')
+        ? trimmed.substring(0, trimmed.length - 2)
+        : trimmed;
+
     final simpleTypePattern = RegExp(r'^[A-Za-z_]\w*(?:\.\w+)*(?:<[^<>]+>)?$');
-    final lastSegment = trimmed.split('.').last;
+    final lastSegment = withoutParens.split('.').last;
     final startsWithTypeName =
         lastSegment.isNotEmpty && RegExp(r'^[A-Z]').hasMatch(lastSegment);
-    if (simpleTypePattern.hasMatch(trimmed) && startsWithTypeName) {
-      return 'const $trimmed()';
+    if (simpleTypePattern.hasMatch(withoutParens) && startsWithTypeName) {
+      return 'const $withoutParens()';
     }
     return trimmed;
   }
