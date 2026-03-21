@@ -563,16 +563,21 @@ mixin _MapStringExample {
   static MapStringExample fromJson(Map<String, dynamic> json) {
     return MapStringExample(
       stringMap:
-          ((SafeCasteUtil.readValue<Map<String, dynamic>>(
+          (((SafeCasteUtil.readValue<Map<String, dynamic>>(
             json,
             'stringMap',
-          )?.cast<String, String>()) ??
+          )?.map(
+            (k, v) => MapEntry(
+              k.toString(),
+              (SafeCasteUtil.safeCast<String>(v) ?? ''),
+            ),
+          ))) ??
           (const {})),
       intMap:
-          ((SafeCasteUtil.readValue<Map<String, dynamic>>(
-            json,
-            'intMap',
-          )?.cast<String, int>()) ??
+          (((SafeCasteUtil.readValue<Map<String, dynamic>>(json, 'intMap')?.map(
+            (k, v) =>
+                MapEntry(k.toString(), (SafeCasteUtil.safeCast<int>(v) ?? 0)),
+          ))) ??
           (const {})),
       dynamicMap:
           ((SafeCasteUtil.readValue<Map<String, dynamic>>(
