@@ -183,9 +183,4 @@ class CircularDependencyDetector {
     return buffer.toString();
   }
 
-  /// Clears all registered classes and dependencies
-  void clear() {
-    _dependencies.clear();
-    _classInfoMap.clear();
-  }
 }

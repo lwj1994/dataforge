@@ -33,7 +33,7 @@ abstract class JsonTypeConverter<T, S> {
 /// - Numeric timestamps (milliseconds since Unix epoch):
 ///   * 13-digit numbers: treated as milliseconds (e.g., 1737619200000)
 ///   * 10-digit numbers: treated as seconds and converted to milliseconds (e.g., 1737619200)
-///   * Other lengths: throws FormatException to avoid ambiguous interpretation
+///   * Other lengths: returns null to avoid ambiguous interpretation
 /// - String values: parsed using DateTime.parse() which supports ISO 8601 format
 ///
 /// ## Timestamp Format Examples
@@ -49,7 +49,7 @@ abstract class JsonTypeConverter<T, S> {
 /// ```
 ///
 /// ## Error Handling
-/// - Ambiguous timestamp lengths (not 10 or 13 digits) will throw FormatException
+/// - Ambiguous timestamp lengths (not 10 or 13 digits) will return null
 /// - Invalid date strings will return null instead of throwing
 /// - Null input always returns null
 class DefaultDateTimeConverter extends JsonTypeConverter<DateTime, Object> {

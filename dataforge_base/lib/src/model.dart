@@ -220,7 +220,8 @@ class ClassInfo {
           other.genericParameters,
           genericParameters,
         ) &&
-        other.deepCopyWith == deepCopyWith;
+        other.deepCopyWith == deepCopyWith &&
+        other.dataforgePrefix == dataforgePrefix;
   }
 
   @override
@@ -232,6 +233,7 @@ class ClassInfo {
         includeToJson,
         const DeepCollectionEquality().hash(genericParameters),
         deepCopyWith,
+        dataforgePrefix,
       ]);
 }
 

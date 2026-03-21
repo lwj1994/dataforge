@@ -71,8 +71,10 @@ class BaseParser {
       }
       try {
         return meta.annotations;
-      } catch (_) {
-        // Annotations property not available
+      } catch (e) {
+        DataforgeLogger.warning(
+          'Could not access annotations via .annotations for "${element.name}": $e',
+        );
       }
     } catch (e) {
       DataforgeLogger.warning(
@@ -193,7 +195,11 @@ class BaseParser {
             try {
               // Try formalParameters (sometimes used in newer APIs)
               params = (constructor as dynamic).formalParameters;
-            } catch (_) {}
+            } catch (e) {
+              DataforgeLogger.warning(
+                'Could not access parameters for constructor of "${element.name}": $e',
+              );
+            }
           }
 
           for (final parameter in params) {
@@ -212,7 +218,11 @@ class BaseParser {
                   parameterRequired[p.name as String] = true;
                 }
               }
-            } catch (_) {}
+            } catch (e) {
+              DataforgeLogger.debug(
+                'Could not read parameter details for "${element.name}": $e',
+              );
+            }
           }
 
           // Fallback: If no defaults were found via API, try parsing
@@ -368,44 +378,9 @@ class BaseParser {
       }
     }
 
-    // Extract toJson function reference
-    String toJsonFunc = '';
-    final toJsonField = obj.getField('toJson');
-    if (toJsonField != null && !toJsonField.isNull) {
-      try {
-        final func = toJsonField.toFunctionValue();
-        toJsonFunc = _normalizeFunctionReference(
-          sourceArguments['toJson'],
-          func,
-        );
-      } catch (_) {}
-    }
-
-    // Extract readValue function reference
-    String readValueFunc = '';
-    final readValueField = obj.getField('readValue');
-    if (readValueField != null && !readValueField.isNull) {
-      try {
-        final func = readValueField.toFunctionValue();
-        readValueFunc = _normalizeFunctionReference(
-          sourceArguments['readValue'],
-          func,
-        );
-      } catch (_) {}
-    }
-
-    // Extract fromJson function reference
-    String fromJsonFunc = '';
-    final fromJsonField = obj.getField('fromJson');
-    if (fromJsonField != null && !fromJsonField.isNull) {
-      try {
-        final func = fromJsonField.toFunctionValue();
-        fromJsonFunc = _normalizeFunctionReference(
-          sourceArguments['fromJson'],
-          func,
-        );
-      } catch (_) {}
-    }
+    final toJsonFunc = _extractFuncRef(obj, sourceArguments, 'toJson');
+    final readValueFunc = _extractFuncRef(obj, sourceArguments, 'readValue');
+    final fromJsonFunc = _extractFuncRef(obj, sourceArguments, 'fromJson');
 
     return JsonKeyInfo(
       name: obj.getField('name')?.toStringValue() ?? '',
@@ -420,6 +395,27 @@ class BaseParser {
       fromJson: fromJsonFunc,
       toJson: toJsonFunc,
     );
+  }
+
+  String _extractFuncRef(
+    DartObject obj,
+    Map<String, String> sourceArgs,
+    String fieldName,
+  ) {
+    final field = obj.getField(fieldName);
+    if (field == null || field.isNull) return '';
+    try {
+      return _normalizeFunctionReference(
+        sourceArgs[fieldName],
+        field.toFunctionValue(),
+      );
+    } catch (e) {
+      DataforgeLogger.warning(
+        'Failed to extract $fieldName function reference from @JsonKey: $e. '
+        'The custom $fieldName function will be ignored.',
+      );
+      return '';
+    }
   }
 
   Map<String, String> _parseNamedArguments(String source) {

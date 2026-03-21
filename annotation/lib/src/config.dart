@@ -1,7 +1,9 @@
 /// Global configuration for Dataforge.
 ///
 /// Set [copyWithErrorCallback] to handle type conversion errors in copyWith.
-/// By default, errors are logged to stderr so they are not silently swallowed.
+/// By default, errors are printed to stdout (using `print()` to avoid a
+/// `dart:io` dependency in the annotation package). Override this callback
+/// to route errors to stderr or a logging framework.
 class DataforgeConfig {
   DataforgeConfig._();
 

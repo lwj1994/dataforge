@@ -5,23 +5,6 @@
 class TypeUtils {
   TypeUtils._();
 
-  /// Common primitive and built-in types that do not need special
-  /// serialization handling (no fromJson/toJson, not enums, not Dataforge).
-  static const Set<String> primitiveTypes = {
-    'String',
-    'int',
-    'double',
-    'bool',
-    'num',
-    'dynamic',
-    'void',
-    'Object',
-    'DateTime',
-    'Duration',
-    'Uri',
-    'BigInt',
-  };
-
   /// Splits a type arguments string at top-level commas, respecting nested
   /// generics, parentheses, braces, and brackets.
   ///
@@ -89,6 +72,17 @@ class TypeUtils {
     }
 
     return parts;
+  }
+
+  /// Checks if an annotation name is a Dataforge class annotation.
+  ///
+  /// Handles prefixed names like `df.Dataforge` by checking the last segment.
+  static bool isDataClassAnnotation(String name) {
+    final cleanName = name.contains('.') ? name.split('.').last : name;
+    return cleanName == 'DataClass' ||
+        cleanName == 'dataClass' ||
+        cleanName == 'Dataforge' ||
+        cleanName == 'dataforge';
   }
 
   /// Extracts the last type argument from a generic type string.

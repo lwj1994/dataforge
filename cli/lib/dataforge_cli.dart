@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'dart:async';
+import 'package:dataforge_base/src/logger.dart';
 import 'package:path/path.dart' as p;
 
 import 'package:dataforge_cli/src/parser.dart';
@@ -157,7 +158,8 @@ Future<List<String>> generate(String path, {bool debugMode = false}) async {
 
     final parseTime = parseEndTime.difference(parseStartTime).inMilliseconds;
     if (parseRes == null) {
-      throw StateError('Failed to parse Dataforge file: $absolutePath');
+      DataforgeLogger.warning('Failed to parse Dataforge file: $absolutePath');
+      return generatedFiles;
     }
 
     if (debugMode) {
@@ -185,6 +187,9 @@ Future<List<String>> generate(String path, {bool debugMode = false}) async {
   }
   final endTime = DateTime.now();
   final totalTime = endTime.difference(startTime).inMilliseconds;
+
+  // Clear the type cache so it doesn't outlive this invocation
+  CliWriter.clearCache();
 
   if (debugMode) {
     print(
@@ -239,10 +244,7 @@ List<String> _scanDirectory(String path,
         }
       }
     } catch (e) {
-      if (debugMode) {
-        print(
-            '[DEBUG] ${DateTime.now()}: Error scanning directory $currentPath: $e');
-      }
+      DataforgeLogger.warning('Could not scan directory $currentPath: $e');
     }
   }
 
@@ -283,21 +285,17 @@ bool _shouldSkipDirectory(String dirName) {
   return skipDirs.contains(dirName);
 }
 
+final _dataforgeAnnotationPattern = RegExp(
+  r'@\w+\.(?:Dataforge|dataforge|DataClass|dataClass)\b|@(?:Dataforge|dataforge|DataClass|dataClass)\b',
+);
+
 /// Quick pre-filter to check if file contains Dataforge annotations
 bool _hasDataforgeAnnotations(String filePath) {
   try {
-    final file = File(filePath);
-    if (!file.existsSync()) return false;
-
-    // Read file content efficiently
-    final content = file.readAsStringSync();
-
-    final annotationPattern = RegExp(
-      r'@\w+\.(?:Dataforge|dataforge|DataClass|dataClass)\b|@(?:Dataforge|dataforge|DataClass|dataClass)\b',
-    );
-    return annotationPattern.hasMatch(content);
+    final content = File(filePath).readAsStringSync();
+    return _dataforgeAnnotationPattern.hasMatch(content);
   } catch (e) {
-    // If we can't read the file, skip it
+    DataforgeLogger.warning('Could not read file $filePath: $e');
     return false;
   }
 }
@@ -337,12 +335,14 @@ String _inferProjectRoot(String absolutePath, FileSystemEntityType entity) {
   return startDir;
 }
 
-/// Determine whether a file should be skipped
+/// Determine whether a file should be skipped based on its path segments.
+///
+/// Note: 'build' is only skipped as a top-level directory (via [_shouldSkipDirectory])
+/// to avoid false positives on user directories like `lib/build_config/`.
 bool _shouldSkipFile(String filePath) {
   const skipDirs = {
     '.dart_tool',
     '.git',
-    'build',
     '.idea',
     '.pub-cache',
     'node_modules',
@@ -410,37 +410,47 @@ Future<List<String>> _processFilesInParallel(
   return results;
 }
 
-/// Process a single file and return the generated file path
+/// Process a single file and return the generated file path.
+/// Returns empty string on failure so batch processing can continue.
 Future<String> _processFile(
     String filePath, String projectRoot, bool debugMode) async {
-  final fileStartTime = DateTime.now();
+  try {
+    final fileStartTime = DateTime.now();
 
-  if (debugMode) {
-    print('[DEBUG] ${DateTime.now()}: Processing file: ${p.basename(filePath)}');
+    if (debugMode) {
+      print(
+          '[DEBUG] ${DateTime.now()}: Processing file: ${p.basename(filePath)}');
+    }
+
+    final parseStartTime = DateTime.now();
+    final parser = Parser(filePath);
+    final parseRes = parser.parseDartFile();
+    final parseEndTime = DateTime.now();
+
+    final parseTime = parseEndTime.difference(parseStartTime).inMilliseconds;
+    if (parseRes == null) {
+      DataforgeLogger.warning(
+          'Failed to parse Dataforge file: ${p.basename(filePath)}');
+      return '';
+    }
+
+    final writeStartTime = DateTime.now();
+    final writer =
+        CliWriter(parseRes, projectRoot: projectRoot, debugMode: debugMode);
+    final generatedFile = await writer.writeCodeAsync();
+    final writeEndTime = DateTime.now();
+
+    final fileEndTime = DateTime.now();
+
+    final writeTime = writeEndTime.difference(writeStartTime).inMilliseconds;
+    final totalTime = fileEndTime.difference(fileStartTime).inMilliseconds;
+    print(
+        '✅ Generated ${p.relative(generatedFile, from: projectRoot)} in ${totalTime}ms (parse: ${parseTime}ms, write: ${writeTime}ms)');
+
+    return generatedFile;
+  } catch (e) {
+    DataforgeLogger.error(
+        'Error processing ${p.basename(filePath)}: $e');
+    return '';
   }
-
-  final parseStartTime = DateTime.now();
-  final parser = Parser(filePath);
-  final parseRes = parser.parseDartFile();
-  final parseEndTime = DateTime.now();
-
-  final parseTime = parseEndTime.difference(parseStartTime).inMilliseconds;
-  if (parseRes == null) {
-    throw StateError('Failed to parse Dataforge file: $filePath');
-  }
-
-  final writeStartTime = DateTime.now();
-  final writer =
-      CliWriter(parseRes, projectRoot: projectRoot, debugMode: debugMode);
-  final generatedFile = await writer.writeCodeAsync();
-  final writeEndTime = DateTime.now();
-
-  final fileEndTime = DateTime.now();
-
-  final writeTime = writeEndTime.difference(writeStartTime).inMilliseconds;
-  final totalTime = fileEndTime.difference(fileStartTime).inMilliseconds;
-  print(
-      '✅ Generated ${p.relative(generatedFile, from: projectRoot)} in ${totalTime}ms (parse: ${parseTime}ms, write: ${writeTime}ms)');
-
-  return generatedFile;
 }
