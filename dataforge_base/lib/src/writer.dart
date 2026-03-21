@@ -487,8 +487,7 @@ class GeneratorWriter {
     final trimmed = converterExpression.trim();
     if (trimmed.isEmpty) return trimmed;
 
-    final simpleTypePattern =
-        RegExp(r'^[A-Za-z_]\w*(?:\.\w+)*(?:<[^<>]+>)?$');
+    final simpleTypePattern = RegExp(r'^[A-Za-z_]\w*(?:\.\w+)*(?:<[^<>]+>)?$');
     final lastSegment = trimmed.split('.').last;
     final startsWithTypeName =
         lastSegment.isNotEmpty && RegExp(r'^[A-Z]').hasMatch(lastSegment);
@@ -550,6 +549,40 @@ class GeneratorWriter {
     }
 
     return '($valueExpression is $enumType ? $valueExpression : ${_buildRequiredExpression('$converter.fromJson($safeString)', field, enumType)})';
+  }
+
+  String _buildPrimitiveFallbackValue(String type) {
+    switch (type) {
+      case 'String':
+        return "''";
+      case 'int':
+        return '0';
+      case 'double':
+        return '0.0';
+      case 'bool':
+        return 'false';
+      case 'num':
+        return '0';
+      default:
+        return 'null';
+    }
+  }
+
+  String _buildPrimitiveMapValueExpression(
+    ClassInfo clazz,
+    String mapValueExpression,
+    String innerType,
+    String innerTypeClean,
+  ) {
+    final safeCastExpression =
+        '${_getPrefix(clazz)}SafeCasteUtil.safeCast<$innerTypeClean>($mapValueExpression)';
+
+    if (innerType.endsWith('?')) {
+      return safeCastExpression;
+    }
+
+    final fallbackValue = _buildPrimitiveFallbackValue(innerTypeClean);
+    return '($safeCastExpression ?? $fallbackValue)';
   }
 
   void _buildToJson(
@@ -1251,10 +1284,39 @@ class GeneratorWriter {
           'double',
           'bool',
           'num',
-          'dynamic',
-          'Object',
         ].contains(innerTypeClean)) {
-          // Basic Map: cast generated map
+          String mapExpr;
+          bool isMapExprNullable = true;
+          if (field.isRequired && !isNullable && field.defaultValue.isEmpty) {
+            mapExpr =
+                "${_getPrefix(clazz)}SafeCasteUtil.readRequiredValue<Map<String, dynamic>>(json, '$jsonKey')";
+            isMapExprNullable = false;
+          } else {
+            mapExpr =
+                "${_getPrefix(clazz)}SafeCasteUtil.readValue<Map<String, dynamic>>(json, '$jsonKey')";
+          }
+
+          if (jsonKeyInfo != null &&
+              (jsonKeyInfo.readValue.isNotEmpty ||
+                  jsonKeyInfo.alternateNames.isNotEmpty)) {
+            mapExpr =
+                '${_getPrefix(clazz)}SafeCasteUtil.safeCast<Map<String, dynamic>>($valueExpression)';
+            isMapExprNullable = true;
+          }
+
+          final valueConversion = _buildPrimitiveMapValueExpression(
+            clazz,
+            'v',
+            innerType,
+            innerTypeClean,
+          );
+          final safeCastExpr =
+              '.map((k, v) => MapEntry(k.toString(), $valueConversion))';
+
+          conversion = (isMapExprNullable
+              ? '($mapExpr?$safeCastExpr)'
+              : '($mapExpr$safeCastExpr)');
+        } else if (['dynamic', 'Object'].contains(innerTypeClean)) {
           if (field.isRequired && !isNullable && field.defaultValue.isEmpty) {
             conversion =
                 "${_getPrefix(clazz)}SafeCasteUtil.readRequiredValue<Map<String, dynamic>>(json, '$jsonKey').cast<String, $innerTypeClean>()";

@@ -775,7 +775,8 @@ void main() {
         );
       });
 
-      test('serializes nested dataforge objects and collections via toJson', () {
+      test('serializes nested dataforge objects and collections via toJson',
+          () {
         final result = ParseResult(
           '',
           'test',
@@ -823,10 +824,12 @@ void main() {
         final output = writer.generate();
 
         expect(output, contains("'user': user.toJson(),"));
-        expect(output, contains("'users': users.map((e) => e.toJson()).toList(),"));
+        expect(output,
+            contains("'users': users.map((e) => e.toJson()).toList(),"));
         expect(
           output,
-          contains("'userMap': userMap.map((k, v) => MapEntry(k, v.toJson())),"),
+          contains(
+              "'userMap': userMap.map((k, v) => MapEntry(k, v.toJson())),"),
         );
       });
 
@@ -893,7 +896,46 @@ void main() {
         );
       });
 
-      test('serializes DateTime collections and fails instead of epoch fallback',
+      test('deserializes primitive maps with eager safe conversion', () {
+        final result = ParseResult(
+          '',
+          'test',
+          [
+            const ClassInfo(
+              name: 'Metrics',
+              mixinName: '_\$Metrics',
+              fields: [
+                FieldInfo(
+                  name: 'scores',
+                  type: 'Map<String, double>',
+                  isFinal: true,
+                  isFunction: false,
+                  isRecord: false,
+                  defaultValue: '',
+                  isRequired: true,
+                ),
+              ],
+              includeFromJson: true,
+              deepCopyWith: false,
+            ),
+          ],
+          [],
+        );
+
+        final writer = GeneratorWriter(result);
+        final output = writer.generate();
+
+        expect(
+          output,
+          contains(
+            'SafeCasteUtil.readRequiredValue<Map<String, dynamic>>(json, \'scores\').map((k, v) => MapEntry(k.toString(), (SafeCasteUtil.safeCast<double>(v) ?? 0.0)))',
+          ),
+        );
+        expect(output, isNot(contains('.cast<String, double>()')));
+      });
+
+      test(
+          'serializes DateTime collections and fails instead of epoch fallback',
           () {
         final result = ParseResult(
           '',
@@ -939,8 +981,12 @@ void main() {
             "'timestamps': timestamps.map((e) => const DefaultDateTimeConverter().toJson(e)).toList(),",
           ),
         );
-        expect(output, contains("SafeCasteUtil.readRequiredValue<DateTime>(json, 'createdAt')"));
-        expect(output, isNot(contains('DateTime.fromMillisecondsSinceEpoch(0)')));
+        expect(
+            output,
+            contains(
+                "SafeCasteUtil.readRequiredValue<DateTime>(json, 'createdAt')"));
+        expect(
+            output, isNot(contains('DateTime.fromMillisecondsSinceEpoch(0)')));
         expect(
           output,
           contains(
