@@ -142,6 +142,42 @@ void main() {
       expect(a, isNot(equals(c)));
     });
 
+    test('equality includes dataforgePrefix', () {
+      final a = const ClassInfo(
+        name: 'User',
+        mixinName: '_\$User',
+        fields: [],
+        dataforgePrefix: 'df',
+      );
+
+      final b = const ClassInfo(
+        name: 'User',
+        mixinName: '_\$User',
+        fields: [],
+        dataforgePrefix: null,
+      );
+
+      expect(a, isNot(equals(b)));
+    });
+
+    test('equality includes deepCopyWith', () {
+      final a = const ClassInfo(
+        name: 'User',
+        mixinName: '_\$User',
+        fields: [],
+        deepCopyWith: true,
+      );
+
+      final b = const ClassInfo(
+        name: 'User',
+        mixinName: '_\$User',
+        fields: [],
+        deepCopyWith: false,
+      );
+
+      expect(a, isNot(equals(b)));
+    });
+
     test('hashCode is consistent with equality', () {
       final a = const ClassInfo(
         name: 'User',
@@ -156,6 +192,43 @@ void main() {
       );
 
       expect(a.hashCode, equals(b.hashCode));
+    });
+
+    test('fromMap handles missing optional fields', () {
+      final info = ClassInfo.fromMap({
+        'name': 'Test',
+        'mixinName': '_Test',
+      });
+
+      expect(info.name, 'Test');
+      expect(info.fields, isEmpty);
+      expect(info.includeFromJson, isTrue);
+      expect(info.includeToJson, isTrue);
+      expect(info.deepCopyWith, isTrue);
+      expect(info.genericParameters, isEmpty);
+      expect(info.dataforgePrefix, isNull);
+    });
+
+    test('fromMap handles legacy fromMap field', () {
+      final info = ClassInfo.fromMap({
+        'name': 'Test',
+        'mixinName': '_Test',
+        'fromMap': false,
+      });
+
+      expect(info.includeFromJson, isFalse);
+      expect(info.includeToJson, isFalse);
+    });
+
+    test('toString includes name and fields', () {
+      const info = ClassInfo(
+        name: 'User',
+        mixinName: '_User',
+        fields: [],
+      );
+
+      expect(info.toString(), contains('User'));
+      expect(info.toString(), contains('_User'));
     });
   });
 
@@ -279,6 +352,123 @@ void main() {
 
       expect(a, equals(b));
       expect(a, isNot(equals(c)));
+    });
+
+    test('asserts name must not be empty', () {
+      expect(
+        () => FieldInfo(
+          name: '',
+          type: 'String',
+          isFinal: true,
+          isFunction: false,
+          isRecord: false,
+          defaultValue: '',
+        ),
+        throwsA(isA<AssertionError>()),
+      );
+    });
+
+    test('asserts type must not be empty', () {
+      expect(
+        () => FieldInfo(
+          name: 'x',
+          type: '',
+          isFinal: true,
+          isFunction: false,
+          isRecord: false,
+          defaultValue: '',
+        ),
+        throwsA(isA<AssertionError>()),
+      );
+    });
+
+    test('asserts isEnum and isDataforge are mutually exclusive', () {
+      expect(
+        () => FieldInfo(
+          name: 'x',
+          type: 'Status',
+          isFinal: true,
+          isFunction: false,
+          isRecord: false,
+          defaultValue: '',
+          isEnum: true,
+          isDataforge: true,
+        ),
+        throwsA(isA<AssertionError>()),
+      );
+    });
+
+    test('asserts isInnerEnum and isInnerDataforge are mutually exclusive', () {
+      expect(
+        () => FieldInfo(
+          name: 'x',
+          type: 'List<Status>',
+          isFinal: true,
+          isFunction: false,
+          isRecord: false,
+          defaultValue: '',
+          isInnerEnum: true,
+          isInnerDataforge: true,
+        ),
+        throwsA(isA<AssertionError>()),
+      );
+    });
+
+    test('fromMap uses sensible defaults', () {
+      final field = FieldInfo.fromMap({
+        'name': 'test',
+        'type': 'int',
+      });
+
+      expect(field.isFinal, isFalse);
+      expect(field.isFunction, isFalse);
+      expect(field.isRecord, isFalse);
+      expect(field.isEnum, isFalse);
+      expect(field.isDataforge, isFalse);
+      expect(field.isRequired, isFalse);
+      expect(field.isInnerEnum, isFalse);
+      expect(field.isInnerDataforge, isFalse);
+      expect(field.defaultValue, isEmpty);
+      expect(field.jsonKey, isNull);
+    });
+
+    test('fromMap restores jsonKey', () {
+      final field = FieldInfo.fromMap({
+        'name': 'test',
+        'type': 'String',
+        'jsonKey': {
+          'name': 'test_name',
+          'alternateNames': ['tn'],
+          'readValue': '',
+          'ignore': false,
+        },
+      });
+
+      expect(field.jsonKey, isNotNull);
+      expect(field.jsonKey!.name, 'test_name');
+      expect(field.jsonKey!.alternateNames, ['tn']);
+    });
+
+    test('hashCode differs for different fields', () {
+      const a = FieldInfo(
+        name: 'a',
+        type: 'String',
+        isFinal: true,
+        isFunction: false,
+        isRecord: false,
+        defaultValue: '',
+      );
+
+      const b = FieldInfo(
+        name: 'b',
+        type: 'String',
+        isFinal: true,
+        isFunction: false,
+        isRecord: false,
+        defaultValue: '',
+      );
+
+      expect(a.hashCode, isNot(equals(b.hashCode)));
     });
   });
 
@@ -468,6 +658,82 @@ void main() {
 
       expect(a, equals(b));
       expect(a, isNot(equals(c)));
+    });
+
+    test('asserts uri must not be empty', () {
+      expect(
+        () => ImportInfo(uri: ''),
+        throwsA(isA<AssertionError>()),
+      );
+    });
+
+    test('hashCode is consistent with equality', () {
+      const a = ImportInfo(uri: 'package:a/a.dart', alias: 'a');
+      const b = ImportInfo(uri: 'package:a/a.dart', alias: 'a');
+      expect(a.hashCode, equals(b.hashCode));
+    });
+
+    test('toString includes all info', () {
+      const info = ImportInfo(
+        uri: 'package:test/test.dart',
+        alias: 'tst',
+        isDeferred: true,
+      );
+      final str = info.toString();
+      expect(str, contains('package:test/test.dart'));
+      expect(str, contains('tst'));
+      expect(str, contains('true'));
+    });
+  });
+
+  group('ParseResult', () {
+    test('equality compares all fields', () {
+      final a = ParseResult('out.dart', 'lib', [], []);
+      final b = ParseResult('out.dart', 'lib', [], []);
+      final c = ParseResult('other.dart', 'lib', [], []);
+
+      expect(a, equals(b));
+      expect(a, isNot(equals(c)));
+    });
+
+    test('equality includes primaryClassName', () {
+      final a = ParseResult('out.dart', 'lib', [], [],
+          primaryClassName: 'User');
+      final b = ParseResult('out.dart', 'lib', [], [],
+          primaryClassName: 'Post');
+
+      expect(a, isNot(equals(b)));
+    });
+
+    test('hashCode is consistent with equality', () {
+      final a = ParseResult('out.dart', 'lib', [], []);
+      final b = ParseResult('out.dart', 'lib', [], []);
+      expect(a.hashCode, equals(b.hashCode));
+    });
+  });
+
+  group('ClassInfo asserts', () {
+    test('name must not be empty', () {
+      expect(
+        () => ClassInfo(name: '', mixinName: '_X', fields: []),
+        throwsA(isA<AssertionError>()),
+      );
+    });
+
+    test('mixinName must not be empty', () {
+      expect(
+        () => ClassInfo(name: 'X', mixinName: '', fields: []),
+        throwsA(isA<AssertionError>()),
+      );
+    });
+  });
+
+  group('GenericParameter asserts', () {
+    test('name must not be empty', () {
+      expect(
+        () => GenericParameter(''),
+        throwsA(isA<AssertionError>()),
+      );
     });
   });
 }
