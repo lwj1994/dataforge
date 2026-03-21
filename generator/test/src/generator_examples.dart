@@ -21,3 +21,4 @@ export 'examples/generic_examples.dart';
 export 'examples/enum_examples.dart';
 export 'examples/datetime_examples.dart';
 export 'examples/dataforge_options_examples.dart';
+export 'examples/nullable_collection_examples.dart';

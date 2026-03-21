@@ -18,6 +18,7 @@ Future<void> main() async {
     'enum_examples.dart',
     'datetime_examples.dart',
     'dataforge_options_examples.dart',
+    'nullable_collection_examples.dart',
   ];
 
   for (final file in testFiles) {
