@@ -13,7 +13,9 @@
       "Bash(dart pub publish:*)",
       "Bash(tree:*)",
       "Bash(grep:*)",
-      "Bash(find /Volumes/mac-ext-ssd/document/GitHub/dataforge -type f -name \"pubspec.yaml\" -exec sh -c 'echo \"\"=== {} ===\"\"; grep -A5 \"\"dev_dependencies:\"\" \"\"$1\"\"' _ {} ;)"
+      "Bash(find /Volumes/mac-ext-ssd/document/GitHub/dataforge -type f -name \"pubspec.yaml\" -exec sh -c 'echo \"\"=== {} ===\"\"; grep -A5 \"\"dev_dependencies:\"\" \"\"$1\"\"' _ {} ;)",
+      "Bash(perl -0777 -ne 'while \\(/ACTUAL CONTENT:\\\\s*\\(r.*?\\)/gs\\) { print \"\"\"\"$1\\\\n---SEPARATOR---\\\\n\"\"\"\" }')",
+      "Read(//tmp/**)"
     ]
   }
 }
