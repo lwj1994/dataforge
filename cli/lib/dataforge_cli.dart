@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'dart:async';
 import 'package:dataforge_base/src/logger.dart';
+import 'package:dataforge_base/src/model.dart';
 import 'package:path/path.dart' as p;
 
 import 'package:dataforge_cli/src/parser.dart';
@@ -22,6 +23,7 @@ Future<List<String>> generate(String path, {bool debugMode = false}) async {
   }
 
   final generatedFiles = <String>[];
+  int failedCount = 0;
   final entity = FileSystemEntity.typeSync(absolutePath);
   if (entity == FileSystemEntityType.notFound) {
     throw FileSystemException('Path does not exist', absolutePath);
@@ -90,12 +92,15 @@ Future<List<String>> generate(String path, {bool debugMode = false}) async {
       debugMode,
     );
 
-    // Collect results
+    // Collect results: non-null non-empty = success, '' = error, null = skip
     int processedCount = 0;
     for (final result in processedResults) {
-      if (result.isNotEmpty) {
+      if (result != null && result.isNotEmpty) {
         generatedFiles.add(result);
         processedCount++;
+      } else if (result != null && result.isEmpty) {
+        // Empty string means an error occurred (not a normal skip)
+        failedCount++;
       }
     }
 
@@ -153,12 +158,21 @@ Future<List<String>> generate(String path, {bool debugMode = false}) async {
       print(
           '[DEBUG] ${DateTime.now()}: Starting parseDartFile() for single file: $absolutePath');
     }
-    final parseRes = parser.parseDartFile();
+
+    ParseResult? parseRes;
+    try {
+      parseRes = parser.parseDartFile();
+    } catch (e, stackTrace) {
+      DataforgeLogger.error(
+          'Error processing $absolutePath: $e', e, stackTrace);
+      failedCount++;
+      return generatedFiles;
+    }
     final parseEndTime = DateTime.now();
 
     final parseTime = parseEndTime.difference(parseStartTime).inMilliseconds;
     if (parseRes == null) {
-      DataforgeLogger.warning('Failed to parse Dataforge file: $absolutePath');
+      // No annotated classes found (annotation pre-filter false positive)
       return generatedFiles;
     }
 
@@ -178,11 +192,14 @@ Future<List<String>> generate(String path, {bool debugMode = false}) async {
 
     final writeTime = writeEndTime.difference(writeStartTime).inMilliseconds;
     final totalTime = writeTime + parseTime;
-    print(
-        '✅ Generated ${p.relative(generatedFile, from: projectRoot)} in ${totalTime}ms (parse: ${parseTime}ms, write: ${writeTime}ms)');
 
     if (generatedFile.isNotEmpty) {
       generatedFiles.add(generatedFile);
+      print(
+          '✅ Generated ${p.relative(generatedFile, from: projectRoot)} in ${totalTime}ms (parse: ${parseTime}ms, write: ${writeTime}ms)');
+    } else {
+      DataforgeLogger.error('Writer returned empty output for $absolutePath');
+      failedCount++;
     }
   }
   final endTime = DateTime.now();
@@ -193,9 +210,12 @@ Future<List<String>> generate(String path, {bool debugMode = false}) async {
 
   if (debugMode) {
     print(
-        '[DEBUG] $endTime: generate() completed for path: "$absolutePath", total generated files: ${generatedFiles.length}, total time: ${totalTime}ms');
+        '[DEBUG] $endTime: generate() completed for path: "$absolutePath", total generated files: ${generatedFiles.length}, failed: $failedCount, total time: ${totalTime}ms');
   } else if (generatedFiles.isNotEmpty) {
-    print('✅ Generated ${generatedFiles.length} files in ${totalTime}ms');
+    final failSuffix = failedCount > 0 ? ' ($failedCount failed)' : '';
+    print('✅ Generated ${generatedFiles.length} files in ${totalTime}ms$failSuffix');
+  } else if (failedCount > 0) {
+    print('❌ Failed to generate $failedCount files in ${totalTime}ms');
   }
 
   return generatedFiles;
@@ -243,7 +263,7 @@ List<String> _scanDirectory(String path,
           dartFiles.add(filePath);
         }
       }
-    } catch (e) {
+    } on FileSystemException catch (e) {
       DataforgeLogger.warning('Could not scan directory $currentPath: $e');
     }
   }
@@ -294,7 +314,7 @@ bool _hasDataforgeAnnotations(String filePath) {
   try {
     final content = File(filePath).readAsStringSync();
     return _dataforgeAnnotationPattern.hasMatch(content);
-  } catch (e) {
+  } on Exception catch (e) {
     DataforgeLogger.warning('Could not read file $filePath: $e');
     return false;
   }
@@ -351,15 +371,17 @@ bool _shouldSkipFile(String filePath) {
   return segments.any(skipDirs.contains);
 }
 
-/// Process files in parallel with controlled concurrency
-/// Returns a list of generated file paths
-Future<List<String>> _processFilesInParallel(
+/// Process files in parallel with controlled concurrency.
+///
+/// Returns results where: non-null non-empty = success path,
+/// empty string = error, null = nothing to generate (skip).
+Future<List<String?>> _processFilesInParallel(
   List<String> filePaths,
   String projectRoot,
   int maxConcurrency,
   bool debugMode,
 ) async {
-  final results = <String>[];
+  final results = <String?>[];
 
   // Split files into batches for controlled concurrency
   final batches = <List<String>>[];
@@ -390,18 +412,14 @@ Future<List<String>> _processFilesInParallel(
       batch.map((filePath) => _processFile(filePath, projectRoot, debugMode)),
     );
 
-    int batchSuccessCount = 0;
-    for (final result in batchResults) {
-      if (result.isNotEmpty) {
-        results.add(result);
-        batchSuccessCount++;
-      }
-    }
+    results.addAll(batchResults);
 
     final batchEndTime = DateTime.now();
     final batchTime = batchEndTime.difference(batchStartTime).inMilliseconds;
 
     if (debugMode) {
+      final batchSuccessCount =
+          batchResults.where((r) => r != null && r.isNotEmpty).length;
       print(
           '[DEBUG] ${DateTime.now()}: Batch ${batchIndex + 1} completed in ${batchTime}ms ($batchSuccessCount/${batch.length} successful)');
     }
@@ -411,8 +429,10 @@ Future<List<String>> _processFilesInParallel(
 }
 
 /// Process a single file and return the generated file path.
-/// Returns empty string on failure so batch processing can continue.
-Future<String> _processFile(
+///
+/// Returns the generated file path on success, `null` if no classes found
+/// (normal skip), or empty string on error.
+Future<String?> _processFile(
     String filePath, String projectRoot, bool debugMode) async {
   try {
     final fileStartTime = DateTime.now();
@@ -429,9 +449,8 @@ Future<String> _processFile(
 
     final parseTime = parseEndTime.difference(parseStartTime).inMilliseconds;
     if (parseRes == null) {
-      DataforgeLogger.warning(
-          'Failed to parse Dataforge file: ${p.basename(filePath)}');
-      return '';
+      // No annotated classes found — normal skip, not an error
+      return null;
     }
 
     final writeStartTime = DateTime.now();
@@ -444,13 +463,17 @@ Future<String> _processFile(
 
     final writeTime = writeEndTime.difference(writeStartTime).inMilliseconds;
     final totalTime = fileEndTime.difference(fileStartTime).inMilliseconds;
-    print(
-        '✅ Generated ${p.relative(generatedFile, from: projectRoot)} in ${totalTime}ms (parse: ${parseTime}ms, write: ${writeTime}ms)');
 
-    return generatedFile;
-  } catch (e) {
+    if (generatedFile.isNotEmpty) {
+      print(
+          '✅ Generated ${p.relative(generatedFile, from: projectRoot)} in ${totalTime}ms (parse: ${parseTime}ms, write: ${writeTime}ms)');
+      return generatedFile;
+    }
+    DataforgeLogger.warning('Writer returned empty output for $filePath');
+    return '';
+  } catch (e, stackTrace) {
     DataforgeLogger.error(
-        'Error processing ${p.basename(filePath)}: $e');
+        'Error processing $filePath: $e', e, stackTrace);
     return '';
   }
 }

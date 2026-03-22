@@ -6,6 +6,7 @@ import 'package:analyzer/dart/ast/ast.dart';
 import 'package:collection/collection.dart';
 import 'package:path/path.dart' as p;
 
+import 'package:dataforge_base/src/logger.dart';
 import 'package:dataforge_base/src/model.dart';
 import 'package:dataforge_base/src/type_utils.dart';
 
@@ -38,35 +39,28 @@ class Parser {
   bool _isDataClassAnnotation(String name) =>
       TypeUtils.isDataClassAnnotation(name);
 
-  /// Parse Dart file and return parse result
+  /// Parse Dart file and return parse result.
   ///
-  /// Returns [ParseResult] if file contains classes with DataClass annotation
-  /// Returns `null` if file doesn't contain relevant annotations or parsing fails
+  /// Returns [ParseResult] if file contains classes with Dataforge annotation.
+  /// Returns `null` if file doesn't contain relevant annotations.
+  /// Throws [FileSystemException] if the file does not exist.
+  /// Throws [FormatException] if the file contains parse errors.
   ParseResult? parseDartFile() {
     final file = File(path);
     if (path.endsWith('.data.dart')) return null;
 
     if (!file.existsSync()) {
-      print('Error: File does not exist: $path');
-      return null;
+      throw FileSystemException('File does not exist', path);
     }
 
     final content = file.readAsStringSync();
     late ParseStringResult parseRes;
 
-    try {
-      parseRes = parseString(content: content);
-    } catch (e) {
-      print('Error parsing file $path: $e');
-      return null;
-    }
+    parseRes = parseString(content: content);
 
     if (parseRes.errors.isNotEmpty) {
-      print('Parse errors in $path:');
-      for (final error in parseRes.errors) {
-        print('  ${error.message}');
-      }
-      return null;
+      final errorMessages = parseRes.errors.map((e) => e.message).join('; ');
+      throw FormatException('Parse errors in $path: $errorMessages');
     }
 
     final classes = <ClassInfo>[];
@@ -118,13 +112,13 @@ class Parser {
 
         // Validate class name validity
         if (className.isEmpty || className.trim().isEmpty) {
-          print('Warning: Skipping class with empty name');
+          DataforgeLogger.warning('Skipping class with empty name');
           continue;
         }
 
         // Ensure class name is a valid Dart identifier
         if (!RegExp(r'^[A-Za-z_][A-Za-z0-9_]*$').hasMatch(className)) {
-          print('Warning: Skipping class with invalid name "$className"');
+          DataforgeLogger.warning('Skipping class with invalid name "$className"');
           continue;
         }
 
@@ -340,9 +334,9 @@ class Parser {
                           jsonKeyInfo = jsonKeyInfo!.copyWith(
                             alternateNames: names,
                           );
-                        } catch (e) {
-                          print(
-                              'Warning: Failed to parse alternateNames for ${member.fields.variables.first.name.lexeme}: $e');
+                        } on Exception catch (e) {
+                          DataforgeLogger.warning(
+                              'Failed to parse alternateNames for ${member.fields.variables.first.name.lexeme}: $e');
                         }
                         break;
 
@@ -388,19 +382,19 @@ class Parser {
 
                 // Validate field validity
                 if (name.isEmpty) {
-                  print('Warning: Skipping field with empty name');
+                  DataforgeLogger.warning('Skipping field with empty name');
                   continue;
                 }
 
                 if (type.isEmpty || type.trim().isEmpty) {
-                  print('Warning: Skipping field "$name" with empty type');
+                  DataforgeLogger.warning('Skipping field "$name" with empty type');
                   continue;
                 }
 
                 // Skip invalid types
                 if (type == 'void') {
-                  print(
-                      'Warning: Skipping field "$name" with invalid type "$type"');
+                  DataforgeLogger.warning(
+                      'Skipping field "$name" with invalid type "$type"');
                   continue;
                 }
 
@@ -435,8 +429,8 @@ class Parser {
             final hasDefaultValue = field.defaultValue.isNotEmpty;
 
             if (!isNullable && !hasDefaultValue) {
-              print(
-                  'Warning: Field "${field.name}" in class "$className" is marked as @JsonKey(ignore: true) '
+              DataforgeLogger.warning(
+                  'Field "${field.name}" in class "$className" is marked as @JsonKey(ignore: true) '
                   'but is not nullable and has no default value. '
                   'Ignored fields must be either nullable (${field.type}?) or have a default value in the constructor.');
             }
