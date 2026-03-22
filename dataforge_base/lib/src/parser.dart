@@ -101,9 +101,10 @@ class BaseParser {
               prefix = match.group(1);
             }
           }
-        } catch (e) {
-          // Source extraction failed - prefix will be null
-          // This is non-critical and only affects qualified imports
+        } on Exception catch (e) {
+          DataforgeLogger.debug(
+            'Could not extract annotation prefix for "${element.name}": $e',
+          );
         }
         return _AnnotationResult(obj!, prefix: prefix);
       }
