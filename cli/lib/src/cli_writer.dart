@@ -9,10 +9,25 @@ import 'package:dataforge_base/src/writer.dart';
 import 'package:path/path.dart' as p;
 
 const _skipDirNames = {
-  '.dart_tool', '.git', '.idea', '.vscode', 'build', '.pub-cache',
-  'node_modules', '.packages', 'coverage', 'doc', 'docs',
-  '.flutter-plugins', '.flutter-plugins-dependencies',
-  'ios', 'android', 'web', 'windows', 'macos', 'linux',
+  '.dart_tool',
+  '.git',
+  '.idea',
+  '.vscode',
+  'build',
+  '.pub-cache',
+  'node_modules',
+  '.packages',
+  'coverage',
+  'doc',
+  'docs',
+  '.flutter-plugins',
+  '.flutter-plugins-dependencies',
+  'ios',
+  'android',
+  'web',
+  'windows',
+  'macos',
+  'linux',
 };
 
 class CliWriter {
@@ -54,19 +69,16 @@ class CliWriter {
       return _ScannedTypes(enumTypes, jsonModelTypes);
     }
 
-    final dartFiles = searchDir
-        .listSync(recursive: true)
-        .whereType<File>()
-        .where((file) {
-          final path = file.path;
-          if (!path.endsWith('.dart') || path.endsWith('.data.dart')) {
-            return false;
-          }
-          // Apply the same skip filters as directory scanning
-          final segments = p.split(path);
-          return !segments.any(_skipDirNames.contains);
-        })
-        .toList();
+    final dartFiles =
+        searchDir.listSync(recursive: true).whereType<File>().where((file) {
+      final path = file.path;
+      if (!path.endsWith('.dart') || path.endsWith('.data.dart')) {
+        return false;
+      }
+      // Apply the same skip filters as directory scanning
+      final segments = p.split(path);
+      return !segments.any(_skipDirNames.contains);
+    }).toList();
 
     for (final file in dartFiles) {
       try {
@@ -81,7 +93,8 @@ class CliWriter {
             enumTypes.add(declaration.name.lexeme);
           } else if (declaration is ClassDeclaration) {
             final className = declaration.name.lexeme;
-            final hasDataforgeAnnotation = declaration.metadata.any((annotation) {
+            final hasDataforgeAnnotation =
+                declaration.metadata.any((annotation) {
               final name = annotation.name.name;
               return TypeUtils.isDataClassAnnotation(name);
             });
@@ -198,7 +211,8 @@ class CliWriter {
     }
 
     await _processOriginalFilesAsync(
-      requiresCollectionImport: generatedContent.contains('DeepCollectionEquality'),
+      requiresCollectionImport:
+          generatedContent.contains('DeepCollectionEquality'),
     );
 
     return result.outputPath;
@@ -418,7 +432,9 @@ class CliWriter {
     int insertIndex = 0;
     for (int i = 0; i < lines.length; i++) {
       final trimmed = lines[i].trim();
-      if (trimmed.isEmpty || trimmed.startsWith('//') || trimmed.startsWith('/*')) {
+      if (trimmed.isEmpty ||
+          trimmed.startsWith('//') ||
+          trimmed.startsWith('/*')) {
         continue;
       }
       if (trimmed.startsWith('library ')) {
@@ -441,7 +457,9 @@ class CliWriter {
     int insertIndex = 0;
     for (int i = 0; i < lines.length; i++) {
       final trimmed = lines[i].trim();
-      if (trimmed.isEmpty || trimmed.startsWith('//') || trimmed.startsWith('/*')) {
+      if (trimmed.isEmpty ||
+          trimmed.startsWith('//') ||
+          trimmed.startsWith('/*')) {
         continue;
       }
       if (trimmed.startsWith('library ') ||

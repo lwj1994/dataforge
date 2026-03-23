@@ -67,7 +67,8 @@ Future<void> main(List<String> args) async {
         }
 
         if (debugMode) {
-          print('[DEBUG] ${DateTime.now()}: Starting generate(\'$defaultPath\')');
+          print(
+              '[DEBUG] ${DateTime.now()}: Starting generate(\'$defaultPath\')');
         }
         final files = await generate(defaultPath, debugMode: debugMode);
         if (debugMode) {

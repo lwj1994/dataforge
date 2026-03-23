@@ -1,3 +1,13 @@
+## 0.7.1-dev.0
+### Fixed
+- Fix primitive map deserialization
+- Fix generator serialization regressions
+- Fix enum converter stdout noise
+
+### Changed
+- Improve collection codegen and add CI checks
+- Refactor enum converter
+
 ## 0.7.0-dev.0
 - Bump version to 0.7.0-dev.0.
 

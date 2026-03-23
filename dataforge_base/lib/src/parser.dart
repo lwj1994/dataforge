@@ -365,8 +365,9 @@ class BaseParser {
   }
 
   JsonKeyInfo _parseJsonKeyAnnotation(DartObject obj, {String? source}) {
-    final sourceArguments =
-        source == null ? const <String, String>{} : _parseNamedArguments(source);
+    final sourceArguments = source == null
+        ? const <String, String>{}
+        : _parseNamedArguments(source);
     List<String> alternateNames = [];
     final altNamesField = obj.getField('alternateNames');
     if (altNamesField != null) {

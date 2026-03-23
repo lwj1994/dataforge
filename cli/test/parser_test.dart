@@ -438,7 +438,8 @@ class Aliased {
       expect(result, isNotNull);
       expect(result!.imports, isNotEmpty);
       final dfImport = result.imports.firstWhere(
-        (i) => i.uri == 'package:dataforge_annotation/dataforge_annotation.dart',
+        (i) =>
+            i.uri == 'package:dataforge_annotation/dataforge_annotation.dart',
       );
       expect(dfImport.alias, 'df');
     });
@@ -530,8 +531,8 @@ class BadIgnore {
       // verify parse still succeeds and includes the ignored field
       final result = Parser(file.path).parseDartFile();
       expect(result, isNotNull);
-      final ignoredField = result!.classes.single.fields
-          .firstWhere((f) => f.name == 'count');
+      final ignoredField =
+          result!.classes.single.fields.firstWhere((f) => f.name == 'count');
       expect(ignoredField.jsonKey?.ignore, isTrue);
     });
 

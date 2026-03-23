@@ -1,3 +1,14 @@
+## 0.7.1-dev.0
+### Fixed
+- Fix primitive map deserialization
+- Fix serialization regressions
+
+### Changed
+- Add TypeUtils for generic type argument parsing
+- Improve collection codegen
+- Improve converters and refine configuration handling
+- Expand test coverage
+
 ## 0.7.0-dev.0
 - Bump version to 0.7.0-dev.0.
 

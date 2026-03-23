@@ -332,8 +332,7 @@ class User {
 }
 ''');
 
-      final generatedFiles =
-          await _runSilently(() => generate(userFile.path));
+      final generatedFiles = await _runSilently(() => generate(userFile.path));
       final generated = await File(generatedFiles.single).readAsString();
 
       expect(
@@ -530,9 +529,7 @@ class Model {
       await _runSilently(() => generate(file.path));
       final content = await file.readAsString();
 
-      final partCount = "part 'model.data.dart';"
-          .allMatches(content)
-          .length;
+      final partCount = "part 'model.data.dart';".allMatches(content).length;
       expect(partCount, 1);
     });
 
@@ -614,7 +611,8 @@ class Mixed with Printable {
       expect(content, contains('Printable'));
       expect(content, contains('_Mixed'));
       // Both should be in the same with clause
-      expect(RegExp(r'with\s+Printable\s*,\s*_Mixed').hasMatch(content), isTrue);
+      expect(
+          RegExp(r'with\s+Printable\s*,\s*_Mixed').hasMatch(content), isTrue);
     });
   });
 
