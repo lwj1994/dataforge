@@ -182,5 +182,4 @@ class CircularDependencyDetector {
 
     return buffer.toString();
   }
-
 }

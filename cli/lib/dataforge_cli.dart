@@ -213,7 +213,8 @@ Future<List<String>> generate(String path, {bool debugMode = false}) async {
         '[DEBUG] $endTime: generate() completed for path: "$absolutePath", total generated files: ${generatedFiles.length}, failed: $failedCount, total time: ${totalTime}ms');
   } else if (generatedFiles.isNotEmpty) {
     final failSuffix = failedCount > 0 ? ' ($failedCount failed)' : '';
-    print('✅ Generated ${generatedFiles.length} files in ${totalTime}ms$failSuffix');
+    print(
+        '✅ Generated ${generatedFiles.length} files in ${totalTime}ms$failSuffix');
   } else if (failedCount > 0) {
     print('❌ Failed to generate $failedCount files in ${totalTime}ms');
   }
@@ -472,8 +473,7 @@ Future<String?> _processFile(
     DataforgeLogger.warning('Writer returned empty output for $filePath');
     return '';
   } catch (e, stackTrace) {
-    DataforgeLogger.error(
-        'Error processing $filePath: $e', e, stackTrace);
+    DataforgeLogger.error('Error processing $filePath: $e', e, stackTrace);
     return '';
   }
 }

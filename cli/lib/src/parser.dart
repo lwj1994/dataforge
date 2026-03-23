@@ -118,7 +118,8 @@ class Parser {
 
         // Ensure class name is a valid Dart identifier
         if (!RegExp(r'^[A-Za-z_][A-Za-z0-9_]*$').hasMatch(className)) {
-          DataforgeLogger.warning('Skipping class with invalid name "$className"');
+          DataforgeLogger.warning(
+              'Skipping class with invalid name "$className"');
           continue;
         }
 
@@ -387,7 +388,8 @@ class Parser {
                 }
 
                 if (type.isEmpty || type.trim().isEmpty) {
-                  DataforgeLogger.warning('Skipping field "$name" with empty type');
+                  DataforgeLogger.warning(
+                      'Skipping field "$name" with empty type');
                   continue;
                 }
 

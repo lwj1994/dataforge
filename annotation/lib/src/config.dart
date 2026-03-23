@@ -18,7 +18,8 @@ class DataforgeConfig {
     StackTrace stackTrace,
   ) {
     // ignore: avoid_print
-    print('Dataforge copyWith error: field "$fieldName" expected $expectedType, '
+    print(
+        'Dataforge copyWith error: field "$fieldName" expected $expectedType, '
         'got ${actualValue.runtimeType} ($error)');
   }
 

@@ -697,10 +697,10 @@ void main() {
     });
 
     test('equality includes primaryClassName', () {
-      final a = ParseResult('out.dart', 'lib', [], [],
-          primaryClassName: 'User');
-      final b = ParseResult('out.dart', 'lib', [], [],
-          primaryClassName: 'Post');
+      final a =
+          ParseResult('out.dart', 'lib', [], [], primaryClassName: 'User');
+      final b =
+          ParseResult('out.dart', 'lib', [], [], primaryClassName: 'Post');
 
       expect(a, isNot(equals(b)));
     });

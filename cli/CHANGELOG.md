@@ -1,3 +1,13 @@
+## 0.7.1-dev.0
+### Fixed
+- Fix primitive map deserialization
+- Fix CLI serialization regressions
+
+### Changed
+- Refactor CLI error handling and parser robustness
+- Improve CLI performance and error handling
+- Expand test coverage
+
 ## 0.7.0-dev.0
 - Bump version to 0.7.0-dev.0.
 

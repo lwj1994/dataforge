@@ -1,3 +1,18 @@
+## 0.7.1-dev.0
+### Fixed
+- Fix primitive map deserialization
+- Fix generator and CLI serialization regressions
+
+### Changed
+- Refactor CLI error handling and parser robustness
+- Improve CLI performance and error handling
+- Improve converters and refine configuration handling
+- Improve collection codegen and add CI checks
+- Add TypeUtils for generic type argument parsing
+- Refactor enum converter and remove outdated VS Code plugin
+- Fix enum converter stdout noise
+- Expand test coverage for dataforge_base and dataforge_cli
+
 ## 0.7.0-dev.0
 - Bump version to 0.7.0-dev.0.
 
