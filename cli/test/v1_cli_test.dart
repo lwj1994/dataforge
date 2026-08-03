@@ -857,37 +857,41 @@ class Invalid {
       timeout: const Timeout(Duration(minutes: 2)),
     );
 
-    test('bin requires an explicit supported command', () async {
-      final missing = await _runCli(
-        repositoryRoot,
-        consumer.root.path,
-        const [],
-      );
-      expect(missing.exitCode, 2);
-      expect(missing.stderr, contains('Missing command'));
+    test(
+      'bin requires an explicit supported command',
+      () async {
+        final missing = await _runCli(
+          repositoryRoot,
+          consumer.root.path,
+          const [],
+        );
+        expect(missing.exitCode, 2);
+        expect(missing.stderr, contains('Missing command'));
 
-      final unknown = await _runCli(repositoryRoot, consumer.root.path, [
-        'unsupported',
-      ]);
-      expect(unknown.exitCode, 2);
-      expect(unknown.stderr, contains('Unknown command'));
+        final unknown = await _runCli(repositoryRoot, consumer.root.path, [
+          'unsupported',
+        ]);
+        expect(unknown.exitCode, 2);
+        expect(unknown.stderr, contains('Unknown command'));
 
-      final removedCheckFlag = await _runCli(
-        repositoryRoot,
-        consumer.root.path,
-        const ['generate', '--check'],
-      );
-      expect(removedCheckFlag.exitCode, 2);
-      expect(removedCheckFlag.stderr, contains('Invalid arguments'));
+        final removedCheckFlag = await _runCli(
+          repositoryRoot,
+          consumer.root.path,
+          const ['generate', '--check'],
+        );
+        expect(removedCheckFlag.exitCode, 2);
+        expect(removedCheckFlag.stderr, contains('Invalid arguments'));
 
-      final help = await _runCli(repositoryRoot, consumer.root.path, const [
-        '--help',
-      ]);
-      expect(help.exitCode, 0);
-      expect(help.stdout, contains('dataforge generate'));
-      expect(help.stdout, contains('dataforge check'));
-      expect(help.stdout, isNot(contains('dataforge [path]')));
-    });
+        final help = await _runCli(repositoryRoot, consumer.root.path, const [
+          '--help',
+        ]);
+        expect(help.exitCode, 0);
+        expect(help.stdout, contains('dataforge generate'));
+        expect(help.stdout, contains('dataforge check'));
+        expect(help.stdout, isNot(contains('dataforge [path]')));
+      },
+      timeout: const Timeout(Duration(minutes: 2)),
+    );
 
     test(
       'missing package config is a generation error and does not edit source',
