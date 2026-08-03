@@ -59,28 +59,72 @@ jobs:
 
       - name: Check format (annotation)
         working-directory: annotation
-        run: dart format --set-exit-if-changed .
+        run: dart format --output=none --set-exit-if-changed .
 
       - name: Check format (dataforge_base)
         working-directory: dataforge_base
-        run: dart format --set-exit-if-changed .
+        run: dart format --output=none --set-exit-if-changed .
 
       - name: Check format (cli)
         working-directory: cli
-        run: dart format --set-exit-if-changed .
+        run: dart format --output=none --set-exit-if-changed lib bin test example
 
       - name: Check format (generator)
         working-directory: generator
-        run: dart format --set-exit-if-changed .
+        run: dart format --output=none --set-exit-if-changed lib test example
 
-  test:
-    name: Test
+  package:
+    name: Package dry-run
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       - uses: dart-lang/setup-dart@v1
         with:
           sdk: stable
+
+      - name: Test publish dry-run validator
+        run: dart run tool/validate_publish_dry_run_test.dart
+
+      - name: Validate annotation package
+        working-directory: annotation
+        run: dart run ../tool/validate_publish_dry_run.dart
+
+      - name: Validate dataforge_base package
+        working-directory: dataforge_base
+        run: dart run ../tool/validate_publish_dry_run.dart
+
+      - name: Validate generator package
+        working-directory: generator
+        run: >-
+          dart run ../tool/validate_publish_dry_run.dart
+          dataforge_annotation dataforge_base
+
+      - name: Validate CLI package
+        working-directory: cli
+        run: >-
+          dart run ../tool/validate_publish_dry_run.dart
+          dataforge_annotation dataforge_base
+
+  test:
+    name: Test (${{ matrix.os }}, Dart ${{ matrix.dart }})
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: ubuntu-latest
+            dart: stable
+          - os: ubuntu-latest
+            dart: 3.9.0
+          - os: macos-latest
+            dart: stable
+          - os: windows-latest
+            dart: stable
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dart-lang/setup-dart@v1
+        with:
+          sdk: ${{ matrix.dart }}
 
       - name: Install dependencies (annotation)
         working-directory: annotation
@@ -113,3 +157,48 @@ jobs:
       - name: Test generator
         working-directory: generator
         run: dart test
+
+  example:
+    name: Examples from clean output
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dart-lang/setup-dart@v1
+        with:
+          sdk: stable
+
+      - name: Install example dependencies
+        working-directory: generator/example
+        run: dart pub get
+
+      - name: Generate example outputs
+        working-directory: generator/example
+        run: dart run build_runner build
+
+      - name: Analyze example
+        working-directory: generator/example
+        run: dart analyze --fatal-infos
+
+      - name: Test example
+        working-directory: generator/example
+        run: dart test
+
+      - name: Install CLI example dependencies
+        working-directory: cli/example
+        run: dart pub get
+
+      - name: Generate CLI example output
+        working-directory: cli/example
+        run: dart run dataforge_cli:dataforge_cli generate .
+
+      - name: Analyze CLI example
+        working-directory: cli/example
+        run: dart analyze --fatal-infos
+
+      - name: Run CLI example
+        working-directory: cli/example
+        run: dart run bin/main.dart
+
+      - name: Check CLI example output
+        working-directory: cli/example
+        run: dart run dataforge_cli:dataforge_cli check .

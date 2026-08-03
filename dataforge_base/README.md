@@ -1,25 +1,37 @@
 # Dataforge Base
 
-Base package for the [Dataforge](https://pub.dev/packages/dataforge_generator) ecosystem.
+Shared resolved-generation core for Dataforge v1.
 
-This package provides the core shared logic used by the Dataforge CLI and Generator, including:
-- Data Class Models (`FieldInfo`, `ClassInfo`, etc.)
-- Parsing Logic (Parsing ASTs using `analyzer`)
-- Writing Logic (Generating code strings)
+> `1.0.0-dev.0` is a preview, not the 1.0 GA release. Public APIs and generated
+> output may still change in later preview versions.
 
-## Installation
-
-This package is typically used as a dependency for `dataforge_generator` or `dataforge_cli`.
+Most applications should depend on `dataforge` or `dataforge_cli`, not call this
+package directly.
 
 ```yaml
 dependencies:
-  dataforge_base: ^0.1.0
+  dataforge_base: ^1.0.0-dev.0
 ```
 
-## Features
+## Public surface
 
-- **Models**: Defines structure of data classes.
-- **Parser**: Extracts models from Analyzer `Element`s.
-- **Writer**: Generates Dart code for `copyWith`, `toJson`, `fromJson`, etc.
+The supported public API contains:
 
-**Internal Use Only**: This package is primarily intended for internal use by `dataforge_cli` and `dataforge_generator`.
+- resolved generation diagnostics;
+- the resolved generation facade used by adapters;
+- `SchemaId`, for stable schema identity where required by public results.
+
+Raw schemas, schema builders and renderers stay internal. An adapter must start
+from a resolved Analyzer element and use the facade so it cannot bypass
+cross-model validation, witness arity checks or type-tree invariants.
+
+## Core invariants
+
+- Public models and diagnostics are immutable snapshots.
+- Collection inputs are defensively copied before being exposed.
+- Freeze, equality and hash traverse the same complete semantic type tree.
+- Exact witnesses form explicit semantic boundaries for custom values.
+- Generation diagnostics use stable codes and source locations.
+
+The build_runner and CLI packages are intentionally thin adapters over this
+shared core.

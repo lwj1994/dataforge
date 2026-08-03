@@ -1,0 +1,15 @@
+/.dart_tool/
+/.pub/
+/build/
+/coverage/
+/pubspec.lock
+/.packages
+
+*.data.dart
+*.freezed.dart
+*.g.dart
+*.tmp
+
+.DS_Store
+.idea/
+.vscode/

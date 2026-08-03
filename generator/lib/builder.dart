@@ -1,5 +1,3 @@
-// @author luwenjie on 2026/01/17 14:37:53
-
 import 'package:build/build.dart';
 import 'package:source_gen/source_gen.dart';
 
@@ -10,7 +8,7 @@ const String _generatedFileHeader =
     '// ignore_for_file: prefer_const_constructors, prefer_single_quotes, '
     'unnecessary_cast, unnecessary_non_null_assertion, unused_element';
 
-/// Builder factory for build_runner integration
+/// Creates the build_runner builder for Dataforge v1 models.
 Builder dataforgeBuilder(BuilderOptions options) {
   return PartBuilder(
     [DataforgeGenerator()],

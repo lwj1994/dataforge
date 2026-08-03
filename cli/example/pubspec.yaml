@@ -1,0 +1,15 @@
+name: dataforge_cli_example
+description: Clean-consumer example for the Dataforge v1 CLI.
+publish_to: none
+version: 1.0.0-dev.0
+
+environment:
+  sdk: '>=3.9.0 <4.0.0'
+
+dependencies:
+  dataforge_annotation: 1.0.0-dev.0
+
+dev_dependencies:
+  dataforge_cli:
+    path: ../
+  lints: ^5.0.0

@@ -1,0 +1,202 @@
+final class _$UserCopyWithSentinel {
+  const _$UserCopyWithSentinel._();
+
+  static const value = _$UserCopyWithSentinel._();
+}
+
+mixin _$User {
+  String get name;
+  List<List<int>> get xs;
+
+  User copyWith({
+    Object? name = _$UserCopyWithSentinel.value,
+    Object? xs = _$UserCopyWithSentinel.value,
+  });
+
+  Map<String, Object?> toJson();
+}
+
+final class _User extends User {
+  @override
+  final String name;
+  @override
+  final List<List<int>> xs;
+
+  _User(
+    {
+      required String name,
+      List<List<int>> xs = const [],
+    }
+  )
+      : name = df.DataforgeTypes.string.freeze(name),
+        xs = df.DataforgeTypes.list(df.DataforgeTypes.list(df.DataforgeTypes.intType)).freeze(xs),
+        super._();
+  const _User._frozen({
+    required String name,
+    required List<List<int>> xs,
+  })
+      : name = name,
+        xs = xs,
+        super._();
+  factory _User.fromJson(Map<String, Object?> json) =>
+      _$UserFromJson(
+        json,
+        const df.JsonDecodeContext(),
+      );
+  @override
+  User copyWith({
+    Object? name = _$UserCopyWithSentinel.value,
+    Object? xs = _$UserCopyWithSentinel.value,
+  }) {
+    final _dfCopyValue0 = identical(
+          name,
+          _$UserCopyWithSentinel.value,
+        ) ||
+        identical(name, this.name)
+        ? this.name
+        : df.DataforgeTypes.string.freeze(name as String);
+    final _dfCopyValue1 = identical(
+          xs,
+          _$UserCopyWithSentinel.value,
+        ) ||
+        identical(xs, this.xs)
+        ? this.xs
+        : df.DataforgeTypes.list(df.DataforgeTypes.list(df.DataforgeTypes.intType)).freeze(xs as List<List<int>>);
+    if (df.DataforgeTypes.string.equals(this.name, _dfCopyValue0) &&
+        df.DataforgeTypes.list(df.DataforgeTypes.list(df.DataforgeTypes.intType)).equals(this.xs, _dfCopyValue1)) {
+      return this;
+    }
+    return _User._frozen(
+      name: _dfCopyValue0,
+      xs: _dfCopyValue1,
+    );
+  }
+  @override
+  Map<String, Object?> toJson() => _$UserDataforgeType()._encode(
+    this,
+    const df.JsonEncodeContext(),
+  );
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is _User &&
+          df.dataforgeValueEquals(df.DataforgeTypes.string, df.DataforgeTypes.string, this.name, other.name) &&
+          df.dataforgeValueEquals(df.DataforgeTypes.list(df.DataforgeTypes.list(df.DataforgeTypes.intType)), df.DataforgeTypes.list(df.DataforgeTypes.list(df.DataforgeTypes.intType)), this.xs, other.xs);
+
+  @override
+  int get hashCode => Object.hashAll(<Object?>[
+    df.DataforgeTypes.string.hash(this.name),
+    df.DataforgeTypes.list(df.DataforgeTypes.list(df.DataforgeTypes.intType)).hash(this.xs),
+  ]);
+  @override
+  String toString() => "User(" + "name: " + this.name.toString() + ", " + "xs: " + this.xs.toString() + ")";
+}
+
+_User _$UserFromJson(
+  Map<String, Object?> json,
+  df.JsonDecodeContext context,
+) {
+  final _modelContext = context.atModel("package:writer_fixture/models.dart#User");
+  final _normalizedJson = df.dataforgeNormalizeJsonObject(json, _modelContext);
+  const acceptedJsonKeys = <String>{
+    "displayName",
+    "name",
+    "xs",
+  };
+  for (final key in _normalizedJson.keys) {
+    if (!acceptedJsonKeys.contains(key)) {
+      _modelContext.field(key).fail("未知 JSON 字段。", code: df.DataforgeJsonErrorCode.unknownField, expectedType: "known JSON field", actualType: "String");
+    }
+  }
+  final _nameJsonKeys = <String>[
+    if (_normalizedJson.containsKey("name")) "name",
+    if (_normalizedJson.containsKey("displayName")) "displayName",
+  ];
+  if (_nameJsonKeys.length > 1) {
+    _modelContext.field(_nameJsonKeys[1], schemaField: "name").fail("同一字段不能同时使用主 JSON 名与 alternate name。", code: df.DataforgeJsonErrorCode.conflictingFieldAliases, expectedType: "exactly one JSON field alias", actualType: "multiple String keys");
+  }
+  final _nameJsonPresent = _nameJsonKeys.isNotEmpty;
+  final _nameJsonKey = _nameJsonPresent ? _nameJsonKeys.single : "name";
+  if (!_nameJsonPresent) {
+    _modelContext.field("name", schemaField: "name").fail("缺少必填字段 name。", code: df.DataforgeJsonErrorCode.missingRequiredField, expectedType: "String", actualType: "missing");
+  }
+  final _xsJsonKeys = <String>[
+    if (_normalizedJson.containsKey("xs")) "xs",
+  ];
+  if (_xsJsonKeys.length > 1) {
+    _modelContext.field(_xsJsonKeys[1], schemaField: "xs").fail("同一字段不能同时使用主 JSON 名与 alternate name。", code: df.DataforgeJsonErrorCode.conflictingFieldAliases, expectedType: "exactly one JSON field alias", actualType: "multiple String keys");
+  }
+  final _xsJsonPresent = _xsJsonKeys.isNotEmpty;
+  final _xsJsonKey = _xsJsonPresent ? _xsJsonKeys.single : "xs";
+  return _User._frozen(
+    name: df.dataforgeDecode(df.DataforgeTypes.string, _normalizedJson[_nameJsonKey], _modelContext.field(_nameJsonKey, schemaField: "name")),
+    xs: _xsJsonPresent ? df.dataforgeDecode(df.DataforgeTypes.list(df.DataforgeTypes.list(df.DataforgeTypes.intType)), _normalizedJson[_xsJsonKey], _modelContext.field(_xsJsonKey, schemaField: "xs")) : df.dataforgeFreeze(df.DataforgeTypes.list(df.DataforgeTypes.list(df.DataforgeTypes.intType)), const [], _modelContext.field("xs", schemaField: "xs")),
+  );
+}
+
+const df.DataforgeType<User> $UserType = _$UserDataforgeType();
+
+final class _$UserDataforgeType implements df.DataforgeType<User>, df.DataforgeTypeIdentity, df.DataforgeTypeErasedEquality {
+  const _$UserDataforgeType();
+
+  @override
+  Object get dataforgeTypeId => "package:writer_fixture/models.dart#User";
+
+  @override
+  List<df.DataforgeType<dynamic>> get dataforgeTypeArguments => const <df.DataforgeType<dynamic>>[];
+
+  @override
+  User freeze(User value) {
+    if (value is _User) return value;
+    return _User._frozen(
+      name: df.DataforgeTypes.string.freeze(value.name),
+      xs: df.DataforgeTypes.list(df.DataforgeTypes.list(df.DataforgeTypes.intType)).freeze(value.xs),
+    );
+  }
+
+  @override
+  bool equals(User left, User right) => dataforgeEqualsErased(this, left, right);
+
+  @override
+  bool dataforgeEqualsErased(df.DataforgeType<dynamic> other, Object? left, Object? right) {
+    if (other is! _$UserDataforgeType || !df.dataforgeTypeEquals(this, other) || left is! _User || right is! _User) {
+      return false;
+    }
+    if (identical(left, right)) return true;
+    return df.dataforgeValueEquals(df.DataforgeTypes.string, df.DataforgeTypes.string, left.name, right.name) &&
+        df.dataforgeValueEquals(df.DataforgeTypes.list(df.DataforgeTypes.list(df.DataforgeTypes.intType)), df.DataforgeTypes.list(df.DataforgeTypes.list(df.DataforgeTypes.intType)), left.xs, right.xs);
+  }
+
+  @override
+  int hash(User value) => Object.hashAll(<Object?>[
+    df.DataforgeTypes.string.hash(value.name),
+    df.DataforgeTypes.list(df.DataforgeTypes.list(df.DataforgeTypes.intType)).hash(value.xs),
+  ]);
+
+  @override
+  User fromJson(Object? json, df.JsonDecodeContext context) {
+    if (json is! Map<String, Object?>) {
+      return context.atModel("package:writer_fixture/models.dart#User").fail("User 必须从 JSON object 解码。", code: df.DataforgeJsonErrorCode.typeMismatch, expectedType: "Map<String, Object?>", actualType: df.dataforgeJsonActualType(json));
+    }
+    return _$UserFromJson(
+      json,
+      context,
+    );
+  }
+
+  @override
+  Object? toJson(User value, df.JsonEncodeContext context) {
+    return _encode(value, context);
+  }
+
+  Map<String, Object?> _encode(
+    User value,
+    df.JsonEncodeContext context,
+  ) {
+    final _modelContext = context.atModel("package:writer_fixture/models.dart#User");
+    return _modelContext.snapshot(<String, Object?>{
+      "name": df.dataforgeEncode(df.DataforgeTypes.string, value.name, _modelContext.field("name", schemaField: "name")),
+      "xs": df.dataforgeEncode(df.DataforgeTypes.list(df.DataforgeTypes.list(df.DataforgeTypes.intType)), value.xs, _modelContext.field("xs", schemaField: "xs")),
+    }) as Map<String, Object?>;
+  }
+}

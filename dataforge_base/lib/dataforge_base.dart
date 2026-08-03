@@ -1,13 +1,9 @@
-/// Dataforge Base Library
+/// Resolved frontend and diagnostics for Dataforge v1 code generation.
 ///
-/// This library provides core functionality for dataforge code generation,
-/// including data models, parser utilities, and code writer.
+/// Raw schemas and renderers remain internal so callers cannot bypass resolved
+/// cross-model validation.
 library dataforge_base;
 
-export 'src/circular_dependency_detector.dart';
-export 'src/exceptions.dart';
-export 'src/logger.dart';
-export 'src/model.dart';
-export 'src/parser.dart';
-export 'src/type_utils.dart';
-export 'src/writer.dart';
+export 'src/v1/diagnostics.dart';
+export 'src/v1/resolved_generation.dart';
+export 'src/v1/schema.dart' show SchemaId;

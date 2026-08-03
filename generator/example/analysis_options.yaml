@@ -1,6 +1,6 @@
 analyzer:
   exclude:
-    - "**/*.g.dart"
+    - "**/*.data.dart"
 
 linter:
   rules:

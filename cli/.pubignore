@@ -1,0 +1,22 @@
+# Publish source only; exclude local tooling and generated artifacts.
+/.dart_tool/
+/.pub/
+/build/
+/coverage/
+/pubspec.lock
+/pubspec_overrides.yaml
+/example/.dart_tool/
+/example/pubspec.lock
+/example/pubspec_overrides.yaml
+/.packages
+
+*.data.dart
+*.freezed.dart
+*.g.dart
+*.dill
+*.snapshot
+*.tmp
+
+.DS_Store
+.idea/
+.vscode/

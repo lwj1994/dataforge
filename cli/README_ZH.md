@@ -1,42 +1,45 @@
-# Dart Dataforge 数据锻造厂
+# Dataforge CLI
 
-[![Pub Version](https://img.shields.io/pub/v/dataforge_cli)](https://pub.dev/packages/dataforge_cli)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+Dataforge v1 值对象的独立 resolved 代码生成适配器。
 
-高性能的 Dart 数据类生成器，比 `build_runner` **快数倍**。自动生成完美的数据类，包含 `copyWith`、`==`、`hashCode`、`toJson`、`fromJson` 等方法。
+> `1.0.0-dev.0` 是预览版本，不是 1.0 GA。CLI 只支持 v1 `abstract final`
+> factory 声明，并且不会编辑模型源码。
 
-## ✨ 功能特性
+## 安装
 
-- ⚡ **闪电般快速**：比 `build_runner` 快数倍
-- 🎯 **零配置**：开箱即用
-- 📦 **完整生成**：`copyWith`、`==`、`hashCode`、`toJson`、`fromJson`、`toString`
-- 🔗 **链式 CopyWith**：高级嵌套对象更新
-- 🔧 **灵活配置**：自定义字段映射、忽略字段、备用名称
-- 🌟 **类型安全**：完整的编译时类型检查
-- 🚀 **易于使用**：简单注解，最少设置
+```bash
+dart pub global activate dataforge_cli 1.0.0-dev.0
+```
 
-## 📦 安装
-
-### 1. 添加依赖
+业务 package 需要同版本运行时注解包：
 
 ```yaml
 dependencies:
-  dataforge_annotation:
-    git:
-      url: https://github.com/lwj1994/dataforge
-      ref: main
-      path: annotation
+  dataforge_annotation: ^1.0.0-dev.0
 ```
 
-### 2. 安装 CLI 工具
+最低要求 Dart 3.9。生成前先在每个 package 运行 `dart pub get`，让 resolved frontend
+能够读取 package configuration。
+
+## 命令
+
+生成一个 package 或单个 Dart 源文件：
 
 ```bash
-dart pub global activate dataforge_cli
+dataforge generate .
+dataforge generate lib/models/user.dart
 ```
 
-## 🚀 快速开始
+只检查已提交输出，不写文件：
 
-### 1. 创建数据类
+```bash
+dataforge check .
+```
+
+输出缺失、漂移或存在需要恢复的未完成 generation journal 时，`check` 退出 4。
+遇到 journal 时先运行一次显式 `generate`，再重新执行 `check`。
+
+## 声明
 
 ```dart
 import 'package:dataforge_annotation/dataforge_annotation.dart';
@@ -44,262 +47,73 @@ import 'package:dataforge_annotation/dataforge_annotation.dart';
 part 'user.data.dart';
 
 @Dataforge()
-class User with _User {
-  @override
-  final String name;
-  
-  @override
-  final int age;
-  
-  @override
-  final List<String> hobbies;
+abstract final class User with _$User {
+  const User._();
 
-  const User({
-    required this.name,
-    this.age = 0,
-    this.hobbies = const [],
-  });
+  factory User({
+    required String name,
+    @DataforgeDefault(<String>[]) List<String> tags,
+  }) = _User;
+
+  factory User.fromJson(Map<String, Object?> json) = _User.fromJson;
 }
 ```
 
-### 2. 生成代码
+CLI 与 build_runner 使用同一声明契约：`part`、mixin、实现名和 redirecting factory
+形状必须准确。源码缺失或非法时返回诊断；CLI 不会代替用户插入或改写声明。
+
+## 事务模型
+
+普通生成会：
+
+1. 在内存中 resolve 全部候选 library 并构建 schema；
+2. 在内存中渲染并格式化全部输出；
+3. 通过 Analyzer overlay 验证完整生成 library；
+4. 按最近的 Dart package root 对输出分组；
+5. 在对应 package 的进程锁内复验源码、package configuration 与 pubspec 快照；
+6. 通过同目录临时文件和该 package 的 recovery journal 安装输出。
+
+journal 会在替换目标前落盘。进程中断后，下一次普通 generate 会先回滚未完成事务。
+若目标含未知内容、路径变成链接或 journal 非法，CLI 会保留现场并报错，不会猜测覆盖。
+
+同一个 package 内的多文件事务可以按组恢复，但不承诺所有文件在操作系统层同一时刻
+可见。monorepo 的不同 package 使用独立事务，因此从外层或嵌套 package 启动时，凡是
+可能修改同一目标，都一定使用同一份 lock 与 journal。
+
+## 退出状态
+
+| Code | 含义 |
+| --- | --- |
+| 0 | 生成或检查成功 |
+| 2 | 命令参数非法 |
+| 3 | 生成或声明失败 |
+| 4 | 输出漂移或其他安全前置条件失败 |
+| 5 | 文件系统或事务 I/O 失败 |
+| 70 | 未预期内部失败 |
+
+## CI
+
+如果项目选择提交 `.data.dart`，可加入：
 
 ```bash
-# 为当前目录生成
-dataforge .
-
-# 为指定文件生成
-dataforge lib/models/user.dart
+dataforge check .
 ```
 
-### 3. 使用生成的方法
+该命令严格只读：不会创建 lock、恢复 journal，也不会修改源码或生成文件。
 
-```dart
-void main() {
-  // 创建实例
-  final user = User(name: "张三", age: 25, hobbies: ["编程"]);
-  
-  // 复制并修改
-  final updated = user.copyWith(age: 26);
-  
-  // JSON 序列化
-  final json = user.toJson();
-  final fromJson = User.fromJson(json);
-  
-  // 对象比较
-  print(user == updated); // false
-  print(user.toString()); // User(name: 张三, age: 25, hobbies: [编程])
-}
-```
+## 与 build_runner 的关系
 
-## 🔧 配置选项
+CLI 与 `dataforge` build_runner 适配器使用同一 resolved generation facade 和
+renderer。代表性 fixture 已校验逐字节一致性，但当前预览尚未宣称覆盖所有类型和平台的
+完整 GA 一致性矩阵。
 
-### @Dataforge 注解
+## 排错
 
-```dart
-@Dataforge(
-  includeFromJson: true,    // 生成 fromJson 方法（默认：false）
-  includeToJson: true,      // 生成 toJson 方法（默认：false）
-  deepCopyWith: false,   // 禁用链式 copyWith（默认：true）
-)
-class MyClass with _MyClass {
-  // ...
-}
-```
+- **找不到 package configuration：** 在最近的 package root 运行 `dart pub get`。
+- **DF1001 声明错误：** 检查 `abstract final`、`_$Model`、`_Model`、私有基类
+  构造器、redirecting factory 与 `.data.dart` part URI。
+- **check 退出 4：** 运行普通生成并审阅 diff。
+- **拒绝恢复：** 保留错误中列出的文件和 journal；CLI 不会自动猜测或删除未知内容。
 
-### @JsonKey 注解
-
-```dart
-class User with _User {
-  // 自定义 JSON 字段名
-  @JsonKey(name: "user_name")
-  final String name;
-  
-  // 多个可能的字段名
-  @JsonKey(alternateNames: ["user_age", "age"])
-  final int age;
-  
-  // 在 JSON 中忽略字段
-  @JsonKey(ignore: true)
-  final String? password;
-  
-  // 从 JSON 中排除 null 值
-  @JsonKey(includeIfNull: false)
-  final String? nickname;
-  
-  // 自定义值读取
-  @JsonKey(readValue: parseDate)
-  final DateTime createdAt;
-  
-  static Object? parseDate(Map map, String key) {
-    final value = map[key];
-    return value is String ? DateTime.parse(value) : value;
-  }
-}
-```
-
-## 🔗 链式 CopyWith
-
-对于复杂的嵌套对象，启用强大的链式更新：
-
-```dart
-@Dataforge(deepCopyWith: true)
-class Address with _Address {
-  @override
-  final String street;
-  @override
-  final String city;
-  @override
-  final String zipCode;
-
-  const Address({required this.street, required this.city, required this.zipCode});
-}
-
-@Dataforge(deepCopyWith: true)
-class Person with _Person {
-  @override
-  final String name;
-  @override
-  final int age;
-  @override
-  final Address address;
-  @override
-  final Address? workAddress;
-
-  const Person({required this.name, required this.age, required this.address, this.workAddress});
-}
-
-@Dataforge(deepCopyWith: true)
-class Company with _Company {
-  @override
-  final String name;
-  @override
-  final Person ceo;
-  @override
-  final List<Person> employees;
-
-  const Company({required this.name, required this.ceo, required this.employees});
-}
-```
-
-### 使用示例
-
-```dart
-final company = Company(
-  name: '科技公司',
-  ceo: Person(
-    name: '张三',
-    age: 30,
-    address: Address(street: '中山路123号', city: '北京', zipCode: '100001'),
-  ),
-  employees: [],
-);
-
-// 简单链式 copyWith
-final newCompany1 = company.copyWith.name('新科技公司');
-
-// 嵌套更新
-final newCompany2 = company.copyWith.ceoBuilder((ceo) => 
-  ceo.copyWith.name('李四')
-);
-
-// 多层嵌套更新
-final newCompany3 = company.copyWith.ceoBuilder((ceo) => 
-  ceo.copyWith.addressBuilder((addr) => 
-    addr.copyWith.street('长安街999号')
-  )
-);
-
-// 复杂多字段更新
-final newCompany4 = company.copyWith.ceoBuilder((ceo) => 
-  ceo.copyWith
-    .name('王五')
-    .copyWith.age(35)
-    .copyWith.addressBuilder((addr) => 
-      addr.copyWith
-        .street('天安门大街777号')
-        .copyWith.city('上海')
-        .copyWith.zipCode('200001')
-    )
-);
-```
-
-## 📋 支持的类型
-
-- **基础类型**：`String`、`int`、`double`、`bool`、`num`
-- **日期时间**：`DateTime`、`Duration`
-- **集合类型**：`List<T>`、`Set<T>`、`Map<K, V>`
-- **可选类型**：`String?`、`int?` 等
-- **嵌套对象**：带有 `fromJson` 的自定义类
-- **复杂集合**：`List<User>`、`Map<String, User>` 等
-
-## 🔄 从 build_runner 迁移
-
-从 `json_annotation` + `build_runner` 迁移？很简单：
-
-**之前（build_runner）：**
-```dart
-@JsonSerializable()
-class User {
-  final String name;
-  final int age;
-  
-  User({required this.name, required this.age});
-  
-  factory User.fromJson(Map<String, dynamic> json) => _$UserFromJson(json);
-  Map<String, dynamic> toJson() => _$UserToJson(this);
-}
-```
-
-**现在（Dataforge）：**
-```dart
-@Dataforge(includeFromJson: true, includeToJson: true)
-class User with _User {
-  @override
-  final String name;
-  @override
-  final int age;
-  
-  const User({required this.name, required this.age});
-}
-```
-
-## 🎯 为什么选择 Dataforge？
-
-| 功能 | Dataforge | build_runner |
-|------|-----------|-------------|
-| **速度** | ⚡ 快数倍 | 🐌 缓慢 |
-| **设置** | ✅ 零配置 | ❌ 复杂设置 |
-| **依赖** | ✅ 轻量级 | ❌ 重量级 |
-| **生成代码** | ✅ 清晰易读 | ❌ 复杂 |
-| **链式 CopyWith** | ✅ 内置支持 | ❌ 不可用 |
-| **学习曲线** | ✅ 最小 | ❌ 陡峭 |
-
-## 🛠️ 开发
-
-```bash
-# 克隆仓库
-git clone https://github.com/lwj1994/dataforge.git
-cd dataforge
-
-# 安装依赖
-dart pub get
-
-# 运行测试
-dart test
-
-# 格式化代码
-dart tools/format_project.dart
-```
-
-## 📄 许可证
-
-MIT 许可证 - 查看 [LICENSE](LICENSE) 文件了解详情。
-
-## 🤝 贡献
-
-欢迎贡献！请随时提交 Pull Request。
-
-## 📞 支持
-
-如果您遇到任何问题或有功能请求，请在 [GitHub](https://github.com/lwj1994/dataforge/issues) 上创建 issue。
+注解、strict JSON 与 witness 语义见
+[generator 文档](https://github.com/lwj1994/dataforge/tree/main/generator)。
