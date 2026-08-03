@@ -57,9 +57,16 @@ final class PendingGeneratedFile {
 /// The journal is installed before any target moves. Recovery always rolls
 /// back to the pre-transaction state, preventing partial new output.
 final class GeneratedFileTransaction {
-  static const String journalRelativePath =
-      '.dart_tool/dataforge/generate-journal.json';
-  static const String lockRelativePath = '.dart_tool/dataforge/generate.lock';
+  static final String journalRelativePath = p.join(
+    '.dart_tool',
+    'dataforge',
+    'generate-journal.json',
+  );
+  static final String lockRelativePath = p.join(
+    '.dart_tool',
+    'dataforge',
+    'generate.lock',
+  );
   static final Map<String, Future<void>> _inProcessLocks = {};
 
   const GeneratedFileTransaction({

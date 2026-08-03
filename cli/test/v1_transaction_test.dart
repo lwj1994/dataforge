@@ -18,6 +18,17 @@ void main() {
     if (await root.exists()) await root.delete(recursive: true);
   });
 
+  test('uses platform-native normalized generation control paths', () {
+    expect(
+      GeneratedFileTransaction.journalRelativePath,
+      p.join('.dart_tool', 'dataforge', 'generate-journal.json'),
+    );
+    expect(
+      GeneratedFileTransaction.lockRelativePath,
+      p.join('.dart_tool', 'dataforge', 'generate.lock'),
+    );
+  });
+
   test('takes an immutable defensive copy of pending bytes', () {
     final source = <int>[1, 2, 3];
     final write = PendingGeneratedFile(
