@@ -6,9 +6,10 @@ import 'package:test/test.dart';
 
 void main() {
   test('public v1 API 只暴露 resolved generation facade', () async {
-    final result = await resolveFile(
-      path: '${Directory.current.path}/lib/dataforge_base.dart',
+    final sourceFile = File.fromUri(
+      Directory.current.uri.resolve('lib/dataforge_base.dart'),
     );
+    final result = await resolveFile(path: sourceFile.path);
     expect(result, isA<ResolvedUnitResult>());
 
     final namespace =

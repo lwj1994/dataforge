@@ -2066,21 +2066,22 @@ final class _Fixture {
       'dataforge_v1_builder_',
     );
     for (final entry in sources.entries) {
-      await File('${directory.path}/${entry.key}').writeAsString(entry.value);
+      await File.fromUri(
+        directory.uri.resolve(entry.key),
+      ).writeAsString(entry.value);
     }
 
     final libraries = <String, LibraryElement>{};
     for (final name in sources.keys) {
-      final result = await resolveFile(path: '${directory.path}/$name');
+      final sourceFile = File.fromUri(directory.uri.resolve(name));
+      final result = await resolveFile(path: sourceFile.path);
       if (result is! ResolvedUnitResult) {
         throw StateError('无法 resolve fixture $name: $result');
       }
       libraries[name] = result.libraryElement;
     }
 
-    final annotationUri = File(
-      '${directory.path}/annotations.dart',
-    ).uri.toString();
+    final annotationUri = directory.uri.resolve('annotations.dart').toString();
     final builder = V1ModelSchemaBuilder(
       dataforgeAnnotation: SymbolId(
         libraryUri: annotationUri,
