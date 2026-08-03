@@ -89,7 +89,8 @@ ${process.stderr}
   return process;
 }
 
-String _yamlPath(String path) => "'${path.replaceAll("'", "''")}'";
+String _yamlPath(String path) =>
+    "'${path.replaceAll('\\', '/').replaceAll("'", "''")}'";
 
 const _modelSource = r'''
 import 'package:dataforge_annotation/dataforge_annotation.dart' as df;

@@ -165,12 +165,12 @@ environment:
   sdk: '>=3.9.0 <4.0.0'
 dependencies:
   dataforge_annotation:
-    path: ${p.join(repositoryRoot, 'annotation')}
+    path: ${_yamlPath(p.join(repositoryRoot, 'annotation'))}
 dependency_overrides:
   dataforge_annotation:
-    path: ${p.join(repositoryRoot, 'annotation')}
+    path: ${_yamlPath(p.join(repositoryRoot, 'annotation'))}
   dataforge_base:
-    path: ${p.join(repositoryRoot, 'dataforge_base')}
+    path: ${_yamlPath(p.join(repositoryRoot, 'dataforge_base'))}
 ''');
         final pubGet = await Process.run(Platform.resolvedExecutable, [
           'pub',
@@ -213,7 +213,12 @@ dependency_overrides:
           p.join(output.parent.path, '.model.data.dart.dataforge.test.0.bak'),
         );
         final journal = File(
-          p.join(nestedRoot.path, '.dart_tool/dataforge/generate-journal.json'),
+          p.join(
+            nestedRoot.path,
+            '.dart_tool',
+            'dataforge',
+            'generate-journal.json',
+          ),
         );
         await temporary.writeAsBytes(newOutputBytes, flush: true);
         await journal.parent.create(recursive: true);
@@ -232,7 +237,7 @@ dependency_overrides:
         final temporaryBeforeCheck = await temporary.readAsBytes();
         final journalBeforeCheck = await journal.readAsBytes();
         final nestedLock = File(
-          p.join(nestedRoot.path, '.dart_tool/dataforge/generate.lock'),
+          p.join(nestedRoot.path, '.dart_tool', 'dataforge', 'generate.lock'),
         );
         final nestedLockBeforeCheck = await nestedLock.readAsBytes();
         final outerLock = File(
@@ -988,6 +993,9 @@ Future<ProcessResult> _runCli(
 
 String _sha256Bytes(List<int> bytes) => sha256.convert(bytes).toString();
 
+String _yamlPath(String path) =>
+    "'${path.replaceAll('\\', '/').replaceAll("'", "''")}'";
+
 String _byteDifference(List<int> expected, List<int> actual) {
   final sharedLength = expected.length < actual.length
       ? expected.length
@@ -1105,16 +1113,16 @@ environment:
   sdk: '>=3.9.0 <4.0.0'
 dependencies:
   dataforge_annotation:
-    path: ${p.join(repositoryRoot, 'annotation')}
+    path: ${_yamlPath(p.join(repositoryRoot, 'annotation'))}
 dev_dependencies:
   build_runner: ^2.10.5
   dataforge:
-    path: ${p.join(repositoryRoot, 'generator')}
+    path: ${_yamlPath(p.join(repositoryRoot, 'generator'))}
 dependency_overrides:
   dataforge_annotation:
-    path: ${p.join(repositoryRoot, 'annotation')}
+    path: ${_yamlPath(p.join(repositoryRoot, 'annotation'))}
   dataforge_base:
-    path: ${p.join(repositoryRoot, 'dataforge_base')}
+    path: ${_yamlPath(p.join(repositoryRoot, 'dataforge_base'))}
 ''');
     final pubGet = await Process.run(Platform.resolvedExecutable, [
       'pub',
@@ -1128,7 +1136,8 @@ dependency_overrides:
     return consumer;
   }
 
-  String path(String relativePath) => p.join(root.path, relativePath);
+  String path(String relativePath) =>
+      p.normalize(p.join(root.path, relativePath));
 
   Future<File> write(String relativePath, String content) async {
     final file = File(path(relativePath));
