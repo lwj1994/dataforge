@@ -1,23 +1,16 @@
 name: dataforge_generator_example
-description: Example usage of dataforge
-version: 0.3.0
+description: Dataforge v1 build_runner example.
+version: 1.0.0-dev.0
 publish_to: none
 
 environment:
-  sdk: ^3.0.0
+  sdk: '>=3.9.0 <4.0.0'
 
 dependencies:
-  dataforge_annotation: ^0.3.0
+  dataforge_annotation: 1.0.0-dev.0
 
 dev_dependencies:
   build_runner: ^2.4.0
   dataforge:
     path: ../
-  lints: ^5.0.0
   test: ^1.29.0
-
-dependency_overrides:
-  dataforge_annotation:
-    path: ../../annotation
-  dataforge_base:
-    path: ../../dataforge_base

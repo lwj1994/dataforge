@@ -1,182 +1,161 @@
 # Release Skill
 
-用于发布 dataforge 项目的所有包到 pub.dev。
+用于把 Dataforge v1 monorepo 的四个包发布到 pub.dev。
 
-## 使用方法
+## 触发与安全边界
 
+只有用户明确要求“发布版本”或调用 `/release <version>` 时，才能执行外部发布、push
+和 tag。普通重构、版本准备或“执行计划”不等于发布授权。
+
+```text
+/release 1.0.0-dev.0
+/release 1.0.0
 ```
-/release <version>
-```
 
-例如：`/release 0.6.1` 或 `/release 1.0.0`
+`1.0.0-dev.0` 是预览版本。发布说明必须明确尚未完成的 GA 类型/平台门禁，不得写成
+正式稳定版。1.0 只发布 v1 `abstract final` 模型链路。
+
+## 包与顺序
+
+四包共享版本，必须按依赖顺序发布：
+
+1. `annotation/` → `dataforge_annotation`
+2. `dataforge_base/` → `dataforge_base`
+3. `generator/` → `dataforge`
+4. `cli/` → `dataforge_cli`
+
+`generator` 和 `cli` 的公开 pubspec 必须精确依赖同版本 annotation/base。monorepo
+本地 path 引用只放在 `pubspec_overrides.yaml`，并由 `.pubignore` 排除。
 
 ## 发布流程
 
-此 skill 会自动执行以下步骤：
+### 1. 对齐版本与文档
 
-1. **格式化代码** - 对所有包执行 `dart format`
-2. **运行测试** - 确保所有测试通过
-3. **更新版本号** - 更新所有包的 pubspec.yaml 和 CHANGELOG.md
-4. **创建 Git Tag** - 创建版本标签并推送到远程
-5. **发布包** - 按依赖顺序发布包，每个包间隔 4 分钟：
-   - dataforge_annotation
-   - dataforge_base
-   - dataforge (generator)
-   - dataforge_cli
+更新四个 `pubspec.yaml` 版本，以及 generator/cli 的两个内部 hosted 精确约束。
 
----
+同时更新：
 
-## 实现
+- 根 `CHANGELOG.md`（annotation 通过软链接共享）；
+- `dataforge_base/CHANGELOG.md`、`generator/CHANGELOG.md`、`cli/CHANGELOG.md`；
+- 根与各包 README；
+- `docs/1.0/RFC.md`、`docs/1.0/SUPPORT_MATRIX.md`；
+- `.agents/skills/dataforge/SKILL.md` 中的当前版本边界。
 
-### 步骤 1: 格式化代码
+主要版本条目使用 `Added`、`Changed`、`Fixed`、`Preview limitations` 分类。预览版不得
+把未通过的 GA 门禁写成已交付。
 
-对所有包执行代码格式化：
+### 2. 依赖解析
 
-```bash
-dart format annotation/ dataforge_base/ generator/ cli/
-```
-
-### 步骤 2: 运行测试
-
-确保所有包的测试都通过：
+分别在四个 package 运行：
 
 ```bash
-cd annotation && dart test && cd ..
-cd dataforge_base && dart test && cd ..
-cd generator && dart test && cd ..
-cd cli && dart test && cd ..
+dart pub get
 ```
 
-如果任何测试失败，停止发布流程并报告错误。
+确认 `dart pub deps --style=compact` 中内部包均解析到本次相同版本。两个 example 也要
+使用兼容 SDK 和 annotation 约束。
 
-### 步骤 3: 更新版本号和 CHANGELOG
-
-#### 3.1 更新 pubspec.yaml 版本号
-
-更新以下文件中的版本号：
-- `annotation/pubspec.yaml` - 第 3 行 `version: {version}`
-- `dataforge_base/pubspec.yaml` - 第 3 行 `version: {version}`
-- `generator/pubspec.yaml` - 第 3 行 `version: {version}`
-- `cli/pubspec.yaml` - 第 3 行 `version: {version}`
-
-同时更新 `generator` 和 `cli` 对 `annotation` 和 `dataforge_base` 的依赖版本：
-- `generator/pubspec.yaml`:
-  - `dataforge_annotation: ^{version}`
-  - `dataforge_base: ^{version}`
-- `cli/pubspec.yaml`:
-  - `dataforge_annotation: ^{version}`
-  - `dataforge_base: ^{version}`
-
-#### 3.2 更新 CHANGELOG.md
-
-在每个包的 CHANGELOG.md 文件顶部添加新版本条目：
-
-**文件列表：**
-- `CHANGELOG.md` (根目录，用于整体项目记录)
-- `annotation/CHANGELOG.md`
-- `dataforge_base/CHANGELOG.md`
-- `generator/CHANGELOG.md`
-- `cli/CHANGELOG.md`
-
-**格式示例：**
-
-```markdown
-## {version}
-- [变更描述 1]
-- [变更描述 2]
-- [变更描述 3]
-
-## {previous_version}
-...
-```
-
-**注意事项：**
-1. 新版本条目添加在文件最顶部
-2. 不需要添加发布日期（与现有格式保持一致）
-3. 使用 `-` 开头的列表格式描述变更
-4. 如果是主要版本，可以分类：
-   - `### Added` - 新增功能
-   - `### Fixed` - Bug 修复
-   - `### Changed` - 变更内容
-   - `### Documentation` - 文档更新
-
-**示例：**
-
-```markdown
-## 0.7.0
-- Support for nullable types in JSON serialization
-- Add new CLI flag `--watch` for hot reload
-- Fix DateTime parsing edge cases
-
-## 0.6.0
-...
-```
-
-### 步骤 4: 提交变更并创建 Git Tag
-
-提交所有版本号和 CHANGELOG 的变更：
+### 3. 格式、分析、测试与示例
 
 ```bash
-git add annotation/pubspec.yaml annotation/CHANGELOG.md
-git add dataforge_base/pubspec.yaml dataforge_base/CHANGELOG.md
-git add generator/pubspec.yaml generator/CHANGELOG.md
-git add cli/pubspec.yaml cli/CHANGELOG.md
-git add CHANGELOG.md
-git commit -m "release: version {version}"
+(cd annotation && dart format --output=none --set-exit-if-changed .)
+(cd dataforge_base && dart format --output=none --set-exit-if-changed .)
+(cd generator && dart format --output=none --set-exit-if-changed lib test example)
+(cd cli && dart format --output=none --set-exit-if-changed lib bin test example)
 ```
 
-创建 tag 并推送到远程：
+随后在每个 package 独立执行：
 
 ```bash
-git tag v{version}
-git push origin main
-git push origin v{version}
+dart analyze --fatal-infos
+dart test
 ```
 
-### 步骤 5: 发布包
+还必须验证：
 
-按依赖顺序发布包，每个包间隔 4 分钟以确保 pub.dev 同步完成：
+- generator example 从无 `.data.dart` 状态 build、analyze、test；
+- CLI example 从无 `.data.dart` 状态 generate、analyze、run、`check`；
+- `dataforge check` 在输出漂移或遗留 journal 存在时严格零写入；
+- 最低 Dart SDK、stable、Linux、macOS、Windows CI 矩阵全部通过。
+
+任何失败都停止发布，不允许用 `--force`、`|| true` 或跳过校验掩盖。
+
+### 4. 在无 Git metadata 的快照中执行首次归档 dry-run
+
+发布准备尚未提交时，直接运行 `dart pub publish --dry-run` 会产生 dirty-repository
+warning。严格 wrapper 会正确拒绝该 warning，因此首次归档验证必须在包含当前内容、
+但不包含 `.git` 的临时快照中执行：
 
 ```bash
-# 1. 发布 annotation (无依赖)
-cd annotation && dart pub publish --force && cd ..
+release_snapshot="$(mktemp -d)"
+rsync -a --exclude '.git' --exclude '.dart_tool' ./ "$release_snapshot/"
 
-# 等待 4 分钟
-sleep 240
+(cd "$release_snapshot/annotation" && dart pub get)
+(cd "$release_snapshot/dataforge_base" && dart pub get)
+(cd "$release_snapshot/generator" && dart pub get)
+(cd "$release_snapshot/cli" && dart pub get)
 
-# 2. 发布 dataforge_base (无依赖)
-cd dataforge_base && dart pub publish --force && cd ..
-
-# 等待 4 分钟
-sleep 240
-
-# 3. 发布 generator (依赖 annotation 和 dataforge_base)
-cd generator && dart pub publish --force && cd ..
-
-# 等待 4 分钟
-sleep 240
-
-# 4. 发布 cli (依赖 annotation 和 dataforge_base)
-cd cli && dart pub publish --force && cd ..
+(cd "$release_snapshot/annotation" && dart run ../tool/validate_publish_dry_run.dart)
+(cd "$release_snapshot/dataforge_base" && dart run ../tool/validate_publish_dry_run.dart)
+(cd "$release_snapshot/generator" && dart run ../tool/validate_publish_dry_run.dart dataforge_annotation dataforge_base)
+(cd "$release_snapshot/cli" && dart run ../tool/validate_publish_dry_run.dart dataforge_annotation dataforge_base)
 ```
 
-## 注意事项
+保留并记录 `release_snapshot` 路径，直到发布完成；不要让清理命令使用空变量或仓库根。
 
-- 确保你已经登录 pub.dev (`dart pub login`)
-- 确保你有权限发布这些包
-- 发布前会显示每个包的变更内容供确认
-- 如果发布过程中某个包失败，会停止后续发布并报告错误
-- 使用 `--force` 跳过发布确认，自动化发布流程
+逐项检查：
 
-## 错误处理
+- package 名、版本、入口、README、CHANGELOG 与 LICENSE 正确；
+- archive 不含二进制、`.exe`、lockfile、临时文件、生成/构建目录；
+- archive 不含 `pubspec_overrides.yaml` 或本地 path dependency；
+- annotation/base 为 0 warning；
+- 预览期 generator/cli 只允许 wrapper 精确匹配 annotation/base 的两条
+  tight-dependency warning；
+- 只允许 0 hint，或精确匹配两个内部依赖的 override hint；
+- wrapper 输出格式无法识别、marker 缺失/重复或出现额外 warning/hint 时必须非零退出。
 
-如果在任何步骤失败：
-1. **测试失败** - 修复测试问题后重新运行
-2. **发布失败** - 检查网络连接和 pub.dev 权限，手动发布剩余的包
-3. **Git 推送失败** - 检查远程仓库权限
+进入 GA 时移除预览 allowlist，并恢复四包全部 0 warning。
 
-## 回滚
+### 5. 审阅并提交
 
-如果需要回滚：
-1. Git tag 可以删除: `git tag -d v{version} && git push origin :refs/tags/v{version}`
-2. 已发布的包无法从 pub.dev 删除，只能发布新版本修复
+向用户汇总版本、变更、测试、示例、快照 dry-run 和已知限制。只有得到发布授权后才
+stage、commit、tag 或 push。
+
+```text
+release: 1.0.0-dev.0
+```
+
+建议 tag：
+
+```text
+v1.0.0-dev.0
+```
+
+### 6. 在干净提交上复验并逐包发布
+
+提交后先确认工作树干净，再在真实 checkout 中重新执行四条 strict wrapper 命令。
+这次不得使用快照来掩盖遗漏提交的文件。
+
+对每个包按依赖顺序执行：
+
+```bash
+dart pub publish
+```
+
+不要默认使用 `--force`。上游包发布后，以 pub.dev 实际可解析为准，不使用固定时长
+sleep。禁用下游本地 override，完成 hosted `dart pub get` 和 strict dry-run 后再发布。
+
+### 7. 完成验证
+
+- 从干净临时 consumer 仅使用 hosted 依赖执行 `dart pub get`；
+- 从无 `.data.dart` 状态生成、analyze、test；
+- 检查 pub.dev README 与 archive 内容；
+- 最后才 push release commit 与 tag（若授权包含 push）。
+
+## 失败与回退
+
+- format、analysis、test、example、dry-run 或 hosted 解析失败：停止后续发布。
+- 某包已发布而下游失败：已发布版本不能删除；修复后发布新的预发布 patch，不重用
+  版本号。
+- tag 未 push 时可在授权范围内处理；已 push tag 只有用户明确授权后才能删除远端。
+- 保存完整命令输出和失败包名，不把部分发布报告成全部成功。

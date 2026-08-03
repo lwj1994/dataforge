@@ -1,0 +1,6 @@
+# Monorepo/CI resolution only; generator/.pubignore excludes this from archives.
+dependency_overrides:
+  dataforge_annotation:
+    path: ../../annotation
+  dataforge_base:
+    path: ../../dataforge_base

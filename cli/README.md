@@ -1,38 +1,46 @@
-# Dart Dataforge
+# Dataforge CLI
 
-[![Pub Version](https://img.shields.io/pub/v/dataforge_cli)](https://pub.dev/packages/dataforge_cli)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+Standalone resolved code-generation adapter for Dataforge v1 value models.
 
-A high-performance Dart data class generator that's **multiple times faster** than `build_runner`. Generate perfect data classes with `copyWith`, `==`, `hashCode`, `toJson`, `fromJson`, and more.
+> `1.0.0-dev.0` is a preview, not the 1.0 GA release. The CLI supports only the
+> v1 `abstract final` factory declaration and never edits model source.
 
-## ✨ Features
+## Install
 
-- ⚡ **Lightning Fast**: Multiple times faster than `build_runner`
-- 🎯 **Zero Configuration**: Works out of the box
-- 📦 **Complete Generation**: `copyWith`, `==`, `hashCode`, `toJson`, `fromJson`, `toString`
-- 🔗 **Chained CopyWith**: Advanced nested object updates
-- 🔧 **Flexible**: Custom field mapping, ignore fields, alternate names
-- 🌟 **Type Safe**: Full compile-time type checking
-- 🚀 **Easy to Use**: Simple annotations, minimal setup
+```bash
+dart pub global activate dataforge_cli 1.0.0-dev.0
+```
 
-## 📦 Installation
-
-### 1. Add Dependency
+The consumer package needs the matching runtime annotation package:
 
 ```yaml
 dependencies:
-  dataforge_annotation: ^0.2.0
+  dataforge_annotation: ^1.0.0-dev.0
 ```
 
-### 2. Install CLI Tool
+Dart 3.9 or later is required. Run `dart pub get` in each package before
+generation so the resolved frontend can read its package configuration.
+
+## Commands
+
+Generate a package or one Dart source file:
 
 ```bash
-dart pub global activate dataforge_cli
+dataforge generate .
+dataforge generate lib/models/user.dart
 ```
 
-## 🚀 Quick Start
+Check committed output without writing:
 
-### 1. Create Your Data Class
+```bash
+dataforge check .
+```
+
+`check` exits 4 when output is missing, stale, or an unfinished generation
+journal requires recovery. In the journal case, run normal `generate` once and
+then repeat `check`.
+
+## Declaration
 
 ```dart
 import 'package:dataforge_annotation/dataforge_annotation.dart';
@@ -40,262 +48,84 @@ import 'package:dataforge_annotation/dataforge_annotation.dart';
 part 'user.data.dart';
 
 @Dataforge()
-class User with _User {
-  @override
-  final String name;
-  
-  @override
-  final int age;
-  
-  @override
-  final List<String> hobbies;
+abstract final class User with _$User {
+  const User._();
 
-  const User({
-    required this.name,
-    this.age = 0,
-    this.hobbies = const [],
-  });
+  factory User({
+    required String name,
+    @DataforgeDefault(<String>[]) List<String> tags,
+  }) = _User;
+
+  factory User.fromJson(Map<String, Object?> json) = _User.fromJson;
 }
 ```
 
-### 2. Generate Code
+The declaration contract is the same as the build_runner adapter: exact part,
+mixin, implementation and redirecting-factory shapes are required. Missing or
+invalid source declarations produce diagnostics; the CLI does not insert or
+rewrite them.
+
+## Transaction model
+
+A normal generation run:
+
+1. resolves all candidate libraries and builds schemas in memory;
+2. renders and formats all outputs in memory;
+3. validates the complete generated library overlay;
+4. groups outputs by their nearest Dart package root;
+5. revalidates source, package configuration and pubspec snapshots under that
+   package's process lock;
+6. installs outputs through same-directory temporary files and that package's
+   recovery journal.
+
+The journal is written before target replacement. A later normal generation
+rolls an interrupted transaction back before starting new work. Unknown target
+content, links and malformed journals are preserved and reported rather than
+overwritten.
+
+Multiple generated files in one package are transactionally recoverable as a
+group, but they are not guaranteed to become visible at the same instant at the
+operating-system level. A monorepo invocation uses independent transactions for
+different packages so outer and nested invocations coordinate on the same lock
+and journal for every shared target.
+
+## Exit status
+
+| Code | Meaning |
+| --- | --- |
+| 0 | Generation or check succeeded |
+| 2 | Invalid command arguments |
+| 3 | Generation or declaration failure |
+| 4 | Check drift or another safe precondition failure |
+| 5 | File-system or transaction I/O failure |
+| 70 | Unexpected internal failure |
+
+## CI
+
+Commit generated `.data.dart` files when that is your project policy, then add:
 
 ```bash
-# Generate for current directory
-dataforge .
-
-# Generate for specific files
-dataforge lib/models/user.dart
+dataforge check .
 ```
 
-### 3. Use Generated Methods
+The command is strictly read-only. It does not create a lock, recover a journal,
+or modify source/generated files.
 
-```dart
-void main() {
-  // Create instance
-  final user = User(name: "John", age: 25, hobbies: ["coding"]);
-  
-  // Copy with changes
-  final updated = user.copyWith(age: 26);
-  
-  // JSON serialization
-  final json = user.toJson();
-  final fromJson = User.fromJson(json);
-  
-  // Object comparison
-  print(user == updated); // false
-  print(user.toString()); // User(name: John, age: 25, hobbies: [coding])
-}
-```
+## Relationship to build_runner
 
-## 🔧 Configuration
+The CLI and `dataforge` build_runner adapter use the same resolved generation
+facade and renderer. Representative fixtures assert byte-for-byte parity. This
+preview does not yet claim a complete GA parity matrix for every type and
+platform.
 
-### @Dataforge Annotation
+## Troubleshooting
 
-```dart
-@Dataforge(
-  includeFromJson: true,    // Generate fromJson method (default: false)
-  includeToJson: true,      // Generate toJson method (default: false)
-  deepCopyWith: false,   // Disable chained copyWith (default: true)
-)
-class MyClass with _MyClass {
-  // ...
-}
-```
+- **No package configuration:** run `dart pub get` in the nearest package root.
+- **DF1001 declaration error:** verify `abstract final`, `_$Model`, `_Model`, the
+  private base constructor, redirecting factory and `.data.dart` part URI.
+- **Check exits 4:** run normal generation and inspect the resulting diff.
+- **Recovery is refused:** preserve the reported files and journal; unknown
+  content is never guessed or deleted automatically.
 
-### @JsonKey Annotation
-
-```dart
-class User with _User {
-  // Custom JSON field name
-  @JsonKey(name: "user_name")
-  final String name;
-  
-  // Multiple possible field names
-  @JsonKey(alternateNames: ["user_age", "age"])
-  final int age;
-  
-  // Ignore field in JSON
-  @JsonKey(ignore: true)
-  final String? password;
-  
-  // Exclude null values from JSON
-  @JsonKey(includeIfNull: false)
-  final String? nickname;
-  
-  // Custom value reading
-  @JsonKey(readValue: parseDate)
-  final DateTime createdAt;
-  
-  static Object? parseDate(Map map, String key) {
-    final value = map[key];
-    return value is String ? DateTime.parse(value) : value;
-  }
-}
-```
-
-## 🔗 Chained CopyWith
-
-For complex nested objects, enable powerful chained updates:
-
-```dart
-@Dataforge(deepCopyWith: true)
-class Address with _Address {
-  @override
-  final String street;
-  @override
-  final String city;
-  @override
-  final String zipCode;
-
-  const Address({required this.street, required this.city, required this.zipCode});
-}
-
-@Dataforge(deepCopyWith: true)
-class Person with _Person {
-  @override
-  final String name;
-  @override
-  final int age;
-  @override
-  final Address address;
-  @override
-  final Address? workAddress;
-
-  const Person({required this.name, required this.age, required this.address, this.workAddress});
-}
-
-@Dataforge(deepCopyWith: true)
-class Company with _Company {
-  @override
-  final String name;
-  @override
-  final Person ceo;
-  @override
-  final List<Person> employees;
-
-  const Company({required this.name, required this.ceo, required this.employees});
-}
-```
-
-### Usage Examples
-
-```dart
-final company = Company(
-  name: 'Tech Corp',
-  ceo: Person(
-    name: 'John Doe',
-    age: 30,
-    address: Address(street: '123 Main St', city: 'New York', zipCode: '10001'),
-  ),
-  employees: [],
-);
-
-// Simple chained copyWith
-final newCompany1 = company.copyWith.name('New Tech Corp');
-
-// Nested updates
-final newCompany2 = company.copyWith.ceoBuilder((ceo) => 
-  ceo.copyWith.name('Jane Smith')
-);
-
-// Multi-level nested updates
-final newCompany3 = company.copyWith.ceoBuilder((ceo) => 
-  ceo.copyWith.addressBuilder((addr) => 
-    addr.copyWith.street('999 Executive Blvd')
-  )
-);
-
-// Complex multi-field updates
-final newCompany4 = company.copyWith.ceoBuilder((ceo) => 
-  ceo.copyWith
-    .name('Alice Johnson')
-    .copyWith.age(35)
-    .copyWith.addressBuilder((addr) => 
-      addr.copyWith
-        .street('777 CEO Lane')
-        .copyWith.city('San Francisco')
-        .copyWith.zipCode('94105')
-    )
-);
-```
-
-## 📋 Supported Types
-
-- **Basic Types**: `String`, `int`, `double`, `bool`, `num`
-- **Date/Time**: `DateTime`, `Duration`
-- **Collections**: `List<T>`, `Set<T>`, `Map<K, V>`
-- **Optional Types**: `String?`, `int?`, etc.
-- **Nested Objects**: Custom classes with `fromJson`
-- **Complex Collections**: `List<User>`, `Map<String, User>`, etc.
-
-## 🔄 Migration from build_runner
-
-Migrating from `json_annotation` + `build_runner`? It's easy:
-
-**Before (build_runner):**
-```dart
-@JsonSerializable()
-class User {
-  final String name;
-  final int age;
-  
-  User({required this.name, required this.age});
-  
-  factory User.fromJson(Map<String, dynamic> json) => _$UserFromJson(json);
-  Map<String, dynamic> toJson() => _$UserToJson(this);
-}
-```
-
-**After (Dataforge):**
-```dart
-@Dataforge(includeFromJson: true, includeToJson: true)
-class User with _User {
-  @override
-  final String name;
-  @override
-  final int age;
-  
-  const User({required this.name, required this.age});
-}
-```
-
-## 🎯 Why Dataforge?
-
-| Feature | Dataforge | build_runner |
-|---------|-----------|-------------|
-| **Speed** | ⚡ Multiple times faster | 🐌 Slow |
-| **Setup** | ✅ Zero config | ❌ Complex setup |
-| **Dependencies** | ✅ Lightweight | ❌ Heavy |
-| **Generated Code** | ✅ Clean & readable | ❌ Complex |
-| **Chained CopyWith** | ✅ Built-in | ❌ Not available |
-| **Learning Curve** | ✅ Minimal | ❌ Steep |
-
-## 🛠️ Development
-
-```bash
-# Clone repository
-git clone https://github.com/lwj1994/dataforge.git
-cd dataforge
-
-# Install dependencies
-dart pub get
-
-# Run tests
-dart test
-
-# Format code
-dart tools/format_project.dart
-```
-
-## 📄 License
-
-MIT License - see [LICENSE](LICENSE) file for details.
-
-## 🤝 Contributing
-
-Contributions are welcome! Please feel free to submit a Pull Request.
-
-## 📞 Support
-
-If you encounter any issues or have feature requests, please create an issue on [GitHub](https://github.com/lwj1994/dataforge/issues).
+See the [generator documentation](https://github.com/lwj1994/dataforge/tree/main/generator)
+for annotations, strict JSON and witness semantics.

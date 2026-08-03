@@ -1,4 +1,6 @@
 analyzer:
+  errors:
+    implementation_imports: error
   exclude:
     - "**/*.g.dart"
 
@@ -7,3 +9,4 @@ linter:
     - always_declare_return_types
     - prefer_single_quotes
     - prefer_const_constructors
+    - implementation_imports

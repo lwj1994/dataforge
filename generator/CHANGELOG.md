@@ -1,89 +1,31 @@
-## 0.7.1-dev.0
+## 1.0.0-dev.0
+
+### Added
+
+- 新增 v1 `abstract final` factory 模型的 resolved Analyzer → schema → renderer
+  build_runner 链路。
+- 新增从无生成文件开始的 clean-consumer 集成测试，覆盖深层集合、strict JSON、
+  Record 与泛型 witness。
+- 新增代表性 library ordering、namespace 与 CLI 字节一致性测试。
+
+### Changed
+
+- generator 改为 v1-only，只接受 `abstract final` factory 声明。
+- adapter 只调用 dataforge_base 的 resolved generation facade，不直接访问 raw schema
+  或 renderer。
+- 最低 Dart SDK 调整为 3.9，以匹配 Analyzer 8.x 基线。
+- annotation/base 依赖在预览期精确锁定 `1.0.0-dev.0`；本地 path dependency 移入
+  `pubspec_overrides.yaml`。
+- published builder 固定生成 `.data.dart` part。
+
 ### Fixed
-- Fix primitive map deserialization
-- Fix generator serialization regressions
-- Fix enum converter stdout noise
 
-### Changed
-- Improve collection codegen and add CI checks
-- Refactor enum converter
+- build_runner 入口继承 resolved frontend 的声明边界、完整生成符号冲突、
+  `DataforgeDefault` 可赋值性与 exact witness 校验。
+- 非法声明在写出源码前产生带位置的稳定 diagnostic。
 
-## 0.7.0-dev.0
-- Bump version to 0.7.0-dev.0.
+### Preview limitations
 
-## 0.6.4
-### Changed
-- Add `// ignore: library_private_types_in_public_api` to generated `CopyWith` classes.
-
-## 0.6.3
-### Maintenance
-- Fix internal tests to match generated code.
-
-## 0.6.2
-### Changed
-- Make generated `copyWith` implementation classes public (e.g., `_ClassNameCopyWith` -> `ClassNameCopyWith`).
-- Make `copyWith` class constructors public to allow instantiation across files for nested `copyWith` support.
-
-## 0.6.1-dev.3
-### Changed
-- Compatibility update for `DataforgeInit.init`.
-
-## 0.6.1-dev.2
-### Changed
-- Refinement for `DataforgeInit` compatibility.
-
-## 0.6.1-dev.1
-### Changed
-- Refined `copyWith` single-field update methods to use internal `call()` method, ensuring all fields are correctly preserved.
-
-## 0.6.1-dev.0
-- **copyWith Null Handling**: Improved null handling for non-nullable primitive types
-  - Provides default values instead of throwing `TypeError` when null is passed
-
-## 0.6.0
-- **Documentation**: Comprehensive README updates with complete feature documentation
-  - Added detailed table of contents and navigation
-  - Expanded JSON serialization documentation (DateTime, Enum, type casting)
-  - Added complete `@JsonKey` annotation reference (8 parameters)
-  - Added CLI tool documentation and performance tips
-  - Added advanced features (custom converters, generics, collection handling)
-  - Added comparison table with json_serializable and freezed
-  - Added troubleshooting and migration guides
-  - Updated all code examples with `@override` annotations (required for mixin pattern)
-- Chinese README (README_ZH.md) fully synchronized with English version
-
-## 0.6.0-dev.6
-- Previous development version
-
-## 0.6.0-dev.4
-- Optimize generated code performance by adding `@pragma('vm:prefer-inline')`.
-
-## 0.6.0-dev.2
-- Bump version.
-
-## 0.6.0-dev.1
-- Fix `readObject` call arguments to pass value directly instead of map and key.
-
-## 0.6.0-dev.0
-- Refine nested `copyWith` API: use chained getter syntax (e.g., `.$address.street`) and remove flat accessor syntax.
-
-## 0.5.0-dev.5
-- Add `isRequired` field parsing for constructor parameters.
-- Use `readRequiredValue` for required non-nullable basic types in `fromJson`.
-- Use `readRequiredObject` for required non-nullable Dataforge objects in `fromJson`.
-- Use `readObject` for optional Dataforge objects with default values.
-- Improve code generation for cleaner output.
-
-## 0.5.0-dev.3
-- Remove `required_inputs` from `build.yaml`.
-
-## 0.5.0-dev.2
-- Support detecting Dataforge prefix alias.
-- Support List<Object> nested fromJson.
-- Fix dataforgeUndefined prefix.
-
-## 0.5.0-dev.1
-- Development release.
-
-## 0.5.0-dev.0
-- Development release.
+- 已有代表性 fixture 验证 build_runner 与 CLI 字节一致；完整类型矩阵和跨平台 GA
+  验证尚未完成。
+- 生成 API 与输出格式在后续 dev/beta 版本中仍可能改变。
